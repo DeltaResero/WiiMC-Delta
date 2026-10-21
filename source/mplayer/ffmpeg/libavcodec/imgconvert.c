@@ -350,7 +350,7 @@ int avpicture_layout(const AVPicture* src, enum PixelFormat pix_fmt, int width, 
     }
 
     if (desc->flags & PIX_FMT_PAL) {
-        uint32_t *d32 = (unsigned char *)(((size_t)dest + 3) & ~3);
+        uint32_t *d32 = (uint32_t *)(((size_t)dest + 3) & ~3);
         for (i = 0; i<256; i++)
             AV_WL32(d32 + i, AV_RN32(src->data[1] + 4*i));
     }
@@ -526,7 +526,7 @@ enum PixelFormat avcodec_find_best_pix_fmt2(enum PixelFormat dst_pix_fmt1, enum 
 void av_picture_copy(AVPicture *dst, const AVPicture *src,
                      enum PixelFormat pix_fmt, int width, int height)
 {
-    av_image_copy(dst->data, dst->linesize, src->data,
+    av_image_copy(dst->data, dst->linesize, (const uint8_t **)src->data,
                   src->linesize, pix_fmt, width, height);
 }
 

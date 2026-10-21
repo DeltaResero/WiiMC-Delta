@@ -40,7 +40,7 @@ WINDRES = windres
 EXTRA_INC = -I$(EXTPREFIX)/include $(foreach dir,$(LIBDIRS),-I$(dir)/include) $(FREETYPE_CFLAGS) -I$(LIBOGC_INC)
 WIIFLAGS = -DGEKKO -mrvl -mcpu=750 -mhard-float -meabi -msdata -mmultiple -frename-registers
 
-CFLAGS   = -Wundef -Wall -Wno-switch -Wno-parentheses -Wno-incompatible-pointer-types -Wpointer-arith -Wredundant-decls -Wmissing-prototypes -Wdisabled-optimization -Wno-pointer-sign -Wdeclaration-after-statement -std=gnu99  -O3 -mcpu=750 -meabi -mrvl -msdata -mmultiple -pipe -g -ffast-math -frename-registers -DGEKKO -DHW_RVL -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -Ilibdvdread4 -Ilibdvdnav $(EXTRA_INC) -I. -Iffmpeg  -DFF_API_MAX_STREAMS=0
+CFLAGS   = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Wmissing-prototypes -Wdisabled-optimization -Wno-pointer-sign -Wdeclaration-after-statement -std=gnu99  -O3 -mcpu=750 -meabi -mrvl -msdata -mmultiple -pipe -g -ffast-math -frename-registers -DGEKKO -DHW_RVL -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -Ilibdvdread4 -Ilibdvdnav $(EXTRA_INC) -I. -Iffmpeg  -DFF_API_MAX_STREAMS=0
 CXXFLAGS = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls  -O3 -mcpu=750 -meabi -mrvl -msdata -mmultiple -pipe -g -ffast-math -frename-registers -DGEKKO -DHW_RVL -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -Ilibdvdread4 $(EXTRA_INC) -I. -Iffmpeg  -DFF_API_MAX_STREAMS=0
 CC_DEPFLAGS = -MD -MP -O3 -mcpu=750 -mhard-float -meabi -mrvl -msdata -mmultiple -pipe -g -ffast-math -frename-registers
 

@@ -586,8 +586,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
 //                             || yuv2planeX == yuv2planeX_8_c) || !ARCH_X86);
 
                 if(use_mmx_vfilter){
-                    vLumFilter= c->lumMmxFilter;
-                    vChrFilter= c->chrMmxFilter;
+                    vLumFilter= (int16_t *)c->lumMmxFilter; // MMX filter layout, x86 only
+                    vChrFilter= (int16_t *)c->chrMmxFilter; // MMX filter layout, x86 only
                 }
 
                 if (vLumFilterSize == 1) {
@@ -618,7 +618,7 @@ static int swScale(SwsContext *c, const uint8_t *src[],
 
                 if (CONFIG_SWSCALE_ALPHA && alpPixBuf) {
                     if(use_mmx_vfilter){
-                        vLumFilter= c->alpMmxFilter;
+                        vLumFilter= (int16_t *)c->alpMmxFilter; // MMX filter layout, x86 only
                     }
                     if (vLumFilterSize == 1) {
                         yuv2plane1(alpSrcPtr[0], dest[3], dstW,
