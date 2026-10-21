@@ -44,7 +44,7 @@ LDFLAGS		+=	-L../buildtools
 #---------------------------------------------------------------------------------
 LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lavutil \
                         -ljpeg -ldi -liso9660 -liconv -lpng -lz -lmxml $(FREETYPE_LIBS) \
-                        -lfat -lwiiuse -lbte -logc -ltinysmb -lexif
+                        -lfat -lwiiuse -lbte -logc -ltinysmb
 
 ifeq ($(ENABLE_NTFS), 1)
 CFLAGS += -DWANT_NTFS
