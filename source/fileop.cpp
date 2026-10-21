@@ -1819,7 +1819,6 @@ static bool ParseDirEntries()
 		return false;
 
 	char ext[7];
-	char path[MAXPATHLEN+1];
 	char tmp[MAXJOLIET+1];
 	struct dirent *entry = NULL;
 	struct stat filestat;
@@ -1878,7 +1877,7 @@ static bool ParseDirEntries()
 				DeleteEntryFiles(f_entry);
 				goto nomemParseDirEntries;
 			}
-			f_entry->length = filestat.st_size;
+			f_entry->length = 0; // readdir() gives no size
 
 			/* Video mode thumbnails */
 			if(f_entry && WiiSettings.artwork && (menuCurrent == MENU_BROWSE_VIDEOS || menuCurrent == MENU_BROWSE_MUSIC)) {
