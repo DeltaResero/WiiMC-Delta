@@ -45,8 +45,6 @@ COSTABLE(2048);
 COSTABLE(4096);
 COSTABLE(8192);
 COSTABLE(16384);
-COSTABLE(32768);
-COSTABLE(65536);
 #endif
 COSTABLE_CONST FFTSample * const FFT_NAME(ff_cos_tabs)[] = {
     NULL, NULL, NULL, NULL,
@@ -61,8 +59,6 @@ COSTABLE_CONST FFTSample * const FFT_NAME(ff_cos_tabs)[] = {
     FFT_NAME(ff_cos_4096),
     FFT_NAME(ff_cos_8192),
     FFT_NAME(ff_cos_16384),
-    FFT_NAME(ff_cos_32768),
-    FFT_NAME(ff_cos_65536),
 };
 
 static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
@@ -135,7 +131,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 {
     int i, j, n;
 
-    if (nbits < 2 || nbits > 16)
+    if (nbits < 2 || nbits > FFT_MAX_BITS)
         goto fail;
     s->nbits = nbits;
     n = 1 << nbits;
@@ -340,12 +336,10 @@ DECL_FFT(2048,1024,512)
 DECL_FFT(4096,2048,1024)
 DECL_FFT(8192,4096,2048)
 DECL_FFT(16384,8192,4096)
-DECL_FFT(32768,16384,8192)
-DECL_FFT(65536,32768,16384)
 
 static void (* const fft_dispatch[])(FFTComplex*) = {
     fft4, fft8, fft16, fft32, fft64, fft128, fft256, fft512, fft1024,
-    fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
+    fft2048, fft4096, fft8192, fft16384,
 };
 
 static void ff_fft_calc_c(FFTContext *s, FFTComplex *z)

@@ -41,13 +41,11 @@ SINTABLE(2048);
 SINTABLE(4096);
 SINTABLE(8192);
 SINTABLE(16384);
-SINTABLE(32768);
-SINTABLE(65536);
 #endif
 static SINTABLE_CONST FFTSample * const ff_sin_tabs[] = {
     NULL, NULL, NULL, NULL,
     ff_sin_16, ff_sin_32, ff_sin_64, ff_sin_128, ff_sin_256, ff_sin_512, ff_sin_1024,
-    ff_sin_2048, ff_sin_4096, ff_sin_8192, ff_sin_16384, ff_sin_32768, ff_sin_65536,
+    ff_sin_2048, ff_sin_4096, ff_sin_8192, ff_sin_16384,
 };
 
 /** Map one real FFT into two parallel real even and odd FFTs. Then interleave
@@ -106,7 +104,7 @@ av_cold int ff_rdft_init(RDFTContext *s, int nbits, enum RDFTransformType trans)
     s->inverse         = trans == IDFT_C2R || trans == DFT_C2R;
     s->sign_convention = trans == IDFT_R2C || trans == DFT_C2R ? 1 : -1;
 
-    if (nbits < 4 || nbits > 16)
+    if (nbits < 4 || nbits > FFT_MAX_BITS)
         return -1;
 
     if (ff_fft_init(&s->fft, nbits-1, trans == IDFT_C2R || trans == IDFT_R2C) < 0)
