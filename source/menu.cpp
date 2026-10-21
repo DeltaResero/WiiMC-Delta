@@ -3979,12 +3979,12 @@ static void MenuBrowse(int menu)
 				if(WiiSettings.descTxt != NULL) {
 				//	WiiSettings.descTxt = NULL; //crashes
 					fileInfo->SetText(NULL);
-					memset(WiiSettings.descTxt, 0, sizeof(WiiSettings.descTxt));
+					WiiSettings.descTxt[0] = 0;
 				}
 				if(WiiSettings.yearNum != NULL) {
 				//	WiiSettings.yearNum = NULL;
 					fileYear->SetText(NULL);
-					memset(WiiSettings.yearNum, 0, sizeof(WiiSettings.yearNum));
+					WiiSettings.yearNum[0] = 0;
 				}
 				
 			//	ShowAreaInfo(MEM2_DESC);
