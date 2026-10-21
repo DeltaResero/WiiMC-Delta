@@ -23,6 +23,9 @@
 static int unicode_transliterate (conv_t cd, ucs4_t wc,
                                   unsigned char* outptr, size_t outleft)
 {
+  /* WiiMC: converts only to UTF-8 and UTF-16, where nothing needs
+     transliterating, so leave out the tables this reads. */
+#if 0
   if (cd->oflags & HAVE_HANGUL_JAMO) {
     /* Decompose Hangul into Jamo. Use double-width Jamo (contained
        in all Korean encodings and ISO-2022-JP-2), not half-width Jamo
@@ -150,6 +153,8 @@ static int unicode_transliterate (conv_t cd, ucs4_t wc,
         return RET_TOOSMALL;
     }
   }
+  return RET_ILUNI;
+#endif
   return RET_ILUNI;
 }
 

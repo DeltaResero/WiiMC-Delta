@@ -42,3 +42,16 @@ Local patch, so it builds against devkitPro's libogc 3 instead of libogc2:
   (`src/`, `srclib/`), tests, translations, man pages, Windows and OS/2
   files and the gnulib import tooling are removed. `configure` still reads
   the `Makefile.in` of each removed directory, so those stay.
+
+Local patch, which keeps about 650 KB of tables out of MEM1:
+
+- `lib/encodings.def` leaves out the converters of the CJK encodings that
+  nothing in WiiMC can ask for: EUC-JP, CP932, ISO-2022-JP (and -1, -2,
+  -MS), GBK, CP936, GB18030, ISO-2022-CN (and -EXT), HZ, EUC-TW, CP950,
+  BIG5-HKSCS, JOHAB, ISO-2022-KR, and the JIS X 0212 and ISO-IR-165
+  character sets. The subtitle codepages in WiiMC's settings (Shift_JIS,
+  GB2312, Big5 and CP949 among them) and EUC-KR keep theirs.
+- `lib/iconv_open1.h` rejects an encoding without converters, so
+  `iconv_open` fails with `EINVAL` as it does for an unknown name.
+- `lib/loop_unicode.h` no longer transliterates (`//TRANSLIT`). WiiMC
+  converts only to UTF-8 and UTF-16, which never need it.

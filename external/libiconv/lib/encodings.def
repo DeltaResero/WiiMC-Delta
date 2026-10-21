@@ -874,7 +874,7 @@ DEFENCODING(( "JIS_X0212",
             /*"JIS0212",                   JDK 1.1 */
             ),
             jisx0212,
-            { jisx0212_mbtowc, NULL },    { jisx0212_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "GB_1988-80",             /* IANA */
               "ISO646-CN",              /* IANA */
@@ -898,7 +898,7 @@ DEFENCODING(( "ISO-IR-165",
               "CN-GB-ISOIR165",         /* RFC 1922 */
             ),
             isoir165,
-            { isoir165_mbtowc, NULL },    { isoir165_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "KSC_5601",               /* IANA */
               "KS_C_5601-1987",         /* IANA */
@@ -922,7 +922,7 @@ DEFENCODING(( "EUC-JP",                 /* IANA */
             /*"CP51932",                   Windows */
             ),
             euc_jp,
-            { euc_jp_mbtowc, NULL },      { euc_jp_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #if defined USE_AIX_ALIASES || defined USE_OS2_ALIASES
 DEFALIAS(     "IBM-EUCJP",              /* AIX, OS/2 */
             euc_jp)
@@ -957,7 +957,7 @@ DEFALIAS(     "PCK",                    /* Solaris */
 DEFENCODING(( "CP932",                  /* glibc */
             ),
             cp932,
-            { cp932_mbtowc, NULL },       { cp932_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #if defined USE_AIX_ALIASES || defined USE_OS2_ALIASES
 DEFALIAS(     "IBM-932",                /* AIX, OS/2 */
             cp932)
@@ -968,25 +968,25 @@ DEFENCODING(( "ISO-2022-JP",            /* IANA, RFC 1468 */
             /*"ISO2022JP",                 JDK 1.1 */
             ),
             iso2022_jp,
-            { iso2022_jp_mbtowc, NULL },  { iso2022_jp_wctomb, iso2022_jp_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "ISO-2022-JP-1",          /* RFC 2237 */
             ),
             iso2022_jp1,
-            { iso2022_jp1_mbtowc, NULL }, { iso2022_jp1_wctomb, iso2022_jp1_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "ISO-2022-JP-2",          /* IANA, RFC 1554 */
               "csISO2022JP2",           /* IANA */
             ),
             iso2022_jp2,
-            { iso2022_jp2_mbtowc, NULL }, { iso2022_jp2_wctomb, iso2022_jp2_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "ISO-2022-JP-MS",
               "CP50221",
             /*"ISO-2022-JP-ESC",           Windows */
             ),
             iso2022_jpms,
-            { iso2022_jpms_mbtowc, NULL }, { iso2022_jpms_wctomb, iso2022_jpms_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "EUC-CN",                 /* glibc */
               "EUCCN",                  /* glibc, IRIX */
@@ -1020,7 +1020,7 @@ DEFALIAS(     "DECHANZI",               /* OSF/1 */
 DEFENCODING(( "GBK",                    /* IANA, JDK 1.1 */
             ),
             ces_gbk,
-            { ces_gbk_mbtowc, NULL },     { ces_gbk_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #ifdef USE_OS2_ALIASES
 DEFALIAS(     "IBM-1386",               /* OS/2 */
             ces_gbk)
@@ -1031,38 +1031,38 @@ DEFENCODING(( "CP936",                  /* IANA */
               "WINDOWS-936",            /* IANA */
             ),
             cp936,
-            { cp936_mbtowc, NULL },       { cp936_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "GB18030",                /* IANA, glibc */
             /*"CP54936",                   Windows */
               "GB18030:2005",
             ),
             gb18030_2005,
-            { gb18030_2005_mbtowc, NULL },{ gb18030_2005_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "GB18030:2022",
             ),
             gb18030_2022,
-            { gb18030_2022_mbtowc, NULL },{ gb18030_2022_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "ISO-2022-CN",            /* IANA, RFC 1922 */
               "csISO2022CN",
             /*"ISO2022CN",                 JDK 1.1 */
             ),
             iso2022_cn,
-            { iso2022_cn_mbtowc, NULL },  { iso2022_cn_wctomb, iso2022_cn_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "ISO-2022-CN-EXT",        /* IANA, RFC 1922 */
             ),
             iso2022_cn_ext,
-            { iso2022_cn_ext_mbtowc, NULL }, { iso2022_cn_ext_wctomb, iso2022_cn_ext_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "HZ",                     /* RFC 1843 */
               "HZ-GB-2312",             /* IANA, RFC 1842 */
             /*"CP52936",                   Windows */
             ),
             hz,
-            { hz_mbtowc, NULL },          { hz_wctomb, hz_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "EUC-TW",                 /* glibc */
               "EUCTW",                  /* glibc, HP-UX, IRIX, OSF/1 */
@@ -1071,7 +1071,7 @@ DEFENCODING(( "EUC-TW",                 /* glibc */
             /*"CP51950",                   Windows */
             ),
             euc_tw,
-            { euc_tw_mbtowc, NULL },      { euc_tw_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #if defined USE_AIX_ALIASES || defined USE_OS2_ALIASES
 DEFALIAS(     "IBM-EUCTW",              /* AIX, OS/2 */
             euc_tw)
@@ -1100,7 +1100,7 @@ DEFENCODING(( "BIG5",                   /* IANA, JDK 1.1 */
 DEFENCODING(( "CP950",                  /* JDK 1.1 */
             ),
             cp950,
-            { cp950_mbtowc, NULL },       { cp950_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #ifdef USE_OS2_ALIASES
 DEFALIAS(     "IBM-950",                /* OS/2 */
             cp950)
@@ -1109,24 +1109,24 @@ DEFALIAS(     "IBM-950",                /* OS/2 */
 DEFENCODING(( "BIG5-HKSCS:1999",
             ),
             big5hkscs1999,
-            { big5hkscs1999_mbtowc, big5hkscs1999_flushwc }, { big5hkscs1999_wctomb, big5hkscs1999_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "BIG5-HKSCS:2001",
             ),
             big5hkscs2001,
-            { big5hkscs2001_mbtowc, big5hkscs2001_flushwc }, { big5hkscs2001_wctomb, big5hkscs2001_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "BIG5-HKSCS:2004",
             ),
             big5hkscs2004,
-            { big5hkscs2004_mbtowc, big5hkscs2004_flushwc }, { big5hkscs2004_wctomb, big5hkscs2004_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "BIG5-HKSCS",             /* IANA */
               "BIG5HKSCS",              /* glibc */
               "BIG5-HKSCS:2008",
             ),
             big5hkscs2008,
-            { big5hkscs2008_mbtowc, big5hkscs2008_flushwc }, { big5hkscs2008_wctomb, big5hkscs2008_reset })
+            { NULL, NULL },               { NULL, NULL })
 
 DEFENCODING(( "EUC-KR",                 /* IANA, RFC 1557 */
               "EUCKR",                  /* glibc, HP-UX, IRIX, OSF/1, OS/2 */
@@ -1171,7 +1171,7 @@ DEFENCODING(( "JOHAB",                  /* glibc */
               "CP1361",                 /* glibc */
             ),
             johab,
-            { johab_mbtowc, NULL },       { johab_wctomb, NULL })
+            { NULL, NULL },               { NULL, NULL })
 #ifdef USE_SOLARIS_ALIASES
 DEFALIAS(     "KO_KR.JOHAP92",          /* Solaris */
             johab)
@@ -1183,5 +1183,5 @@ DEFENCODING(( "ISO-2022-KR",            /* IANA, RFC 1557 */
             /*"CP50225",                   Windows */
             ),
             iso2022_kr,
-            { iso2022_kr_mbtowc, NULL },  { iso2022_kr_wctomb, iso2022_kr_reset })
+            { NULL, NULL },               { NULL, NULL })
 
