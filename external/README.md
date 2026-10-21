@@ -24,3 +24,18 @@ Local patch, so it builds against devkitPro's libogc 3 instead of libogc2:
   libogc 3 lacks.
 - `source/types.h` includes `<gcbool.h>` for `BOOL`, `TRUE` and `FALSE`.
 - `source/ea.c` maps `makedev` to libogc 3's `mkdev`.
+
+## libiconv
+
+- Upstream: https://ftp.gnu.org/gnu/libiconv/
+- Version: GNU libiconv 1.19 (`libiconv-1.19.tar.gz`, signature checked
+  against the GNU keyring, signed by Bruno Haible)
+- SHA-256 of the tarball:
+  `88dd96a8c0464eca144fc791ae60cd31cd8ee78321e67397e25fc095c4a19aa6`
+- Fetched: 2026-10-09
+- Licence: the library (`lib/`, `libcharset/`, `include/`) is LGPL 2.1 or
+  later (`COPYING.LIB`); the `iconv` program is GPL 3 or later (`COPYING`).
+- Trimmed to the library: the `iconv` program and its gnulib copy
+  (`src/`, `srclib/`), tests, translations, man pages, Windows and OS/2
+  files and the gnulib import tooling are removed. `configure` still reads
+  the `Makefile.in` of each removed directory, so those stay.
