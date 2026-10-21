@@ -2375,7 +2375,7 @@ static void CreditsWindow()
 	alignWindow.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	creditsWindow.Append(&alignWindow);
 
-	int numEntries = 15;
+	int numEntries = 18;
 	GuiText *txt[numEntries];
 
 	wchar_t appVersion[20];
