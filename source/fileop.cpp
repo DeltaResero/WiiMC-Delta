@@ -533,7 +533,7 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
 		disc = usb;
 
 	char mount[10];
-	sprintf(mount, "%s%i", prefix[device], *devnum+1);
+	snprintf(mount, sizeof(mount), "%s%i", prefix[device], *devnum+1);
 	char *name;
 
 	switch(type)
@@ -2700,7 +2700,7 @@ int ParseOnlineMedia()
 			strncmp(browser.dir, om_entry->file, dirLen) == 0)
 		{
 			char folder[MAXPATHLEN];
-			strncpy(folder, &om_entry->file[dirLen], MAXPATHLEN);
+			snprintf(folder, sizeof(folder), "%s", &om_entry->file[dirLen]);
 			char * end = strchr(folder, '/');
 			if(end) *end = 0; // strip end
 			

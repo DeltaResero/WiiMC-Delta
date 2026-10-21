@@ -597,8 +597,8 @@ bool InitMPlayer()
 	struct stat st;
 	char filepath[1024];
 	char monopath[1024];
-	sprintf(filepath, "%s/subfont.ttf", appPath);
-	sprintf(monopath, "%s/monospace.ttf", appPath);
+	snprintf(filepath, sizeof(filepath), "%s/subfont.ttf", appPath);
+	snprintf(monopath, sizeof(monopath), "%s/monospace.ttf", appPath);
 
 	if(stat(filepath, &st) == 0)
 		subtitleFontFound = 1;
@@ -646,10 +646,10 @@ bool InitMPlayer()
 		fclose(fp);
 	//END */
 
-	sprintf(MPLAYER_DATADIR,"%s",appPath);
-	sprintf(MPLAYER_CONFDIR,"%s",appPath);
-	sprintf(MPLAYER_LIBDIR,"%s",appPath);
-	sprintf(MPLAYER_CSSDIR,"%s/css",appPath);
+	snprintf(MPLAYER_DATADIR, sizeof(MPLAYER_DATADIR), "%s", appPath);
+	snprintf(MPLAYER_CONFDIR, sizeof(MPLAYER_CONFDIR), "%s", appPath);
+	snprintf(MPLAYER_LIBDIR, sizeof(MPLAYER_LIBDIR), "%s", appPath);
+	snprintf(MPLAYER_CSSDIR, sizeof(MPLAYER_CSSDIR), "%s/css", appPath);
 	DIR *dir = opendir(MPLAYER_CSSDIR);
 
 	if(!dir && mkdir(MPLAYER_CSSDIR, 0777) != 0)

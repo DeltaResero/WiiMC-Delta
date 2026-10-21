@@ -426,7 +426,8 @@ static int UpdateDirName()
 		if(browser.selIndex->type != TYPE_PLAYLIST)
 		{
 			// update current directory name
-			sprintf(browser.dir, "%s%s/",browser.dir, browser.selIndex->file);
+			size_t len = strlen(browser.dir);
+			snprintf(browser.dir + len, MAXPATHLEN - len, "%s/", browser.selIndex->file);
 		}
 		return 1;
 	}
@@ -534,15 +535,15 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 				BROWSERENTRY *entry;
 				entry=AddEntryFiles();
 				
-				sprintf(tmp, "%s:", part[DEVICE_SD][i].mount);
+				snprintf(tmp, sizeof(tmp), "%s:", part[DEVICE_SD][i].mount);
 				entry->file = mem2_strdup(tmp, MEM2_BROWSER);
 
 				if(strlen(part[DEVICE_SD][i].name) > 0)
-					sprintf(tmp, "%s - %s", gettext("SD"), part[DEVICE_SD][i].name);
+					snprintf(tmp, sizeof(tmp), "%s - %s", gettext("SD"), part[DEVICE_SD][i].name);
 				else if(i == 0 && part[DEVICE_SD][1].type == 0) // only one SD partition
-					sprintf(tmp, "SD Card");
+					snprintf(tmp, sizeof(tmp), "SD Card");
 				else
-					sprintf(tmp, "%s (%d)", gettext("SD Card"), i+1);
+					snprintf(tmp, sizeof(tmp), "%s (%d)", gettext("SD Card"), i+1);
 
 				entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 				entry->length = 0;
@@ -561,15 +562,15 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 				BROWSERENTRY *entry;
 				entry=AddEntryFiles();
 
-				sprintf(tmp, "%s:", part[DEVICE_USB][i].mount);
+				snprintf(tmp, sizeof(tmp), "%s:", part[DEVICE_USB][i].mount);
 				entry->file = mem2_strdup(tmp, MEM2_BROWSER);
 
 				if(strlen(part[DEVICE_USB][i].name) > 0)
-					sprintf(tmp, "%s - %s", gettext("USB"), part[DEVICE_USB][i].name);
+					snprintf(tmp, sizeof(tmp), "%s - %s", gettext("USB"), part[DEVICE_USB][i].name);
 				else if(i == 0 && part[DEVICE_USB][1].type == 0) // only one USB partition
-					sprintf(tmp, "USB Mass Storage");
+					snprintf(tmp, sizeof(tmp), "USB Mass Storage");
 				else
-					sprintf(tmp, "%s (%d)", gettext("USB Mass Storage"), i+1);
+					snprintf(tmp, sizeof(tmp), "%s (%d)", gettext("USB Mass Storage"), i+1);
 
 				entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 				entry->length = 0;
@@ -598,13 +599,13 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 			BROWSERENTRY *entry;
 			entry=AddEntryFiles();
 
-			sprintf(tmp, "smb%d:", i+1);
+			snprintf(tmp, sizeof(tmp), "smb%d:", i+1);
 			entry->file = mem2_strdup(tmp, MEM2_BROWSER);
 			
 			if(WiiSettings.smbConf[i].displayname[0] != 0)
-				sprintf(tmp, "%s", WiiSettings.smbConf[i].displayname);
+				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.smbConf[i].displayname);
 			else
-				sprintf(tmp, "%s", WiiSettings.smbConf[i].share);
+				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.smbConf[i].share);
 			
 			entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 			entry->length = 0;
@@ -620,13 +621,13 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 			BROWSERENTRY *entry;
 			entry=AddEntryFiles();
 
-			sprintf(tmp, "ftp%d:", i+1);
+			snprintf(tmp, sizeof(tmp), "ftp%d:", i+1);
 			entry->file = mem2_strdup(tmp, MEM2_BROWSER);
 			
 			if(WiiSettings.ftpConf[i].displayname[0] != 0)
-				sprintf(tmp, "%s", WiiSettings.ftpConf[i].displayname);
+				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.ftpConf[i].displayname);
 			else
-				sprintf(tmp, "%s@%s/%s", WiiSettings.ftpConf[i].user, WiiSettings.ftpConf[i].ip, WiiSettings.ftpConf[i].folder);
+				snprintf(tmp, sizeof(tmp), "%s@%s/%s", WiiSettings.ftpConf[i].user, WiiSettings.ftpConf[i].ip, WiiSettings.ftpConf[i].folder);
 			
 			entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 			entry->length = 0;
