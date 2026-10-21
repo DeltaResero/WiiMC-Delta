@@ -54,7 +54,7 @@ void * operator new(size_t size)
 }
 
 // overloaded delete operator
-void  operator delete(void *p)
+void  operator delete(void *p) noexcept
 {
 	mem2_free(p,MEM2_OTHER);
 }
@@ -73,7 +73,7 @@ void * operator new[](size_t size)
 }
 
 // overloaded delete operator for arrays
-void  operator delete[](void *p)
+void  operator delete[](void *p) noexcept
 {
 	mem2_free(p,MEM2_OTHER);
 }
@@ -688,7 +688,7 @@ void FreeTypeGX::getOffset(wchar_t *text, ftgxDataOffset* offset)
  */
 void FreeTypeGX::getOffset(wchar_t const *text, ftgxDataOffset* offset)
 {
-	this->getOffset(text, offset);
+	this->getOffset((wchar_t *)text, offset);
 }
 
 /**
