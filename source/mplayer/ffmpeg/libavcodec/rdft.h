@@ -69,6 +69,7 @@ int ff_rdft_init(RDFTContext *s, int nbits, enum RDFTransformType trans);
 void ff_rdft_end(RDFTContext *s);
 
 void ff_rdft_init_arm(RDFTContext *s);
+void ff_rdft_init_paired(RDFTContext *s);
 
 
 #endif /* AVCODEC_RDFT_H */

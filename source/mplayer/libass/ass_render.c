@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <malloc.h>
 
 #include "ass_render.h"
 #include "ass_parse.h"

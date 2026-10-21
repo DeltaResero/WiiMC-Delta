@@ -140,6 +140,7 @@ void ff_fft_init_arm(FFTContext *s);
 #else
 void ff_fft_fixed_init_arm(FFTContext *s);
 #endif
+void ff_fft_init_paired(FFTContext *s);
 
 void ff_fft_end(FFTContext *s);
 

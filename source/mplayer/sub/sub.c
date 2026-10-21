@@ -38,6 +38,7 @@
 #include "libvo/video_out.h"
 #include "font_load.h"
 #include "sub.h"
+#include "access_mpcontext.h"
 #include "spudec.h"
 #include "libavutil/common.h"
 
