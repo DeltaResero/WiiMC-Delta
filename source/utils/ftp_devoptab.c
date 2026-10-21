@@ -1705,20 +1705,20 @@ static bool FTP_DeleteDir(const char * name, ftp_env * env)
 	char buf2[FTP_MAXPATH + 6];
 	int res;
 
-    sprintf(buf2, "CDUP");
+	sprintf(buf2, "CDUP");
 
 	if((res = ftp_execute(env, buf2, 250, 0)) < 0)
-    {
-        //Couldn't delete directory
-        return false;
-    }
+	{
+		//Couldn't delete directory
+		return false;
+	}
 
-    if(name[strlen(name)-1] == '/')
-        ((char *) name)[strlen(name)-1] = 0;
+	if(name[strlen(name)-1] == '/')
+		((char *) name)[strlen(name)-1] = 0;
 
-    char * relativename = strrchr(name, '/');
-    if(!relativename)
-        return false;
+	char * relativename = strrchr(name, '/');
+	if(!relativename)
+		return false;
 
 	sprintf(buf2, "RMD %s", relativename+1);
 
@@ -1728,7 +1728,7 @@ static bool FTP_DeleteDir(const char * name, ftp_env * env)
 		return false;
 	}
 
-    ftp_close_data(env);
+	ftp_close_data(env);
 
 	return true;
 }

@@ -5153,10 +5153,10 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Backward");
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Folder");
-    if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-       sprintf(options.name[i++], nulo);
-    else
-        sprintf(options.name[i++], "Force Fullscreen in 4:3");
+	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+		sprintf(options.name[i++], nulo);
+	else
+		sprintf(options.name[i++], "Force Fullscreen in 4:3");
 	sprintf(options.name[i++], "Volume Normalizer");
 	sprintf(options.name[i++], "Deflicker");
 	sprintf(options.name[i++], "Set VI Width to 720");
