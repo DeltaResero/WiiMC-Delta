@@ -889,6 +889,9 @@ void spudec_draw_scaled(void *me, unsigned int dxs, unsigned int dys, void (*dra
   scale_pixel *table_x;
   scale_pixel *table_y;
 
+  if (spu == NULL) // a video closing with sub pictures on screen
+    return;
+
   if (spudec_visible(spu)) {
 
     // check if only forced subtitles are requested
