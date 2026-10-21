@@ -84,7 +84,7 @@ export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/liba
 				$(MPLAYER)/ffmpeg/libavcodec/libavcodec.a $(MPLAYER)/ffmpeg/libswscale/libswscale.a \
 				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
-				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP)"
+				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
 NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard external/libntfs/source/*.c)))
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -151,8 +151,8 @@ $(BUILD): $(EXTLIBS)
 #---------------------------------------------------------------------------------
 $(EXTBUILD)/libntfs/%.o: $(EXTERNAL)/libntfs/source/%.c
 	@mkdir -p $(@D)
-	$(CC) -O2 -Wall -Wno-address-of-packed-member $(MACHDEP) -DHAVE_CONFIG_H \
-		-I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
+	$(CC) -O2 -Wall -Wno-address-of-packed-member -fno-asynchronous-unwind-tables \
+		$(MACHDEP) -DHAVE_CONFIG_H -I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
 
 $(EXTPREFIX)/lib/libntfs.a: $(NTFSOBJS)
 	@mkdir -p $(@D) $(EXTPREFIX)/include
