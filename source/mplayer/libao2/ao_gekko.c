@@ -27,6 +27,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <ogcsys.h>
+#include <ogc/machine/processor.h>
 
 #include "config.h"
 #include "libaf/af.h"
@@ -64,7 +65,7 @@ static u8 silence[BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
 static u8 buffer_fill = 0;
 static u8 buffer_play = 0;
 static u8 quality = AI_SAMPLERATE_48KHZ;
-static int buffered = 0;
+static volatile int buffered = 0; // also lowered by the DMA interrupt
 static int request_size = BUFFER_SIZE;
 static float request_mult = 1.0;
 static ao_control_vol_t volume = { 0x8E, 0x8E };
@@ -259,6 +260,16 @@ static inline void copy_channels(s16 *dst, s16 *src, int len, int processed, int
 	}
 }
 
+// a plain += here could lose a decrement made by switch_buffers() meanwhile
+static void add_buffered(int bytes)
+{
+	u32 level;
+
+	_CPU_ISR_Disable(level);
+	buffered += bytes;
+	_CPU_ISR_Restore(level);
+}
+
 static int play(void *data, int remaining, int flags)
 {
 	int processed = 0;
@@ -274,7 +285,7 @@ static int play(void *data, int remaining, int flags)
 
 		processed += request_size;
 		source += request_size / sizeof(s16);
-		buffered += BUFFER_SIZE;
+		add_buffered(BUFFER_SIZE);
 		remaining -= request_size;		
 	}
 
@@ -287,7 +298,7 @@ static int play(void *data, int remaining, int flags)
 		buffer_fill = (buffer_fill + 1) % BUFFER_COUNT;
 
 		processed += remaining;
-		buffered += BUFFER_SIZE;
+		add_buffered(BUFFER_SIZE);
 	}
 
 	if (!playing)
