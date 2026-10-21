@@ -54,7 +54,7 @@
 #define _SHIFTR(v, s, w)	\
     ((u32)(((u32)(v) >> (s)) & ((0x01 << (w)) - 1)))
 
-extern void udelay(int us);
+#include <ogc/lwp_watchdog.h>
 
 static u32 i2cIdentFirst = 0;
 static u32 i2cIdentFlag = 1;

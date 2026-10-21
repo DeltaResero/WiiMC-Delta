@@ -18,7 +18,7 @@ of Crazy Nation and the GC Linux project.
 
 #include <string.h>
 
-extern void udelay(int us);
+#include <ogc/lwp_watchdog.h>
 
 #define HW_REG_BASE 0xd800000
 #define HW_GPIO1BOUT (HW_REG_BASE + 0x0c0)

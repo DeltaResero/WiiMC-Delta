@@ -2,6 +2,9 @@
 
 devkitPro doesn't package these for the Wii, so WiiMC carries plain copies
 (not submodules).
+The top-level Makefile builds them into `build/external` (headers in
+`include/`, static libraries in `lib/`) before MPlayer and WiiMC, and never
+installs anything into `$DEVKITPRO`. `make clean` removes them.
 
 ## libntfs
 

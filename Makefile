@@ -7,7 +7,7 @@ ifeq ($(strip $(DEVKITPPC)),)
 $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
 endif
 
-include $(DEVKITPRO)/libogc2/wii_rules
+include $(DEVKITPPC)/wii_rules
 export	FREETYPE_CFLAGS 	:=	`$(DEVKITPRO)/portlibs/ppc/bin/powerpc-eabi-pkg-config --cflags freetype2`
 export	FREETYPE_LIBS	:=	`$(DEVKITPRO)/portlibs/ppc/bin/powerpc-eabi-pkg-config --libs freetype2`
 
@@ -71,6 +71,18 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
+
+#---------------------------------------------------------------------------------
+# vendored libraries (external/) are built into a prefix inside the build directory
+#---------------------------------------------------------------------------------
+EXTERNAL	:=	$(CURDIR)/external
+EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
+export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
+EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
+EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
+				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP)"
+NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard external/libntfs/source/*.c)))
+
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
@@ -107,6 +119,7 @@ export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD) \
+					-I$(EXTPREFIX)/include \
 					-I$(LIBOGC_INC)
 
 #---------------------------------------------------------------------------------
@@ -114,6 +127,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
  
 export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
+				-L$(EXTPREFIX)/lib \
 				-L$(MPLAYER)/ \
 				-L$(MPLAYER)/ffmpeg/libavcodec \
 				-L$(MPLAYER)/ffmpeg/libavformat \
@@ -124,11 +138,32 @@ export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------
-$(BUILD):
+$(BUILD): $(EXTLIBS)
 	@[ -d $(TARGETDIR) ] || mkdir -p $(TARGETDIR)
 	cd source/mplayer; $(MAKE) -f Makefile; cd ../..
 	@[ -d $@ ] || mkdir -p $@
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
+#---------------------------------------------------------------------------------
+$(EXTBUILD)/libntfs/%.o: $(EXTERNAL)/libntfs/source/%.c
+	@mkdir -p $(@D)
+	$(CC) -O2 -Wall -Wno-address-of-packed-member $(MACHDEP) -DHAVE_CONFIG_H \
+		-I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
+
+$(EXTPREFIX)/lib/libntfs.a: $(NTFSOBJS)
+	@mkdir -p $(@D) $(EXTPREFIX)/include
+	rm -f $@
+	$(AR) -rc $@ $^
+	cp $(EXTERNAL)/libntfs/include/ntfs.h $(EXTPREFIX)/include/
+
+# libiconv: only libcharset and lib/ are built
+$(EXTPREFIX)/lib/libiconv.a:
+	@rm -rf $(EXTBUILD)/libiconv; mkdir -p $(EXTBUILD)/libiconv
+	cd $(EXTBUILD)/libiconv && $(EXTERNAL)/libiconv/configure $(EXTCONFIGURE)
+	$(MAKE) -C $(EXTBUILD)/libiconv lib/localcharset.h
+	$(MAKE) -C $(EXTBUILD)/libiconv/lib
+	$(MAKE) -C $(EXTBUILD)/libiconv/lib install-lib libdir=$(EXTPREFIX)/lib includedir=$(EXTPREFIX)/include
+	cp $(EXTBUILD)/libiconv/include/iconv.h.inst $(EXTPREFIX)/include/iconv.h
 
 #---------------------------------------------------------------------------------
 test:
@@ -140,6 +175,7 @@ clean:
 	rm -f $(BUILD)/*.d $(BUILD)/*.h $(BUILD)/*.ii $(BUILD)/*.lst $(BUILD)/*.map \
 	$(BUILD)/*.o $(BUILD)/*.s
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
+	rm -rf $(EXTPREFIX) $(EXTBUILD)
 	cd source/mplayer; $(MAKE) -f Makefile clean
 
 #---------------------------------------------------------------------------------

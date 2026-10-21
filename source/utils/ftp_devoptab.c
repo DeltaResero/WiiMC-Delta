@@ -2601,6 +2601,8 @@ bool ftpInitDevice(const char* name, const char *user, const char *password, con
 	NET_PRINTF("ftpInitDevice( name='%s', user='%s', password='%s', share='%s', hostname='%s', port='%i' )\n", name, user, password, share, hostname, port);
 
 	char myIP[16];
+	char netmask[16];
+	char gateway[16];
 
 	int i;
 
@@ -2625,7 +2627,7 @@ bool ftpInitDevice(const char* name, const char *user, const char *password, con
 	for(i=0;i<MAX_FTP_MOUNTED && FTPEnv[i].name!=NULL;i++);
 	if(i==MAX_FTP_MOUNTED) return false; //all allowed ftp connections reached
 
-	if (if_config(myIP, NULL, NULL, true) < 0)
+	if (if_config(myIP, netmask, gateway, true, 1) < 0) // max_retries is unused on Wii
 		return false;
 
 	_FTP_lock();

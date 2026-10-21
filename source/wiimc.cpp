@@ -144,7 +144,7 @@ static void ShutdownCB()
 	ActivateExitThread();
 }
 
-static void ResetCB()
+static void ResetCB(u32 irq, void *ctx)
 {
 	ExitRequested = true;
 	ActivateExitThread();
@@ -167,11 +167,11 @@ static void SaveLogToSD()
 {
 	char _file[128];
 	FILE *fp;
-	DISC_INTERFACE* sd = &__io_wiisd;
+	const DISC_INTERFACE* sd = &__io_wiisd;
 
 	if(WiiSettings.debug != 1) return;
 
-	sd->startup(sd);
+	sd->startup();
 	
 	if(!fatMount("sdlog",sd,0,2,64)) return;
 

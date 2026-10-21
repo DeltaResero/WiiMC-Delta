@@ -57,8 +57,11 @@ int ff_neterrno(void);
 #include <netdb.h>
 #else
 #include <network.h>
-#define INADDR_LOOPBACK    ((unsigned long) 0x7f000001)  /* 127.0.0.1 */
-#define INET_ADDRSTRLEN 16
+/* libogc 3's BSD socket headers (netdb.h, netinet/in.h) provide these */
+#undef HAVE_STRUCT_SOCKADDR_STORAGE
+#define HAVE_STRUCT_SOCKADDR_STORAGE 1
+#undef HAVE_STRUCT_ADDRINFO
+#define HAVE_STRUCT_ADDRINFO 1
 #define gethostbyname net_gethostbyname
 #endif
 
