@@ -1618,7 +1618,7 @@ read_retry:
 	if( (res = ftp_execute_open(env, buf2, "I", offset, &data_sock)) < 0)
 	{
 		//Couldn't open data connection
-		NET_PRINTF( "FTP_ReadFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>32), (u32)(len & 0xffffFFFF) );
+		NET_PRINTF( "FTP_ReadFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>>32), (u32)(len & 0xffffFFFF) );
 		return false;
 	}
 
@@ -1646,21 +1646,20 @@ static bool FTP_WriteFile(void* buf, off_t len, off_t offset, FTPFILESTRUCT* fil
 
     _FTP_lock();
 
-read_retry:
-
 	sprintf(buf2, "STOR %s%s", env->share, file->filename);
 
 	if( (res = ftp_execute_open(env, buf2, "I", offset, &data_sock)) < 0)
 	{
 		//Couldn't open data connection
-		NET_PRINTF( "FTP_WriteFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>32), (u32)(len & 0xffffFFFF) );
+		NET_PRINTF( "FTP_WriteFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>>32), (u32)(len & 0xffffFFFF) );
 		_FTP_unlock();
 		return false;
 	}
 
-	if( SocketSend( data_sock, (char*)buf, len) < 0)
+	if( !SocketSend( data_sock, (char*)buf, len) )
 	{
-		goto read_retry;
+		_FTP_unlock();
+		return false;
 	}
 
 	last_off = offset + len;
