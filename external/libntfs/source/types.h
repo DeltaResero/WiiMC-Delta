@@ -36,6 +36,7 @@
 
 #ifdef GEKKO
 #include <gctypes.h>
+#include <gcbool.h> /* devkitPro libogc 3: BOOL, TRUE, FALSE */
 #else /* GEKKO */
 
 typedef uint8_t  u8;			/* Unsigned types of an exact size */

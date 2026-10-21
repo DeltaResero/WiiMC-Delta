@@ -105,7 +105,7 @@ typedef struct _EXTENDED_BOOT_RECORD {
  */
 typedef struct _INTERFACE_ID {
     const char *name;                       /* Interface name */
-    DISC_INTERFACE *interface;              /* Disc interface */
+    const DISC_INTERFACE *interface;              /* Disc interface */
 } INTERFACE_ID;
 
 /**
