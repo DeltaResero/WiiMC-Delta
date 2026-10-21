@@ -5386,7 +5386,7 @@ static void MenuSettingsVideos()
 			sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
 			snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
 			sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
-			sprintf (options.value[13], "%d%", WiiSettings.audioNorm);
+			sprintf (options.value[13], "%d%%", WiiSettings.audioNorm);
 			sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
 			sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
 			sprintf (options.value[16], "%s", WiiSettings.skipLoop ? "On" : "Off");
