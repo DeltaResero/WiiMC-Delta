@@ -734,7 +734,7 @@ static inline void dump_CodecDecompressParams(void* xxx){
     printf("dstrect: %d;%d - %d;%d\n",cd->dstRect.top,cd->dstRect.left,cd->dstRect.bottom,cd->dstRect.right);
     printf("wantedDestinationPixelTypes=%p\n",cd->wantedDestinationPixelTypes);
     if(cd->wantedDestinationPixelTypes){
-	unsigned int* p=cd->wantedDestinationPixelTypes;
+	OSType* p=*cd->wantedDestinationPixelTypes; // handle to 0-terminated list
 	while(p[0]){
 	    printf("  0x%08X %p\n",p[0],&p[0]);
 	    ++p;

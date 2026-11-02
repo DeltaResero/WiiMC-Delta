@@ -394,14 +394,14 @@ static void start_slice(struct vf_instance *vf, mp_image_t *mpi){
 
 static void scale(struct SwsContext *sws1, struct SwsContext *sws2, uint8_t *src[MP_MAX_PLANES], int src_stride[MP_MAX_PLANES],
                   int y, int h,  uint8_t *dst[MP_MAX_PLANES], int dst_stride[MP_MAX_PLANES], int interlaced){
-    uint8_t *src2[MP_MAX_PLANES]={src[0], src[1], src[2], src[3]};
+    const uint8_t *src2[MP_MAX_PLANES]={src[0], src[1], src[2], src[3]};
 #if HAVE_BIGENDIAN
     uint32_t pal2[256];
     if (src[1] && !src[2]){
         int i;
         for(i=0; i<256; i++)
             pal2[i]= bswap_32(((uint32_t*)src[1])[i]);
-        src2[1]= pal2;
+        src2[1]= (const uint8_t *)pal2;
     }
 #endif
 

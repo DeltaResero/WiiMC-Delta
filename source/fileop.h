@@ -25,7 +25,7 @@ typedef struct
 	char name[50];
 	char mount[10];
 	int type;
-	DISC_INTERFACE* interface;
+	const DISC_INTERFACE* interface;
 	sec_t sector;
 } DEVICE_STRUCT;
 

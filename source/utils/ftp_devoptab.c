@@ -1618,7 +1618,7 @@ read_retry:
 	if( (res = ftp_execute_open(env, buf2, "I", offset, &data_sock)) < 0)
 	{
 		//Couldn't open data connection
-		NET_PRINTF( "FTP_ReadFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>32), (u32)(len & 0xffffFFFF) );
+		NET_PRINTF( "FTP_ReadFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>>32), (u32)(len & 0xffffFFFF) );
 		return false;
 	}
 
@@ -1646,21 +1646,20 @@ static bool FTP_WriteFile(void* buf, off_t len, off_t offset, FTPFILESTRUCT* fil
 
     _FTP_lock();
 
-read_retry:
-
 	sprintf(buf2, "STOR %s%s", env->share, file->filename);
 
 	if( (res = ftp_execute_open(env, buf2, "I", offset, &data_sock)) < 0)
 	{
 		//Couldn't open data connection
-		NET_PRINTF( "FTP_WriteFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>32), (u32)(len & 0xffffFFFF) );
+		NET_PRINTF( "FTP_WriteFile( filename = '%s', offset = %u:%u, len= %u:%u ) - FAILED\n", file->filename, (u32)(offset>>32), (u32)(offset & 0xffffFFFF), (u32)(len>>32), (u32)(len & 0xffffFFFF) );
 		_FTP_unlock();
 		return false;
 	}
 
-	if( SocketSend( data_sock, (char*)buf, len) < 0)
+	if( !SocketSend( data_sock, (char*)buf, len) )
 	{
-		goto read_retry;
+		_FTP_unlock();
+		return false;
 	}
 
 	last_off = offset + len;
@@ -1706,20 +1705,20 @@ static bool FTP_DeleteDir(const char * name, ftp_env * env)
 	char buf2[FTP_MAXPATH + 6];
 	int res;
 
-    sprintf(buf2, "CDUP");
+	sprintf(buf2, "CDUP");
 
 	if((res = ftp_execute(env, buf2, 250, 0)) < 0)
-    {
-        //Couldn't delete directory
-        return false;
-    }
+	{
+		//Couldn't delete directory
+		return false;
+	}
 
-    if(name[strlen(name)-1] == '/')
-        ((char *) name)[strlen(name)-1] = 0;
+	if(name[strlen(name)-1] == '/')
+		((char *) name)[strlen(name)-1] = 0;
 
-    char * relativename = strrchr(name, '/');
-    if(!relativename)
-        return false;
+	char * relativename = strrchr(name, '/');
+	if(!relativename)
+		return false;
 
 	sprintf(buf2, "RMD %s", relativename+1);
 
@@ -1729,7 +1728,7 @@ static bool FTP_DeleteDir(const char * name, ftp_env * env)
 		return false;
 	}
 
-    ftp_close_data(env);
+	ftp_close_data(env);
 
 	return true;
 }
@@ -2601,6 +2600,8 @@ bool ftpInitDevice(const char* name, const char *user, const char *password, con
 	NET_PRINTF("ftpInitDevice( name='%s', user='%s', password='%s', share='%s', hostname='%s', port='%i' )\n", name, user, password, share, hostname, port);
 
 	char myIP[16];
+	char netmask[16];
+	char gateway[16];
 
 	int i;
 
@@ -2625,7 +2626,7 @@ bool ftpInitDevice(const char* name, const char *user, const char *password, con
 	for(i=0;i<MAX_FTP_MOUNTED && FTPEnv[i].name!=NULL;i++);
 	if(i==MAX_FTP_MOUNTED) return false; //all allowed ftp connections reached
 
-	if (if_config(myIP, NULL, NULL, true) < 0)
+	if (if_config(myIP, netmask, gateway, true, 1) < 0) // max_retries is unused on Wii
 		return false;
 
 	_FTP_lock();

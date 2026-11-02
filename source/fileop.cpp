@@ -65,9 +65,9 @@ dvdcss_t dvdcss = NULL;
 
 static char prefix[2][4] = { "sd", "usb" };
 
-static DISC_INTERFACE* sd = &__io_wiisd;
-static DISC_INTERFACE* usb = &__io_usbstorage;
-static DISC_INTERFACE* dvd = &__io_wiidvd;
+static const DISC_INTERFACE* sd = &__io_wiisd;
+static const DISC_INTERFACE* usb = &__io_usbstorage;
+static const DISC_INTERFACE* dvd = &__io_wiidvd;
 
 // folder parsing thread
 static lwp_t parsethread = LWP_THREAD_NULL;
@@ -108,10 +108,10 @@ static void * devicecallback (void *arg)
 	{
 		if(isInserted[DEVICE_SD])
 		{
-			if(!sd->isInserted(sd)) // device was removed
+			if(!sd->isInserted()) // device was removed
 			{
 				UnmountPartitions(DEVICE_SD);
-				sd->shutdown(sd);
+				sd->shutdown();
 
 				if(strlen(loadedFile) > 2 && strncmp(loadedFile, "sd", 2) == 0)
 				{
@@ -123,7 +123,7 @@ static void * devicecallback (void *arg)
 				devicesChanged = true;
 			}
 		}
-		else if(sd->startup(sd) && sd->isInserted(sd)) // device was inserted
+		else if(sd->startup() && sd->isInserted()) // device was inserted
 		{
 			MountPartitions(DEVICE_SD, SILENT);
 			isInserted[DEVICE_SD] = true;
@@ -132,10 +132,10 @@ static void * devicecallback (void *arg)
 
 		if(isInserted[DEVICE_USB])
 		{
-			if(!usb->isInserted(usb)) // device was removed
+			if(!usb->isInserted()) // device was removed
 			{
 				UnmountPartitions(DEVICE_USB);
-				usb->shutdown(usb);
+				usb->shutdown();
 
 				if(strlen(loadedFile) > 3 && (strncmp(loadedFile, "usb", 3) == 0 ||
 				    (strncmp(loadedFile, "dvd", 3) == 0 && strcmp(loadedDevice, "/dev/usb") == 0)))
@@ -150,7 +150,7 @@ static void * devicecallback (void *arg)
 				devicesChanged = true;
 			}
 		}
-		else if(usb->startup(usb) && usb->isInserted(usb)) // device was inserted
+		else if(usb->startup() && usb->isInserted()) // device was inserted
 		{
 			MountPartitions(DEVICE_USB, SILENT);
 			isInserted[DEVICE_USB] = true;
@@ -159,7 +159,7 @@ static void * devicecallback (void *arg)
 
 		if(isInserted[DEVICE_DVD])
 		{
-			if(!dvd->isInserted(dvd))
+			if(!dvd->isInserted())
 			{
 				dvdLastUsed = 0;
 				isInserted[DEVICE_DVD] = false;
@@ -185,7 +185,7 @@ static void * devicecallback (void *arg)
 				}
 			}
 		}
-		else if(!WiiSettings.dvdDisabled && dvd->isInserted(dvd))
+		else if(!WiiSettings.dvdDisabled && dvd->isInserted())
 		{
 			isInserted[DEVICE_DVD] = true;
 			devicesChanged = true;
@@ -449,6 +449,74 @@ typedef struct _EXTENDED_BOOT_RECORD {
 
 DEVICE_STRUCT part[2][MAX_DEVICES];
 
+static u32 le16(const u8 *p) { return p[0] | (p[1] << 8); }
+static u32 le32(const u8 *p) { return p[0] | (p[1] << 8) | (p[2] << 16) | ((u32)p[3] << 24); }
+
+// libfat-ogc declares fatGetVolumeLabel() but doesn't define it
+static void GetFATVolumeLabel(const DISC_INTERFACE *disc, sec_t start, char *label)
+{
+	u8 buf[BYTES_PER_SECTOR] ATTRIBUTE_ALIGN (32);
+	char bpblabel[12];
+	sec_t root;
+	u32 rootsecs;
+	bool found = false;
+
+	label[0] = 0;
+
+	if(!disc->readSectors(start, 1, buf))
+		return;
+
+	u32 bps = le16(buf + 11);
+	u32 spc = buf[13];
+	u32 fatsz = le16(buf + 22);
+
+	if(bps < 512 || bps > BYTES_PER_SECTOR || spc == 0)
+		return;
+
+	root = start + le16(buf + 14) + buf[16] * (fatsz ? fatsz : le32(buf + 36));
+
+	if(fatsz == 0) // FAT32
+	{
+		memcpy(bpblabel, buf + 71, 11);
+		root += (le32(buf + 44) - 2) * spc;
+		rootsecs = spc;
+	}
+	else
+	{
+		memcpy(bpblabel, buf + 43, 11);
+		rootsecs = (le16(buf + 17) * 32 + bps - 1) / bps;
+	}
+	bpblabel[11] = 0;
+
+	for(u32 s = 0; s < rootsecs && !found; s++)
+	{
+		if(!disc->readSectors(root + s, 1, buf))
+			break;
+
+		for(u32 e = 0; e < bps; e += 32)
+		{
+			if(buf[e] == 0) // end of directory
+			{
+				s = rootsecs;
+				break;
+			}
+			if(buf[e] != 0xE5 && buf[e + 11] == 0x08) // volume label entry
+			{
+				memcpy(label, buf + e, 11);
+				label[11] = 0;
+				found = true;
+				break;
+			}
+		}
+	}
+
+	if(!found)
+		strcpy(label, bpblabel);
+
+	if(strncmp(label, "NO NAME", 7) == 0)
+		label[0] = 0;
+}
+
 static void AddPartition(sec_t sector, int device, int type, int *devnum)
 {
 	int i;
@@ -459,13 +527,13 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
 	for(i=0; i < *devnum; i++)
 		if(part[device][i].sector == sector) return; // to avoid mount same partition again
 
-	DISC_INTERFACE *disc = (DISC_INTERFACE *)sd;
+	const DISC_INTERFACE *disc = sd;
 
 	if(device == DEVICE_USB)
-		disc = (DISC_INTERFACE *)usb;
+		disc = usb;
 
 	char mount[10];
-	sprintf(mount, "%s%i", prefix[device], *devnum+1);
+	snprintf(mount, sizeof(mount), "%s%i", prefix[device], *devnum+1);
 	char *name;
 
 	switch(type)
@@ -473,7 +541,7 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
 		case T_FAT:
 			if(!fatMount(mount, disc, sector, 2, 64))
 				return;
-			fatGetVolumeLabel(mount, part[device][*devnum].name);
+			GetFATVolumeLabel(disc, sector, part[device][*devnum].name);
 			break;
 #ifdef WANT_NTFS
 		case T_NTFS:
@@ -547,12 +615,12 @@ static int FindPartitions(int device)
 		part[device][i].type = 0;
 	}
 
-	DISC_INTERFACE *interface;
+	const DISC_INTERFACE *interface;
 
 	if(device == DEVICE_SD)
-		interface = (DISC_INTERFACE *)sd;
+		interface = sd;
 	else
-		interface = (DISC_INTERFACE *)usb;
+		interface = usb;
 
 	MASTER_BOOT_RECORD mbr;
 	PARTITION_RECORD *partition = NULL;
@@ -565,7 +633,7 @@ static int FindPartitions(int device)
 		MASTER_BOOT_RECORD mbr;
 		EXTENDED_BOOT_RECORD ebr;
 		NTFS_BOOT_SECTOR boot;
-	} sector;
+	} sector ATTRIBUTE_ALIGN (32);
 
 	if (device == DEVICE_USB && USBStorage_IsDVD())
 	{
@@ -574,7 +642,7 @@ static int FindPartitions(int device)
 	}
 
 	// Read the first sector on the device
-	if (!interface->readSectors(interface, 0, 1, &sector.buffer))
+	if (!interface->readSectors(0, 1, &sector.buffer))
 	{
 		errno = EIO;
 		return -1;
@@ -608,7 +676,7 @@ static int FindPartitions(int device)
 					debug_printf("Partition %i: Claims to be NTFS\n", i + 1);
 
 					// Read and validate the NTFS partition
-					if (interface->readSectors(interface, part_lba, 1, &sector))
+					if (interface->readSectors(part_lba, 1, &sector))
 					{
 						debug_printf("sector.boot.oem_id: 0x%x\n", sector.boot.oem_id);
 						debug_printf("NTFS_OEM_ID: 0x%x\n", NTFS_OEM_ID);
@@ -636,7 +704,7 @@ static int FindPartitions(int device)
 					do
 					{
 						// Read and validate the extended boot record
-						if (interface->readSectors(interface, ebr_lba + next_erb_lba, 1, &sector))
+						if (interface->readSectors(ebr_lba + next_erb_lba, 1, &sector))
 						{
 							if (sector.ebr.signature == EBR_SIGNATURE)
 							{
@@ -662,9 +730,9 @@ static int FindPartitions(int device)
 									AddPartition(part_lba, device, T_EXT2, &devnum);
 								}
 								// Check if this partition has a valid NTFS boot record
-								else if (interface->readSectors(interface, part_lba, 1, &sector))
+								else if (interface->readSectors(part_lba, 1, &sector))
 #else
-								if (interface->readSectors(interface, part_lba, 1, &sector))
+								if (interface->readSectors(part_lba, 1, &sector))
 #endif
 								{
 									if (sector.boot.oem_id == NTFS_OEM_ID)
@@ -721,7 +789,7 @@ static int FindPartitions(int device)
 				{
 					// Check if this partition has a valid NTFS boot record anyway,
 					// it might be misrepresented due to a lazy partition editor
-					if (interface->readSectors(interface, part_lba, 1, &sector))
+					if (interface->readSectors(part_lba, 1, &sector))
 					{
 						if (sector.boot.oem_id == NTFS_OEM_ID)
 						{
@@ -763,7 +831,7 @@ static int FindPartitions(int device)
 		// As a last-ditched effort, search the first 64 sectors of the device for stray NTFS/FAT partitions
 		for (i = 0; i < 64; i++)
 		{
-			if (interface->readSectors(interface, i, 1, &sector))
+			if (interface->readSectors(i, 1, &sector))
 			{
 				if (sector.boot.oem_id == NTFS_OEM_ID)
 				{
@@ -873,12 +941,12 @@ static bool MountPartitions(int device, int silent)
 
 static bool Remount(int device, int silent)
 {
-	DISC_INTERFACE *disc = NULL;
+	const DISC_INTERFACE *disc = NULL;
 
 	if(device == DEVICE_SD)
-		disc = (DISC_INTERFACE *)sd;
+		disc = sd;
 	else if(device == DEVICE_USB)
-		disc = (DISC_INTERFACE *)usb;
+		disc = usb;
 	else
 		return false;
 
@@ -888,7 +956,7 @@ static bool Remount(int device, int silent)
 	if(isInserted[device])
 	{
 		UnmountPartitions(device);
-		disc->shutdown(disc);
+		disc->shutdown();
 
 		if(strlen(loadedFile) > 3 && strncmp(loadedFile, prefix[device], strlen(prefix[device])) == 0)
 		{
@@ -906,7 +974,7 @@ static bool Remount(int device, int silent)
 
 	usleep(250000); // 1/4 sec
 
-	if(disc->startup(disc) && disc->isInserted(disc))
+	if(disc->startup() && disc->isInserted())
 	{
 		mounted = true;
 		MountPartitions(device, SILENT);
@@ -926,7 +994,7 @@ void FindAppPath()
 	char filepath[MAXPATHLEN];
 	DIR *dir;
 
-	if(sd->startup(sd) && sd->isInserted(sd))
+	if(sd->startup() && sd->isInserted())
 	{
 		isInserted[DEVICE_SD] = true;
 		MountPartitions(DEVICE_SD, SILENT);
@@ -948,7 +1016,7 @@ void FindAppPath()
 
 	while(diff_sec(start, gettime()) < 5) // 5 sec
 	{
-		if(usb->startup(usb) && usb->isInserted(usb))
+		if(usb->startup() && usb->isInserted())
 		{
 			isInserted[DEVICE_USB] = true;
 			break;
@@ -1011,7 +1079,7 @@ static bool MountDVD(bool silent)
 		if(!silent)
 			ShowAction("Loading DVD...");
 
-		if(!dvd->isInserted(dvd))
+		if(!dvd->isInserted())
 		{
 			if(silent)
 				break;
@@ -1049,7 +1117,7 @@ void SetLastDVDMotorTime()
 
 bool StartDVDMotor()
 {
-	if(!dvd->isInserted(dvd))
+	if(!dvd->isInserted())
 		return false;
 
 	if(dvdLastUsed)
@@ -1070,8 +1138,8 @@ bool WakeupUSB()
 	if(USBStorage_IsDVD())
 		return true;
 
-	char buf[BYTES_PER_SECTOR];
-	return usb->readSectors(usb, 0, 1, buf);
+	char buf[BYTES_PER_SECTOR] ATTRIBUTE_ALIGN (32);
+	return usb->readSectors(0, 1, buf);
 }
 }
 
@@ -1751,7 +1819,6 @@ static bool ParseDirEntries()
 		return false;
 
 	char ext[7];
-	char path[MAXPATHLEN+1];
 	char tmp[MAXJOLIET+1];
 	struct dirent *entry = NULL;
 	struct stat filestat;
@@ -1810,7 +1877,7 @@ static bool ParseDirEntries()
 				DeleteEntryFiles(f_entry);
 				goto nomemParseDirEntries;
 			}
-			f_entry->length = filestat.st_size;
+			f_entry->length = 0; // readdir() gives no size
 
 			/* Video mode thumbnails */
 			if(f_entry && WiiSettings.artwork && (menuCurrent == MENU_BROWSE_VIDEOS || menuCurrent == MENU_BROWSE_MUSIC)) {
@@ -2632,7 +2699,7 @@ int ParseOnlineMedia()
 			strncmp(browser.dir, om_entry->file, dirLen) == 0)
 		{
 			char folder[MAXPATHLEN];
-			strncpy(folder, &om_entry->file[dirLen], MAXPATHLEN);
+			snprintf(folder, sizeof(folder), "%s", &om_entry->file[dirLen]);
 			char * end = strchr(folder, '/');
 			if(end) *end = 0; // strip end
 			

@@ -27,5 +27,6 @@ void *mpctx_get_playtree_iter(struct MPContext *mpctx);
 void *mpctx_get_mixer(struct MPContext *mpctx);
 int mpctx_get_global_sub_size(struct MPContext *mpctx);
 int mpctx_get_osd_function(struct MPContext *mpctx);
+int mpctx_get_set_of_sub_size(void);
 
 #endif /* MPLAYER_ACCESS_MPCONTEXT_H */

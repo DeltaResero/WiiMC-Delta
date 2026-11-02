@@ -55,8 +55,8 @@ u32 getipbyname(char *domain)
 }
 
 #define THREAD_SLEEP 	200
-#define GSTACK 			(16384)
-#define GUITH_STACK 	(16384)
+#define GSTACK 			(32768)
+#define GUITH_STACK 	(32768)
 
 static u8 guistack[GSTACK] ATTRIBUTE_ALIGN (32);
 static u8 progressstack[GUITH_STACK] ATTRIBUTE_ALIGN (32);
@@ -2375,7 +2375,7 @@ static void CreditsWindow()
 	alignWindow.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	creditsWindow.Append(&alignWindow);
 
-	int numEntries = 15;
+	int numEntries = 18;
 	GuiText *txt[numEntries];
 
 	wchar_t appVersion[20];
@@ -2998,8 +2998,8 @@ static void *ThumbThread (void *arg)
 					LoadThumbsFileHTTP(loadIndex->xml);
 					
 					if (WiiSettings.numThumb > 0) {
-						sprintf(year_txt, "%s", WiiSettings.yearNum);
-						sprintf(desc_txt, "%s", WiiSettings.descTxt);
+						snprintf(year_txt, sizeof(year_txt), "%s", WiiSettings.yearNum);
+						snprintf(desc_txt, sizeof(desc_txt), "%s", WiiSettings.descTxt);
 						
 						WiiSettings.numThumb = 0;
 						if(WiiSettings.descTxt && WiiSettings.yearNum) {
@@ -3023,9 +3023,9 @@ static void *ThumbThread (void *arg)
 					if(slash) snprintf(loadIndex->image, 256, "%s", slash+1);
 					char *slash_2 = strrchr(loadIndex->xml, '/');
 					if(slash_2) snprintf(loadIndex->xml, 256, "%s", slash_2+1);
-					sprintf(art_disp_2, loadIndex->xml); // For LoadThumbsFile to always load xml
+					snprintf(art_disp_2, sizeof(art_disp_2), "%s", loadIndex->xml); // For LoadThumbsFile to always load xml
 					
-					sprintf(locate_paths, "%s%s.xml", WiiSettings.artworkFolder, art_disp_2);
+					snprintf(locate_paths, sizeof(locate_paths), "%s%s.xml", WiiSettings.artworkFolder, art_disp_2);
 				//	usleep(6000);
 					LoadThumbsFile(locate_paths);
 				/*	LoadThumbsFile(locate_paths);
@@ -3041,9 +3041,9 @@ static void *ThumbThread (void *arg)
 						
 						/* art_disp_2 has the og title(without the _xx appended)
 						 * so it's the best way to maintain the actual_path fresh. */
-						sprintf(actual_path, "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
-						sprintf(year_txt, "%s", WiiSettings.yearNum);
-						sprintf(desc_txt, "%s", WiiSettings.descTxt);
+						snprintf(actual_path, sizeof(actual_path), "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
+						snprintf(year_txt, sizeof(year_txt), "%s", WiiSettings.yearNum);
+						snprintf(desc_txt, sizeof(desc_txt), "%s", WiiSettings.descTxt);
 						mem2_free(WiiSettings.descTxt, MEM2_DESC);
 						mem2_free(WiiSettings.yearNum, MEM2_DESC);
 						
@@ -3054,7 +3054,7 @@ static void *ThumbThread (void *arg)
 						secure_type = false;
 					} else {
 						// Try to look for regular art.
-						sprintf(actual_path, "%s%s.jpg", WiiSettings.artworkFolder, loadIndex->image);
+						snprintf(actual_path, sizeof(actual_path), "%s%s.jpg", WiiSettings.artworkFolder, loadIndex->image);
 						struct stat st;
 						if(stat(actual_path, &st) == 0) {
 							same_dir = false;
@@ -3063,7 +3063,7 @@ static void *ThumbThread (void *arg)
 							same_dir = true;
 					}
 					if (same_dir) {
-						sprintf(actual_path, "%s.jpg", art_disp);
+						snprintf(actual_path, sizeof(actual_path), "%s.jpg", art_disp);
 						same_dir = false;
 						secure_type = true;
 					}
@@ -3979,12 +3979,12 @@ static void MenuBrowse(int menu)
 				if(WiiSettings.descTxt != NULL) {
 				//	WiiSettings.descTxt = NULL; //crashes
 					fileInfo->SetText(NULL);
-					memset(WiiSettings.descTxt, 0, sizeof(WiiSettings.descTxt));
+					WiiSettings.descTxt[0] = 0;
 				}
 				if(WiiSettings.yearNum != NULL) {
 				//	WiiSettings.yearNum = NULL;
 					fileYear->SetText(NULL);
-					memset(WiiSettings.yearNum, 0, sizeof(WiiSettings.yearNum));
+					WiiSettings.yearNum[0] = 0;
 				}
 				
 			//	ShowAreaInfo(MEM2_DESC);
@@ -4929,7 +4929,7 @@ static void ScreenPositionWindowUpdate(void *ptr, int x, int y)
 		WiiSettings.videoXshift += x;
 		WiiSettings.videoYshift += y;
 
-		char shift[10];
+		char shift[24];
 		sprintf(shift, "%i, %i", WiiSettings.videoXshift, WiiSettings.videoYshift);
 		settingText->SetText(shift);
 		b->ResetState();
@@ -5004,7 +5004,7 @@ static void ScreenPositionWindow()
 	screenPositionImg.SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
 
 	settingText = new GuiText(NULL, 20, (GXColor){0, 0, 0, 255});
-	char shift[10];
+	char shift[24];
 	sprintf(shift, "%i, %i", WiiSettings.videoXshift, WiiSettings.videoYshift);
 	settingText->SetText(shift);
 
@@ -5153,10 +5153,10 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Backward");
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Folder");
-    if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-       sprintf(options.name[i++], nulo);
-    else
-        sprintf(options.name[i++], "Force Fullscreen in 4:3");
+	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+		sprintf(options.name[i++], nulo);
+	else
+		sprintf(options.name[i++], "Force Fullscreen in 4:3");
 	sprintf(options.name[i++], "Volume Normalizer");
 	sprintf(options.name[i++], "Deflicker");
 	sprintf(options.name[i++], "Set VI Width to 720");
@@ -5386,7 +5386,7 @@ static void MenuSettingsVideos()
 			sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
 			snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
 			sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
-			sprintf (options.value[13], "%d%", WiiSettings.audioNorm);
+			sprintf (options.value[13], "%d%%", WiiSettings.audioNorm);
 			sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
 			sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
 			sprintf (options.value[16], "%s", WiiSettings.skipLoop ? "On" : "Off");
@@ -8049,7 +8049,7 @@ static void StartGuiThreads()
 	screensaverThreadHalt = 1;
 	creditsThreadHalt = 1;
 
-	LWP_CreateThread (&guithread, GuiThread, NULL, guistack, 24576, 60);
+	LWP_CreateThread (&guithread, GuiThread, NULL, guistack, GSTACK, 60);
 	LWP_CreateThread (&progressthread, ProgressThread, NULL, progressstack, GUITH_STACK, 60);
 	LWP_CreateThread (&screensaverthread, ScreensaverThread, NULL, screensaverstack, GUITH_STACK, 60);
 	LWP_CreateThread (&creditsthread, CreditsThread, NULL, creditsstack, GUITH_STACK, 60);

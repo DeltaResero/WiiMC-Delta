@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         image: ["Wii"]
-    container: ghcr.io/extremscorner/libogc2:latest
+    container: devkitpro/devkitppc:20261016@sha256:d50f8a886f2ce1d3c22685a774afb0845379876b47d9b41a9b729f4f63a54813
 
     steps:
     - name: Checkout wiimc repo

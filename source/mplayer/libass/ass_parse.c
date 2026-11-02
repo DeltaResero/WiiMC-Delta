@@ -22,6 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#ifdef GEKKO
+#include <ogc/pad.h>
+#endif
 
 #include "ass_render.h"
 #include "ass_parse.h"

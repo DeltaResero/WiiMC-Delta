@@ -268,7 +268,7 @@ class GuiElement
 		//!Constructor
 		GuiElement();
 		//!Destructor
-		~GuiElement();
+		virtual ~GuiElement();
 
 		//!Operator overload: new, delete, new[] and delete[]
 		void *operator new(size_t size);

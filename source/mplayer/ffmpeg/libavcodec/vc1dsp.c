@@ -651,6 +651,14 @@ PUT_VC1_MSPEL(1, 3)
 PUT_VC1_MSPEL(2, 3)
 PUT_VC1_MSPEL(3, 3)
 
+/* mc00 is a plain 8x8 copy, wrapped to match op_pixels_func */
+static void put_vc1_mspel_mc00_c(uint8_t *dst, const uint8_t *src, int stride, int rnd) {
+    ff_put_pixels8x8_c(dst, (uint8_t *)src, stride);
+}
+static void avg_vc1_mspel_mc00_c(uint8_t *dst, const uint8_t *src, int stride, int rnd) {
+    ff_avg_pixels8x8_c(dst, (uint8_t *)src, stride);
+}
+
 static void put_no_rnd_vc1_chroma_mc8_c(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int stride, int h, int x, int y){
     const int A=(8-x)*(8-y);
     const int B=(  x)*(8-y);
@@ -800,7 +808,7 @@ av_cold void ff_vc1dsp_init(VC1DSPContext* dsp) {
     dsp->vc1_v_loop_filter16 = vc1_v_loop_filter16_c;
     dsp->vc1_h_loop_filter16 = vc1_h_loop_filter16_c;
 
-    dsp->put_vc1_mspel_pixels_tab[ 0] = ff_put_pixels8x8_c;
+    dsp->put_vc1_mspel_pixels_tab[ 0] = put_vc1_mspel_mc00_c;
     dsp->put_vc1_mspel_pixels_tab[ 1] = put_vc1_mspel_mc10_c;
     dsp->put_vc1_mspel_pixels_tab[ 2] = put_vc1_mspel_mc20_c;
     dsp->put_vc1_mspel_pixels_tab[ 3] = put_vc1_mspel_mc30_c;
@@ -817,7 +825,7 @@ av_cold void ff_vc1dsp_init(VC1DSPContext* dsp) {
     dsp->put_vc1_mspel_pixels_tab[14] = put_vc1_mspel_mc23_c;
     dsp->put_vc1_mspel_pixels_tab[15] = put_vc1_mspel_mc33_c;
 
-    dsp->avg_vc1_mspel_pixels_tab[ 0] = ff_avg_pixels8x8_c;
+    dsp->avg_vc1_mspel_pixels_tab[ 0] = avg_vc1_mspel_mc00_c;
     dsp->avg_vc1_mspel_pixels_tab[ 1] = avg_vc1_mspel_mc10_c;
     dsp->avg_vc1_mspel_pixels_tab[ 2] = avg_vc1_mspel_mc20_c;
     dsp->avg_vc1_mspel_pixels_tab[ 3] = avg_vc1_mspel_mc30_c;
