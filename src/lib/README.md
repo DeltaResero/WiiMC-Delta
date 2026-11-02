@@ -71,3 +71,18 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
 - Version: GNU FriBidi 0.19.2; in WiiMC since its first commit
 - Licence: LGPL 2.1 or later (`COPYING`)
 - Lays out right-to-left text, such as Arabic and Hebrew.
+
+## FFmpeg
+
+- Upstream: https://git.ffmpeg.org/ffmpeg.git
+- Version: FFmpeg 9.0.2 (tag `n9.0.2`, commit
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8`)
+- Fetched: 2026-11-03
+- Licence: LGPL 2.1 or later (`COPYING.LGPLv2.1`, `LICENSE.md`); WiiMC
+  builds it with the GPL parts enabled, which makes the result GPL.
+- Trimmed to what WiiMC's build reads: the sources and headers its objects
+  are compiled from, the build machinery (`configure`, `ffbuild/`, the
+  library Makefiles and version scripts), the component lists `configure`
+  scans, the libraries' public headers, and the licence and release files.
+  1,689 of the 10,424 files remain. A build of the trimmed tree compiles
+  to the same code as one of the whole tree.
