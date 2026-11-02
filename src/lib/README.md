@@ -94,3 +94,6 @@ Local changes:
 - `libavutil/tx_template.c`: with `FF_TX_SMALL_SR_TABLES` the static
   split-radix tables and their codelets stop at 2^15 points instead of
   2^17. Longer power-of-two transforms use the generic codelets.
+- `libavcodec/h264*.c`: with `FF_H264_8BIT_ONLY` the H.264 DSP,
+  prediction, IDCT and qpel functions are built for 8-bit video only, and
+  the SPS parser turns away a stream of any other bit depth.

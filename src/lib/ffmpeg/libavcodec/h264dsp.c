@@ -39,6 +39,7 @@
 #include "h264dsp_template.c"
 #undef BIT_DEPTH
 
+#if !FF_H264_8BIT_ONLY
 #define BIT_DEPTH 9
 #include "h264dsp_template.c"
 #undef BIT_DEPTH
@@ -54,14 +55,17 @@
 #define BIT_DEPTH 14
 #include "h264dsp_template.c"
 #undef BIT_DEPTH
+#endif /* !FF_H264_8BIT_ONLY */
 
 #define BIT_DEPTH 8
 #include "h264addpx_template.c"
 #undef BIT_DEPTH
 
+#if !FF_H264_8BIT_ONLY
 #define BIT_DEPTH 16
 #include "h264addpx_template.c"
 #undef BIT_DEPTH
+#endif
 
 av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
                              const int chroma_format_idc)
@@ -78,9 +82,12 @@ av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
     c->add_pixels4_clear = FUNC(ff_h264_add_pixels4, depth);\
     c->add_pixels8_clear = FUNC(ff_h264_add_pixels8, depth)
 
+#if !FF_H264_8BIT_ONLY
     if (bit_depth > 8 && bit_depth <= 16) {
         SET_PIXSIZE_FUNCS(16);
-    } else {
+    } else
+#endif
+    {
         SET_PIXSIZE_FUNCS(8);
     }
 
@@ -133,6 +140,7 @@ av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
     c->loop_filter_strength = NULL;
 
     switch (bit_depth) {
+#if !FF_H264_8BIT_ONLY
     case 9:
         H264_DSP(9);
         break;
@@ -145,6 +153,7 @@ av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
     case 14:
         H264_DSP(14);
         break;
+#endif
     default:
         av_assert0(bit_depth<=8);
         H264_DSP(8);

@@ -28,6 +28,7 @@
 #include "h264qpel_template.c"
 #undef BIT_DEPTH
 
+#if !FF_H264_8BIT_ONLY
 #define BIT_DEPTH 9
 #include "h264qpel_template.c"
 #undef BIT_DEPTH
@@ -45,6 +46,7 @@
 #define BIT_DEPTH 14
 #include "h264qpel_template.c"
 #undef BIT_DEPTH
+#endif /* !FF_H264_8BIT_ONLY */
 
 
 av_cold void ff_h264qpel_init(H264QpelContext *c, int bit_depth)
@@ -82,6 +84,7 @@ av_cold void ff_h264qpel_init(H264QpelContext *c, int bit_depth)
     default:
         SET_QPEL(8);
         break;
+#if !FF_H264_8BIT_ONLY
     case 9:
         SET_QPEL(9);
         break;
@@ -94,6 +97,7 @@ av_cold void ff_h264qpel_init(H264QpelContext *c, int bit_depth)
     case 14:
         SET_QPEL(14);
         break;
+#endif
     }
 
 #if ARCH_AARCH64

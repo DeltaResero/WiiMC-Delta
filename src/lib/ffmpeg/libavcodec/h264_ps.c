@@ -369,6 +369,14 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
                    sps->bit_depth_luma, sps->bit_depth_chroma);
             goto fail;
         }
+#if FF_H264_8BIT_ONLY
+        /* only the 8-bit DSP functions are built */
+        if (sps->bit_depth_luma != 8) {
+            avpriv_report_missing_feature(avctx, "%d-bit H.264 in an 8-bit-only build",
+                                          sps->bit_depth_luma);
+            goto fail;
+        }
+#endif
         sps->transform_bypass = get_bits1(gb);
         ret = decode_scaling_matrices(gb, sps, NULL, 1, get_bits1(gb),
                                       &sps->scaling_matrix_present_mask,

@@ -31,6 +31,7 @@
 #include "h264idct_template.c"
 #undef BIT_DEPTH
 
+#if !FF_H264_8BIT_ONLY
 #define BIT_DEPTH 9
 #include "h264idct_template.c"
 #undef BIT_DEPTH
@@ -46,3 +47,4 @@
 #define BIT_DEPTH 14
 #include "h264idct_template.c"
 #undef BIT_DEPTH
+#endif /* !FF_H264_8BIT_ONLY */
