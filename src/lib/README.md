@@ -97,3 +97,6 @@ Local changes:
 - `libavcodec/h264*.c`: with `FF_H264_8BIT_ONLY` the H.264 DSP,
   prediction, IDCT and qpel functions are built for 8-bit video only, and
   the SPS parser turns away a stream of any other bit depth.
+- `libavutil/tx.c`: with `FF_TX_FLOAT_ONLY` only the float transforms are
+  listed, so the double and int32 ones aren't linked, and `av_tx_init()`
+  returns `AVERROR(ENOSYS)` for those types.

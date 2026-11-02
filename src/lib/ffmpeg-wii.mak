@@ -61,7 +61,8 @@ FFMPEG_BSFS := \
 # WiiMC's changes to FFmpeg, listed in src/lib/README.md
 FFMPEG_WII := \
 	-DFF_TX_SMALL_SR_TABLES=1 \
-	-DFF_H264_8BIT_ONLY=1
+	-DFF_H264_8BIT_ONLY=1 \
+	-DFF_TX_FLOAT_ONLY=1
 
 FFMPEG_CFLAGS := $(MACHDEP) $(FFMPEG_WII) -I$(LIBOGC_INC) -I$(DEVKITPRO)/portlibs/ppc/include \
 	-fno-asynchronous-unwind-tables -DTCP_MAXSEG=2
