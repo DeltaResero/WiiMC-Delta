@@ -86,3 +86,8 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
   scans, the libraries' public headers, and the licence and release files.
   1,689 of the 10,424 files remain. A build of the trimmed tree compiles
   to the same code as one of the whole tree.
+
+Local changes:
+
+- `Makefile` includes the Makefiles of `tools/`, `fftools/`, `doc/` and
+  `tests/` only if they exist, since the trim removes those directories.

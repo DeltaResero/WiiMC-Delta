@@ -47,7 +47,7 @@ SKIPHEADERS = compat/w32pthreads.h
 # first so "all" becomes default target
 all: all-yes
 
-include $(SRC_PATH)/tools/Makefile
+-include $(SRC_PATH)/tools/Makefile
 include $(SRC_PATH)/ffbuild/common.mak
 
 FF_EXTRALIBS := $(FFEXTRALIBS)
@@ -131,9 +131,9 @@ endef
 
 $(foreach D,$(FFLIBS),$(eval $(call DOSUBDIR,lib$(D))))
 
-include $(SRC_PATH)/fftools/Makefile
-include $(SRC_PATH)/doc/Makefile
-include $(SRC_PATH)/doc/examples/Makefile
+-include $(SRC_PATH)/fftools/Makefile
+-include $(SRC_PATH)/doc/Makefile
+-include $(SRC_PATH)/doc/examples/Makefile
 
 $(ALLFFLIBS:%=lib%/version.o): libavutil/ffversion.h
 
@@ -206,7 +206,7 @@ config:
 build: all alltools examples testprogs
 check: all alltools examples testprogs fate
 
-include $(SRC_PATH)/tests/Makefile
+-include $(SRC_PATH)/tests/Makefile
 
 $(sort $(OUTDIRS)):
 	$(Q)mkdir -p $@
