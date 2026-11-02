@@ -15,7 +15,6 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <map>
-#include <libexif/exif-data.h>
 #include <wiiuse/wpad.h>
 #include <di/di.h>
 #include <iso9660.h>

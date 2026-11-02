@@ -2,13 +2,10 @@ msgid "********"
 msgstr "••••••••"
 
 msgid "Videos"
-msgstr "Vídeo"
+msgstr "Video"
 
 msgid "Music"
 msgstr "Música"
-
-msgid "Pictures"
-msgstr "Imágenes"
 
 msgid "Online Media"
 msgstr "Medios online"
@@ -31,9 +28,6 @@ msgstr "Cancelar"
 msgid "Information"
 msgstr "Información"
 
-msgid "Credits"
-msgstr "Créditos"
-
 msgid "Play"
 msgstr "Reproducir"
 
@@ -55,6 +49,24 @@ msgstr "Repetitivo"
 msgid "Continuous"
 msgstr "Continuo"
 
+msgid "Through"
+msgstr "Directo"
+
+msgid "Screensaver Art"
+msgstr "Carátulas en el salvapantallas"
+
+msgid "Internal Loops"
+msgstr "Loop interno"
+
+msgid "Top"
+msgstr "Arriba"
+
+msgid "Side"
+msgstr "Al lado"
+
+msgid "Full"
+msgstr "Completo"
+
 msgid "Playlist"
 msgstr "Lista de reprodución"
 
@@ -74,16 +86,16 @@ msgid "Subtitles"
 msgstr "Subtítulos"
 
 msgid "Subtitle Delay"
-msgstr "Retardo de subtítulo"
+msgstr "Retraso de subtítulos"
 
 msgid "Settings"
 msgstr "Opciones"
 
 msgid "On"
-msgstr "On"
+msgstr "Sí"
 
 msgid "Off"
-msgstr "Off"
+msgstr "No"
 
 msgid "Always"
 msgstr "Habilitado"
@@ -116,25 +128,10 @@ msgid "Close"
 msgstr "Cerrar"
 
 msgid "DVD"
-msgstr "DVD vídeo"
+msgstr "DVD Video"
 
 msgid "Go back"
 msgstr "Atras"
-
-msgid "Update Available"
-msgstr "Actualización disponible"
-
-msgid "An update is available!"
-msgstr "¡Una actualización disponible!"
-
-msgid "Update now"
-msgstr "Actualizar ahora"
-
-msgid "Update later"
-msgstr "Actualizar más tarde"
-
-msgid "Online media file not found."
-msgstr "Archivo no encontrado"
 
 msgid "Unrecognized DVD format!"
 msgstr "¡Formato de DVD desconocido!"
@@ -152,13 +149,10 @@ msgid "Settings - Global"
 msgstr "Opciones - Generales"
 
 msgid "Settings - Videos"
-msgstr "Opciones - Vídeos"
+msgstr "Opciones - Video"
 
 msgid "Settings - Music"
 msgstr "Opciones - Música"
-
-msgid "Settings - Pictures"
-msgstr "Opciones - Imágenes"
 
 msgid "Settings - Online Media"
 msgstr "Opciones - Medios online"
@@ -181,8 +175,8 @@ msgstr "Volumen"
 msgid "Exit Action"
 msgstr "Acción al salir"
 
-msgid "Wiimote Rumble"
-msgstr "Vibración del mando"
+msgid "Wii Remote Rumble"
+msgstr "Vibración"
 
 msgid "Hide"
 msgstr "Ocultar"
@@ -194,7 +188,7 @@ msgid "Auto"
 msgstr "Auto"
 
 msgid "Return to Wii Menu"
-msgstr "Volver al Menu Wii"
+msgstr "Volver al Menú Wii"
 
 msgid "Power Off Wii"
 msgstr "Apagar Wii"
@@ -209,27 +203,42 @@ msgid "Screen Position"
 msgstr "Posición"
 
 msgid "Frame Dropping"
-msgstr "Disminuir cuadros (solo NTSC)"
+msgstr "Disminuir cuadros"
 
 msgid "Aspect Ratio"
 msgstr "Formato pantalla"
 
 msgid "Cache Fill"
-msgstr "Memoria disponible"
+msgstr "Memoria inicial"
 
 msgid "Audio Delay"
-msgstr "Retardo de audio"
+msgstr "Retraso de audio"
 
 msgid "Auto-Resume"
 msgstr "Reinicio automático"
 
-msgid "Videos Files Folder"
-msgstr "Carpeta de vídeos"
+msgid "Videos Folder"
+msgstr "Carpeta de videos"
+
+msgid "Force Fullscreen in 4:3"
+msgstr "Tamaño completo en 4:3"
+
+msgid "Volume Normalizer"
+msgstr "Iguala el volumen"
+
+msgid "Deflicker"
+msgstr "Defliqueador"
+
+msgid "Set VI Width to 720"
+msgstr "Cambia el ancho a 720"
+
+msgid "Skip Deblocking Filter"
+msgstr "Saltar filtro in-loop"
 
 msgid "Play Order"
 msgstr "Modo de reproducción"
 
-msgid "Music Files Folder"
+msgid "Music Folder"
 msgstr "Carpeta de audio"
 
 msgid "Pictures Files Folder"
@@ -295,17 +304,11 @@ msgstr "¡Error cargando archivo!"
 msgid "Resume"
 msgstr "Reiniciar"
 
-msgid "Stop Slideshow"
-msgstr "Parar diapositivas"
-
-msgid "Start Slideshow"
-msgstr "Reproducir diapositivas"
-
-msgid "Slideshow Delay"
-msgstr "Duración diapositivas"
-
 msgid "Online Media Folder"
 msgstr "Carpeta medios online"
+
+msgid "Banner Screensaver"
+msgstr "Screensaver Online"
 
 msgid "Add SMB Share"
 msgstr "Conexión al PC"
@@ -314,7 +317,13 @@ msgid "Add FTP Site"
 msgstr "Conexión FTP"
 
 msgid "DVD Menu"
-msgstr "Menu DVD"
+msgstr "Menú DVD"
+
+msgid "DVD Sync Type"
+msgstr "Método de scan"
+
+msgid "Mixed"
+msgstr "Mixto"
 
 msgid "Skip to Main Title"
 msgstr "Ir al título principal"
@@ -358,17 +367,11 @@ msgstr "¡Ningún disco insertado!"
 msgid "Invalid DVD."
 msgstr "DVD no válido."
 
-msgid "Up One Level"
-msgstr "Subir nivel"
-
 msgid "Error opening"
 msgstr "Error abriendo"
 
 msgid "Warning"
 msgstr "Atención"
-
-msgid "One or more pictures within this folder exceeds the maximum size (6 MB) and will not be viewable."
-msgstr "Algunas imágenes exceden el tamaño máximo (6 MB) y no serán visualizadas"
 
 msgid "Error loading playlist!"
 msgstr "¡Error cargando lista de reproducción!"
@@ -402,12 +405,6 @@ msgstr "Seleccione elemento y pulse el botón + para agregarlo a la lista de rep
 
 msgid "Exit Playlist"
 msgstr "Salir de la lista de reproducción"
-
-msgid "Update successful!"
-msgstr "¡Actualización completada!"
-
-msgid "Update failed!"
-msgstr "¡Error en la actualización!"
 
 msgid "Initializing network..."
 msgstr "Iniciando conexión..."
@@ -463,17 +460,17 @@ msgstr "Imposible guardar opciones"
 msgid "Thanks to"
 msgstr "Gracias a"
 
-msgid "This software is open source and may be copied, distributed, or modified under the terms of the GNU General Public License (GPL) Version 2."
-msgstr "Este software es libre y puede ser copiado, distribuido y/o modificado bajo las normas de GNU General Public License (GPL) Versión 2."
-
 msgid "Menu artwork"
 msgstr "Iconos del menú"
 
-msgid "Coding"
+msgid "Programming"
 msgstr "Programación"
 
-msgid "Coding & menu design"
-msgstr "Programación y diseno del menu"
+msgid "& menu design"
+msgstr "& diseño del menú"
+
+msgid "This is a private build of WiiMC."
+msgstr "Esto es una versión privada de WiiMC."
 
 msgid "Logo"
 msgstr ""
@@ -496,8 +493,11 @@ msgstr "Opciones - Subtítulos"
 msgid "Visibility"
 msgstr "Visibilidad"
 
+msgid "Monospaced"
+msgstr "Monoespaciada"
+
 msgid "Delay"
-msgstr "Retardo"
+msgstr "Retrasar"
 
 msgid "Codepage"
 msgstr "Codificacion"
@@ -514,23 +514,8 @@ msgstr "¡Imposible cambiar idioma. Memoria insuficiente!"
 msgid "Font Required"
 msgstr "Fuente requerida"
 
-msgid "A new font is required to display this language."
-msgstr "Se requiere nueva fuente para mostrar este idioma."
-
-msgid "Download font"
-msgstr "Descargar fuente"
-
-msgid "Unable to save font file!"
-msgstr "¡Imposible guardar fuente!"
-
 msgid "Out of Memory"
 msgstr "Fuera de memoria"
-
-msgid "WiiMC does not have enough free memory to load the picture viewer."
-msgstr "WiiMC no tiene suficiente memoria libre para cargar el visor de imágenes."
-
-msgid "Close MPlayer"
-msgstr "Cerrar MPlayer"
 
 msgid "Subtitle Codepage"
 msgstr "Codificación Subtítulo"
@@ -540,18 +525,6 @@ msgstr "Este directorio contiene más entradas del máximo permitido. No todas s
 
 msgid "This playlist contains more entries than the maximum allowed. Not all entries will be visible."
 msgstr "Esta lista de reproducción contiene más entradas del máximo permitido. No todas serán visibles."
-
-msgid "Downloading..."
-msgstr "Descargando..."
-
-msgid "Unzipping..."
-msgstr "Descomprimiendo..."
-
-msgid "Color"
-msgstr "Color"
-
-msgid "Size"
-msgstr "Tamaño"
 
 msgid "White"
 msgstr "Blanco"
@@ -565,6 +538,9 @@ msgstr "Amarillo"
 msgid "Red"
 msgstr "Rojo"
 
+msgid "Size"
+msgstr "Tamaño"
+
 msgid "Sleep Timer"
 msgstr "Temporizador"
 
@@ -574,26 +550,8 @@ msgstr "seg"
 msgid "min"
 msgstr "min"
 
-msgid "Blue"
-msgstr "Azul"
-
-msgid "Green"
-msgstr "Verde"
-
-msgid "Grey"
-msgstr "Gris"
-
-msgid "Orange"
-msgstr "Naranja"
-
-msgid "Theme"
-msgstr "Tema"
-
-msgid "Purple (Default)"
-msgstr "Púrpura (Por defecto)"
-
 msgid "Auto-Play Next Video"
-msgstr "Auto-Play siguiente vídeo"
+msgstr "Auto-Play siguiente video"
 
 msgid "Adding files to playlist..."
 msgstr "Añadiendo ficheros a la lista de reproducción..."
@@ -608,25 +566,22 @@ msgid "Use Last Browsed"
 msgstr "Última Búsqueda"
 
 msgid "Audio Language"
-msgstr "Idioma para el Audio"
+msgstr "Idioma para el audio"
 
 msgid "DVD Support"
 msgstr "Soporte DVD"
 
-msgid "Enabled"
-msgstr "Habilitado"
+msgid "Interlacing"
+msgstr "Entrelazado"
 
-msgid "Error loading YouTube file!"
-msgstr "Error en la carga del archivo de Youtube!"
+msgid "Interlacing"
+msgstr "Entrelazar"
 
-msgid "Rotate"
-msgstr "Rotar"
+msgid "Blur"
+msgstr "Filtro Vertical"
 
-msgid "Resolution exceeds maximum allowed (1280x720)!"
-msgstr "La resolución excede el máximo permitido (1280x720)!"
-
-msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
-msgstr "El IOS actual ha sido alterado (firma errónea). La funcionalidad y/o estabilidad puede verse afectada."
+msgid "Resolution exceeds maximum allowed (1024x720)!"
+msgstr "La resolución excede el máximo permitido (1024x720)!"
 
 msgid "Online media file is invalid."
 msgstr "El archivo Online Media es inválido"
@@ -634,14 +589,41 @@ msgstr "El archivo Online Media es inválido"
 msgid "Subtitle font file not found. Subtitles will not be visible."
 msgstr "La fuente del subtítulo no se encuentra. El subtítulo no estará visible."
 
-msgid "WiiMC does not have DVD access - AHBPROT is not enabled."
-msgstr "WiiMC no tiene acceso al DVD - AHBPROT no está habilitado."
+msgid "WiiMC does not have DVD access."
+msgstr "WiiMC no tiene acceso al DVD."
 
 msgid "Starting Area"
 msgstr "Área de inicio"
 
-msgid "Error downloading font file!"
-msgstr "Error descargando la fuente del archivo!"
+msgid "Artwork Viewer"
+msgstr "Carátulas y portadas"
+
+msgid "Artwork Viewer"
+msgstr "Carátulas y portadas"
+
+msgid "Art Folder"
+msgstr "Carpeta de carátulas y portadas"
+
+msgid "Screensaver Banner Limiter"
+msgstr "Límite de banners"
+
+msgid "Banner Folder"
+msgstr "Carpeta de banners"
+
+msgid "JPEG Resample"
+msgstr "JPEG suave"
+
+msgid "Night Filter"
+msgstr "Filtro nocturno"
+
+msgid "Screen Burn-in Reduction"
+msgstr "Protector de pantalla"
+
+msgid "Force 576p"
+msgstr "Modo 576p"
+
+msgid "Enhanced Resolution"
+msgstr "Definición mejorada"
 
 msgid "Error opening font file!"
 msgstr "Error abriendo la fuente del archivo!"
@@ -649,28 +631,17 @@ msgstr "Error abriendo la fuente del archivo!"
 msgid "Could not change language. The font file is corrupted!"
 msgstr "No se puede cambiar de idioma. Fuente del archivo erronea!"
 
-msgid "YouTube Quality"
-msgstr "Calidad de YouTube"
-
-msgid "Low (400x240)"
-msgstr "Baja (400x240)"
-msgid "Medium (480x360)"
-msgstr "Media (480x360)"
-
-msgid "High (854x480)"
-msgstr "Alta (854x480)"
-
 msgid "The current IOS is unsupported. Functionality and/or stability may be adversely affected."
 msgstr "El IOS actual no es soportado. La funcionalidad y/o estabilidad pueden verse drásticamente afectadas."
 
 msgid "Screensaver Delay"
-msgstr "Retardo del Salvapantallas"
+msgstr "Retraso del salvapantallas"
 
 msgid "Inactivity Shutdown"
-msgstr "Cierre por Inactividad"
+msgstr "Cierre por inactividad"
 
 msgid "Invalid subtitle delay."
-msgstr "No válido el retardo de subtítulos."
+msgstr "No válido el retraso de subtítulos."
 
 msgid "DVD playback is not supported on this Wii."
-msgstr "La reproducción de DVD no es compatible con esta Wii."
+msgstr "La reproducción de DVD no es compatible con esta consola."
