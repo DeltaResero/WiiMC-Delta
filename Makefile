@@ -85,6 +85,16 @@ export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/liba
 				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
 				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
+# FFmpeg 9.0.2 (src/lib/ffmpeg) is configured and built out of tree, with
+# the options in src/lib/ffmpeg-wii.mak. It installs into a prefix of its
+# own, since in $(EXTPREFIX) its libraries and headers would come before
+# FFmpeg 0.10's.
+FFPREFIX	:=	$(CURDIR)/$(BUILD)/ffmpeg
+include $(LIBSRC)/ffmpeg-wii.mak
+FFSRC		:=	$(LIBSRC)/ffmpeg
+FFBUILD		:=	$(EXTBUILD)/ffmpeg
+FFMPEGLIBS	:=	$(foreach lib,avformat avcodec swscale swresample avutil,$(FFPREFIX)/lib/lib$(lib).a)
+FFMPEGFILES	:=	$(wildcard $(addprefix $(FFSRC)/,lib*/*.[chS] lib*/*/*.[chS] lib*/*/*/*.[chS]))
 NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard src/lib/libntfs/source/*.c)))
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -143,7 +153,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 .PHONY: $(BUILD) clean forwarder
 
 #---------------------------------------------------------------------------------
-$(BUILD): $(EXTLIBS)
+$(BUILD): $(EXTLIBS) $(FFMPEGLIBS)
 	@[ -d $(TARGETDIR) ] || mkdir -p $(TARGETDIR)
 	cd src/mplayer; $(MAKE) -f Makefile; cd ../..
 	@[ -d $@ ] || mkdir -p $@
@@ -170,6 +180,19 @@ $(EXTPREFIX)/lib/libiconv.a:
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib install-lib libdir=$(EXTPREFIX)/lib includedir=$(EXTPREFIX)/include
 	cp $(EXTBUILD)/libiconv/include/iconv.h.inst $(EXTPREFIX)/include/iconv.h
 
+# FFmpeg 9: reconfigured from scratch when its options change, rebuilt and
+# reinstalled when any of its sources change. VPATH is WiiMC's, not FFmpeg's.
+$(FFBUILD)/ffbuild/config.mak: $(LIBSRC)/ffmpeg-wii.mak $(FFSRC)/configure
+	@rm -rf $(FFBUILD); mkdir -p $(FFBUILD)
+	cd $(FFBUILD) && $(FFSRC)/configure $(FFMPEG_CONFIGURE) > configure.log || { tail -30 configure.log; false; }
+
+$(firstword $(FFMPEGLIBS)): $(FFBUILD)/ffbuild/config.mak $(FFMPEGFILES)
+	$(MAKE) -C $(FFBUILD) VPATH=
+	$(MAKE) -C $(FFBUILD) VPATH= install
+
+$(wordlist 2,$(words $(FFMPEGLIBS)),$(FFMPEGLIBS)): $(firstword $(FFMPEGLIBS))
+	@:
+
 #---------------------------------------------------------------------------------
 # the channel forwarder in extras/, which links the libntfs built here
 forwarder: $(EXTPREFIX)/lib/libntfs.a
@@ -185,7 +208,7 @@ clean:
 	rm -f $(BUILD)/*.d $(BUILD)/*.h $(BUILD)/*.ii $(BUILD)/*.lst $(BUILD)/*.map \
 	$(BUILD)/*.o $(BUILD)/*.s
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
-	rm -rf $(EXTPREFIX) $(EXTBUILD)
+	rm -rf $(EXTPREFIX) $(EXTBUILD) $(FFPREFIX)
 	cd src/mplayer; $(MAKE) -f Makefile clean
 	$(MAKE) -C extras/forwarder clean
 
