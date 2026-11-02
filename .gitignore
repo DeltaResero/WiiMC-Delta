@@ -1,8 +1,69 @@
-*.d
-*.o
-*.a
-build/*.h
-wiimc.dol
-wiimc.elf
-.project
+#
+# NOTE! Please use 'git ls-files -i --exclude-standard -c'
+# command after changing this file, to see if there are
+# any tracked files which get ignored after the change.
+#
+
+# ===================================================================
+# Build output directories
+# ===================================================================
+# Object files, embedded image headers and the external library builds
+/build/
+# wiimc.elf and wiimc.dol
 /executables/
+
+# ===================================================================
+# Compiled files and build artifacts
+# ===================================================================
+# MPlayer and FFmpeg build in place, next to their sources
+*.o
+*.d
+*.a
+*.elf
+*.dol
+
+# ===================================================================
+# IDE / Editor configuration
+# ===================================================================
+# Clangd / Language Server Protocol caching
+.cache/
+compile_commands.json
+# Eclipse (C/C++ Development Tooling - CDT)
+.project
+.cproject
+.settings/
+.metadata/
+# Visual Studio Code
+.vscode/
+# JetBrains IDEs (CLion, etc.)
+.idea/
+# Visual Studio
+.vs/
+# KDevelop
+*.kdev4
+
+# ===================================================================
+# OS-specific files
+# ===================================================================
+# macOS custom folder attributes
+.DS_Store
+# Windows thumbnail cache
+Thumbs.db
+# KDE Dolphin folder settings
+.directory
+
+# ===================================================================
+# Miscellaneous temporary files
+# ===================================================================
+# Editor backups and swap files
+*~
+\#*#
+*.swp
+*.swo
+*.kate-swp
+# Leftovers from applying patches
+*.orig
+*.rej
+# Diffs and patches left in the root for testing
+/*.diff
+/*.patch
