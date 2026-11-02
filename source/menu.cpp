@@ -55,8 +55,8 @@ u32 getipbyname(char *domain)
 }
 
 #define THREAD_SLEEP 	200
-#define GSTACK 			(16384)
-#define GUITH_STACK 	(16384)
+#define GSTACK 			(32768)
+#define GUITH_STACK 	(32768)
 
 static u8 guistack[GSTACK] ATTRIBUTE_ALIGN (32);
 static u8 progressstack[GUITH_STACK] ATTRIBUTE_ALIGN (32);
@@ -8049,7 +8049,7 @@ static void StartGuiThreads()
 	screensaverThreadHalt = 1;
 	creditsThreadHalt = 1;
 
-	LWP_CreateThread (&guithread, GuiThread, NULL, guistack, 24576, 60);
+	LWP_CreateThread (&guithread, GuiThread, NULL, guistack, GSTACK, 60);
 	LWP_CreateThread (&progressthread, ProgressThread, NULL, progressstack, GUITH_STACK, 60);
 	LWP_CreateThread (&screensaverthread, ScreensaverThread, NULL, screensaverstack, GUITH_STACK, 60);
 	LWP_CreateThread (&creditsthread, CreditsThread, NULL, creditsstack, GUITH_STACK, 60);
