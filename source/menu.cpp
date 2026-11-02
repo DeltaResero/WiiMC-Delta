@@ -3501,8 +3501,8 @@ static void MenuBrowse(int menu)
 
 			if(stat(filepath, &buf) == 0)
 				ErrorPrompt("Online media file is invalid.");
-			//else
-			//	ErrorPrompt("Online media file not found.");
+			else if(onlinePLS[0] == 0)
+				ErrorPrompt("Online media file not found.");
 
 			sprintf(filepath, "%s", onlinePLS);
 			strcpy(browser.dir, filepath);
