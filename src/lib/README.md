@@ -100,3 +100,5 @@ Local changes:
 - `libavutil/tx.c`: with `FF_TX_FLOAT_ONLY` only the float transforms are
   listed, so the double and int32 ones aren't linked, and `av_tx_init()`
   returns `AVERROR(ENOSYS)` for those types.
+- `configure`: the PowerPC probe for `dcbzl` only runs when the option is
+  still on, so `--disable-dcbzl` takes effect.
