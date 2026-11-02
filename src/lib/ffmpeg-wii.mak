@@ -58,7 +58,11 @@ FFMPEG_BSFS := \
 
 # TCP_MAXSEG has libogc's value; its netinet/tcp.h hides it from FFmpeg's
 # strict POSIX feature macros.
-FFMPEG_CFLAGS := $(MACHDEP) -I$(LIBOGC_INC) -I$(DEVKITPRO)/portlibs/ppc/include \
+# WiiMC's changes to FFmpeg, listed in src/lib/README.md
+FFMPEG_WII := \
+	-DFF_TX_SMALL_SR_TABLES=1
+
+FFMPEG_CFLAGS := $(MACHDEP) $(FFMPEG_WII) -I$(LIBOGC_INC) -I$(DEVKITPRO)/portlibs/ppc/include \
 	-fno-asynchronous-unwind-tables -DTCP_MAXSEG=2
 
 ffmpeg_comma := ,

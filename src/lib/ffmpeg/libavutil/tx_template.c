@@ -29,7 +29,12 @@
 #define TABLE_DEF(name, size) \
     DECLARE_ALIGNED(32, TXSample, TX_TAB(ff_tx_tab_ ##name))[size]
 
-#define SR_POW2_TABLES \
+/* The split-radix tables are static arrays of len/4+1 samples for every
+ * power of two, for each of float, double and int32: about 1 MiB of .bss
+ * up to 2^17. With FF_TX_SMALL_SR_TABLES (set for the Wii, which has 24 MiB
+ * of MEM1) they stop at 2^15. Longer power-of-two transforms then fall back
+ * to the generic codelets; no decoder in that build needs more than 8192. */
+#define SR_POW2_TABLES_SMALL \
     SR_TABLE(8)        \
     SR_TABLE(16)       \
     SR_TABLE(32)       \
@@ -43,8 +48,16 @@
     SR_TABLE(8192)     \
     SR_TABLE(16384)    \
     SR_TABLE(32768)    \
+
+#if FF_TX_SMALL_SR_TABLES
+#define SR_POW2_TABLES SR_POW2_TABLES_SMALL
+#else
+#define SR_POW2_TABLES \
+    SR_POW2_TABLES_SMALL \
     SR_TABLE(65536)    \
     SR_TABLE(131072)   \
+
+#endif
 
 #define SR_TABLE(len) \
     TABLE_DEF(len, len/4 + 1);
@@ -145,7 +158,7 @@ av_cold void TX_TAB(ff_tx_init_tabs)(int len)
 {
     int factor_2 = ff_ctz(len);
     if (factor_2) {
-        int idx = factor_2 - 3;
+        int idx = FFMIN(factor_2 - 3, (int)FF_ARRAY_ELEMS(sr_tabs_init_funcs) - 1);
         for (int i = 0; i <= idx; i++)
             ff_thread_once(&sr_tabs_init_once[i],
                             sr_tabs_init_funcs[i]);
@@ -718,8 +731,10 @@ DECL_SR_CODELET(4096,2048,1024)
 DECL_SR_CODELET(8192,4096,2048)
 DECL_SR_CODELET(16384,8192,4096)
 DECL_SR_CODELET(32768,16384,8192)
+#if !FF_TX_SMALL_SR_TABLES
 DECL_SR_CODELET(65536,32768,16384)
 DECL_SR_CODELET(131072,65536,32768)
+#endif
 
 static av_cold int TX_NAME(ff_tx_fft_init)(AVTXContext *s,
                                            const FFTXCodelet *cd,
@@ -2150,8 +2165,10 @@ const FFTXCodelet * const TX_NAME(ff_tx_codelet_list)[] = {
     &TX_NAME(ff_tx_fft8192_ns_def),
     &TX_NAME(ff_tx_fft16384_ns_def),
     &TX_NAME(ff_tx_fft32768_ns_def),
+#if !FF_TX_SMALL_SR_TABLES
     &TX_NAME(ff_tx_fft65536_ns_def),
     &TX_NAME(ff_tx_fft131072_ns_def),
+#endif
 
     /* Prime factor codelets */
     &TX_NAME(ff_tx_fft3_ns_def),

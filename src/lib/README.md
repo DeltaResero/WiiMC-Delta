@@ -91,3 +91,6 @@ Local changes:
 
 - `Makefile` includes the Makefiles of `tools/`, `fftools/`, `doc/` and
   `tests/` only if they exist, since the trim removes those directories.
+- `libavutil/tx_template.c`: with `FF_TX_SMALL_SR_TABLES` the static
+  split-radix tables and their codelets stop at 2^15 points instead of
+  2^17. Longer power-of-two transforms use the generic codelets.
