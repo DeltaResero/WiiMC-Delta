@@ -186,6 +186,9 @@ av_cold int ff_dct_init(DCTContext *s, int nbits, enum DCTTransformType inverse)
     if (inverse == DCT_II && nbits == 5) {
         s->dct_calc = dct32_func;
     } else {
+        if (nbits + 2 > FFT_MAX_BITS)
+            return -1;
+
         ff_init_ff_cos_tabs(nbits + 2);
 
         s->costab = ff_cos_tabs[nbits + 2];

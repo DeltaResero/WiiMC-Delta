@@ -273,4 +273,8 @@
     from_index = ap->encoding_index;
     break;
   }
+  /* WiiMC: encodings.def leaves out the converters it doesn't need. */
+  if (all_encodings[from_index].ifuncs.xxx_mbtowc == NULL
+      || all_encodings[to_index].ofuncs.xxx_wctomb == NULL)
+    goto invalid;
 }

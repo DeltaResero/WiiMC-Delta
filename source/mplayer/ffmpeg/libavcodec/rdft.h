@@ -45,8 +45,6 @@ extern SINTABLE(2048);
 extern SINTABLE(4096);
 extern SINTABLE(8192);
 extern SINTABLE(16384);
-extern SINTABLE(32768);
-extern SINTABLE(65536);
 
 struct RDFTContext {
     int nbits;

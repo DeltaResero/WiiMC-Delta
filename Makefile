@@ -79,8 +79,12 @@ EXTERNAL	:=	$(CURDIR)/external
 EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
 export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
 EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
+# libraries built in this tree, so the DOL relinks when one of them changes
+export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/libavformat.a \
+				$(MPLAYER)/ffmpeg/libavcodec/libavcodec.a $(MPLAYER)/ffmpeg/libswscale/libswscale.a \
+				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
-				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP)"
+				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
 NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard external/libntfs/source/*.c)))
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -147,8 +151,8 @@ $(BUILD): $(EXTLIBS)
 #---------------------------------------------------------------------------------
 $(EXTBUILD)/libntfs/%.o: $(EXTERNAL)/libntfs/source/%.c
 	@mkdir -p $(@D)
-	$(CC) -O2 -Wall -Wno-address-of-packed-member $(MACHDEP) -DHAVE_CONFIG_H \
-		-I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
+	$(CC) -O2 -Wall -Wno-address-of-packed-member -fno-asynchronous-unwind-tables \
+		$(MACHDEP) -DHAVE_CONFIG_H -I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
 
 $(EXTPREFIX)/lib/libntfs.a: $(NTFSOBJS)
 	@mkdir -p $(@D) $(EXTPREFIX)/include
@@ -195,7 +199,11 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 $(OUTPUT).dol: $(OUTPUT).elf
-$(OUTPUT).elf: $(OFILES)
+# not devkitPro's %.elf rule: it links $^, which would put LINKDEPS ahead of LIBS
+$(OUTPUT).elf: $(OFILES) $(LINKDEPS)
+	$(SILENTMSG) linking ... $(notdir $@)
+	$(ADD_COMPILE_COMMAND) end
+	$(SILENTCMD)$(LD) $(OFILES) $(LDFLAGS) $(LIBPATHS) $(LIBS) -o $@
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with .ttf, .lang, .png, and .jpg extensions

@@ -777,10 +777,12 @@ GUI_ICONSIZES = 16x16 22x22 24x24 32x32 48x48 256x256
 MPLAYERWIILIB = $(OBJS_MPLAYER) 
 MPLAYERWIILIB += $(OBJS_COMMON) 
 
-all: $(MPLAYERWIILIB) $(COMMON_LIBS)
-	rm -f libmplayerwii.a
-	$(AR) rc libmplayerwii.a $(MPLAYERWIILIB)
-	$(RANLIB) libmplayerwii.a
+all: libmplayerwii.a $(COMMON_LIBS)
+
+libmplayerwii.a: $(MPLAYERWIILIB)
+	rm -f $@
+	$(AR) rc $@ $(MPLAYERWIILIB)
+	$(RANLIB) $@
 
 %.o: %.S
 	$(CC) $(CC_DEPFLAGS) $(CFLAGS) -c -o $@ $<
