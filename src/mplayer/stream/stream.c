@@ -23,7 +23,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(GEKKO)
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #endif
@@ -94,11 +94,15 @@ static const stream_info_t* const auto_open_streams[] = {
   &stream_info_cdda,
 #endif
 #ifdef CONFIG_NETWORKING
+  #if !defined(GEKKO)
   &stream_info_netstream,
+  #endif
   &stream_info_http1,
   &stream_info_asf,
   &stream_info_pnm,
+  #if !defined(GEKKO)
   &stream_info_rtsp,
+  #endif
 #ifdef CONFIG_LIVE555
   &stream_info_sdp,
   &stream_info_rtsp_sip,
@@ -300,6 +304,9 @@ static int stream_reconnect(stream_t *s)
 
 int stream_read_internal(stream_t *s, void *buf, int len)
 {
+#ifdef GEKKO
+  static int _try=0;
+#endif
   int orig_len = len;
   // we will retry even if we already reached EOF previously.
   switch(s->type){
@@ -325,6 +332,44 @@ int stream_read_internal(stream_t *s, void *buf, int len)
   default:
     len= s->fill_buffer ? s->fill_buffer(s, buf, len) : 0;
   }
+#ifdef GEKKO
+  if(len==0)
+  {
+         printf("stream error len==0, try: %i\n",_try);
+    if(_try>3)
+      s->eof=1;
+    else if(_try == 0)
+    {
+      off_t pos = s->pos;
+      stream_reset(s);
+      stream_seek_internal(s, pos);
+      printf("stream error seek\n");
+    }
+    _try++;
+    s->buf_pos=s->buf_len=0;
+    return 0;
+  }
+  if(len<0)
+  {
+    s->eof=1;
+
+    if(s->type == STREAMTYPE_DVDNAV)
+      return 0;
+
+    s->buf_pos=s->buf_len=0;
+    if(s->error==0 && (errno==EIO || errno==ENOSYS))
+    {
+      s->error=1;
+      off_t pos = s->pos;
+      stream_reset(s);
+      stream_seek_internal(s, pos);
+      printf("stream error2 seek\n");
+    }
+    printf("stream s->error: %i\n",s->error);
+    return 0;
+  }
+
+#else
   if(len<=0){
     // do not retry if this looks like proper eof
     if (s->eof || (s->end_pos && s->pos == s->end_pos))
@@ -346,10 +391,14 @@ eof_out:
     s->eof=1;
     return 0;
   }
+#endif
   // When reading succeeded we are obviously not at eof.
   // This e.g. avoids issues with eof getting stuck when lavf seeks in MPEG-TS
   s->eof=0;
   s->pos+=len;
+#ifdef GEKKO
+  _try=0;
+#endif
   return len;
 }
 
@@ -391,7 +440,12 @@ int stream_write_buffer(stream_t *s, unsigned char *buf, int len) {
   if(rd < 0)
     return -1;
   s->pos += rd;
+#ifdef GEKKO
+  if(rd != len)
+    return -1;
+#else
   assert(rd == len && "stream_write_buffer(): unexpected short write");
+#endif
   return rd;
 }
 

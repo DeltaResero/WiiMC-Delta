@@ -170,6 +170,9 @@ typedef struct stream {
   unsigned int buf_pos,buf_len;
   int64_t pos,start_pos,end_pos;
   int eof;
+#ifdef GEKKO
+  int error;
+#endif
   int mode; //STREAM_READ or STREAM_WRITE
   unsigned int cache_pid;
   void* cache_data;
@@ -191,9 +194,9 @@ int stream_seek_long(stream_t *s, int64_t pos);
 void stream_capture_do(stream_t *s);
 
 #ifdef CONFIG_STREAM_CACHE
-int stream_enable_cache(stream_t *stream,int64_t size,int64_t min,int64_t prefill);
+int stream_enable_cache(stream_t *stream,int size,int min,int prefill);
 int cache_stream_fill_buffer(stream_t *s);
-int cache_stream_seek_long(stream_t *s,int64_t pos);
+int cache_stream_seek_long(stream_t *s,off_t pos);
 #else
 // no cache, define wrappers:
 #define cache_stream_fill_buffer(x) stream_fill_buffer(x)
@@ -280,7 +283,9 @@ static inline unsigned int stream_read_int24(stream_t *s)
   y=(y<<8)|stream_read_char(s);
   return y;
 }
-
+#ifdef GEKKO
+int stream_read(stream_t *s,char* mem,int total);
+#else
 static inline int stream_read(stream_t *s, char *mem, int total)
 {
   int len=total;
@@ -298,6 +303,7 @@ static inline int stream_read(stream_t *s, char *mem, int total)
   }
   return total;
 }
+#endif
 
 uint8_t *stream_read_until(stream_t *s, uint8_t *mem, int max, uint8_t term, int utf16);
 static inline uint8_t *stream_read_line(stream_t *s, uint8_t *mem,
