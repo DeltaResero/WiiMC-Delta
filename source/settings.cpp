@@ -64,12 +64,12 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Dansk", "da", "dan" },*/
 	{ "English", "en", "eng" },
 	//{ "Esperanto", "eo", "epo" },
-	{ "Español", "es", "spa" },
+	{ "EspaÃ±ol", "es", "spa" },
 	/*{ "Estonian", "et", "est" },
 	{ "Finnish", "fi", "fin" },
 	{ "Fiji", "fj", "fij" },
 	{ "Faroese", "fo", "fao" }, */
-	{ "Français", "fr", "fre" },
+	{ "FranÃ§ais", "fr", "fre" },
 /*	{ "Frisian", "fy", "fry" },
 	{ "Galician", "gl", "glg" },
 	{ "Georgian", "ka", "geo" },

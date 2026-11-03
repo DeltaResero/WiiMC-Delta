@@ -4704,8 +4704,8 @@ static void MenuSettingsGlobal()
 				case LANG_ENGLISH:				sprintf(options.value[0], "English"); break;
 				//only support languages that can have all text translated
 				//case LANG_GERMAN:				sprintf(options.value[0], "Deutsch"); break;
-				//case LANG_FRENCH:				sprintf(options.value[0], "Français"); break;
-				case LANG_SPANISH:				sprintf(options.value[0], "Español"); break;
+				//case LANG_FRENCH:				sprintf(options.value[0], "FranÃ§ais"); break;
+				case LANG_SPANISH:				sprintf(options.value[0], "EspaÃ±ol"); break;
 				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italiano"); break;
 				case LANG_DUTCH:				sprintf(options.value[0], "Dutch"); break;
 				case LANG_SIMP_CHINESE:			sprintf(options.value[0], "Chinese (Simplified)"); break;
