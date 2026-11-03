@@ -416,7 +416,7 @@ char *GetCpuFriendlyName(unsigned int regs[], unsigned int regs2[]){
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
-#elif defined(__AMIGAOS4__) || defined(_WIN32)
+#elif defined(__AMIGAOS4__) || defined(_WIN32) || defined(GEKKO)
 /* nothing */
 #else
 #include <signal.h>

@@ -17,7 +17,7 @@
  */
 
 #include <string.h>
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(GEKKO)
 #include <sys/ioctl.h>
 #endif
 #include <fcntl.h>

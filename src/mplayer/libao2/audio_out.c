@@ -54,6 +54,9 @@ extern const ao_functions_t audio_out_v4l2;
 extern const ao_functions_t audio_out_mpegpes;
 extern const ao_functions_t audio_out_pcm;
 extern const ao_functions_t audio_out_pss;
+#ifdef GEKKO
+extern const ao_functions_t audio_out_gekko;
+#endif
 
 const ao_functions_t* const audio_out_drivers[] =
 {
@@ -116,6 +119,9 @@ const ao_functions_t* const audio_out_drivers[] =
 #endif
 #ifdef CONFIG_V4L2_DECODER
         &audio_out_v4l2,
+#endif
+#ifdef GEKKO
+                &audio_out_gekko,
 #endif
         &audio_out_null,
 // should not be auto-selected:

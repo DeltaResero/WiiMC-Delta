@@ -1735,6 +1735,7 @@ mp_input_get_section(void) {
 
 void
 mp_input_init(void) {
+#ifndef GEKKO
   char* file;
 
   file = config_file[0] != '/' ? get_path(config_file) : config_file;
@@ -1819,7 +1820,7 @@ mp_input_init(void) {
     else
       mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrCantOpenFile,in_file,strerror(errno));
   }
-
+#endif
 }
 
 void

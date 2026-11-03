@@ -141,6 +141,9 @@ extern const vo_functions_t video_out_quartz;
 extern const vo_functions_t video_out_pnm;
 extern const vo_functions_t video_out_md5sum;
 extern const vo_functions_t video_out_mng;
+#ifdef GEKKO
+extern const vo_functions_t video_out_gekko;
+#endif
 
 /* The following declarations are _not_ const because functions pointers
  * get overloaded during (re)initialization. */
@@ -273,6 +276,9 @@ const vo_functions_t* const video_out_drivers[] =
         &video_out_winvidix,
 #endif
         &video_out_cvidix,
+#endif
+#ifdef GEKKO
+        &video_out_gekko,
 #endif
         &video_out_null,
         &video_out_mpegpes,
