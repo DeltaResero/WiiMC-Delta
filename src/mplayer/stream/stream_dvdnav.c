@@ -159,7 +159,12 @@ static void dvdnav_get_highlight (dvdnav_priv_t *priv, int display_mode) {
 
   dvdnav_get_current_highlight (priv->dvdnav, &(hlev->buttonN));
   hlev->display = display_mode; /* show */
-
+#ifdef GEKKO
+  // always hide button highlight
+  hlev->sx = hlev->ex = 0;
+  hlev->sy = hlev->ey = 0;
+  hlev->palette = hlev->buttonN = 0;
+#else
   if (hlev->buttonN > 0 && pnavpci->hli.hl_gi.btn_ns > 0 && hlev->display) {
     for (btnum = 0; btnum < pnavpci->hli.hl_gi.btn_ns; btnum++) {
       btni_t *btni = &(pnavpci->hli.btnit[btnum]);
@@ -180,6 +185,7 @@ static void dvdnav_get_highlight (dvdnav_priv_t *priv, int display_mode) {
     hlev->sy = hlev->ey = 0;
     hlev->palette = hlev->buttonN = 0;
   }
+#endif
 }
 
 static inline int dvdnav_get_duration (int length) {

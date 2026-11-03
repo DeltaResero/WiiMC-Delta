@@ -844,6 +844,39 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
       if (DVDUDFVolumeInfo(dvd, volid, sizeof(volid), NULL, 0) >= 0 || DVDISOVolumeInfo(dvd, volid, sizeof(volid), NULL, 0) >= 0)
         mp_msg(MSGT_IDENTIFY, MSGL_V, "ID_DVD_VOLUME_ID=%s\n", volid);
     }
+#ifdef GEKKO
+/**
+ * Try to autodetect main title if title number not specified.
+ */
+    if (dvd_title == 0) {
+            int longest_len = 0;
+            int longest_title = 0;
+
+            int vts_no;
+            for (vts_no = 1; vts_no <= vmg_file->vts_atrt->nr_of_vtss; vts_no++) {
+                    ifo_handle_t *temp_vts_file = ifoOpen(dvd, vts_no);
+                    // ignore failed titles
+                    if (temp_vts_file) {
+                            int title_no;
+                            for (title_no = 0; title_no < tt_srpt->nr_of_srpts; title_no++) {
+                                    int len;
+                                    if (tt_srpt->title[title_no].title_set_nr != vts_no)
+                                            continue;
+                                    len = mp_get_titleset_length(temp_vts_file, tt_srpt, title_no);
+                                    if (len > longest_len) {
+                                            longest_len = len;
+                                            longest_title = title_no;
+                                    }
+                            }
+                            ifoClose(temp_vts_file);
+                    }
+
+            }
+            dvd_title = longest_title + 1; // remap +1 for the validation
+    }
+    if(dvd_angle < 1)
+        dvd_angle = 1;
+#endif
     /**
      * Make sure our title number is valid.
      */
@@ -1047,6 +1080,39 @@ fail:
   return STREAM_UNSUPPORTED;
 }
 
+#ifdef GEKKO
+static char *gekko_basename(char *name)
+{
+        if(!name)
+                return NULL;
+
+        char *base = strrchr(name, '/');
+
+        if(!base)
+                return strdup("");
+
+        base++;
+        return strdup(base);
+}
+
+static char *gekko_dirname(char *url)
+{
+        if(!url)
+                return NULL;
+
+        char res[1024];
+        strcpy(res, url);
+
+        char *end = strrchr(res, '/');
+
+        if(!end)
+                return strdup(url);
+
+        *end = 0;
+        return strdup(res);
+}
+#endif
+
 static int ifo_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
 {
     char* filename;
@@ -1058,10 +1124,20 @@ static int ifo_stream_open (stream_t *stream, int mode, void *opts, int *file_fo
 
     mp_msg(MSGT_DVD, MSGL_INFO, ".IFO detected. Redirecting to dvd://\n");
 
+#ifdef GEKKO
+    filename = gekko_basename(stream->url);
+#else
     filename = strdup(mp_basename(stream->url));
+#endif
 
     spriv=calloc(1, sizeof(struct stream_priv_s));
+
+#ifdef GEKKO
+    spriv->device = gekko_dirname(stream->url);
+#else
     spriv->device = mp_dirname(stream->url);
+#endif
+
     if(!av_strncasecmp(filename,"vts_",4))
     {
         if(sscanf(filename+3, "_%02d_", &spriv->title)!=1)
