@@ -67,14 +67,14 @@ WINE_MODREF* MODULE_FindModule(LPCSTR m)
     modref_list* list=local_wm;
     TRACE("FindModule: Module %s request\n", m);
     if(list==NULL)
-	return NULL;
+        return NULL;
 //    while(strcmp(m, list->wm->filename))
     while(!strstr(list->wm->filename, m))
     {
-	TRACE("%s: %x\n", list->wm->filename, list->wm->module);
-	list=list->prev;
-	if(list==NULL)
-	    return NULL;
+        TRACE("%s: %x\n", list->wm->filename, list->wm->module);
+        list=list->prev;
+        if(list==NULL)
+            return NULL;
     }
     TRACE("Resolved to %s\n", list->wm->filename);
     return list->wm;
@@ -84,29 +84,29 @@ static void MODULE_RemoveFromList(WINE_MODREF *mod)
 {
     modref_list* list=local_wm;
     if(list==0)
-	return;
+        return;
     if(mod==0)
-	return;
+        return;
     if((list->prev==NULL)&&(list->next==NULL))
     {
-	free(list);
-	local_wm=NULL;
-//	uninstall_fs();
-	return;
+        free(list);
+        local_wm=NULL;
+//      uninstall_fs();
+        return;
     }
     for(;list;list=list->prev)
     {
-	if(list->wm==mod)
-	{
-	    if(list->prev)
-		list->prev->next=list->next;
-	    if(list->next)
-		list->next->prev=list->prev;
-	    if(list==local_wm)
-		local_wm=list->prev;
-	    free(list);
-	    return;
-	}
+        if(list->wm==mod)
+        {
+            if(list->prev)
+                list->prev->next=list->next;
+            if(list->next)
+                list->next->prev=list->prev;
+            if(list==local_wm)
+                local_wm=list->prev;
+            free(list);
+            return;
+        }
     }
 
 }
@@ -117,26 +117,26 @@ WINE_MODREF *MODULE32_LookupHMODULE(HMODULE m)
     TRACE("LookupHMODULE: Module %X request\n", m);
     if(list==NULL)
     {
-	TRACE("LookupHMODULE failed\n");
-	return NULL;
+        TRACE("LookupHMODULE failed\n");
+        return NULL;
     }
     while(m!=list->wm->module)
     {
 //      printf("Checking list %X wm %X module %X\n",
-//	list, list->wm, list->wm->module);
-	list=list->prev;
-	if(list==NULL)
-	{
-	    TRACE("LookupHMODULE failed\n");
-	    return NULL;
-	}
+//      list, list->wm, list->wm->module);
+        list=list->prev;
+        if(list==NULL)
+        {
+            TRACE("LookupHMODULE failed\n");
+            return NULL;
+        }
     }
     TRACE("LookupHMODULE hit %p\n", list->wm);
     return list->wm;
 }
 
 /*************************************************************************
- *		MODULE_InitDll
+ *              MODULE_InitDll
  */
 static WIN_BOOL MODULE_InitDll( WINE_MODREF *wm, DWORD type, LPVOID lpReserved )
 {
@@ -185,7 +185,7 @@ static WIN_BOOL MODULE_InitDll( WINE_MODREF *wm, DWORD type, LPVOID lpReserved )
 }
 
 /*************************************************************************
- *		MODULE_DllProcessAttach
+ *              MODULE_DllProcessAttach
  *
  * Send the process attach notification to all DLLs the given module
  * depends on (recursively). This is somewhat complicated due to the fact that
@@ -250,9 +250,9 @@ static WIN_BOOL MODULE_DllProcessAttach( WINE_MODREF *wm, LPVOID lpReserved )
     }
     else
     {
-	local_wm = malloc(sizeof(modref_list));
-	local_wm->next=local_wm->prev=NULL;
-	local_wm->wm=wm;
+        local_wm = malloc(sizeof(modref_list));
+        local_wm->next=local_wm->prev=NULL;
+        local_wm->wm=wm;
     }
     /* Remove recursion flag */
     wm->flags &= ~WINE_MODREF_MARKER;
@@ -271,7 +271,7 @@ static WIN_BOOL MODULE_DllProcessAttach( WINE_MODREF *wm, LPVOID lpReserved )
 }
 
 /*************************************************************************
- *		MODULE_DllProcessDetach
+ *              MODULE_DllProcessDetach
  *
  * Send DLL process detach notifications.  See the comment about calling
  * sequence at MODULE_DllProcessAttach.  Unless the bForceDetach flag
@@ -285,15 +285,15 @@ static void MODULE_DllProcessDetach( WINE_MODREF* wm, WIN_BOOL bForceDetach, LPV
     MODULE_InitDll( wm, DLL_PROCESS_DETACH, lpReserved );
 /*    while (l)
     {
-	modref_list* f = l;
-	l = l->next;
-	free(f);
+        modref_list* f = l;
+        l = l->next;
+        free(f);
     }
     local_wm = 0;*/
 }
 
 /***********************************************************************
- *	MODULE_LoadLibraryExA	(internal)
+ *      MODULE_LoadLibraryExA   (internal)
  *
  * Load a PE style module according to the load order.
  *
@@ -305,37 +305,37 @@ static void MODULE_DllProcessDetach( WINE_MODREF* wm, WIN_BOOL bForceDetach, LPV
  */
 static WINE_MODREF *MODULE_LoadLibraryExA( LPCSTR libname, HFILE hfile, DWORD flags )
 {
-	DWORD err = GetLastError();
-	WINE_MODREF *pwm;
-//	module_loadorder_t *plo;
+        DWORD err = GetLastError();
+        WINE_MODREF *pwm;
+//      module_loadorder_t *plo;
 
         SetLastError( ERROR_FILE_NOT_FOUND );
-	TRACE("Trying native dll '%s'\n", libname);
-	pwm = PE_LoadLibraryExA(libname, flags);
+        TRACE("Trying native dll '%s'\n", libname);
+        pwm = PE_LoadLibraryExA(libname, flags);
 #ifdef HAVE_LIBDL
-	if(!pwm)
-	{
-    	    TRACE("Trying ELF dll '%s'\n", libname);
-	    pwm=(WINE_MODREF*)ELFDLL_LoadLibraryExA(libname, flags);
-	}
+        if(!pwm)
+        {
+            TRACE("Trying ELF dll '%s'\n", libname);
+            pwm=(WINE_MODREF*)ELFDLL_LoadLibraryExA(libname, flags);
+        }
 #endif
-//		printf("0x%08x\n", pwm);
-//		break;
-	if(pwm)
-	{
-		/* Initialize DLL just loaded */
-		TRACE("Loaded module '%s' at 0x%08x, \n", libname, pwm->module);
-		/* Set the refCount here so that an attach failure will */
-		/* decrement the dependencies through the MODULE_FreeLibrary call. */
-		pwm->refCount++;
+//              printf("0x%08x\n", pwm);
+//              break;
+        if(pwm)
+        {
+                /* Initialize DLL just loaded */
+                TRACE("Loaded module '%s' at 0x%08x, \n", libname, pwm->module);
+                /* Set the refCount here so that an attach failure will */
+                /* decrement the dependencies through the MODULE_FreeLibrary call. */
+                pwm->refCount++;
 
                 SetLastError( err );  /* restore last error */
-		return pwm;
-	}
+                return pwm;
+        }
 
 
-	WARN("Failed to load module '%s'; error=0x%08lx, \n", libname, GetLastError());
-	return NULL;
+        WARN("Failed to load module '%s'; error=0x%08lx, \n", libname, GetLastError());
+        return NULL;
 }
 
 /***********************************************************************
@@ -362,108 +362,108 @@ static WIN_BOOL MODULE_FreeLibrary( WINE_MODREF *wm )
  */
 HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 {
-	WINE_MODREF *wm = 0;
-	char* listpath[] = { "", "", 0 };
-	char path[512];
-	char checked[2000];
+        WINE_MODREF *wm = 0;
+        char* listpath[] = { "", "", 0 };
+        char path[512];
+        char checked[2000];
         int i = -1;
 
         checked[0] = 0;
-	if(!libname)
-	{
-		SetLastError(ERROR_INVALID_PARAMETER);
-		return 0;
-	}
+        if(!libname)
+        {
+                SetLastError(ERROR_INVALID_PARAMETER);
+                return 0;
+        }
 
-	wm=MODULE_FindModule(libname);
-	if(wm) return wm->module;
+        wm=MODULE_FindModule(libname);
+        if(wm) return wm->module;
 
-//	if(fs_installed==0)
-//	    install_fs();
+//      if(fs_installed==0)
+//          install_fs();
 
-	// Do not load libraries from a path relative to the current directory
-	if (*libname != '/')
-	    i++;
+        // Do not load libraries from a path relative to the current directory
+        if (*libname != '/')
+            i++;
 
-	while (wm == 0 && listpath[++i])
-	{
-	    if (i < 2)
-	    {
-		if (i == 0)
-		    /* check just original file name */
-		    strncpy(path, libname, 511);
+        while (wm == 0 && listpath[++i])
+        {
+            if (i < 2)
+            {
+                if (i == 0)
+                    /* check just original file name */
+                    strncpy(path, libname, 511);
                 else
-		    /* check default user path */
-		    strncpy(path, codec_path, 300);
-	    }
-	    else if (strcmp(codec_path, listpath[i]))
+                    /* check default user path */
+                    strncpy(path, codec_path, 300);
+            }
+            else if (strcmp(codec_path, listpath[i]))
                 /* path from the list */
-		strncpy(path, listpath[i], 300);
-	    else
-		continue;
+                strncpy(path, listpath[i], 300);
+            else
+                continue;
 
-	    if (i > 0)
-	    {
-		strcat(path, "/");
-		strncat(path, libname, 100);
-	    }
-	    path[511] = 0;
-	    wm = MODULE_LoadLibraryExA( path, hfile, flags );
+            if (i > 0)
+            {
+                strcat(path, "/");
+                strncat(path, libname, 100);
+            }
+            path[511] = 0;
+            wm = MODULE_LoadLibraryExA( path, hfile, flags );
 
-	    if (!wm)
-	    {
-		if (checked[0])
-		    strcat(checked, ", ");
-		strcat(checked, path);
+            if (!wm)
+            {
+                if (checked[0])
+                    strcat(checked, ", ");
+                strcat(checked, path);
                 checked[1500] = 0;
 
-	    }
-	}
-	if ( wm )
-	{
-		if ( !MODULE_DllProcessAttach( wm, NULL ) )
-		{
-			WARN_(module)("Attach failed for module '%s', \n", libname);
-			MODULE_FreeLibrary(wm);
-			SetLastError(ERROR_DLL_INIT_FAILED);
-			MODULE_RemoveFromList(wm);
-			wm = NULL;
-		}
-	}
+            }
+        }
+        if ( wm )
+        {
+                if ( !MODULE_DllProcessAttach( wm, NULL ) )
+                {
+                        WARN_(module)("Attach failed for module '%s', \n", libname);
+                        MODULE_FreeLibrary(wm);
+                        SetLastError(ERROR_DLL_INIT_FAILED);
+                        MODULE_RemoveFromList(wm);
+                        wm = NULL;
+                }
+        }
 
-	if (!wm && !strstr(checked, "avisynth.dll"))
-	    printf("Win32 LoadLibrary failed to load: %s\n", checked);
+        if (!wm && !strstr(checked, "avisynth.dll"))
+            printf("Win32 LoadLibrary failed to load: %s\n", checked);
 
 #define RVA(x) ((char *)wm->module+(unsigned int)(x))
-	if (strstr(libname, "CFDecode2.ax") && wm)
-	{
-	    if (PE_FindExportedFunction(wm, "DllGetClassObject", TRUE) == RVA(0xd00e0))
-	    {
-	        // Patch some movdqa to movdqu
-	        // It is currently unclear why this is necessary, it seems
-	        // to be some output frame, but our frame seems correctly
-	        // aligned
-	        int offsets[] = {0x7318c, 0x731ba, 0x731e0, 0x731fe, 0};
-	        int i;
-	        for (i = 0; offsets[i]; i++)
-	        {
-	            int ofs = offsets[i];
-	            if (RVA(ofs)[0] == 0x66 && RVA(ofs)[1] == 0x0f &&
-	                RVA(ofs)[2] == 0x7f)
-	                RVA(ofs)[0] = 0xf3;
-	        }
-	    }
-	}
-	if (strstr(libname,"vp31vfw.dll") && wm)
-	{
-	    int i;
+        if (strstr(libname, "CFDecode2.ax") && wm)
+        {
+            if (PE_FindExportedFunction(wm, "DllGetClassObject", TRUE) == RVA(0xd00e0))
+            {
+                // Patch some movdqa to movdqu
+                // It is currently unclear why this is necessary, it seems
+                // to be some output frame, but our frame seems correctly
+                // aligned
+                int offsets[] = {0x7318c, 0x731ba, 0x731e0, 0x731fe, 0};
+                int i;
+                for (i = 0; offsets[i]; i++)
+                {
+                    int ofs = offsets[i];
+                    if (RVA(ofs)[0] == 0x66 && RVA(ofs)[1] == 0x0f &&
+                        RVA(ofs)[2] == 0x7f)
+                        RVA(ofs)[0] = 0xf3;
+                }
+            }
+        }
+        if (strstr(libname,"vp31vfw.dll") && wm)
+        {
+            int i;
 
-	  // sse hack moved from patch dll into runtime patching
+          // sse hack moved from patch dll into runtime patching
           if (PE_FindExportedFunction(wm, "DriverProc", TRUE)==RVA(0x1000)) {
-	    fprintf(stderr, "VP3 DLL found\n");
-	    for (i=0;i<18;i++) RVA(0x4bd6)[i]=0x90;
-	  }
-	}
+            fprintf(stderr, "VP3 DLL found\n");
+            for (i=0;i<18;i++) RVA(0x4bd6)[i]=0x90;
+          }
+        }
 
         // remove a few divs in the VP codecs that make trouble
         if (strstr(libname,"vp5vfw.dll") && wm)
@@ -520,79 +520,79 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
           }
         }
 
-	if (strstr(libname,"QuickTime.qts") && wm)
-	{
-	    void** ptr;
-	    void *dispatch_addr;
-	    int i;
+        if (strstr(libname,"QuickTime.qts") && wm)
+        {
+            void** ptr;
+            void *dispatch_addr;
+            int i;
 
-//	    dispatch_addr = GetProcAddress(wm->module, "theQuickTimeDispatcher", TRUE);
-	    dispatch_addr = PE_FindExportedFunction(wm, "theQuickTimeDispatcher", TRUE);
-	    if (dispatch_addr == RVA(0x124c30))
-	    {
-	        fprintf(stderr, "QuickTime5 DLLs found\n");
-		ptr = (void **)RVA(0x375ca4); // dispatch_ptr
-	        for (i=0;i<5;i++)  RVA(0x19e842)[i]=0x90; // make_new_region ?
-	        for (i=0;i<28;i++) RVA(0x19e86d)[i]=0x90; // call__call_CreateCompatibleDC ?
-		for (i=0;i<5;i++)  RVA(0x19e898)[i]=0x90; // jmp_to_call_loadbitmap ?
-	        for (i=0;i<9;i++)  RVA(0x19e8ac)[i]=0x90; // call__calls_OLE_shit ?
-	        for (i=0;i<106;i++) RVA(0x261b10)[i]=0x90; // disable threads
+//          dispatch_addr = GetProcAddress(wm->module, "theQuickTimeDispatcher", TRUE);
+            dispatch_addr = PE_FindExportedFunction(wm, "theQuickTimeDispatcher", TRUE);
+            if (dispatch_addr == RVA(0x124c30))
+            {
+                fprintf(stderr, "QuickTime5 DLLs found\n");
+                ptr = (void **)RVA(0x375ca4); // dispatch_ptr
+                for (i=0;i<5;i++)  RVA(0x19e842)[i]=0x90; // make_new_region ?
+                for (i=0;i<28;i++) RVA(0x19e86d)[i]=0x90; // call__call_CreateCompatibleDC ?
+                for (i=0;i<5;i++)  RVA(0x19e898)[i]=0x90; // jmp_to_call_loadbitmap ?
+                for (i=0;i<9;i++)  RVA(0x19e8ac)[i]=0x90; // call__calls_OLE_shit ?
+                for (i=0;i<106;i++) RVA(0x261b10)[i]=0x90; // disable threads
 #if 0
-		/* CreateThread callers */
-		for (i=0;i<5;i++) RVA(0x1487c5)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x14b275)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x1a24b1)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x1afc5a)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x2f799c)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x2f7efe)[i]=0x90;
-		for (i=0;i<5;i++) RVA(0x2fa33e)[i]=0x90;
+                /* CreateThread callers */
+                for (i=0;i<5;i++) RVA(0x1487c5)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x14b275)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x1a24b1)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x1afc5a)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x2f799c)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x2f7efe)[i]=0x90;
+                for (i=0;i<5;i++) RVA(0x2fa33e)[i]=0x90;
 #endif
 
 #if 0
-		/* TerminateQTML fix */
-		for (i=0;i<47;i++) RVA(0x2fa3b8)[i]=0x90; // terminate thread
-		for (i=0;i<47;i++) RVA(0x2f7f78)[i]=0x90; // terminate thread
-		for (i=0;i<77;i++) RVA(0x1a13d5)[i]=0x90;
-		RVA(0x08e0ae)[0] = 0xc3; // font/dc remover
-		for (i=0;i<24;i++) RVA(0x07a1ad)[i]=0x90; // destroy window
+                /* TerminateQTML fix */
+                for (i=0;i<47;i++) RVA(0x2fa3b8)[i]=0x90; // terminate thread
+                for (i=0;i<47;i++) RVA(0x2f7f78)[i]=0x90; // terminate thread
+                for (i=0;i<77;i++) RVA(0x1a13d5)[i]=0x90;
+                RVA(0x08e0ae)[0] = 0xc3; // font/dc remover
+                for (i=0;i<24;i++) RVA(0x07a1ad)[i]=0x90; // destroy window
 #endif
-	    } else if (dispatch_addr == RVA(0x13b330))
-	    {
-    		fprintf(stderr, "QuickTime6 DLLs found\n");
-		ptr = (void **)RVA(0x3b9524); // dispatcher_ptr
-		for (i=0;i<5;i++)  RVA(0x2730cc)[i]=0x90; // make_new_region
-		for (i=0;i<28;i++) RVA(0x2730f7)[i]=0x90; // call__call_CreateCompatibleDC
-		for (i=0;i<5;i++)  RVA(0x273122)[i]=0x90; // jmp_to_call_loadbitmap
-		for (i=0;i<9;i++)  RVA(0x273131)[i]=0x90; // call__calls_OLE_shit
-		for (i=0;i<96;i++) RVA(0x2ac852)[i]=0x90; // disable threads
-	    } else if (dispatch_addr == RVA(0x13c3e0))
-	    {
-    		fprintf(stderr, "QuickTime6.3 DLLs found\n");
-		ptr = (void **)RVA(0x3ca01c); // dispatcher_ptr
-		for (i=0;i<5;i++)  RVA(0x268f6c)[i]=0x90; // make_new_region
-		for (i=0;i<28;i++) RVA(0x268f97)[i]=0x90; // call__call_CreateCompatibleDC
-		for (i=0;i<5;i++)  RVA(0x268fc2)[i]=0x90; // jmp_to_call_loadbitmap
-		for (i=0;i<9;i++)  RVA(0x268fd1)[i]=0x90; // call__calls_OLE_shit
-		for (i=0;i<96;i++) RVA(0x2b4722)[i]=0x90; // disable threads
-	    } else
-	    {
-	        fprintf(stderr, "Unsupported QuickTime version (%p)\n",
-		    dispatch_addr);
-		return 0;
-	    }
+            } else if (dispatch_addr == RVA(0x13b330))
+            {
+                fprintf(stderr, "QuickTime6 DLLs found\n");
+                ptr = (void **)RVA(0x3b9524); // dispatcher_ptr
+                for (i=0;i<5;i++)  RVA(0x2730cc)[i]=0x90; // make_new_region
+                for (i=0;i<28;i++) RVA(0x2730f7)[i]=0x90; // call__call_CreateCompatibleDC
+                for (i=0;i<5;i++)  RVA(0x273122)[i]=0x90; // jmp_to_call_loadbitmap
+                for (i=0;i<9;i++)  RVA(0x273131)[i]=0x90; // call__calls_OLE_shit
+                for (i=0;i<96;i++) RVA(0x2ac852)[i]=0x90; // disable threads
+            } else if (dispatch_addr == RVA(0x13c3e0))
+            {
+                fprintf(stderr, "QuickTime6.3 DLLs found\n");
+                ptr = (void **)RVA(0x3ca01c); // dispatcher_ptr
+                for (i=0;i<5;i++)  RVA(0x268f6c)[i]=0x90; // make_new_region
+                for (i=0;i<28;i++) RVA(0x268f97)[i]=0x90; // call__call_CreateCompatibleDC
+                for (i=0;i<5;i++)  RVA(0x268fc2)[i]=0x90; // jmp_to_call_loadbitmap
+                for (i=0;i<9;i++)  RVA(0x268fd1)[i]=0x90; // call__calls_OLE_shit
+                for (i=0;i<96;i++) RVA(0x2b4722)[i]=0x90; // disable threads
+            } else
+            {
+                fprintf(stderr, "Unsupported QuickTime version (%p)\n",
+                    dispatch_addr);
+                return 0;
+            }
 
-	    fprintf(stderr,"QuickTime.qts patched!!! old entry=%p\n",ptr[0]);
+            fprintf(stderr,"QuickTime.qts patched!!! old entry=%p\n",ptr[0]);
 
 #ifdef EMU_QTX_API
-	    report_entry = report_func;
-	    report_ret   = report_func_ret;
-	    wrapper_target=ptr[0];
-	    ptr[0]=wrapper;
+            report_entry = report_func;
+            report_ret   = report_func_ret;
+            wrapper_target=ptr[0];
+            ptr[0]=wrapper;
 #endif
-	}
+        }
 #undef RVA
 
-	return wm ? wm->module : 0;
+        return wm ? wm->module : 0;
 }
 
 
@@ -600,7 +600,7 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
  *           LoadLibraryA         (KERNEL32)
  */
 HMODULE WINAPI LoadLibraryA(LPCSTR libname) {
-	return LoadLibraryExA(libname,0,0);
+        return LoadLibraryExA(libname,0,0);
 }
 
 /***********************************************************************
@@ -616,7 +616,7 @@ WIN_BOOL WINAPI FreeLibrary(HINSTANCE hLibModule)
     if ( !wm || !hLibModule )
     {
         SetLastError( ERROR_INVALID_HANDLE );
-	return 0;
+        return 0;
     }
     else
         retv = MODULE_FreeLibrary( wm );
@@ -630,7 +630,7 @@ WIN_BOOL WINAPI FreeLibrary(HINSTANCE hLibModule)
 }
 
 /***********************************************************************
- *           GetProcAddress   		(KERNEL32.257)
+ *           GetProcAddress             (KERNEL32.257)
  */
 FARPROC WINAPI GetProcAddress( HMODULE hModule, LPCSTR function )
 {
@@ -705,23 +705,23 @@ static int dump_component(char* name, int type, void* orig, ComponentParameters 
     fprintf(stderr,"%*sComponentCall: %s  flags=0x%X  size=%d  what=0x%X %s\n",3*c_level,"",name,params->flags, params->paramSize, params->what, component_func(params->what));
 
     for(i=0;i<params->paramSize/4;i++)
-	fprintf(stderr,"%*s param[%d] = 0x%X\n",3*c_level,"",i,params->params[i]);
+        fprintf(stderr,"%*s param[%d] = 0x%X\n",3*c_level,"",i,params->params[i]);
 
     ++c_level;
     ret=orig(params,glob);
     --c_level;
 
     if(ret>=0x1000)
-	fprintf(stderr,"%*s return=0x%X\n",3*c_level,"",ret);
+        fprintf(stderr,"%*s return=0x%X\n",3*c_level,"",ret);
     else
-	fprintf(stderr,"%*s return=%d\n",3*c_level,"",ret);
+        fprintf(stderr,"%*s return=%d\n",3*c_level,"",ret);
     return ret;
 }
 
 #define DECL_COMPONENT(sname,name,type) \
     static void* real_ ## sname = NULL; \
     static int fake_ ## sname(ComponentParameters *params,void** glob){ \
-	return dump_component(name,type,real_ ## sname, params, glob); \
+        return dump_component(name,type,real_ ## sname, params, glob); \
     }
 
 #include "qt_comp_template.c"
@@ -786,33 +786,33 @@ static int report_func(void *stack_base, int stack_size, reg386_t *reg, uint32_t
           dptr=0x62b672c0;dptr+=2*(reg->eax&65535);
 //          printf("FUNC: ptr2=%p  eax=%p  edx=%p\n",0x62924910,dptr[0],dptr[1]);
           pptr=dptr[0]; plen=dptr[1];
-	  break;
+          break;
       case 0x62924e40:
           dptr=0x62b67c70;dptr+=2*(reg->eax&65535);
 //          printf("FUNC: ptr2=%p  eax=%p  edx=%p\n",0x62924910,dptr[0],dptr[1]);
           pptr=dptr[0]; plen=dptr[1];
-	  break;
+          break;
       case 0x62924e60:
           dptr=0x62b68108;if(reg->eax&0x8000) dptr+=2*(reg->eax|0xffff0000); else dptr+=2*(reg->eax&65535);
 //          printf("FUNC: ptr2=%p  eax=%p  edx=%p\n",0x62924910,dptr[0],dptr[1]);
           pptr=dptr[0]; plen=dptr[1];
-	  break;
+          break;
       case 0x62924e80:
           dptr=0x62b68108;if(reg->eax&0x8000) dptr+=2*(reg->eax|0xffff0000); else dptr+=2*(reg->eax&65535);
 //          printf("FUNC: ptr2=%p  eax=%p  edx=%p\n",0x62924910,dptr[0],dptr[1]);
           pptr=dptr[0]; plen=dptr[1];
-	  break;
+          break;
       default:
           printf("FUNC: unknown ptr & psize!\n");
-	  pwrapper=dptr[1];
+          pwrapper=dptr[1];
       }
   }
 
   for(i=0;qt_fv_list[i].name;i++){
           if(qt_fv_list[i].id==reg->eax){
-	      pname=qt_fv_list[i].name;
-	      break;
-	  }
+              pname=qt_fv_list[i].name;
+              break;
+          }
   }
 
   printf("FUNC[%X/%s]: wrapper=%p  func=%p  len=%d\n",reg->eax,
@@ -920,22 +920,22 @@ static int report_func(void *stack_base, int stack_size, reg386_t *reg, uint32_t
       int i;
       for(i=0;qt_fv_list[i].name;i++){
           if(qt_fv_list[i].id==reg->eax){
-	      printf("FUNC: %s\n",qt_fv_list[i].name);
-	      break;
-	  }
+              printf("FUNC: %s\n",qt_fv_list[i].name);
+              break;
+          }
       }
       }
   }
 
   // print stack/reg information
   printf("ENTER(%d) stack = %d bytes @ %p\n"
-	 "eax = 0x%08x edx = 0x%08x ebx = 0x%08x ecx = 0x%08x\n"
-	 "esp = 0x%08x ebp = 0x%08x esi = 0x%08x edi = 0x%08x\n"
-	 "flags = 0x%08x\n", ret_i,
-	 stack_size, stack_base,
-	 reg->eax, reg->edx, reg->ebx, reg->ecx,
-	 reg->esp, reg->ebp, reg->esi, reg->edi,
-	 *flags);
+         "eax = 0x%08x edx = 0x%08x ebx = 0x%08x ecx = 0x%08x\n"
+         "esp = 0x%08x ebp = 0x%08x esi = 0x%08x edi = 0x%08x\n"
+         "flags = 0x%08x\n", ret_i,
+         stack_size, stack_base,
+         reg->eax, reg->edx, reg->ebx, reg->ecx,
+         reg->esp, reg->ebp, reg->esi, reg->edi,
+         *flags);
 #endif
 
   // save ret addr:
@@ -981,13 +981,13 @@ static int report_func_ret(void *stack_base, int stack_size, reg386_t *reg, uint
 #else
   // print stack/reg information
   printf("LEAVE(%d) stack = %d bytes @ %p\n"
-	 "eax = 0x%08x edx = 0x%08x ebx = 0x%08x ecx = 0x%08x\n"
-	 "esp = 0x%08x ebp = 0x%08x esi = 0x%08x edi = 0x%08x\n"
-	 "flags = 0x%08x\n", ret_i,
-	 stack_size, stack_base,
-	 reg->eax, reg->edx, reg->ebx, reg->ecx,
-	 reg->esp, reg->ebp, reg->esi, reg->edi,
-	 *flags);
+         "eax = 0x%08x edx = 0x%08x ebx = 0x%08x ecx = 0x%08x\n"
+         "esp = 0x%08x ebp = 0x%08x esi = 0x%08x edi = 0x%08x\n"
+         "flags = 0x%08x\n", ret_i,
+         stack_size, stack_base,
+         reg->eax, reg->edx, reg->ebx, reg->ecx,
+         reg->esp, reg->ebp, reg->esi, reg->edi,
+         *flags);
 #endif
 
 #if 0
@@ -1012,48 +1012,48 @@ static int report_func_ret(void *stack_base, int stack_size, reg386_t *reg, uint
 #endif
 
 /***********************************************************************
- *           MODULE_GetProcAddress   		(internal)
+ *           MODULE_GetProcAddress              (internal)
  */
 FARPROC MODULE_GetProcAddress(
-	HMODULE hModule, 	/* [in] current module handle */
-	LPCSTR function,	/* [in] function to be looked up */
-	WIN_BOOL snoop )
+        HMODULE hModule,        /* [in] current module handle */
+        LPCSTR function,        /* [in] function to be looked up */
+        WIN_BOOL snoop )
 {
-    WINE_MODREF	*wm = MODULE32_LookupHMODULE( hModule );
+    WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
 //    WINE_MODREF *wm=local_wm;
-    FARPROC	retproc;
+    FARPROC     retproc;
 
 #ifdef DEBUG_QTX_API
     if (HIWORD(function))
-	fprintf(stderr,"XXX GetProcAddress(%08lx,%s)\n",(DWORD)hModule,function);
+        fprintf(stderr,"XXX GetProcAddress(%08lx,%s)\n",(DWORD)hModule,function);
     else
-	fprintf(stderr,"XXX GetProcAddress(%08lx,%p)\n",(DWORD)hModule,function);
+        fprintf(stderr,"XXX GetProcAddress(%08lx,%p)\n",(DWORD)hModule,function);
 #endif
 
-//	TRACE_(win32)("(%08lx,%s)\n",(DWORD)hModule,function);
+//      TRACE_(win32)("(%08lx,%s)\n",(DWORD)hModule,function);
 //    else
-//	TRACE_(win32)("(%08lx,%p)\n",(DWORD)hModule,function);
+//      TRACE_(win32)("(%08lx,%p)\n",(DWORD)hModule,function);
 
     if (!wm) {
-    	SetLastError(ERROR_INVALID_HANDLE);
+        SetLastError(ERROR_INVALID_HANDLE);
         return (FARPROC)0;
     }
     switch (wm->type)
     {
     case MODULE32_PE:
-     	retproc = PE_FindExportedFunction( wm, function, snoop );
-	if (!retproc) SetLastError(ERROR_PROC_NOT_FOUND);
-	break;
+        retproc = PE_FindExportedFunction( wm, function, snoop );
+        if (!retproc) SetLastError(ERROR_PROC_NOT_FOUND);
+        break;
 #ifdef HAVE_LIBDL
     case MODULE32_ELF:
-	retproc = (FARPROC) dlsym( (void*) wm->module, function);
-	if (!retproc) SetLastError(ERROR_PROC_NOT_FOUND);
-	return retproc;
+        retproc = (FARPROC) dlsym( (void*) wm->module, function);
+        if (!retproc) SetLastError(ERROR_PROC_NOT_FOUND);
+        return retproc;
 #endif
     default:
-    	ERR("wine_modref type %d not handled.\n",wm->type);
-    	SetLastError(ERROR_INVALID_HANDLE);
-    	return (FARPROC)0;
+        ERR("wine_modref type %d not handled.\n",wm->type);
+        SetLastError(ERROR_INVALID_HANDLE);
+        return (FARPROC)0;
     }
 
 #ifdef EMU_QTX_API
@@ -1062,8 +1062,8 @@ FARPROC MODULE_GetProcAddress(
 #ifdef DEBUG_QTX_API
 #define DECL_COMPONENT(sname,name,type) \
     if(!strcmp(function,name)){ \
-	fprintf(stderr,name "dispatcher catched -> %p\n",retproc); \
-	real_ ## sname = retproc; retproc = fake_ ## sname; \
+        fprintf(stderr,name "dispatcher catched -> %p\n",retproc); \
+        real_ ## sname = retproc; retproc = fake_ ## sname; \
     }
 #include "qt_comp_template.c"
 #undef DECL_COMPONENT
@@ -1073,7 +1073,7 @@ FARPROC MODULE_GetProcAddress(
 //      || !strcmp(function,"CallComponentFunctionWithStorage")
 //      || !strcmp(function,"CallComponent")
       ){
-	fprintf(stderr,"theQuickTimeDispatcher catched -> %p\n",retproc);
+        fprintf(stderr,"theQuickTimeDispatcher catched -> %p\n",retproc);
       report_entry = report_func;
       report_ret   = report_func_ret;
       wrapper_target=(void(*)(void))retproc;
@@ -1099,16 +1099,16 @@ void CodecRelease(void)
     //printf("**************CODEC RELEASE %d\n", acounter);
     if (acounter == 0)
     {
-	for (;;)
-	{
-	    modref_list* list = local_wm;
-	    if (!local_wm)
-		break;
-	    //printf("CODECRELEASE %p\n", list);
+        for (;;)
+        {
+            modref_list* list = local_wm;
+            if (!local_wm)
+                break;
+            //printf("CODECRELEASE %p\n", list);
             MODULE_FreeLibrary(list->wm);
-	    MODULE_RemoveFromList(list->wm);
+            MODULE_RemoveFromList(list->wm);
             if (local_wm == NULL)
-		my_garbagecollection();
-	}
+                my_garbagecollection();
+        }
     }
 }

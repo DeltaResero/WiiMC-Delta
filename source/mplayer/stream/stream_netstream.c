@@ -103,7 +103,7 @@ static int lock_fd(int fd) {
     if(fcntl(fd,F_SETLKW,&lock)) {
       if(errno == EAGAIN) continue;
       mp_msg(MSGT_STREAM,MSGL_ERR, "Failed to get the lock: %s\n",
-	     strerror(errno));
+             strerror(errno));
       return 0;
     }
   } while(0);
@@ -124,7 +124,7 @@ static int unlock_fd(int fd) {
   mp_msg(MSGT_STREAM,MSGL_DBG2, "Unlock (%d)\n",getpid());
   if(fcntl(fd,F_SETLK,&lock)) {
     mp_msg(MSGT_STREAM,MSGL_ERR, "Failed to release the lock: %s\n",
-	   strerror(errno));
+           strerror(errno));
     return 0;
   }
 #else

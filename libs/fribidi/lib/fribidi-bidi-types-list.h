@@ -42,25 +42,25 @@
 
 #if !defined(_FRIBIDI_PAR_TYPES) || defined(_FRIBIDI_ALL_TYPES)
 
-_FRIBIDI_ADD_TYPE (LTR, 'L')	/* Left-To-Right letter */
-_FRIBIDI_ADD_TYPE (RTL, 'R')	/* Right-To-Left letter */
-_FRIBIDI_ADD_TYPE (AL, 'A')	/* Arabic Letter */
-_FRIBIDI_ADD_TYPE (EN, '1')	/* European Numeral */
-_FRIBIDI_ADD_TYPE (AN, '9')	/* Arabic Numeral */
-_FRIBIDI_ADD_TYPE (ES, 'w')	/* European number Separator */
-_FRIBIDI_ADD_TYPE (ET, 'w')	/* European number Terminator */
-_FRIBIDI_ADD_TYPE (CS, 'w')	/* Common Separator */
-_FRIBIDI_ADD_TYPE (NSM, '`')	/* Non Spacing Mark */
-_FRIBIDI_ADD_TYPE (BN, 'b')	/* Boundary Neutral */
-_FRIBIDI_ADD_TYPE (BS, 'B')	/* Block Separator */
-_FRIBIDI_ADD_TYPE (SS, 'S')	/* Segment Separator */
-_FRIBIDI_ADD_TYPE (WS, '_')	/* WhiteSpace */
-_FRIBIDI_ADD_TYPE (ON, 'n')	/* Other Neutral */
-_FRIBIDI_ADD_TYPE (LRE, '+')	/* Left-to-Right Embedding */
-_FRIBIDI_ADD_TYPE (RLE, '+')	/* Right-to-Left Embedding */
-_FRIBIDI_ADD_TYPE (LRO, '+')	/* Left-to-Right Override */
-_FRIBIDI_ADD_TYPE (RLO, '+')	/* Right-to-Left Override */
-_FRIBIDI_ADD_TYPE (PDF, '-')	/* Pop Directional Flag */
+_FRIBIDI_ADD_TYPE (LTR, 'L')    /* Left-To-Right letter */
+_FRIBIDI_ADD_TYPE (RTL, 'R')    /* Right-To-Left letter */
+_FRIBIDI_ADD_TYPE (AL, 'A') /* Arabic Letter */
+_FRIBIDI_ADD_TYPE (EN, '1') /* European Numeral */
+_FRIBIDI_ADD_TYPE (AN, '9') /* Arabic Numeral */
+_FRIBIDI_ADD_TYPE (ES, 'w') /* European number Separator */
+_FRIBIDI_ADD_TYPE (ET, 'w') /* European number Terminator */
+_FRIBIDI_ADD_TYPE (CS, 'w') /* Common Separator */
+_FRIBIDI_ADD_TYPE (NSM, '`')    /* Non Spacing Mark */
+_FRIBIDI_ADD_TYPE (BN, 'b') /* Boundary Neutral */
+_FRIBIDI_ADD_TYPE (BS, 'B') /* Block Separator */
+_FRIBIDI_ADD_TYPE (SS, 'S') /* Segment Separator */
+_FRIBIDI_ADD_TYPE (WS, '_') /* WhiteSpace */
+_FRIBIDI_ADD_TYPE (ON, 'n') /* Other Neutral */
+_FRIBIDI_ADD_TYPE (LRE, '+')    /* Left-to-Right Embedding */
+_FRIBIDI_ADD_TYPE (RLE, '+')    /* Right-to-Left Embedding */
+_FRIBIDI_ADD_TYPE (LRO, '+')    /* Left-to-Right Override */
+_FRIBIDI_ADD_TYPE (RLO, '+')    /* Right-to-Left Override */
+_FRIBIDI_ADD_TYPE (PDF, '-')    /* Pop Directional Flag */
 
 #if defined(_FRIBIDI_ADD_ALIAS)
 _FRIBIDI_ADD_ALIAS (L, LTR)
@@ -70,18 +70,18 @@ _FRIBIDI_ADD_ALIAS (S, SS)
 #endif /* _FRIBIDI_ADD_ALIAS */
 
 #if defined(_FRIBIDI_SENTINEL_TYPE) || defined(_FRIBIDI_ALL_TYPES)
-_FRIBIDI_ADD_TYPE (SENTINEL, '$')	/* SENTINEL */
+_FRIBIDI_ADD_TYPE (SENTINEL, '$')   /* SENTINEL */
 #endif /* _FRIBIDI_SENTINEL_TYPES || _FRIBIDI_ALL_TYPES*/
 #endif /* !_FRIBIDI_PAR_TYPES || _FRIBIDI_ALL_TYPES */
 
 #if defined(_FRIBIDI_PAR_TYPES) || defined(_FRIBIDI_ALL_TYPES)
 # if !defined(_FRIBIDI_ALL_TYPES)
-_FRIBIDI_ADD_TYPE (LTR, 'L')	/* Left-To-Right paragraph */
-_FRIBIDI_ADD_TYPE (RTL, 'R')	/* Right-To-Left paragraph */
-_FRIBIDI_ADD_TYPE (ON, 'n')	/* directiOn-Neutral paragraph */
+_FRIBIDI_ADD_TYPE (LTR, 'L')    /* Left-To-Right paragraph */
+_FRIBIDI_ADD_TYPE (RTL, 'R')    /* Right-To-Left paragraph */
+_FRIBIDI_ADD_TYPE (ON, 'n') /* directiOn-Neutral paragraph */
 # endif /* !_FRIBIDI_ALL_TYPES */
-_FRIBIDI_ADD_TYPE (WLTR, 'l')	/* Weak Left To Right paragraph */
-_FRIBIDI_ADD_TYPE (WRTL, 'r')	/* Weak Right To Left paragraph */
+_FRIBIDI_ADD_TYPE (WLTR, 'l')   /* Weak Left To Right paragraph */
+_FRIBIDI_ADD_TYPE (WRTL, 'r')   /* Weak Right To Left paragraph */
 #endif /* _FRIBIDI_PAR_TYPES || _FRIBIDI_ALL_TYPES*/
 
 #if defined(_FRIBIDI_ENUM_TYPES)

@@ -34,11 +34,11 @@
 #include "loader/wine/windef.h"
 
 static const ad_info_t info = {
-	"RealAudio decoder",
-	"realaud",
-	"Alex Beregszaszi",
-	"Florian Schneider, Arpad Gereoffy, Alex Beregszaszi, Donnie Smith",
-	"binary real audio codecs"
+        "RealAudio decoder",
+        "realaud",
+        "Alex Beregszaszi",
+        "Florian Schneider, Arpad Gereoffy, Alex Beregszaszi, Donnie Smith",
+        "binary real audio codecs"
 };
 
 LIBAD_EXTERN(realaud)
@@ -53,28 +53,28 @@ void  __pure_virtual(void);
 
 void *__builtin_new(unsigned long size)
 {
-	return malloc(size);
+        return malloc(size);
 }
 
 void __builtin_delete(void* ize)
 {
-	free(ize);
+        free(ize);
 }
 
 void *__builtin_vec_new(unsigned long size)
 {
-	return malloc(size);
+        return malloc(size);
 }
 
 void __builtin_vec_delete(void *mem)
 {
-	free(mem);
+        free(mem);
 }
 
 void __pure_virtual(void)
 {
-	printf("FATAL: __pure_virtual() called!\n");
-//	exit(1);
+        printf("FATAL: __pure_virtual() called!\n");
+//      exit(1);
 }
 
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
@@ -168,8 +168,8 @@ static int load_syms_linux(char *path)
     handle = dlopen(path, RTLD_LAZY);
     if (!handle)
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error: %s\n", dlerror());
-	return 0;
+        mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error: %s\n", dlerror());
+        return 0;
     }
 
     raCloseCodec = dlsym(handle, "RACloseCodec");
@@ -183,11 +183,11 @@ static int load_syms_linux(char *path)
     raSetPwd = dlsym(handle, "RASetPwd"); // optional, used by SIPR
 
     if (raCloseCodec && raDecode && raFreeDecoder &&
-	(raOpenCodec||raOpenCodec2) && raSetFlavor &&
-	/*raSetDLLAccessPath &&*/ raInitDecoder)
+        (raOpenCodec||raOpenCodec2) && raSetFlavor &&
+        /*raSetDLLAccessPath &&*/ raInitDecoder)
     {
-	rv_handle = handle;
-	return 1;
+        rv_handle = handle;
+        return 1;
     }
 
     mp_msg(MSGT_DECAUDIO,MSGL_WARN,"Cannot resolve symbols - incompatible dll: %s\n",path);
@@ -216,8 +216,8 @@ static int load_syms_windows(char *path)
     handle = LoadLibraryA(path);
     if (!handle)
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error loading dll\n");
-	return 0;
+        mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error loading dll\n");
+        return 0;
     }
 
     wraCloseCodec = GetProcAddress(handle, "RACloseCodec");
@@ -231,12 +231,12 @@ static int load_syms_windows(char *path)
     wraSetPwd = GetProcAddress(handle, "RASetPwd"); // optional, used by SIPR
 
     if (wraCloseCodec && wraDecode && wraFreeDecoder &&
-	(wraOpenCodec || wraOpenCodec2) && wraSetFlavor &&
-	/*wraSetDLLAccessPath &&*/ wraInitDecoder)
+        (wraOpenCodec || wraOpenCodec2) && wraSetFlavor &&
+        /*wraSetDLLAccessPath &&*/ wraInitDecoder)
     {
-	rv_handle = handle;
-	dll_type = 1;
-	return 1;
+        rv_handle = handle;
+        dll_type = 1;
+        return 1;
     }
 
     mp_msg(MSGT_DECAUDIO,MSGL_WARN,"Cannot resolve symbols - incompatible dll: %s\n",path);
@@ -264,13 +264,13 @@ static int preinit(sh_audio_t *sh){
     if (strstr(sh->codec->dll,".dll") || !load_syms_linux(path))
 #endif
 #ifdef CONFIG_WIN32DLL
-	if (!load_syms_windows(sh->codec->dll))
+        if (!load_syms_windows(sh->codec->dll))
 #endif
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingDLLcodec, sh->codec->dll);
-	mp_msg(MSGT_DECVIDEO, MSGL_HINT, "Read the RealAudio section of the DOCS!\n");
-	free(path);
-	return 0;
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingDLLcodec, sh->codec->dll);
+        mp_msg(MSGT_DECVIDEO, MSGL_HINT, "Read the RealAudio section of the DOCS!\n");
+        free(path);
+        return 0;
     }
 
 #ifdef CONFIG_WIN32DLL
@@ -305,7 +305,7 @@ static int preinit(sh_audio_t *sh){
         sprintf(path, "%s\\", codec_path);
         result = wraOpenCodec2(&sh->context, path);
       } else
-	result=wraOpenCodec(&sh->context);
+        result=wraOpenCodec(&sh->context);
     } else
 #endif
     if (raOpenCodec2) {
@@ -326,30 +326,30 @@ static int preinit(sh_audio_t *sh){
 
   {
     ra_init_t init_data={
-	sh->wf->nSamplesPerSec,
-	sh->wf->wBitsPerSample,
-	sh->wf->nChannels,
-	100, // quality
-	sh->wf->nBlockAlign, // subpacket size
-	sh->wf->nBlockAlign, // coded frame size
-	sh->wf->cbSize, // codec data length
-	(char*)(sh->wf+1) // extras
+        sh->wf->nSamplesPerSec,
+        sh->wf->wBitsPerSample,
+        sh->wf->nChannels,
+        100, // quality
+        sh->wf->nBlockAlign, // subpacket size
+        sh->wf->nBlockAlign, // coded frame size
+        sh->wf->cbSize, // codec data length
+        (char*)(sh->wf+1) // extras
     };
 #ifdef CONFIG_WIN32DLL
     wra_init_t winit_data={
-	sh->wf->nSamplesPerSec,
-	sh->wf->wBitsPerSample,
-	sh->wf->nChannels,
-	100, // quality
-	sh->wf->nBlockAlign, // subpacket size
-	sh->wf->nBlockAlign, // coded frame size
-	sh->wf->cbSize, // codec data length
-	(char*)(sh->wf+1) // extras
+        sh->wf->nSamplesPerSec,
+        sh->wf->wBitsPerSample,
+        sh->wf->nChannels,
+        100, // quality
+        sh->wf->nBlockAlign, // subpacket size
+        sh->wf->nBlockAlign, // coded frame size
+        sh->wf->cbSize, // codec data length
+        (char*)(sh->wf+1) // extras
     };
 #endif
 #ifdef CONFIG_WIN32DLL
     if (dll_type == 1)
-	result=wraInitDecoder(sh->context,&winit_data);
+        result=wraInitDecoder(sh->context,&winit_data);
     else
 #endif
     result=raInitDecoder(sh->context,&init_data);
@@ -366,13 +366,13 @@ static int preinit(sh_audio_t *sh){
 #else
     if(raSetPwd){
 #endif
-	// used by 'SIPR'
+        // used by 'SIPR'
 #ifdef CONFIG_WIN32DLL
-	if (dll_type == 1)
-	    wraSetPwd(sh->context,"Ardubancel Quazanga");
-	else
+        if (dll_type == 1)
+            wraSetPwd(sh->context,"Ardubancel Quazanga");
+        else
 #endif
-	raSetPwd(sh->context,"Ardubancel Quazanga"); // set password... lol.
+        raSetPwd(sh->context,"Ardubancel Quazanga"); // set password... lol.
     }
 
   if (sh->format == mmioFOURCC('s','i','p','r')) {
@@ -390,7 +390,7 @@ static int preinit(sh_audio_t *sh){
 
 #ifdef CONFIG_WIN32DLL
     if (dll_type == 1)
-	result=wraSetFlavor(sh->context,flavor);
+        result=wraSetFlavor(sh->context,flavor);
     else
 #endif
     result=raSetFlavor(sh->context,flavor);
@@ -425,8 +425,8 @@ static void uninit(sh_audio_t *sh){
 #ifdef CONFIG_WIN32DLL
     if (dll_type == 1)
     {
-	if (wraFreeDecoder) wraFreeDecoder(sh->context);
-	if (wraCloseCodec) wraCloseCodec(sh->context);
+        if (wraFreeDecoder) wraFreeDecoder(sh->context);
+        if (wraCloseCodec) wraCloseCodec(sh->context);
     }
 #endif
 
@@ -437,7 +437,7 @@ static void uninit(sh_audio_t *sh){
 #ifdef CONFIG_WIN32DLL
     if (dll_type == 1)
     {
-	if (rv_handle) FreeLibrary(rv_handle);
+        if (rv_handle) FreeLibrary(rv_handle);
     } else
 #endif
 // this dlclose() causes some memory corruption, and crashes soon (in caller):
@@ -479,14 +479,14 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...){
     switch(cmd){
       case ADCTRL_RESYNC_STREAM:
         // it is called once after seeking, to resync.
-	// Note: sh_audio->a_in_buffer_len=0; is done _before_ this call!
-	return CONTROL_TRUE;
+        // Note: sh_audio->a_in_buffer_len=0; is done _before_ this call!
+        return CONTROL_TRUE;
       case ADCTRL_SKIP_FRAME:
         // it is called to skip (jump over) small amount (1/10 sec or 1 frame)
-	// of audio data - used to sync audio to video after seeking
-	// if you don't return CONTROL_TRUE, it will defaults to:
-	//      ds_fill_buffer(sh_audio->ds);  // skip 1 demux packet
-	return CONTROL_TRUE;
+        // of audio data - used to sync audio to video after seeking
+        // if you don't return CONTROL_TRUE, it will defaults to:
+        //      ds_fill_buffer(sh_audio->ds);  // skip 1 demux packet
+        return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }

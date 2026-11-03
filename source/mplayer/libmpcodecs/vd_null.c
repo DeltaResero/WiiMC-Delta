@@ -26,11 +26,11 @@
 
 static const vd_info_t info =
 {
-	"Null video decoder",
-	"null",
-	"A'rpi",
-	"A'rpi",
-	"no decoding"
+    "Null video decoder",
+    "null",
+    "A'rpi",
+    "A'rpi",
+    "no decoding"
 };
 
 LIBVD_EXTERN(null)

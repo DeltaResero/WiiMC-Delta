@@ -26,14 +26,14 @@
 //#define URL_DEBUG
 
 typedef struct {
-	char *url;
-	char *noauth_url;
-	char *protocol;
-	char *hostname;
-	char *file;
-	unsigned int port;
-	char *username;
-	char *password;
+    char *url;
+    char *noauth_url;
+    char *protocol;
+    char *hostname;
+    char *file;
+    unsigned int port;
+    char *username;
+    char *password;
 } URL_t;
 
 URL_t *url_redirect(URL_t **url, const char *redir);

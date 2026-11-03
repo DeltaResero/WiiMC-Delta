@@ -41,7 +41,7 @@ static unsigned char *pciConfBase;
 static inline void enable_os_io(void)
 {
     pciConfBase = (unsigned char *) smem_create("PCI-CONF",
-    	    (char *)0x80800000, 64*1024, SM_READ|SM_WRITE);
+            (char *)0x80800000, 64*1024, SM_READ|SM_WRITE);
     if (pciConfBase == (void *) -1)
         exit(1);
 }
@@ -60,56 +60,56 @@ static unsigned char *pciConfBase;
 static inline unsigned long
 static swapl(unsigned long val)
 {
-	unsigned char *p = (unsigned char *)&val;
-	return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0);
+        unsigned char *p = (unsigned char *)&val;
+        return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0);
 }
 
 
 #define BUS(tag) (((tag)>>16)&0xff)
 #define DFN(tag) (((tag)>>8)&0xff)
 
-#define PCIBIOS_DEVICE_NOT_FOUND	0x86
-#define PCIBIOS_SUCCESSFUL		0x00
+#define PCIBIOS_DEVICE_NOT_FOUND        0x86
+#define PCIBIOS_SUCCESSFUL              0x00
 
 static int pciconfig_read(
           unsigned char bus,
           unsigned char dev,
           unsigned char offset,
-          int len,		/* unused, alway 4 */
+          int len,              /* unused, alway 4 */
           unsigned long *val)
 {
-	unsigned long _val;
-	unsigned long *ptr;
+        unsigned long _val;
+        unsigned long *ptr;
 
-	dev >>= 3;
-	if (bus || dev >= 16) {
-		*val = 0xFFFFFFFF;
-		return PCIBIOS_DEVICE_NOT_FOUND;
-	} else {
-		ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
-		_val = swapl(*ptr);
-	}
-	*val = _val;
-	return PCIBIOS_SUCCESSFUL;
+        dev >>= 3;
+        if (bus || dev >= 16) {
+                *val = 0xFFFFFFFF;
+                return PCIBIOS_DEVICE_NOT_FOUND;
+        } else {
+                ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
+                _val = swapl(*ptr);
+        }
+        *val = _val;
+        return PCIBIOS_SUCCESSFUL;
 }
 
 static int pciconfig_write(
           unsigned char bus,
           unsigned char dev,
           unsigned char offset,
-          int len,		/* unused, alway 4 */
+          int len,              /* unused, alway 4 */
           unsigned long val)
 {
-	unsigned long _val;
-	unsigned long *ptr;
+        unsigned long _val;
+        unsigned long *ptr;
 
-	dev >>= 3;
-	_val = swapl(val);
-	if (bus || dev >= 16) {
-		return PCIBIOS_DEVICE_NOT_FOUND;
-	} else {
-		ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
-		*ptr = _val;
-	}
-	return PCIBIOS_SUCCESSFUL;
+        dev >>= 3;
+        _val = swapl(val);
+        if (bus || dev >= 16) {
+                return PCIBIOS_DEVICE_NOT_FOUND;
+        } else {
+                ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
+                *ptr = _val;
+        }
+        return PCIBIOS_SUCCESSFUL;
 }

@@ -37,11 +37,11 @@
 
 #include <fribidi-char-sets-iso8859-6.h>
 
-#define ISO_HAMZA		0xc1
-#define ISO_SUKUN		0xf2
+#define ISO_HAMZA               0xc1
+#define ISO_SUKUN               0xf2
 
-#define UNI_HAMZA		0x0621
-#define UNI_SUKUN		0x0652
+#define UNI_HAMZA               0x0621
+#define UNI_SUKUN               0x0652
 
 FriBidiChar
 fribidi_iso8859_6_to_unicode_c (

@@ -102,9 +102,9 @@ typedef struct __attribute__((__packed__)) stream_header {
 
     union {
         // Video specific
-        stream_header_video	video;
+        stream_header_video     video;
         // Audio specific
-        stream_header_audio	audio;
+        stream_header_audio     audio;
     } sh;
 } stream_header;
 

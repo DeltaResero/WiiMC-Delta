@@ -87,18 +87,18 @@ fribidi_mem_chunk_alloc (
     {
       register void *chunk = fribidi_malloc (mem_chunk->area_size);
       if LIKELY
-	(chunk)
-	{
-	  if (mem_chunk->chunk)
-	    *(void **) chunk =
-	      (char *) mem_chunk->chunk + mem_chunk->empty_size -
-	      mem_chunk->area_size;
-	  chunk = (char *) chunk + mem_chunk->atom_size;
-	  mem_chunk->chunk = chunk;
-	  mem_chunk->empty_size = mem_chunk->area_size - mem_chunk->atom_size;
-	}
+        (chunk)
+        {
+          if (mem_chunk->chunk)
+            *(void **) chunk =
+              (char *) mem_chunk->chunk + mem_chunk->empty_size -
+              mem_chunk->area_size;
+          chunk = (char *) chunk + mem_chunk->atom_size;
+          mem_chunk->chunk = chunk;
+          mem_chunk->empty_size = mem_chunk->area_size - mem_chunk->atom_size;
+        }
       else
-	return NULL;
+        return NULL;
     }
 
   {

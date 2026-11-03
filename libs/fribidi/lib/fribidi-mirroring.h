@@ -58,8 +58,8 @@
  * Returns: if the character has a mirroring equivalent or not.
  */
 FRIBIDI_ENTRY fribidi_boolean fribidi_get_mirror_char (
-  FriBidiChar ch,		/* input character */
-  FriBidiChar *mirrored_ch	/* output mirrored character */
+  FriBidiChar ch,               /* input character */
+  FriBidiChar *mirrored_ch      /* output mirrored character */
 );
 
 #define fribidi_shape_mirroring FRIBIDI_NAMESPACE(shape_mirroring)
@@ -73,11 +73,11 @@ FRIBIDI_ENTRY fribidi_boolean fribidi_get_mirror_char (
  * available at http://www.unicode.org/reports/tr9/#L4.
  */
 FRIBIDI_ENTRY void fribidi_shape_mirroring (
-  const FriBidiLevel *embedding_levels,	/* input list of embedding
-					   levels, as returned by
-					   fribidi_get_par_embedding_levels */
-  const FriBidiStrIndex len,	/* input string length */
-  FriBidiChar *str		/* string to shape */
+  const FriBidiLevel *embedding_levels, /* input list of embedding
+                                           levels, as returned by
+                                           fribidi_get_par_embedding_levels */
+  const FriBidiStrIndex len,    /* input string length */
+  FriBidiChar *str              /* string to shape */
 );
 
 #include "fribidi-enddecls.h"

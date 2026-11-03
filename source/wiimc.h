@@ -11,17 +11,17 @@
 #include "utils/FreeTypeGX.h"
 #include "network.h"
 
-#define APPNAME			"WiiMC"
-#define APPVERSION		"3.0.0"
-#define APPFOLDER		"wiimc"
+#define APPNAME         "WiiMC"
+#define APPVERSION      "3.0.0"
+#define APPFOLDER       "wiimc"
 
 enum {
-	DEVICE_SD,
-	DEVICE_USB,
-	DEVICE_DVD,
-	DEVICE_SMB,
-	DEVICE_FTP,
-	DEVICE_INTERNET
+    DEVICE_SD,
+    DEVICE_USB,
+    DEVICE_DVD,
+    DEVICE_SMB,
+    DEVICE_FTP,
+    DEVICE_INTERNET
 };
 
 #define NOTSILENT 0

@@ -134,34 +134,34 @@ static void scale_block_c(const uint8_t src[64]/*align 8*/, uint8_t *dst/*align 
 #if HAVE_PAIRED
 static void scale_block_paired(const uint8_t src[64], uint8_t *dst, int linesize)
 {
-	const float scalar = 257.0;
-	vector float pair;
+    const float scalar = 257.0;
+    vector float pair;
 
-	uint16_t *dst1 = (uint16_t *)(dst - linesize*2);
-	uint16_t *dst2 = (uint16_t *)(dst - linesize);
-	src -= 8;
+    uint16_t *dst1 = (uint16_t *)(dst - linesize*2);
+    uint16_t *dst2 = (uint16_t *)(dst - linesize);
+    src -= 8;
 
-	for (int i = 0; i < 8; i++) {
-		pair = psq_lu(8,src,0,4);
-		pair = ps_mul(pair, scalar);
-		psq_stux(pair,dst1,linesize*2,0,5);
-		psq_stux(pair,dst2,linesize*2,0,5);
+    for (int i = 0; i < 8; i++) {
+        pair = psq_lu(8,src,0,4);
+        pair = ps_mul(pair, scalar);
+        psq_stux(pair,dst1,linesize*2,0,5);
+        psq_stux(pair,dst2,linesize*2,0,5);
 
-		pair = psq_l(2,src,0,4);
-		pair = ps_mul(pair, scalar);
-		psq_st(pair,4,dst1,0,5);
-		psq_st(pair,4,dst2,0,5);
+        pair = psq_l(2,src,0,4);
+        pair = ps_mul(pair, scalar);
+        psq_st(pair,4,dst1,0,5);
+        psq_st(pair,4,dst2,0,5);
 
-		pair = psq_l(4,src,0,4);
-		pair = ps_mul(pair, scalar);
-		psq_st(pair,8,dst1,0,5);
-		psq_st(pair,8,dst2,0,5);
+        pair = psq_l(4,src,0,4);
+        pair = ps_mul(pair, scalar);
+        psq_st(pair,8,dst1,0,5);
+        psq_st(pair,8,dst2,0,5);
 
-		pair = psq_l(6,src,0,4);
-		pair = ps_mul(pair, scalar);
-		psq_st(pair,12,dst1,0,5);
-		psq_st(pair,12,dst2,0,5);
-	}
+        pair = psq_l(6,src,0,4);
+        pair = ps_mul(pair, scalar);
+        psq_st(pair,12,dst1,0,5);
+        psq_st(pair,12,dst2,0,5);
+    }
 }
 #endif
 

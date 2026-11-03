@@ -15,16 +15,16 @@
 #define DEBUG_MEM2_LEVEL 1  // to get info about used mem, it's an approximation because of memory fragmentation
 
 enum mem2_areas_enum {
-	MEM2_MPLAYER_BUFFER,
-	MEM2_VIDEO,
-	MEM2_BROWSER,
-	MEM2_GUI,
-	MEM2_OTHER,
-	MEM2_PICTURE,
-	MEM2_INDEX,
-	MEM2_EXTFONT,
-	MEM2_DESC,
-	MEM2_MAX
+    MEM2_MPLAYER_BUFFER,
+    MEM2_VIDEO,
+    MEM2_BROWSER,
+    MEM2_GUI,
+    MEM2_OTHER,
+    MEM2_PICTURE,
+    MEM2_INDEX,
+    MEM2_EXTFONT,
+    MEM2_DESC,
+    MEM2_MAX
 };
 
 #ifdef __cplusplus

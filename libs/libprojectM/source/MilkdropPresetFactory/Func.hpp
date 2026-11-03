@@ -45,13 +45,13 @@ public:
     /* Public Prototypes */
     ~Func();
 
-	inline const std::string & getName() const {
-		return name;
-	}
+    inline const std::string & getName() const {
+        return name;
+    }
 
-	inline int getNumArgs() const {
-		return num_args;
-	}
+    inline int getNumArgs() const {
+        return num_args;
+    }
 
     float (*func_ptr)(float*);
 private:

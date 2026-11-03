@@ -58,7 +58,7 @@ Version:    CVS snapshot
 Homepage:   http://www.ffmpeg.org
 Directory:  libavcodec, libavformat, libavutil, libpostproc
 Copyright (c)  The ffmpeg Project
-	  (see individual files for other copyrights)
+          (see individual files for other copyrights)
 License:    GNU Lesser General Public License, some parts GNU General Public
             License, GNU General Public License when combined
 
@@ -125,8 +125,8 @@ License:    GNU General Public License
 Name:       dvbstream
 Version:    0.4.3-pre3 (cvs checkout)
 Homepage:   http://www.linuxstb.org/dvbstream/
-	    now at http://prdownloads.sourceforge.net/dvbtools/
-File:	    libmpdemux/dvbin.h  libmpdemux/dvbin.c libmpdemux/rtp.h
+            now at http://prdownloads.sourceforge.net/dvbtools/
+File:       libmpdemux/dvbin.h  libmpdemux/dvbin.c libmpdemux/rtp.h
 Copyright (C) 2002 the xine project
 License:    GNU General Public License
 
@@ -154,7 +154,7 @@ License:    GNU General Public License
 Name:       unrarlib
 Version:    0.4.0 + patches
 Homepage:   http://www.unrarlib.org/
-File:	    unrarlib.[ch]
+File:       unrarlib.[ch]
 Copyright (C) 2000-2002 by Christian Scheurer (www.ChristianScheurer.ch)
   UNIX port copyright (c) 2000-2002 by Johannes Winkelmann (jw@tks6.net)
 License:    GNU General Public License / UniquE RAR File Library License
@@ -175,19 +175,19 @@ License:    GNU General Public License
 --- libmpdemux
 libmpdemux is itself a collection of code from different sources
 
-File:	    libmpdemux/pnm.c libmpdemux/pnm.h
+File:       libmpdemux/pnm.c libmpdemux/pnm.h
 Copyright (C) 2000-2002 the xine project
 License:    GNU General Public License
 
-File:	    libmpdemux/demux_avs.c libmpdemux/demux_avs.h
+File:       libmpdemux/demux_avs.c libmpdemux/demux_avs.h
 Copyright (c) 2005 Gianluigi Tiesi <sherpya@netfarm.it>
 Copyright 2003 Kevin Atkinson
 License:    GNU General Public License
 
 
-Name:	    lavtools
-File:	    libmpdemux/yuv4mpeg.h
-Home:	  mjpeg.sourceforge.net
+Name:       lavtools
+File:       libmpdemux/yuv4mpeg.h
+Home:     mjpeg.sourceforge.net
 Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
 License:    GNU General Public License
 

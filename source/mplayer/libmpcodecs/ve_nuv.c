@@ -90,7 +90,7 @@ const m_option_t nuvopts_conf[] = {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
 
   // We need a buffer wich can holda header and a whole YV12 picture
   // or a RTJpeg table
@@ -152,10 +152,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     // Try lzo ???
     if(vf->priv->lzo) {
       r = lzo1x_1_compress(mpi->planes[0],len,
-			   zdata,&zlen,vf->priv->zmem);
+                           zdata,&zlen,vf->priv->zmem);
       if(r != LZO_E_OK) {
-	mp_msg(MSGT_VFILTER,MSGL_ERR,"LZO compress error\n");
-	zlen = 0;
+        mp_msg(MSGT_VFILTER,MSGL_ERR,"LZO compress error\n");
+        zlen = 0;
       }
     }
 
@@ -170,7 +170,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 
   } else { // RTjpeg compression
     len = RTjpeg_mcompressYUV420(data,mpi->planes[0],vf->priv->l,
-				 vf->priv->c);
+                                 vf->priv->c);
     if(len <= 0) {
       mp_msg(MSGT_VFILTER,MSGL_ERR,"RTjpeg_mcompressYUV420 error (%d)\n",len);
       return 0;
@@ -179,8 +179,8 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     if(vf->priv->lzo) {
       r = lzo1x_1_compress(data,len,zdata,&zlen,vf->priv->zmem);
       if(r != LZO_E_OK) {
-	mp_msg(MSGT_VFILTER,MSGL_ERR,"LZO compress error\n");
-	zlen = 0;
+        mp_msg(MSGT_VFILTER,MSGL_ERR,"LZO compress error\n");
+        zlen = 0;
       }
     }
 

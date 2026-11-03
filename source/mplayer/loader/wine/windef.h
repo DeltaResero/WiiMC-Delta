@@ -225,14 +225,14 @@ typedef DWORD SEGPTR;
 
 #ifdef STRICT
 #define DECLARE_HANDLE(a) \
-	typedef struct a##__ { int unused; } *a; \
-	typedef a *P##a; \
-	typedef a *LP##a
+    typedef struct a##__ { int unused; } *a; \
+    typedef a *P##a; \
+    typedef a *LP##a
 #else /*STRICT*/
 #define DECLARE_HANDLE(a) \
-	typedef HANDLE a; \
-	typedef a *P##a; \
-	typedef a *LP##a
+    typedef HANDLE a; \
+    typedef a *P##a; \
+    typedef a *LP##a
 #endif /*STRICT*/
 
 DECLARE_HANDLE(HACMDRIVERID);
@@ -348,10 +348,10 @@ typedef INT16          *LPINT16;
 typedef UINT16         *LPUINT16;
 
 #define DECLARE_HANDLE16(a) \
-	typedef HANDLE16 a##16; \
-	typedef a##16 *P##a##16; \
-	typedef a##16 *NP##a##16; \
-	typedef a##16 *LP##a##16
+    typedef HANDLE16 a##16; \
+    typedef a##16 *P##a##16; \
+    typedef a##16 *NP##a##16; \
+    typedef a##16 *LP##a##16
 
 DECLARE_HANDLE16(HACMDRIVERID);
 DECLARE_HANDLE16(HACMDRIVER);
@@ -587,8 +587,8 @@ typedef struct POINTL
 
 typedef struct tagPOINTS
 {
-	SHORT x;
-	SHORT y;
+    SHORT x;
+    SHORT y;
 } POINTS, *PPOINTS, *LPPOINTS;
 
 

@@ -1,13 +1,13 @@
 /*
- *  Copyright	1994	Eric Youndale & Erik Bos
- *  Copyright	1995	Martin von Löwis
+ *  Copyright   1994    Eric Youndale & Erik Bos
+ *  Copyright   1995    Martin von Löwis
  *  Copyright   1996-98 Marcus Meissner
  *
- *	based on Eric Youndale's pe-test and:
+ *      based on Eric Youndale's pe-test and:
  *
- *	ftp.microsoft.com:/pub/developer/MSDN/CD8/PEFILE.ZIP
+ *      ftp.microsoft.com:/pub/developer/MSDN/CD8/PEFILE.ZIP
  * make that:
- *	ftp.microsoft.com:/developr/MSDN/OctCD/PEFILE.ZIP
+ *      ftp.microsoft.com:/developr/MSDN/OctCD/PEFILE.ZIP
  *
  * Modified for use with MPlayer, detailed changelog at
  * http://svn.mplayerhq.hu/mplayer/trunk/
@@ -73,11 +73,11 @@
 
 static void dump_exports( HMODULE hModule )
 {
-  char		*Module;
+  char          *Module;
   unsigned int i, j;
-  unsigned short	*ordinal;
-  unsigned long	*function,*functions;
-  unsigned char	**name;
+  unsigned short        *ordinal;
+  unsigned long *function,*functions;
+  unsigned char **name;
   unsigned int load_addr = hModule;
 
   DWORD rva_start = PE_HEADER(hModule)->OptionalHeader
@@ -101,75 +101,75 @@ static void dump_exports( HMODULE hModule )
       if (!*function) continue;
       if (TRACE_ON(win32))
       {
-	dbg_printf( "%4ld %08lx %p", i + pe_exports->Base, *function, RVA(*function) );
+        dbg_printf( "%4ld %08lx %p", i + pe_exports->Base, *function, RVA(*function) );
 
-	for (j = 0; j < pe_exports->NumberOfNames; j++)
+        for (j = 0; j < pe_exports->NumberOfNames; j++)
           if (ordinal[j] == i)
           {
               dbg_printf( "  %s", (char*)RVA(name[j]) );
               break;
           }
-	if ((*function >= rva_start) && (*function <= rva_end))
-	  dbg_printf(" (forwarded -> %s)", (char *)RVA(*function));
-	dbg_printf("\n");
+        if ((*function >= rva_start) && (*function <= rva_end))
+          dbg_printf(" (forwarded -> %s)", (char *)RVA(*function));
+        dbg_printf("\n");
       }
   }
 }
 
 /* Look up the specified function or ordinal in the exportlist:
  * If it is a string:
- * 	- look up the name in the Name list.
- *	- look up the ordinal with that index.
- *	- use the ordinal as offset into the functionlist
+ *      - look up the name in the Name list.
+ *      - look up the ordinal with that index.
+ *      - use the ordinal as offset into the functionlist
  * If it is a ordinal:
- *	- use ordinal-pe_export->Base as offset into the functionlist
+ *      - use ordinal-pe_export->Base as offset into the functionlist
  */
 FARPROC PE_FindExportedFunction(
-	WINE_MODREF *wm,
-	LPCSTR funcName,
+        WINE_MODREF *wm,
+        LPCSTR funcName,
         WIN_BOOL snoop )
 {
-	unsigned short			* ordinals;
-	unsigned long			* function;
-	unsigned char			** name;
-	const char *ename = NULL;
-	int				i, ordinal;
-	PE_MODREF			*pem = &(wm->binfmt.pe);
-	IMAGE_EXPORT_DIRECTORY 		*exports = pem->pe_export;
-	unsigned int			load_addr = wm->module;
-	unsigned long			rva_start, rva_end, addr;
-	char				* forward;
+        unsigned short                  * ordinals;
+        unsigned long                   * function;
+        unsigned char                   ** name;
+        const char *ename = NULL;
+        int                             i, ordinal;
+        PE_MODREF                       *pem = &(wm->binfmt.pe);
+        IMAGE_EXPORT_DIRECTORY          *exports = pem->pe_export;
+        unsigned int                    load_addr = wm->module;
+        unsigned long                   rva_start, rva_end, addr;
+        char                            * forward;
 
-	if (HIWORD(funcName))
-		TRACE("(%s)\n",funcName);
-	else
-		TRACE("(%d)\n",(int)funcName);
-	if (!exports) {
-		/* Not a fatal problem, some apps do
-		 * GetProcAddress(0,"RegisterPenApp") which triggers this
-		 * case.
-		 */
-		WARN("Module %08x(%s)/MODREF %p doesn't have a exports table.\n",wm->module,wm->modname,pem);
-		return NULL;
-	}
-	ordinals= (unsigned short*)  RVA(exports->AddressOfNameOrdinals);
-	function= (unsigned long*)   RVA(exports->AddressOfFunctions);
-	name	= (unsigned char **) RVA(exports->AddressOfNames);
-	forward = NULL;
-	rva_start = PE_HEADER(wm->module)->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-	rva_end = rva_start + PE_HEADER(wm->module)->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+        if (HIWORD(funcName))
+                TRACE("(%s)\n",funcName);
+        else
+                TRACE("(%d)\n",(int)funcName);
+        if (!exports) {
+                /* Not a fatal problem, some apps do
+                 * GetProcAddress(0,"RegisterPenApp") which triggers this
+                 * case.
+                 */
+                WARN("Module %08x(%s)/MODREF %p doesn't have a exports table.\n",wm->module,wm->modname,pem);
+                return NULL;
+        }
+        ordinals= (unsigned short*)  RVA(exports->AddressOfNameOrdinals);
+        function= (unsigned long*)   RVA(exports->AddressOfFunctions);
+        name    = (unsigned char **) RVA(exports->AddressOfNames);
+        forward = NULL;
+        rva_start = PE_HEADER(wm->module)->OptionalHeader
+                .DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+        rva_end = rva_start + PE_HEADER(wm->module)->OptionalHeader
+                .DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
 
-	if (HIWORD(funcName))
+        if (HIWORD(funcName))
         {
 
             int min = 0, max = exports->NumberOfNames - 1;
             while (min <= max)
             {
                 int res, pos = (min + max) / 2;
-		ename = (const char*) RVA(name[pos]);
-		if (!(res = strcmp( ename, funcName )))
+                ename = (const char*) RVA(name[pos]);
+                if (!(res = strcmp( ename, funcName )))
                 {
                     ordinal = ordinals[pos];
                     goto found;
@@ -178,18 +178,18 @@ FARPROC PE_FindExportedFunction(
                 else min = pos + 1;
             }
 
-	    for (i = 0; i < exports->NumberOfNames; i++)
+            for (i = 0; i < exports->NumberOfNames; i++)
             {
-		ename = (const char*) RVA(name[i]);
+                ename = (const char*) RVA(name[i]);
                 if (!strcmp( ename, funcName ))
                 {
-		    ERR( "%s.%s required a linear search\n", wm->modname, funcName );
+                    ERR( "%s.%s required a linear search\n", wm->modname, funcName );
                     ordinal = ordinals[i];
                     goto found;
                 }
             }
             return NULL;
-	}
+        }
         else
         {
             ordinal = LOWORD(funcName) - exports->Base;
@@ -202,12 +202,12 @@ FARPROC PE_FindExportedFunction(
                         break;
                     }
             }
-	}
+        }
 
  found:
         if (ordinal >= exports->NumberOfFunctions)
         {
-            TRACE("	ordinal %ld out of range!\n", ordinal + exports->Base );
+            TRACE("\tordinal %ld out of range!\n", ordinal + exports->Base );
             return NULL;
         }
         addr = function[ordinal];
@@ -219,7 +219,7 @@ FARPROC PE_FindExportedFunction(
             {
                 if (!ename) ename = "@";
 //                proc = SNOOP_GetProcAddress(wm->module,ename,ordinal,proc);
-		TRACE("SNOOP_GetProcAddress n/a\n");
+                TRACE("SNOOP_GetProcAddress n/a\n");
 
             }
             return proc;
@@ -228,34 +228,34 @@ FARPROC PE_FindExportedFunction(
         {
                 WINE_MODREF *wm;
                 char *forward = RVA(addr);
-		char module[256];
-		char *end = strchr(forward, '.');
+                char module[256];
+                char *end = strchr(forward, '.');
 
-		if (!end) return NULL;
+                if (!end) return NULL;
                 if (end - forward >= sizeof(module)) return NULL;
                 memcpy( module, forward, end - forward );
-		module[end-forward] = 0;
+                module[end-forward] = 0;
                 if (!(wm = MODULE_FindModule( module )))
                 {
                     ERR("module not found for forward '%s'\n", forward );
                     return NULL;
                 }
-		return MODULE_GetProcAddress( wm->module, end + 1, snoop );
-	}
+                return MODULE_GetProcAddress( wm->module, end + 1, snoop );
+        }
 }
 
 static DWORD fixup_imports( WINE_MODREF *wm )
 {
-    IMAGE_IMPORT_DESCRIPTOR	*pe_imp;
-    PE_MODREF			*pem;
-    unsigned int load_addr	= wm->module;
-    int				i,characteristics_detection=1;
-    char			*modname;
+    IMAGE_IMPORT_DESCRIPTOR     *pe_imp;
+    PE_MODREF                   *pem;
+    unsigned int load_addr      = wm->module;
+    int                         i,characteristics_detection=1;
+    char                        *modname;
 
     assert(wm->type==MODULE32_PE);
     pem = &(wm->binfmt.pe);
     if (pem->pe_export)
-    	modname = (char*) RVA(pem->pe_export->Name);
+        modname = (char*) RVA(pem->pe_export->Name);
     else
         modname = "<unknown>";
 
@@ -271,11 +271,11 @@ static DWORD fixup_imports( WINE_MODREF *wm )
      * switch the detection off for them.
      */
     for (i = 0; pe_imp->Name ; pe_imp++) {
-	if (!i && !pe_imp->u.Characteristics)
-		characteristics_detection = 0;
-	if (characteristics_detection && !pe_imp->u.Characteristics)
-		break;
-	i++;
+        if (!i && !pe_imp->u.Characteristics)
+                characteristics_detection = 0;
+        if (characteristics_detection && !pe_imp->u.Characteristics)
+                break;
+        i++;
     }
     if (!i) return 0;
 
@@ -288,57 +288,57 @@ static DWORD fixup_imports( WINE_MODREF *wm )
      */
 
     for (i = 0, pe_imp = pem->pe_import; pe_imp->Name ; pe_imp++) {
-	IMAGE_IMPORT_BY_NAME	*pe_name;
-	PIMAGE_THUNK_DATA	import_list,thunk_list;
- 	char			*name = (char *) RVA(pe_imp->Name);
+        IMAGE_IMPORT_BY_NAME    *pe_name;
+        PIMAGE_THUNK_DATA       import_list,thunk_list;
+        char                    *name = (char *) RVA(pe_imp->Name);
 
-	if (characteristics_detection && !pe_imp->u.Characteristics)
-		break;
+        if (characteristics_detection && !pe_imp->u.Characteristics)
+                break;
 
         /* FIXME: here we should fill imports */
         TRACE("Loading imports for %s.dll\n", name);
 
-	if (pe_imp->u.OriginalFirstThunk != 0) {
-	    TRACE("Microsoft style imports used\n");
-	    import_list =(PIMAGE_THUNK_DATA) RVA(pe_imp->u.OriginalFirstThunk);
-	    thunk_list = (PIMAGE_THUNK_DATA) RVA(pe_imp->FirstThunk);
+        if (pe_imp->u.OriginalFirstThunk != 0) {
+            TRACE("Microsoft style imports used\n");
+            import_list =(PIMAGE_THUNK_DATA) RVA(pe_imp->u.OriginalFirstThunk);
+            thunk_list = (PIMAGE_THUNK_DATA) RVA(pe_imp->FirstThunk);
 
-	    while (import_list->u1.Ordinal) {
-		if (IMAGE_SNAP_BY_ORDINAL(import_list->u1.Ordinal)) {
-		    int ordinal = IMAGE_ORDINAL(import_list->u1.Ordinal);
+            while (import_list->u1.Ordinal) {
+                if (IMAGE_SNAP_BY_ORDINAL(import_list->u1.Ordinal)) {
+                    int ordinal = IMAGE_ORDINAL(import_list->u1.Ordinal);
 
-//		    TRACE("--- Ordinal %s,%d\n", name, ordinal);
+//                  TRACE("--- Ordinal %s,%d\n", name, ordinal);
 
-		    thunk_list->u1.Function=LookupExternal(name, ordinal);
-		} else {
-		    pe_name = (PIMAGE_IMPORT_BY_NAME)RVA(import_list->u1.AddressOfData);
-//		    TRACE("--- %s %s.%d\n", pe_name->Name, name, pe_name->Hint);
-		    thunk_list->u1.Function=LookupExternalByName(name, pe_name->Name);
-		}
-		import_list++;
-		thunk_list++;
-	    }
-	} else {
-	    TRACE("Borland style imports used\n");
-	    thunk_list = (PIMAGE_THUNK_DATA) RVA(pe_imp->FirstThunk);
-	    while (thunk_list->u1.Ordinal) {
-		if (IMAGE_SNAP_BY_ORDINAL(thunk_list->u1.Ordinal)) {
+                    thunk_list->u1.Function=LookupExternal(name, ordinal);
+                } else {
+                    pe_name = (PIMAGE_IMPORT_BY_NAME)RVA(import_list->u1.AddressOfData);
+//                  TRACE("--- %s %s.%d\n", pe_name->Name, name, pe_name->Hint);
+                    thunk_list->u1.Function=LookupExternalByName(name, pe_name->Name);
+                }
+                import_list++;
+                thunk_list++;
+            }
+        } else {
+            TRACE("Borland style imports used\n");
+            thunk_list = (PIMAGE_THUNK_DATA) RVA(pe_imp->FirstThunk);
+            while (thunk_list->u1.Ordinal) {
+                if (IMAGE_SNAP_BY_ORDINAL(thunk_list->u1.Ordinal)) {
 
-		    int ordinal = IMAGE_ORDINAL(thunk_list->u1.Ordinal);
+                    int ordinal = IMAGE_ORDINAL(thunk_list->u1.Ordinal);
 
-		    TRACE("--- Ordinal %s.%d\n",name,ordinal);
-		    thunk_list->u1.Function=LookupExternal(
-		      name, ordinal);
-		} else {
-		    pe_name=(PIMAGE_IMPORT_BY_NAME) RVA(thunk_list->u1.AddressOfData);
-		    TRACE("--- %s %s.%d\n",
-		   		  pe_name->Name,name,pe_name->Hint);
-		    thunk_list->u1.Function=LookupExternalByName(
-		      name, pe_name->Name);
-		}
-		thunk_list++;
-	    }
-	}
+                    TRACE("--- Ordinal %s.%d\n",name,ordinal);
+                    thunk_list->u1.Function=LookupExternal(
+                      name, ordinal);
+                } else {
+                    pe_name=(PIMAGE_IMPORT_BY_NAME) RVA(thunk_list->u1.AddressOfData);
+                    TRACE("--- %s %s.%d\n",
+                                  pe_name->Name,name,pe_name->Hint);
+                    thunk_list->u1.Function=LookupExternalByName(
+                      name, pe_name->Name);
+                }
+                thunk_list++;
+            }
+        }
     }
     return 0;
 }
@@ -373,51 +373,51 @@ static int calc_vma_size( HMODULE hModule )
 static void do_relocations( unsigned int load_addr, IMAGE_BASE_RELOCATION *r )
 {
     int delta = load_addr - PE_HEADER(load_addr)->OptionalHeader.ImageBase;
-    int	hdelta = (delta >> 16) & 0xFFFF;
-    int	ldelta = delta & 0xFFFF;
+    int hdelta = (delta >> 16) & 0xFFFF;
+    int ldelta = delta & 0xFFFF;
 
-	if(delta == 0)
+        if(delta == 0)
 
-		return;
-	while(r->VirtualAddress)
-	{
-		char *page = (char*) RVA(r->VirtualAddress);
-		int count = (r->SizeOfBlock - 8)/2;
-		int i;
-		TRACE_(fixup)("%x relocations for page %lx\n",
-			count, r->VirtualAddress);
+                return;
+        while(r->VirtualAddress)
+        {
+                char *page = (char*) RVA(r->VirtualAddress);
+                int count = (r->SizeOfBlock - 8)/2;
+                int i;
+                TRACE_(fixup)("%x relocations for page %lx\n",
+                        count, r->VirtualAddress);
 
-		for(i=0;i<count;i++)
-		{
-			int offset = r->TypeOffset[i] & 0xFFF;
-			int type = r->TypeOffset[i] >> 12;
-//			TRACE_(fixup)("patching %x type %x\n", offset, type);
-			switch(type)
-			{
-			case IMAGE_REL_BASED_ABSOLUTE: break;
-			case IMAGE_REL_BASED_HIGH:
-				*(short*)(page+offset) += hdelta;
-				break;
-			case IMAGE_REL_BASED_LOW:
-				*(short*)(page+offset) += ldelta;
-				break;
-			case IMAGE_REL_BASED_HIGHLOW:
-				*(int*)(page+offset) += delta;
+                for(i=0;i<count;i++)
+                {
+                        int offset = r->TypeOffset[i] & 0xFFF;
+                        int type = r->TypeOffset[i] >> 12;
+//                      TRACE_(fixup)("patching %x type %x\n", offset, type);
+                        switch(type)
+                        {
+                        case IMAGE_REL_BASED_ABSOLUTE: break;
+                        case IMAGE_REL_BASED_HIGH:
+                                *(short*)(page+offset) += hdelta;
+                                break;
+                        case IMAGE_REL_BASED_LOW:
+                                *(short*)(page+offset) += ldelta;
+                                break;
+                        case IMAGE_REL_BASED_HIGHLOW:
+                                *(int*)(page+offset) += delta;
 
-				break;
-			case IMAGE_REL_BASED_HIGHADJ:
-				FIXME("Don't know what to do with IMAGE_REL_BASED_HIGHADJ\n");
-				break;
-			case IMAGE_REL_BASED_MIPS_JMPADDR:
-				FIXME("Is this a MIPS machine ???\n");
-				break;
-			default:
-				FIXME("Unknown fixup type\n");
-				break;
-			}
-		}
-		r = (IMAGE_BASE_RELOCATION*)((char*)r + r->SizeOfBlock);
-	}
+                                break;
+                        case IMAGE_REL_BASED_HIGHADJ:
+                                FIXME("Don't know what to do with IMAGE_REL_BASED_HIGHADJ\n");
+                                break;
+                        case IMAGE_REL_BASED_MIPS_JMPADDR:
+                                FIXME("Is this a MIPS machine ???\n");
+                                break;
+                        default:
+                                FIXME("Unknown fixup type\n");
+                                break;
+                        }
+                }
+                r = (IMAGE_BASE_RELOCATION*)((char*)r + r->SizeOfBlock);
+        }
 }
 
 
@@ -425,7 +425,7 @@ static void do_relocations( unsigned int load_addr, IMAGE_BASE_RELOCATION *r )
 
 
 /**********************************************************************
- *			PE_LoadImage
+ *                      PE_LoadImage
  * Load one PE format DLL/EXE into memory
  *
  * Unluckily we can't just mmap the sections where we want them, for
@@ -436,14 +436,14 @@ static void do_relocations( unsigned int load_addr, IMAGE_BASE_RELOCATION *r )
  */
 HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
 {
-    HMODULE	hModule;
-    HANDLE	mapping;
+    HMODULE     hModule;
+    HANDLE      mapping;
 
     IMAGE_NT_HEADERS *nt;
     IMAGE_SECTION_HEADER *pe_sec;
     IMAGE_DATA_DIRECTORY *dir;
 //    BY_HANDLE_FILE_INFORMATION bhfi;
-    int	i, rawsize, lowest_va, vma_size, file_size = 0;
+    int i, rawsize, lowest_va, vma_size, file_size = 0;
     DWORD load_addr = 0, aoep, reloc = 0;
 //    struct get_read_fd_request *req = get_req_buffer();
     int unix_handle = handle;
@@ -451,7 +451,7 @@ HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
 
 
 //    if ( GetFileInformationByHandle( hFile, &bhfi ) )
-//    	file_size = bhfi.nFileSizeLow;
+//      file_size = bhfi.nFileSizeLow;
     file_size=lseek(handle, 0, SEEK_END);
     lseek(handle, 0, SEEK_SET);
 
@@ -512,10 +512,10 @@ HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
     {
         if (lowest_va > pe_sec[i].VirtualAddress)
            lowest_va = pe_sec[i].VirtualAddress;
-    	if (pe_sec[i].Characteristics & IMAGE_SCN_CNT_UNINITIALIZED_DATA)
-	    continue;
-	if (pe_sec[i].PointerToRawData+pe_sec[i].SizeOfRawData > rawsize)
-	    rawsize = pe_sec[i].PointerToRawData+pe_sec[i].SizeOfRawData;
+        if (pe_sec[i].Characteristics & IMAGE_SCN_CNT_UNINITIALIZED_DATA)
+            continue;
+        if (pe_sec[i].PointerToRawData+pe_sec[i].SizeOfRawData > rawsize)
+            rawsize = pe_sec[i].PointerToRawData+pe_sec[i].SizeOfRawData;
     }
 
 
@@ -577,7 +577,7 @@ HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
     {
 
         FIXME("We need to perform base relocations for %s\n", filename);
-	dir = nt->OptionalHeader.DataDirectory+IMAGE_DIRECTORY_ENTRY_BASERELOC;
+        dir = nt->OptionalHeader.DataDirectory+IMAGE_DIRECTORY_ENTRY_BASERELOC;
         if (dir->Size)
             reloc = dir->VirtualAddress;
         else
@@ -597,13 +597,13 @@ HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
             ERR( "Forced to relocate system DLL (base > 2GB). This is not good.\n" );
 
         load_addr = (DWORD)VirtualAlloc( NULL, vma_size,
-					 MEM_RESERVE | MEM_COMMIT,
-					 PAGE_EXECUTE_READWRITE );
-	if (!load_addr) {
+                                         MEM_RESERVE | MEM_COMMIT,
+                                         PAGE_EXECUTE_READWRITE );
+        if (!load_addr) {
             FIXME_(win32)(
                    "FATAL: Couldn't load module %s (out of memory, %d needed)!\n", filename, vma_size);
             goto error;
-	}
+        }
     }
 
     TRACE("Load addr is %lx (base %lx), range %x\n",
@@ -751,17 +751,17 @@ WINE_MODREF *PE_CreateModule( HMODULE hModule,
     dir = nt->OptionalHeader.DataDirectory+IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT;
     if (dir->Size)
     {
-		TRACE("Delayed import, stub calls LoadLibrary\n" );
-		/*
-		 * Nothing to do here.
-		 */
+                TRACE("Delayed import, stub calls LoadLibrary\n" );
+                /*
+                 * Nothing to do here.
+                 */
 
 #ifdef ImgDelayDescr
-		/*
-		 * This code is useful to observe what the heck is going on.
-		 */
-		{
-		ImgDelayDescr *pe_delay = NULL;
+                /*
+                 * This code is useful to observe what the heck is going on.
+                 */
+                {
+                ImgDelayDescr *pe_delay = NULL;
         pe_delay = (PImgDelayDescr)RVA(dir->VirtualAddress);
         TRACE_(delayhlp)("pe_delay->grAttrs = %08x\n", pe_delay->grAttrs);
         TRACE_(delayhlp)("pe_delay->szName = %s\n", pe_delay->szName);
@@ -773,7 +773,7 @@ WINE_MODREF *PE_CreateModule( HMODULE hModule,
         TRACE_(delayhlp)("pe_delay->dwTimeStamp = %08x\n", pe_delay->dwTimeStamp);
         }
 #endif
-	}
+        }
 
     dir = nt->OptionalHeader.DataDirectory+IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR;
     if (dir->Size) FIXME("Unknown directory 14 ignored\n" );
@@ -830,40 +830,40 @@ WINE_MODREF *PE_CreateModule( HMODULE hModule,
  */
 WINE_MODREF *PE_LoadLibraryExA (LPCSTR name, DWORD flags)
 {
-	HMODULE		hModule32;
-	WINE_MODREF	*wm;
-	char        	filename[256];
-	int hFile;
-	WORD		version = 0;
+        HMODULE         hModule32;
+        WINE_MODREF     *wm;
+        char            filename[256];
+        int hFile;
+        WORD            version = 0;
 
 
-	strncpy(filename, name, sizeof(filename));
-	hFile=open(filename, O_RDONLY);
-	if(hFile==-1)
-	    return NULL;
+        strncpy(filename, name, sizeof(filename));
+        hFile=open(filename, O_RDONLY);
+        if(hFile==-1)
+            return NULL;
 
 
-	hModule32 = PE_LoadImage( hFile, filename, &version );
-	if (!hModule32)
-	{
-		SetLastError( ERROR_OUTOFMEMORY );
-		return NULL;
-	}
+        hModule32 = PE_LoadImage( hFile, filename, &version );
+        if (!hModule32)
+        {
+                SetLastError( ERROR_OUTOFMEMORY );
+                return NULL;
+        }
 
-	if ( !(wm = PE_CreateModule( hModule32, filename, flags, FALSE )) )
-	{
-		ERR( "can't load %s\n", filename );
-		SetLastError( ERROR_OUTOFMEMORY );
-		return NULL;
-	}
-	close(hFile);
-	//printf("^^^^^^^^^^^^^^^^Alloc VM1  %p\n", wm);
-	return wm;
+        if ( !(wm = PE_CreateModule( hModule32, filename, flags, FALSE )) )
+        {
+                ERR( "can't load %s\n", filename );
+                SetLastError( ERROR_OUTOFMEMORY );
+                return NULL;
+        }
+        close(hFile);
+        //printf("^^^^^^^^^^^^^^^^Alloc VM1  %p\n", wm);
+        return wm;
 }
 
 
 /*****************************************************************************
- *	PE_UnloadLibrary
+ *      PE_UnloadLibrary
  *
  * Unload the library unmapping the image and freeing the modref structure.
  */
@@ -922,33 +922,33 @@ WIN_BOOL PE_InitDLL( WINE_MODREF *wm, DWORD type, LPVOID lpReserved )
     if ((PE_HEADER(wm->module)->FileHeader.Characteristics & IMAGE_FILE_DLL) &&
         (PE_HEADER(wm->module)->OptionalHeader.AddressOfEntryPoint)
     ) {
-	DLLENTRYPROC entry ;
-	entry = (void*)PE_FindExportedFunction(wm, "DllMain", 0);
-	if(entry==NULL)
-	    entry = (void*)RVA_PTR( wm->module,OptionalHeader.AddressOfEntryPoint );
+        DLLENTRYPROC entry ;
+        entry = (void*)PE_FindExportedFunction(wm, "DllMain", 0);
+        if(entry==NULL)
+            entry = (void*)RVA_PTR( wm->module,OptionalHeader.AddressOfEntryPoint );
 
-	TRACE_(relay)("CallTo32(entryproc=%p,module=%08x,type=%ld,res=%p)\n",
+        TRACE_(relay)("CallTo32(entryproc=%p,module=%08x,type=%ld,res=%p)\n",
                        entry, wm->module, type, lpReserved );
 
 
-	TRACE("Entering DllMain(");
-	switch(type)
-	{
-	    case DLL_PROCESS_DETACH:
-	        TRACE("DLL_PROCESS_DETACH) ");
-		break;
-	    case DLL_PROCESS_ATTACH:
-	        TRACE("DLL_PROCESS_ATTACH) ");
-		break;
-	    case DLL_THREAD_DETACH:
-	        TRACE("DLL_THREAD_DETACH) ");
-		break;
-	    case DLL_THREAD_ATTACH:
-	        TRACE("DLL_THREAD_ATTACH) ");
-		break;
-	}
-	TRACE("for %s\n", wm->filename);
-	extend_stack_for_dll_alloca();
+        TRACE("Entering DllMain(");
+        switch(type)
+        {
+            case DLL_PROCESS_DETACH:
+                TRACE("DLL_PROCESS_DETACH) ");
+                break;
+            case DLL_PROCESS_ATTACH:
+                TRACE("DLL_PROCESS_ATTACH) ");
+                break;
+            case DLL_THREAD_DETACH:
+                TRACE("DLL_THREAD_DETACH) ");
+                break;
+            case DLL_THREAD_ATTACH:
+                TRACE("DLL_THREAD_ATTACH) ");
+                break;
+        }
+        TRACE("for %s\n", wm->filename);
+        extend_stack_for_dll_alloca();
         retv = entry( wm->module, type, lpReserved );
     }
 

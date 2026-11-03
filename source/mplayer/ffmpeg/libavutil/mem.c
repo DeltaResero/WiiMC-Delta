@@ -98,7 +98,7 @@ void *av_malloc(size_t size)
 #ifdef GEKKO
     ptr = memalign(32,size);
 #else
-	ptr = memalign(ALIGN,size);
+    ptr = memalign(ALIGN,size);
 #endif
     /* Why 64?
        Indeed, we should align it:

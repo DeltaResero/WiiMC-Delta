@@ -65,10 +65,10 @@ char *vorbis_comment_query(vorbis_comment *vc, char *tag, int count){
   for(i=0;i<vc->comments;i++){
     if(!tagcompare(vc->user_comments[i], fulltag, taglen)){
       if(count == found)
-	/* We return a pointer to the data, not a copy */
-      	return vc->user_comments[i] + taglen;
+        /* We return a pointer to the data, not a copy */
+        return vc->user_comments[i] + taglen;
       else
-	found++;
+        found++;
     }
   }
   return NULL; /* didn't find anything */
@@ -95,7 +95,7 @@ void vorbis_comment_clear(vorbis_comment *vc){
     for(i=0;i<vc->comments;i++)
       if(vc->user_comments[i])_ogg_free(vc->user_comments[i]);
     if(vc->user_comments)_ogg_free(vc->user_comments);
-	if(vc->comment_lengths)_ogg_free(vc->comment_lengths);
+        if(vc->comment_lengths)_ogg_free(vc->comment_lengths);
     if(vc->vendor)_ogg_free(vc->vendor);
   }
   memset(vc,0,sizeof(*vc));
@@ -134,14 +134,14 @@ void vorbis_info_clear(vorbis_info *vi){
 
     for(i=0;i<ci->books;i++){
       if(ci->book_param[i]){
-	/* knows if the book was not alloced */
-	vorbis_staticbook_destroy(ci->book_param[i]);
+        /* knows if the book was not alloced */
+        vorbis_staticbook_destroy(ci->book_param[i]);
       }
       if(ci->fullbooks)
-	vorbis_book_clear(ci->fullbooks+i);
+        vorbis_book_clear(ci->fullbooks+i);
     }
     if(ci->fullbooks)
-	_ogg_free(ci->fullbooks);
+        _ogg_free(ci->fullbooks);
 
     _ogg_free(ci);
   }
@@ -196,7 +196,7 @@ static int _vorbis_unpack_comment(vorbis_comment *vc,oggpack_buffer *opb){
   for(i=0;i<vc->comments;i++){
     int len=oggpack_read(opb,32);
     if(len<0)goto err_out;
-	vc->comment_lengths[i]=len;
+        vc->comment_lengths[i]=len;
     vc->user_comments[i]=(char *)_ogg_calloc(len+1,1);
     _v_readstring(opb,vc->user_comments[i],len);
   }
@@ -310,42 +310,42 @@ int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op)
       memset(buffer,0,6);
       _v_readstring(&opb,buffer,6);
       if(memcmp(buffer,"vorbis",6)){
-	/* not a vorbis header */
-	return(OV_ENOTVORBIS);
+        /* not a vorbis header */
+        return(OV_ENOTVORBIS);
       }
       switch(packtype){
       case 0x01: /* least significant *bit* is read first */
-	if(!op->b_o_s){
-	  /* Not the initial packet */
-	  return(OV_EBADHEADER);
-	}
-	if(vi->rate!=0){
-	  /* previously initialized info header */
-	  return(OV_EBADHEADER);
-	}
+        if(!op->b_o_s){
+          /* Not the initial packet */
+          return(OV_EBADHEADER);
+        }
+        if(vi->rate!=0){
+          /* previously initialized info header */
+          return(OV_EBADHEADER);
+        }
 
-	return(_vorbis_unpack_info(vi,&opb));
+        return(_vorbis_unpack_info(vi,&opb));
 
       case 0x03: /* least significant *bit* is read first */
-	if(vi->rate==0){
-	  /* um... we didn't get the initial header */
-	  return(OV_EBADHEADER);
-	}
+        if(vi->rate==0){
+          /* um... we didn't get the initial header */
+          return(OV_EBADHEADER);
+        }
 
-	return(_vorbis_unpack_comment(vc,&opb));
+        return(_vorbis_unpack_comment(vc,&opb));
 
       case 0x05: /* least significant *bit* is read first */
-	if(vi->rate==0 || vc->vendor==NULL){
-	  /* um... we didn;t get the initial header or comments yet */
-	  return(OV_EBADHEADER);
-	}
+        if(vi->rate==0 || vc->vendor==NULL){
+          /* um... we didn;t get the initial header or comments yet */
+          return(OV_EBADHEADER);
+        }
 
-	return(_vorbis_unpack_books(vi,&opb));
+        return(_vorbis_unpack_books(vi,&opb));
 
       default:
-	/* Not a valid vorbis header type */
-	return(OV_EBADHEADER);
-	break;
+        /* Not a valid vorbis header type */
+        return(OV_EBADHEADER);
+        break;
       }
     }
   }

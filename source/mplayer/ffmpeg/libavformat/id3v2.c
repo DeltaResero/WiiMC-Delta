@@ -754,8 +754,8 @@ void ff_id3v2_read(AVFormatContext *s, const char *magic, ID3v2ExtraMeta **extra
                   ((buf[8] & 0x7f) << 7) |
                    (buf[9] & 0x7f);
             ff_id3v2_parse(s, len, buf[3], buf[5], extra_meta);
-			break; //this fixes AIFF not loading if tag info is not aligned.
-			//return; //test, shows pic but not info.
+                        break; //this fixes AIFF not loading if tag info is not aligned.
+                        //return; //test, shows pic but not info.
         } else {
             avio_seek(s->pb, off, SEEK_SET);
         }
@@ -800,7 +800,7 @@ int ff_id3v2_parse_apic(AVFormatContext *s, ID3v2ExtraMeta **extra_meta)
         if (!(st = avformat_new_stream(s, NULL)))
             return AVERROR(ENOMEM);
 
-		// memleak
+                // memleak
 /*
         st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
         st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -816,20 +816,20 @@ int ff_id3v2_parse_apic(AVFormatContext *s, ID3v2ExtraMeta **extra_meta)
         st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
 */
 
-		if(apic->len > 0 && apic->len <= 1.5*1024*1024) {
-			pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
-			//avio_seek(s->pb, -picsize, SEEK_CUR);
-			//avio_read(st->pb, pos_pic, st->attached_pic.size);
+                if(apic->len > 0 && apic->len <= 1.5*1024*1024) {
+                        pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+                        //avio_seek(s->pb, -picsize, SEEK_CUR);
+                        //avio_read(st->pb, pos_pic, st->attached_pic.size);
 
-			//limit size ?
-			//not necessary because of current if case
+                        //limit size ?
+                        //not necessary because of current if case
 
-			memcpy(pos_pic, apic->data, apic->len);
-			embedded_pic = 1;
-		}
+                        memcpy(pos_pic, apic->data, apic->len);
+                        embedded_pic = 1;
+                }
 
-		free_apic(apic);
-		apic->data = NULL;
+                free_apic(apic);
+                apic->data = NULL;
         apic->len  = 0;
     }
 

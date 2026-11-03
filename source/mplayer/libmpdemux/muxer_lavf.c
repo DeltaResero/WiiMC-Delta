@@ -46,18 +46,18 @@ enum PixelFormat imgfmt2pixfmt(int fmt);
 #define BIO_BUFFER_SIZE 32768
 
 typedef struct {
-	//AVInputFormat *avif;
-	AVFormatContext *oc;
-	AVIOContext *pb;
-	int audio_streams;
-	int video_streams;
-	int64_t last_pts;
-	uint8_t buffer[BIO_BUFFER_SIZE];
+    //AVInputFormat *avif;
+    AVFormatContext *oc;
+    AVIOContext *pb;
+    int audio_streams;
+    int video_streams;
+    int64_t last_pts;
+    uint8_t buffer[BIO_BUFFER_SIZE];
 } muxer_priv_t;
 
 typedef struct {
-	int64_t last_pts;
-	AVStream *avstream;
+    int64_t last_pts;
+    AVStream *avstream;
 } muxer_stream_priv_t;
 
 static char *conf_format = NULL;
@@ -68,119 +68,119 @@ static float mux_max_delay= 0.7;
 static char *mux_avopt = NULL;
 
 const m_option_t lavfopts_conf[] = {
-	{"format", &(conf_format), CONF_TYPE_STRING, 0, 0, 0, NULL},
-	{"muxrate", &mux_rate, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
-	{"packetsize", &mux_packet_size, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
-	{"preload", &mux_preload, CONF_TYPE_FLOAT, CONF_RANGE, 0, INT_MAX, NULL},
-	{"delay", &mux_max_delay, CONF_TYPE_FLOAT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"format", &(conf_format), CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"muxrate", &mux_rate, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"packetsize", &mux_packet_size, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"preload", &mux_preload, CONF_TYPE_FLOAT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"delay", &mux_max_delay, CONF_TYPE_FLOAT, CONF_RANGE, 0, INT_MAX, NULL},
         {"o", &mux_avopt, CONF_TYPE_STRING, 0, 0, 0, NULL},
 
-	{NULL, NULL, 0, 0, 0, 0, NULL}
+    {NULL, NULL, 0, 0, 0, 0, NULL}
 };
 
 static int mp_write(void *opaque, uint8_t *buf, int size)
 {
-	muxer_t *muxer = opaque;
-	return stream_write_buffer(muxer->stream, buf, size);
+    muxer_t *muxer = opaque;
+    return stream_write_buffer(muxer->stream, buf, size);
 }
 
 static int64_t mp_seek(void *opaque, int64_t pos, int whence)
 {
-	muxer_t *muxer = opaque;
-	if(whence == SEEK_CUR)
-	{
-		off_t cur = stream_tell(muxer->stream);
-		if(cur == -1)
-			return -1;
-		pos += cur;
-	}
-	else if(whence == SEEK_END)
-	{
-		off_t size=0;
-		if(stream_control(muxer->stream, STREAM_CTRL_GET_SIZE, &size) == STREAM_UNSUPPORTED || size < pos)
-			return -1;
-		pos = size - pos;
-	}
-	mp_msg(MSGT_MUXER, MSGL_DBG2, "SEEK %"PRIu64"\n", (int64_t)pos);
-	if(!stream_seek(muxer->stream, pos))
-		return -1;
-	return 0;
+    muxer_t *muxer = opaque;
+    if(whence == SEEK_CUR)
+    {
+        off_t cur = stream_tell(muxer->stream);
+        if(cur == -1)
+            return -1;
+        pos += cur;
+    }
+    else if(whence == SEEK_END)
+    {
+        off_t size=0;
+        if(stream_control(muxer->stream, STREAM_CTRL_GET_SIZE, &size) == STREAM_UNSUPPORTED || size < pos)
+            return -1;
+        pos = size - pos;
+    }
+    mp_msg(MSGT_MUXER, MSGL_DBG2, "SEEK %"PRIu64"\n", (int64_t)pos);
+    if(!stream_seek(muxer->stream, pos))
+        return -1;
+    return 0;
 }
 
 
 static muxer_stream_t* lavf_new_stream(muxer_t *muxer, int type)
 {
-	muxer_priv_t *priv = muxer->priv;
-	muxer_stream_t *stream;
-	muxer_stream_priv_t *spriv;
-	AVCodecContext *ctx;
+    muxer_priv_t *priv = muxer->priv;
+    muxer_stream_t *stream;
+    muxer_stream_priv_t *spriv;
+    AVCodecContext *ctx;
 
-	if(!muxer || (type != MUXER_TYPE_VIDEO && type != MUXER_TYPE_AUDIO))
-	{
-		mp_msg(MSGT_MUXER, MSGL_ERR, "UNKNOWN TYPE %d\n", type);
-		return NULL;
-	}
+    if(!muxer || (type != MUXER_TYPE_VIDEO && type != MUXER_TYPE_AUDIO))
+    {
+        mp_msg(MSGT_MUXER, MSGL_ERR, "UNKNOWN TYPE %d\n", type);
+        return NULL;
+    }
 
-	stream = calloc(1, sizeof(muxer_stream_t));
-	if(!stream)
-	{
-		mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate muxer_stream, EXIT.\n");
-		return NULL;
-	}
-	muxer->streams[muxer->avih.dwStreams] = stream;
-	stream->b_buffer = malloc(2048);
-	if(!stream->b_buffer)
-	{
-		mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate b_buffer, EXIT.\n");
-		free(stream);
-		return NULL;
-	}
-	stream->b_buffer_size = 2048;
-	stream->b_buffer_ptr = 0;
-	stream->b_buffer_len = 0;
+    stream = calloc(1, sizeof(muxer_stream_t));
+    if(!stream)
+    {
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate muxer_stream, EXIT.\n");
+        return NULL;
+    }
+    muxer->streams[muxer->avih.dwStreams] = stream;
+    stream->b_buffer = malloc(2048);
+    if(!stream->b_buffer)
+    {
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate b_buffer, EXIT.\n");
+        free(stream);
+        return NULL;
+    }
+    stream->b_buffer_size = 2048;
+    stream->b_buffer_ptr = 0;
+    stream->b_buffer_len = 0;
 
-	spriv = calloc(1, sizeof(muxer_stream_priv_t));
-	if(!spriv)
-	{
-		free(stream);
-		return NULL;
-	}
-	stream->priv = spriv;
+    spriv = calloc(1, sizeof(muxer_stream_priv_t));
+    if(!spriv)
+    {
+        free(stream);
+        return NULL;
+    }
+    stream->priv = spriv;
 
-	spriv->avstream = avformat_new_stream(priv->oc, NULL);
-	if(!spriv->avstream)
-	{
-		mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate avstream, EXIT.\n");
-		return NULL;
-	}
-	spriv->avstream->id = 1;
+    spriv->avstream = avformat_new_stream(priv->oc, NULL);
+    if(!spriv->avstream)
+    {
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate avstream, EXIT.\n");
+        return NULL;
+    }
+    spriv->avstream->id = 1;
 
-	ctx = spriv->avstream->codec;
-	ctx->codec_id = CODEC_ID_NONE;
-	switch(type)
-	{
-		case MUXER_TYPE_VIDEO:
-			ctx->codec_type = AVMEDIA_TYPE_VIDEO;
-			break;
-		case MUXER_TYPE_AUDIO:
-			ctx->codec_type = AVMEDIA_TYPE_AUDIO;
-			break;
-	}
+    ctx = spriv->avstream->codec;
+    ctx->codec_id = CODEC_ID_NONE;
+    switch(type)
+    {
+        case MUXER_TYPE_VIDEO:
+            ctx->codec_type = AVMEDIA_TYPE_VIDEO;
+            break;
+        case MUXER_TYPE_AUDIO:
+            ctx->codec_type = AVMEDIA_TYPE_AUDIO;
+            break;
+    }
 
-	muxer->avih.dwStreams++;
-	stream->muxer = muxer;
-	stream->type = type;
-	mp_msg(MSGT_MUXER, MSGL_V, "ALLOCATED STREAM N. %d, type=%d\n", muxer->avih.dwStreams, type);
-	return stream;
+    muxer->avih.dwStreams++;
+    stream->muxer = muxer;
+    stream->type = type;
+    mp_msg(MSGT_MUXER, MSGL_V, "ALLOCATED STREAM N. %d, type=%d\n", muxer->avih.dwStreams, type);
+    return stream;
 }
 
 
 static void fix_parameters(muxer_stream_t *stream)
 {
-	muxer_stream_priv_t *spriv = (muxer_stream_priv_t *) stream->priv;
-	AVCodecContext *ctx;
+    muxer_stream_priv_t *spriv = (muxer_stream_priv_t *) stream->priv;
+    AVCodecContext *ctx;
 
-	ctx = spriv->avstream->codec;
+    ctx = spriv->avstream->codec;
 
         ctx->bit_rate= stream->avg_rate;
         if(stream->wf && stream->wf->nAvgBytesPerSec && !ctx->bit_rate)
@@ -188,185 +188,185 @@ static void fix_parameters(muxer_stream_t *stream)
         ctx->rc_buffer_size= stream->vbv_size;
         ctx->rc_max_rate= stream->max_rate;
 
-	if(stream->type == MUXER_TYPE_AUDIO)
-	{
-		ctx->codec_id = mp_tag2codec_id(stream->wf->wFormatTag, 1);
+    if(stream->type == MUXER_TYPE_AUDIO)
+    {
+        ctx->codec_id = mp_tag2codec_id(stream->wf->wFormatTag, 1);
 #if 0 //breaks aac in mov at least
-		ctx->codec_tag = codec_get_wav_tag(ctx->codec_id);
+        ctx->codec_tag = codec_get_wav_tag(ctx->codec_id);
 #endif
-		mp_msg(MSGT_MUXER, MSGL_INFO, "AUDIO CODEC ID: %x, TAG: %x\n", ctx->codec_id, (uint32_t) ctx->codec_tag);
-		ctx->sample_rate = stream->wf->nSamplesPerSec;
+        mp_msg(MSGT_MUXER, MSGL_INFO, "AUDIO CODEC ID: %x, TAG: %x\n", ctx->codec_id, (uint32_t) ctx->codec_tag);
+        ctx->sample_rate = stream->wf->nSamplesPerSec;
 //                mp_msg(MSGT_MUXER, MSGL_INFO, "stream->h.dwSampleSize: %d\n", stream->h.dwSampleSize);
-		ctx->channels = stream->wf->nChannels;
+        ctx->channels = stream->wf->nChannels;
                 if(stream->h.dwRate && (stream->h.dwScale * (int64_t)ctx->sample_rate) % stream->h.dwRate == 0)
                     ctx->frame_size= (stream->h.dwScale * (int64_t)ctx->sample_rate) / stream->h.dwRate;
                 mp_msg(MSGT_MUXER, MSGL_V, "MUXER_LAVF(audio stream) frame_size: %d, scale: %u, sps: %u, rate: %u, ctx->block_align = stream->wf->nBlockAlign; %d=%d stream->wf->nAvgBytesPerSec:%d\n",
-			ctx->frame_size, stream->h.dwScale, ctx->sample_rate, stream->h.dwRate,
-			ctx->block_align, stream->wf->nBlockAlign, stream->wf->nAvgBytesPerSec);
-		ctx->block_align = stream->h.dwSampleSize;
-		if(stream->wf+1 && stream->wf->cbSize)
-		{
-			ctx->extradata = av_malloc(stream->wf->cbSize);
-			if(ctx->extradata != NULL)
-			{
-				ctx->extradata_size = stream->wf->cbSize;
-				memcpy(ctx->extradata, stream->wf+1, ctx->extradata_size);
-			}
-			else
-				mp_msg(MSGT_MUXER, MSGL_ERR, "MUXER_LAVF(audio stream) error! Could not allocate %d bytes for extradata.\n",
-					stream->wf->cbSize);
-		}
-	}
-	else if(stream->type == MUXER_TYPE_VIDEO)
-	{
-		ctx->codec_id = mp_tag2codec_id(stream->bih->biCompression, 0);
+            ctx->frame_size, stream->h.dwScale, ctx->sample_rate, stream->h.dwRate,
+            ctx->block_align, stream->wf->nBlockAlign, stream->wf->nAvgBytesPerSec);
+        ctx->block_align = stream->h.dwSampleSize;
+        if(stream->wf+1 && stream->wf->cbSize)
+        {
+            ctx->extradata = av_malloc(stream->wf->cbSize);
+            if(ctx->extradata != NULL)
+            {
+                ctx->extradata_size = stream->wf->cbSize;
+                memcpy(ctx->extradata, stream->wf+1, ctx->extradata_size);
+            }
+            else
+                mp_msg(MSGT_MUXER, MSGL_ERR, "MUXER_LAVF(audio stream) error! Could not allocate %d bytes for extradata.\n",
+                    stream->wf->cbSize);
+        }
+    }
+    else if(stream->type == MUXER_TYPE_VIDEO)
+    {
+        ctx->codec_id = mp_tag2codec_id(stream->bih->biCompression, 0);
                 if(ctx->codec_id <= 0 || force_fourcc)
                     ctx->codec_tag= stream->bih->biCompression;
-		mp_msg(MSGT_MUXER, MSGL_INFO, "VIDEO CODEC ID: %d\n", ctx->codec_id);
-		if (stream->imgfmt)
-		    ctx->pix_fmt = imgfmt2pixfmt(stream->imgfmt);
-		ctx->width = stream->bih->biWidth;
-		ctx->height = stream->bih->biHeight;
-		ctx->bit_rate = 800000;
-		ctx->time_base.den = stream->h.dwRate;
-		ctx->time_base.num = stream->h.dwScale;
-		if(stream->bih && (stream->bih->biSize > sizeof(*stream->bih)))
-		{
-			ctx->extradata_size = stream->bih->biSize - sizeof(*stream->bih);
-			ctx->extradata = av_malloc(ctx->extradata_size);
-			if(ctx->extradata != NULL)
-				memcpy(ctx->extradata, stream->bih+1, ctx->extradata_size);
-			else
-			{
-				mp_msg(MSGT_MUXER, MSGL_ERR, "MUXER_LAVF(video stream) error! Could not allocate %d bytes for extradata.\n",
-					ctx->extradata_size);
-				ctx->extradata_size = 0;
-			}
-		}
-	}
+        mp_msg(MSGT_MUXER, MSGL_INFO, "VIDEO CODEC ID: %d\n", ctx->codec_id);
+        if (stream->imgfmt)
+            ctx->pix_fmt = imgfmt2pixfmt(stream->imgfmt);
+        ctx->width = stream->bih->biWidth;
+        ctx->height = stream->bih->biHeight;
+        ctx->bit_rate = 800000;
+        ctx->time_base.den = stream->h.dwRate;
+        ctx->time_base.num = stream->h.dwScale;
+        if(stream->bih && (stream->bih->biSize > sizeof(*stream->bih)))
+        {
+            ctx->extradata_size = stream->bih->biSize - sizeof(*stream->bih);
+            ctx->extradata = av_malloc(ctx->extradata_size);
+            if(ctx->extradata != NULL)
+                memcpy(ctx->extradata, stream->bih+1, ctx->extradata_size);
+            else
+            {
+                mp_msg(MSGT_MUXER, MSGL_ERR, "MUXER_LAVF(video stream) error! Could not allocate %d bytes for extradata.\n",
+                    ctx->extradata_size);
+                ctx->extradata_size = 0;
+            }
+        }
+    }
 }
 
 static void write_chunk(muxer_stream_t *stream, size_t len, unsigned int flags, double dts, double pts)
 {
-	muxer_t *muxer = stream->muxer;
-	muxer_priv_t *priv = muxer->priv;
-	muxer_stream_priv_t *spriv = (muxer_stream_priv_t *) stream->priv;
-	AVPacket pkt;
+    muxer_t *muxer = stream->muxer;
+    muxer_priv_t *priv = muxer->priv;
+    muxer_stream_priv_t *spriv = (muxer_stream_priv_t *) stream->priv;
+    AVPacket pkt;
 
-	if(len)
-	{
-	av_init_packet(&pkt);
-	pkt.size = len;
-	pkt.stream_index= spriv->avstream->index;
-	pkt.data = stream->buffer;
+    if(len)
+    {
+    av_init_packet(&pkt);
+    pkt.size = len;
+    pkt.stream_index= spriv->avstream->index;
+    pkt.data = stream->buffer;
 
-	if(flags & AVIIF_KEYFRAME)
-		pkt.flags |= AV_PKT_FLAG_KEY;
-	else
-		pkt.flags = 0;
+    if(flags & AVIIF_KEYFRAME)
+        pkt.flags |= AV_PKT_FLAG_KEY;
+    else
+        pkt.flags = 0;
 
-	pkt.dts = (dts / av_q2d(priv->oc->streams[pkt.stream_index]->time_base) + 0.5);
-	pkt.pts = (pts / av_q2d(priv->oc->streams[pkt.stream_index]->time_base) + 0.5);
+    pkt.dts = (dts / av_q2d(priv->oc->streams[pkt.stream_index]->time_base) + 0.5);
+    pkt.pts = (pts / av_q2d(priv->oc->streams[pkt.stream_index]->time_base) + 0.5);
 //fprintf(stderr, "%Ld %Ld id:%d tb:%f %f\n", pkt.dts, pkt.pts, pkt.stream_index, av_q2d(priv->oc->streams[pkt.stream_index]->time_base), stream->timer);
 
-	if(av_interleaved_write_frame(priv->oc, &pkt) != 0) //av_write_frame(priv->oc, &pkt)
-	{
-		mp_msg(MSGT_MUXER, MSGL_ERR, "Error while writing frame.\n");
-	}
-	}
+    if(av_interleaved_write_frame(priv->oc, &pkt) != 0) //av_write_frame(priv->oc, &pkt)
+    {
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Error while writing frame.\n");
+    }
+    }
 
-	return;
+    return;
 }
 
 
 static void write_header(muxer_t *muxer)
 {
-	muxer_priv_t *priv = muxer->priv;
-	AVDictionary *opts = NULL;
-	char tmpstr[50];
+    muxer_priv_t *priv = muxer->priv;
+    AVDictionary *opts = NULL;
+    char tmpstr[50];
 
-	mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingHeader);
-	if (mux_rate) {
-		snprintf(tmpstr, sizeof(tmpstr), "%i", mux_rate);
-		av_dict_set(&opts, "muxrate", tmpstr, 0);
-	}
-	if (mux_preload) {
-		snprintf(tmpstr, sizeof(tmpstr), "%i", (int)(mux_preload * AV_TIME_BASE));
-		av_dict_set(&opts, "preload", tmpstr, 0);
-	}
-	avformat_write_header(priv->oc, &opts);
-	av_dict_free(&opts);
-	muxer->cont_write_header = NULL;
+    mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingHeader);
+    if (mux_rate) {
+        snprintf(tmpstr, sizeof(tmpstr), "%i", mux_rate);
+        av_dict_set(&opts, "muxrate", tmpstr, 0);
+    }
+    if (mux_preload) {
+        snprintf(tmpstr, sizeof(tmpstr), "%i", (int)(mux_preload * AV_TIME_BASE));
+        av_dict_set(&opts, "preload", tmpstr, 0);
+    }
+    avformat_write_header(priv->oc, &opts);
+    av_dict_free(&opts);
+    muxer->cont_write_header = NULL;
 }
 
 
 static void write_trailer(muxer_t *muxer)
 {
-	int i;
-	muxer_priv_t *priv = muxer->priv;
+    int i;
+    muxer_priv_t *priv = muxer->priv;
 
-	mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingTrailer);
-	av_write_trailer(priv->oc);
-	for(i = 0; i < priv->oc->nb_streams; i++)
-	{
-		av_freep(&(priv->oc->streams[i]));
-	}
+    mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingTrailer);
+    av_write_trailer(priv->oc);
+    for(i = 0; i < priv->oc->nb_streams; i++)
+    {
+        av_freep(&(priv->oc->streams[i]));
+    }
 
-	av_freep(&priv->oc->pb);
+    av_freep(&priv->oc->pb);
 
-	av_free(priv->oc);
+    av_free(priv->oc);
 }
 
 static void list_formats(void) {
-	AVOutputFormat *fmt;
-	mp_msg(MSGT_DEMUX, MSGL_INFO, "Available lavf output formats:\n");
-	for (fmt = av_oformat_next(NULL); fmt; fmt = av_oformat_next(fmt))
-		mp_msg(MSGT_DEMUX, MSGL_INFO, "%15s : %s\n", fmt->name, fmt->long_name);
+    AVOutputFormat *fmt;
+    mp_msg(MSGT_DEMUX, MSGL_INFO, "Available lavf output formats:\n");
+    for (fmt = av_oformat_next(NULL); fmt; fmt = av_oformat_next(fmt))
+        mp_msg(MSGT_DEMUX, MSGL_INFO, "%15s : %s\n", fmt->name, fmt->long_name);
 }
 
 int muxer_init_muxer_lavf(muxer_t *muxer)
 {
-	muxer_priv_t *priv;
-	AVOutputFormat *fmt = NULL;
+    muxer_priv_t *priv;
+    AVOutputFormat *fmt = NULL;
 
-	init_avformat();
+    init_avformat();
 
-	if (conf_format && strcmp(conf_format, "help") == 0) {
-		list_formats();
-		return 0;
-	}
+    if (conf_format && strcmp(conf_format, "help") == 0) {
+        list_formats();
+        return 0;
+    }
 
-	mp_msg(MSGT_MUXER, MSGL_WARN, "** MUXER_LAVF *****************************************************************\n");
-	mp_msg(MSGT_MUXER, MSGL_WARN,
+    mp_msg(MSGT_MUXER, MSGL_WARN, "** MUXER_LAVF *****************************************************************\n");
+    mp_msg(MSGT_MUXER, MSGL_WARN,
 "REMEMBER: MEncoder's libavformat muxing is presently broken and can generate\n"
 "INCORRECT files in the presence of B-frames. Moreover, due to bugs MPlayer\n"
 "will play these INCORRECT files as if nothing were wrong!\n"
 "*******************************************************************************\n");
 
-	priv = calloc(1, sizeof(muxer_priv_t));
-	if(priv == NULL)
-		return 0;
+    priv = calloc(1, sizeof(muxer_priv_t));
+    if(priv == NULL)
+        return 0;
 
-	priv->oc = avformat_alloc_context();
-	if(!priv->oc)
-	{
-		mp_msg(MSGT_MUXER, MSGL_FATAL, "Could not get format context.\n");
-		goto fail;
-	}
+    priv->oc = avformat_alloc_context();
+    if(!priv->oc)
+    {
+        mp_msg(MSGT_MUXER, MSGL_FATAL, "Could not get format context.\n");
+        goto fail;
+    }
 
-	if(conf_format)
-		fmt = av_guess_format(conf_format, NULL, NULL);
-	if(! fmt)
-		fmt = av_guess_format(NULL, out_filename, NULL);
-	if(! fmt)
-	{
-		mp_msg(MSGT_MUXER, MSGL_FATAL, "Cannot get specified format.\n");
-		goto fail;
-	}
-	priv->oc->oformat = fmt;
+    if(conf_format)
+        fmt = av_guess_format(conf_format, NULL, NULL);
+    if(! fmt)
+        fmt = av_guess_format(NULL, out_filename, NULL);
+    if(! fmt)
+    {
+        mp_msg(MSGT_MUXER, MSGL_FATAL, "Cannot get specified format.\n");
+        goto fail;
+    }
+    priv->oc->oformat = fmt;
 
 
-	priv->oc->packet_size= mux_packet_size;
+    priv->oc->packet_size= mux_packet_size;
         priv->oc->max_delay= (int)(mux_max_delay*AV_TIME_BASE);
         if (info_name)
             av_dict_set(&priv->oc->metadata, "title",     info_name,      0);
@@ -386,20 +386,20 @@ int muxer_init_muxer_lavf(muxer_t *muxer)
             }
         }
 
-	priv->oc->pb = avio_alloc_context(priv->buffer, BIO_BUFFER_SIZE, 1, muxer, NULL, mp_write, mp_seek);
-	if ((muxer->stream->flags & MP_STREAM_SEEK) != MP_STREAM_SEEK)
+    priv->oc->pb = avio_alloc_context(priv->buffer, BIO_BUFFER_SIZE, 1, muxer, NULL, mp_write, mp_seek);
+    if ((muxer->stream->flags & MP_STREAM_SEEK) != MP_STREAM_SEEK)
             priv->oc->pb->seekable = 0;
 
-	muxer->priv = priv;
-	muxer->cont_new_stream = &lavf_new_stream;
-	muxer->cont_write_chunk = &write_chunk;
-	muxer->cont_write_header = &write_header;
-	muxer->cont_write_index = &write_trailer;
-	muxer->fix_stream_parameters = &fix_parameters;
-	mp_msg(MSGT_MUXER, MSGL_INFO, "OK, exit.\n");
-	return 1;
+    muxer->priv = priv;
+    muxer->cont_new_stream = &lavf_new_stream;
+    muxer->cont_write_chunk = &write_chunk;
+    muxer->cont_write_header = &write_header;
+    muxer->cont_write_index = &write_trailer;
+    muxer->fix_stream_parameters = &fix_parameters;
+    mp_msg(MSGT_MUXER, MSGL_INFO, "OK, exit.\n");
+    return 1;
 
 fail:
-	free(priv);
-	return 0;
+    free(priv);
+    return 0;
 }

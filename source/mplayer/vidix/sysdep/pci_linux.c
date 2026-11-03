@@ -74,7 +74,7 @@ static long pci_config_read_long(
     p.pcipos = (bus << 8) | dev | (func << 5);
 
     if (ioctl(svgahelper_fd, SVGALIB_HELPER_IOCGPCIINL, &p))
-	return -1;
+        return -1;
 
     return p.val;
 }
@@ -94,8 +94,8 @@ static inline int enable_os_io(void)
     svgahelper_fd = open(DEV_SVGA, O_RDWR);
     if (svgahelper_fd > 0)
     {
-	svgahelper_initialized = 1;
-	return 0;
+        svgahelper_initialized = 1;
+        return 0;
     }
     svgahelper_initialized = -1;
 #endif
@@ -104,8 +104,8 @@ static inline int enable_os_io(void)
     dhahelper_fd = open("/dev/dhahelper", O_RDWR);
     if (dhahelper_fd > 0)
     {
-	dhahelper_initialized = 1;
-	return 0;
+        dhahelper_initialized = 1;
+        return 0;
     }
     dhahelper_initialized = -1;
 #endif
@@ -114,7 +114,7 @@ static inline int enable_os_io(void)
 /* should be fixed? */
 #else
     if (iopl(3) != 0)
-	return errno;
+        return errno;
 #endif
     return 0;
 }
@@ -123,19 +123,19 @@ static inline int disable_os_io(void)
 {
 #ifdef CONFIG_SVGAHELPER
     if (svgahelper_initialized == 1)
-	close(svgahelper_fd);
+        close(svgahelper_fd);
     else
 #endif
 #ifdef CONFIG_DHAHELPER
     if (dhahelper_initialized == 1)
-	close(dhahelper_fd);
+        close(dhahelper_fd);
     else
 #endif
 #ifdef __powerpc__
 /* should be fixed? */
 #else
     if (iopl(0) != 0)
-	return errno;
+        return errno;
 #endif
     return 0;
 }
@@ -169,19 +169,19 @@ static int pci_get_vendor(
     sprintf(path,"/proc/bus/pci/%02d/%02x.0", bus, dev);
     fd = open(path,O_RDONLY|O_SYNC);
     if (fd == -1) {
-	    retval=0xFFFF;
+            retval=0xFFFF;
     }
     else if (pread(fd, &vendor, 2, PCI_VENDOR_ID) == 2 &&
              pread(fd, &device, 2, PCI_DEVICE_ID) == 2) {
-	    vendor = le2me_16(vendor);
-	    device = le2me_16(device);
-	    retval = vendor + (device<<16); /*no worries about byte order,
-	    				      all ppc are bigendian*/
+            vendor = le2me_16(vendor);
+            device = le2me_16(device);
+            retval = vendor + (device<<16); /*no worries about byte order,
+                                              all ppc are bigendian*/
     } else {
-	    retval = 0xFFFF;
+            retval = 0xFFFF;
     }
     if (fd > 0) {
-	    close(fd);
+            close(fd);
     }
     return retval;
 }
@@ -198,15 +198,15 @@ static long pci_config_read_long(
     sprintf(path,"/proc/bus/pci/%02d/%02x.0", bus, dev);
     fd = open(path,O_RDONLY|O_SYNC);
     if (fd == -1) {
-	    retval=0;
+            retval=0;
     }
     else if (pread(fd, &retval, 4, cmd) == 4) {
-	    retval = le2me_32(retval);
+            retval = le2me_32(retval);
     } else {
-	    retval = 0;
+            retval = 0;
     }
     if (fd > 0) {
-	    close(fd);
+            close(fd);
     }
     return retval;
 }

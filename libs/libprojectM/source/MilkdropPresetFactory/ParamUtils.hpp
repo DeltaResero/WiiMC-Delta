@@ -51,14 +51,14 @@ public:
 
       /* Finally, insert the new parameter into this preset's parameter tree */
       std::pair<std::map<std::string,Param*>::iterator, bool>  insertRetPair =
-		paramTree->insert(std::make_pair(param->name, param));
+                paramTree->insert(std::make_pair(param->name, param));
 
       assert(insertRetPair.second);
 
     } else if (pos != paramTree->end())
-	param = pos->second;
+        param = pos->second;
     else
-	param = NULL;
+        param = NULL;
 
     /* Return the found (or created) parameter. Note that this could be null */
     return param;

@@ -27,16 +27,16 @@
 #include "stream.h"
 #include "libavutil/intreadwrite.h"
 //=================== VideoCD ==========================
-#if	defined(__linux__) || defined(sun) || defined(__bsdi__)
+#if     defined(__linux__) || defined(sun) || defined(__bsdi__)
 
 typedef struct mp_vcd_priv_st mp_vcd_priv_t;
 
-#if	defined(__linux__)
+#if     defined(__linux__)
 #include <linux/cdrom.h>
-#elif	defined(sun)
+#elif   defined(sun)
 #include <sys/cdio.h>
 static int sun_vcd_read(mp_vcd_priv_t*, int*);
-#elif	defined(__bsdi__)
+#elif   defined(__bsdi__)
 #include <dvd.h>
 #endif
 
@@ -99,8 +99,8 @@ static mp_vcd_priv_t* vcd_read_toc(int fd){
       tocentry.cdte_format = CDROM_MSF;
 
       if (ioctl(fd,CDROMREADTOCENTRY,&tocentry)==-1) {
-	mp_msg(MSGT_OPEN,MSGL_ERR,"read CDROM toc entry: %s\n",strerror(errno));
-	return NULL;
+        mp_msg(MSGT_OPEN,MSGL_ERR,"read CDROM toc entry: %s\n",strerror(errno));
+        return NULL;
       }
 
       if (i<=tochdr.cdth_trk1)
@@ -151,11 +151,11 @@ static int vcd_end_track(mp_vcd_priv_t* vcd)
 }
 
 static int vcd_read(mp_vcd_priv_t* vcd,char *mem){
-#if	defined(__linux__) || defined(__bsdi__)
+#if     defined(__linux__) || defined(__bsdi__)
   memcpy(vcd->buf,&vcd->entry.cdte_addr.msf,sizeof(struct cdrom_msf));
   if(ioctl(vcd->fd,CDROMREADRAW,vcd->buf)==-1) return 0; // EOF?
   memcpy(mem,&vcd->buf[VCD_SECTOR_OFFS],VCD_SECTOR_DATA);
-#elif	defined(sun)
+#elif   defined(sun)
   {
     int offset;
     if (sun_vcd_read(vcd, &offset) <= 0) return 0;
@@ -177,14 +177,14 @@ static int vcd_read(mp_vcd_priv_t* vcd,char *mem){
 }
 
 
-#ifdef	sun
+#ifdef  sun
 #include <sys/scsi/generic/commands.h>
 #include <sys/scsi/impl/uscsi.h>
 
-#define	SUN_XAREAD	1	/*fails on atapi drives*/
-#define	SUN_MODE2READ	2	/*fails on atapi drives*/
-#define	SUN_SCSIREAD	3
-#define	SUN_VCDREAD	SUN_SCSIREAD
+#define SUN_XAREAD      1       /*fails on atapi drives*/
+#define SUN_MODE2READ   2       /*fails on atapi drives*/
+#define SUN_SCSIREAD    3
+#define SUN_VCDREAD     SUN_SCSIREAD
 
 static int sun_vcd_read(mp_vcd_priv_t* vcd, int *offset)
 {
@@ -246,7 +246,7 @@ static int sun_vcd_read(mp_vcd_priv_t* vcd, int *offset)
 #error SUN_VCDREAD
 #endif
 }
-#endif	/*sun*/
+#endif  /*sun*/
 
 #else /* __linux__ || sun || __bsdi__ */
 

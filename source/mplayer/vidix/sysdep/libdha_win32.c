@@ -32,19 +32,19 @@
 
 typedef struct MapDevRequest
 {
-	DWORD	mdr_ServiceID;		/* supplied by caller */
-	LPVOID	mdr_PhysicalAddress;	/* supplied by caller */
-	DWORD	mdr_SizeInBytes;	/* supplied by caller */
-	LPVOID	mdr_LinearAddress;	/* returned by VxD */
-	WORD	mdr_Selector;		/* returned if 16-bit caller */
-	WORD	mdr_Status;		/* MDR_xxxx code below */
+        DWORD   mdr_ServiceID;          /* supplied by caller */
+        LPVOID  mdr_PhysicalAddress;    /* supplied by caller */
+        DWORD   mdr_SizeInBytes;        /* supplied by caller */
+        LPVOID  mdr_LinearAddress;      /* returned by VxD */
+        WORD    mdr_Selector;           /* returned if 16-bit caller */
+        WORD    mdr_Status;             /* MDR_xxxx code below */
 } MAPDEVREQUEST, *PMAPDEVREQUEST;
 
-#define MDR_SERVICE_MAP		CTL_CODE(FILE_DEVICE_UNKNOWN, 1, METHOD_NEITHER, FILE_ANY_ACCESS)
-#define MDR_SERVICE_UNMAP	CTL_CODE(FILE_DEVICE_UNKNOWN, 2, METHOD_NEITHER, FILE_ANY_ACCESS)
+#define MDR_SERVICE_MAP         CTL_CODE(FILE_DEVICE_UNKNOWN, 1, METHOD_NEITHER, FILE_ANY_ACCESS)
+#define MDR_SERVICE_UNMAP       CTL_CODE(FILE_DEVICE_UNKNOWN, 2, METHOD_NEITHER, FILE_ANY_ACCESS)
 
-#define MDR_STATUS_SUCCESS	1
-#define MDR_STATUS_ERROR	0
+#define MDR_STATUS_SUCCESS      1
+#define MDR_STATUS_ERROR        0
 /*#include "winioctl.h"*/
 #define FILE_DEVICE_UNKNOWN             0x00000022
 #define METHOD_NEITHER                  3
@@ -64,9 +64,9 @@ static HANDLE hDriver = INVALID_HANDLE_VALUE;
 void *map_phys_mem(unsigned long base, unsigned long size) {
   if(!IsWinNT()){
   HANDLE hDevice ;
-  PVOID inBuf[1] ;		/* buffer for struct pointer to VxD */
-  DWORD cbBytesReturned ;	/* count of bytes returned from VxD */
-  MAPDEVREQUEST req ;		/* map device request structure */
+  PVOID inBuf[1] ;              /* buffer for struct pointer to VxD */
+  DWORD cbBytesReturned ;       /* count of bytes returned from VxD */
+  MAPDEVREQUEST req ;           /* map device request structure */
   const PCHAR VxDName = "\\\\.\\MAPDEV.VXD" ;
   const PCHAR VxDNameAlreadyLoaded = "\\\\.\\MAPDEV" ;
 

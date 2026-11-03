@@ -2542,7 +2542,7 @@ static double fix_timestamp(demuxer_t *demuxer, mkv_track_t *track, double ts)
     mkv_demuxer_t *mkv_d = demuxer->priv;
     //if (demuxer->opts->demux_mkv->fix_timestamps && track->default_duration > 0) {
    // if (track->default_duration > 0) {
-		//find_prob++;
+                //find_prob++;
         // Assume that timestamps have been rounded to the timecode scale.
        double quant = MPMIN(mkv_d->tc_scale / 1e9, 0.001);
    //    double rts = rint_wii(ts / track->default_duration) * track->default_duration;
@@ -2590,11 +2590,11 @@ static int handle_block(demuxer_t *demuxer, uint8_t *block, uint64_t length,
         free(lace_size);
         return -1;
     } */
-	tc = time * mkv_d->tc_scale + mkv_d->cluster_tc;
+        tc = time * mkv_d->tc_scale + mkv_d->cluster_tc;
    // current_pts = tc / 1000.0;
  //   current_pts = tc / 1e9;
-	current_pts = fix_timestamp(demuxer, track, tc / 1e9); //- track->codec_delay;
-	//find_prob = current_pts;
+        current_pts = fix_timestamp(demuxer, track, tc / 1e9); //- track->codec_delay;
+        //find_prob = current_pts;
 
     for (i = 0; i < mkv_d->num_tracks; i++)
         if (mkv_d->tracks[i]->tnum == num) {
@@ -2995,7 +2995,7 @@ static void demux_mkv_seek(demuxer_t *demuxer, float rel_seek_secs,
         if (demuxer->video->id >= 0)
             mkv_d->v_skip_to_keyframe = 1;
        // mkv_d->skip_to_timecode = index->timecode;
-	    mkv_d->skip_to_timecode = index->timecode * mkv_d->tc_scale;
+            mkv_d->skip_to_timecode = index->timecode * mkv_d->tc_scale;
         mkv_d->a_skip_to_keyframe = 1;
 
         demux_mkv_fill_buffer(demuxer, NULL);

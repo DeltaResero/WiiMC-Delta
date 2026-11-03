@@ -49,7 +49,7 @@ int avpriv_adx_decode_header(AVCodecContext *avctx, const uint8_t *buf,
     if (AV_RB16(buf) != 0x8000)
         return AVERROR_INVALIDDATA;
     offset = AV_RB16(buf + 2) + 4;
-	//offset_start = offset;
+    //offset_start = offset;
 
     /* if copyright string is within the provided data, validate it */
     if (bufsize >= offset && memcmp(buf + offset - 6, "(c)CRI", 6))
@@ -81,24 +81,24 @@ int avpriv_adx_decode_header(AVCodecContext *avctx, const uint8_t *buf,
         ff_adx_calculate_coeffs(cutoff, avctx->sample_rate, COEFF_BITS, coeff);
     }
 
-	//Add loop start/end point
-	if(buf[0x12] == 3) {
-		if(buf[0x17] == 1 && buf[0x1B] == 1) { //loop enabled, latter is correct
-			loop_st_point = AV_RB32(buf + 0x1C);
-			loop_st_point /= avctx->sample_rate;
+    //Add loop start/end point
+    if(buf[0x12] == 3) {
+        if(buf[0x17] == 1 && buf[0x1B] == 1) { //loop enabled, latter is correct
+            loop_st_point = AV_RB32(buf + 0x1C);
+            loop_st_point /= avctx->sample_rate;
 
-			loop_ed_point = AV_RB32(buf + 0x24);
-			loop_ed_point /= avctx->sample_rate;
-		}
-	} else if(buf[0x12] == 4) {
-		if(buf[0x23] == 1 && buf[0x27] == 1) { //loop enabled
-			loop_st_point = AV_RB32(buf + 0x28);
-			loop_st_point /= avctx->sample_rate;
+            loop_ed_point = AV_RB32(buf + 0x24);
+            loop_ed_point /= avctx->sample_rate;
+        }
+    } else if(buf[0x12] == 4) {
+        if(buf[0x23] == 1 && buf[0x27] == 1) { //loop enabled
+            loop_st_point = AV_RB32(buf + 0x28);
+            loop_st_point /= avctx->sample_rate;
 
-			loop_ed_point = AV_RB32(buf + 0x30);
-			loop_ed_point /= avctx->sample_rate;
-		}
-	}
+            loop_ed_point = AV_RB32(buf + 0x30);
+            loop_ed_point /= avctx->sample_rate;
+        }
+    }
 
     *header_size = offset;
     return 0;

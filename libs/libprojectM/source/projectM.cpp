@@ -272,7 +272,7 @@ void projectM::renderFrame()
     if ( timeKeeper->IsSmoothing() && timeKeeper->SmoothRatio() <= 1.0 && !m_presetChooser->empty() )
     {
 
-        //	 printf("start thread\n");
+        //   printf("start thread\n");
         assert ( m_activePreset2.get() );
 
         #ifdef USE_THREADS
@@ -288,7 +288,7 @@ void projectM::renderFrame()
         #endif
 
         //PresetMerger::MergePresets(m_activePreset->presetOutputs(), m_activePreset2->presetOutputs(),
-        //	timeKeeper->SmoothRatio(), presetInputs.gx, presetInputs.gy);
+        //  timeKeeper->SmoothRatio(), presetInputs.gx, presetInputs.gy);
 
         Pipeline pipeline;
 
@@ -320,8 +320,8 @@ void projectM::renderFrame()
         _renderer->RenderFrame (m_activePreset->pipeline(), pipelineContext());
     }
 
-    //	std::cout<< m_activePreset->absoluteFilePath()<<std::endl;
-    //	_renderer->presetName = m_activePreset->absoluteFilePath();
+    //  std::cout<< m_activePreset->absoluteFilePath()<<std::endl;
+    //  _renderer->presetName = m_activePreset->absoluteFilePath();
 
     /*glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -356,7 +356,7 @@ void projectM::renderFrame()
     {
         // printf("%s:",this->mspf-timediff);
         int sleepTime = ( unsigned int ) ( this->mspf-timediff ) * 1000;
-        //		DWRITE ( "usleep: %d\n", sleepTime );
+        //      DWRITE ( "usleep: %d\n", sleepTime );
         if ( sleepTime > 0 && sleepTime < 100000 )
         {
             if ( usleep ( sleepTime ) != 0 ) {}}
@@ -436,7 +436,7 @@ void projectM::projectM_resetengine()
 
     /// @bug call factory clear here?
     std::cerr << "call factory clear here?" << std::endl;
-    //	abort();
+    //  abort();
 
 
 }
@@ -485,7 +485,7 @@ int projectM::initPresetTools(int gx, int gy)
         m_presetPos = new PresetIterator();
 
     // Initialize a preset queue position as well
-    //	m_presetQueuePos = new PresetIterator();
+    //  m_presetQueuePos = new PresetIterator();
 
     // Start at end ptr- this allows next/previous to easily be done from this position.
     *m_presetPos = m_presetChooser->end();

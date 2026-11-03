@@ -31,13 +31,13 @@
 // Data for specific instances of this filter
 typedef struct af_gate_s
 {
-  int   enable[AF_NCH];		// Enable/disable / channel
-  float time[AF_NCH];		// Forgetting factor for power estimate
-  float	pow[AF_NCH];		// Estimated power level [dB]
-  float	tresh[AF_NCH];		// Threshold [dB]
-  int	attack[AF_NCH];		// Attack time [ms]
-  int	release[AF_NCH];	// Release time [ms]
-  float	range[AF_NCH];		// Range level [dB]
+  int   enable[AF_NCH];         // Enable/disable / channel
+  float time[AF_NCH];           // Forgetting factor for power estimate
+  float pow[AF_NCH];            // Estimated power level [dB]
+  float tresh[AF_NCH];          // Threshold [dB]
+  int   attack[AF_NCH];         // Attack time [ms]
+  int   release[AF_NCH];        // Release time [ms]
+  float range[AF_NCH];          // Range level [dB]
 }af_gate_t;
 
 // Initialization and runtime control
@@ -109,31 +109,31 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*    c   = data;			// Current working data
-  af_gate_t*  	s   = (af_gate_t*)af->setup; 	// Setup for this instance
-  float*   	a   = (float*)c->audio;		// Audio data
-  int       	len = c->len/4;			// Number of samples
-  int           ch  = 0;			// Channel counter
-  register int	nch = c->nch;			// Number of channels
+  af_data_t*    c   = data;                     // Current working data
+  af_gate_t*    s   = (af_gate_t*)af->setup;    // Setup for this instance
+  float*        a   = (float*)c->audio;         // Audio data
+  int           len = c->len/4;                 // Number of samples
+  int           ch  = 0;                        // Channel counter
+  register int  nch = c->nch;                   // Number of channels
   register int  i   = 0;
 
 
   // Noise gate
   for(ch = 0; ch < nch ; ch++){
     if(s->enable[ch]){
-      float	t   = 1.0 - s->time[ch];
+      float     t   = 1.0 - s->time[ch];
       for(i=ch;i<len;i+=nch){
-	register float x 	= a[i];
-	register float pow 	= x*x;
-	s->pow[ch] = t*s->pow[ch] +
-	  pow*s->time[ch]; // LP filter
-	if(pow < s->pow[ch]){
-	  ;
-	}
-	else{
-	  ;
-	}
-	a[i] = x;
+        register float x        = a[i];
+        register float pow      = x*x;
+        s->pow[ch] = t*s->pow[ch] +
+          pow*s->time[ch]; // LP filter
+        if(pow < s->pow[ch]){
+          ;
+        }
+        else{
+          ;
+        }
+        a[i] = x;
       }
     }
   }

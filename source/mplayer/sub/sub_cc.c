@@ -82,12 +82,12 @@ static void build_char_table(void)
 
 static void clear_buffer(subtitle *buf)
 {
-	int i;
-	buf->lines=0;
-	for (i = 0; i < SUB_MAX_TEXT; i++) {
-		free(buf->text[i]);
-		buf->text[i] = NULL;
-	}
+        int i;
+        buf->lines=0;
+        for (i = 0; i < SUB_MAX_TEXT; i++) {
+                free(buf->text[i]);
+                buf->text[i] = NULL;
+        }
 }
 
 
@@ -97,33 +97,33 @@ static void clear_buffer(subtitle *buf)
 */
 static void scroll_buffer(subtitle* buf)
 {
-	int i;
+        int i;
 
-	while(buf->lines > cc_lines)
-	{
-		free(buf->text[0]);
+        while(buf->lines > cc_lines)
+        {
+                free(buf->text[0]);
 
-		for(i = 0; i < buf->lines - 1; i++) buf->text[i] = buf->text[i+1];
+                for(i = 0; i < buf->lines - 1; i++) buf->text[i] = buf->text[i+1];
 
-		buf->text[buf->lines-1] = NULL;
-		buf->lines--;
-	}
+                buf->text[buf->lines-1] = NULL;
+                buf->lines--;
+        }
 }
 
 static int channel;
 
 void subcc_init(void)
 {
-	int i;
-	//printf("subcc_init(): initing...\n");
-	build_char_table();
-	for(i=0;i<SUB_MAX_TEXT;i++) {buf1.text[i]=buf2.text[i]=NULL;}
-	buf1.lines=buf2.lines=0;
-	fb=&buf1;
-	bb=&buf2;
-	channel = -1;
+        int i;
+        //printf("subcc_init(): initing...\n");
+        build_char_table();
+        for(i=0;i<SUB_MAX_TEXT;i++) {buf1.text[i]=buf2.text[i]=NULL;}
+        buf1.lines=buf2.lines=0;
+        fb=&buf1;
+        bb=&buf2;
+        channel = -1;
 
-	initialized=1;
+        initialized=1;
 }
 
 void subcc_reset(void)
@@ -136,51 +136,51 @@ void subcc_reset(void)
 
 static void display_buffer(subtitle *buf)
 {
-	vo_sub = buf;
-	vo_osd_changed(OSDTYPE_SUBTITLE);
+        vo_sub = buf;
+        vo_osd_changed(OSDTYPE_SUBTITLE);
 }
 
 
 static void append_char(char c)
 {
-	if(!bb->lines) {bb->lines++; cursor_pos=0;}
-	if(bb->text[bb->lines - 1]==NULL)
-	{
-		bb->text[bb->lines - 1] = calloc(1, CC_MAX_LINE_LENGTH);
-		cursor_pos=0;
-	}
+        if(!bb->lines) {bb->lines++; cursor_pos=0;}
+        if(bb->text[bb->lines - 1]==NULL)
+        {
+                bb->text[bb->lines - 1] = calloc(1, CC_MAX_LINE_LENGTH);
+                cursor_pos=0;
+        }
 
-	if(c=='\n')
-	{
-		if(cursor_pos>0 && bb->lines < SUB_MAX_TEXT)
-		{
-			bb->lines++;cursor_pos=0;
-			if(cc_mode==CC_ROLLUP){ //Carriage return - scroll buffer one line up
-				bb->text[bb->lines - 1]=calloc(1, CC_MAX_LINE_LENGTH);
-				scroll_buffer(bb);
-			}
-		}
-	}
-	else
-	{
-		if(cursor_pos==CC_MAX_LINE_LENGTH-1)
-		{
-			fprintf(stderr,"CC: append_char() reached CC_MAX_LINE_LENGTH!\n");
-			return;
-		}
-		bb->text[bb->lines - 1][cursor_pos++]=c;
-	}
-	//In CC roll-up mode data should be shown immediately
-	if(cc_mode==CC_ROLLUP) display_buffer(bb);
+        if(c=='\n')
+        {
+                if(cursor_pos>0 && bb->lines < SUB_MAX_TEXT)
+                {
+                        bb->lines++;cursor_pos=0;
+                        if(cc_mode==CC_ROLLUP){ //Carriage return - scroll buffer one line up
+                                bb->text[bb->lines - 1]=calloc(1, CC_MAX_LINE_LENGTH);
+                                scroll_buffer(bb);
+                        }
+                }
+        }
+        else
+        {
+                if(cursor_pos==CC_MAX_LINE_LENGTH-1)
+                {
+                        fprintf(stderr,"CC: append_char() reached CC_MAX_LINE_LENGTH!\n");
+                        return;
+                }
+                bb->text[bb->lines - 1][cursor_pos++]=c;
+        }
+        //In CC roll-up mode data should be shown immediately
+        if(cc_mode==CC_ROLLUP) display_buffer(bb);
 }
 
 
 static void swap_buffers(void)
 {
-	subtitle *foo;
-	foo=fb;
-	fb=bb;
-	bb=foo;
+        subtitle *foo;
+        foo=fb;
+        fb=bb;
+        bb=foo;
 }
 
 static int selected_channel(void)
@@ -195,71 +195,71 @@ static void cc_decode_EIA608(unsigned short int data)
   uint8_t c1 = data & 0x7f;
   uint8_t c2 = (data >> 8) & 0x7f;
 
-  if (c1 & 0x60) {		/* normal character, 0x20 <= c1 <= 0x7f */
-	   if (channel != (selected_channel() & 1))
-		   return;
-	   append_char(chartbl[c1]);
-	   if(c2 & 0x60)	/*c2 might not be a normal char even if c1 is*/
-		   append_char(chartbl[c2]);
+  if (c1 & 0x60) {              /* normal character, 0x20 <= c1 <= 0x7f */
+           if (channel != (selected_channel() & 1))
+                   return;
+           append_char(chartbl[c1]);
+           if(c2 & 0x60)        /*c2 might not be a normal char even if c1 is*/
+                   append_char(chartbl[c2]);
   }
-  else if (c1 & 0x10)		// control code / special char
+  else if (c1 & 0x10)           // control code / special char
   {
-	  channel = (c1 & 0x08) >> 3;
-	  if (channel != (selected_channel() & 1))
-		return;
-	  c1&=~0x08;
-	  if(data!=lastcode)
-	  {
-	  	if(c2 & 0x40) {	/*PAC, Preamble Address Code */
-			append_char('\n'); /*FIXME properly interpret PACs*/
-		}
-		else
-			switch(c1)
-			{
-				case 0x10:	break; // ext attribute
-				case 0x11:
-					if((c2 & 0x30)==0x30)
-					{
-						//printf("[debug]:Special char (ignored)\n");
-						/*cc_decode_special_char()*/;
-					}
-					else if (c2 & 0x20)
-					{
-						//printf("[debug]: midrow_attr (ignored)\n");
-						/*cc_decode_midrow_attr()*/;
-					}
-					break;
-				case 0x14:
-					switch(c2)
-					{
-						case 0x00: //CC roll-on mode
-							   cc_mode=CC_ROLLON;
-							   break;
-						case 0x25: //CC roll-up, 2 rows
-						case 0x26: //CC roll-up, 3 rows
-						case 0x27: //CC roll-up, 4 rows
-							   cc_lines=c2-0x23;
-							   cc_mode=CC_ROLLUP;
-							   break;
-						case 0x2C: display_buffer(NULL); //EDM
-							   clear_buffer(fb); break;
-						case 0x2d: append_char('\n');	//carriage return
-							   break;
-						case 0x2e: clear_buffer(bb);	//ENM
-							   break;
-						case 0x2f: swap_buffers();	//Swap buffers
-							   display_buffer(fb);
-							   clear_buffer(bb);
-							   break;
-					}
-					break;
-				case 0x17:
-					if( c2>=0x21 && c2<=0x23) //TAB
-					{
-						break;
-					}
-			}
-	  }
+          channel = (c1 & 0x08) >> 3;
+          if (channel != (selected_channel() & 1))
+                return;
+          c1&=~0x08;
+          if(data!=lastcode)
+          {
+                if(c2 & 0x40) { /*PAC, Preamble Address Code */
+                        append_char('\n'); /*FIXME properly interpret PACs*/
+                }
+                else
+                        switch(c1)
+                        {
+                                case 0x10:      break; // ext attribute
+                                case 0x11:
+                                        if((c2 & 0x30)==0x30)
+                                        {
+                                                //printf("[debug]:Special char (ignored)\n");
+                                                /*cc_decode_special_char()*/;
+                                        }
+                                        else if (c2 & 0x20)
+                                        {
+                                                //printf("[debug]: midrow_attr (ignored)\n");
+                                                /*cc_decode_midrow_attr()*/;
+                                        }
+                                        break;
+                                case 0x14:
+                                        switch(c2)
+                                        {
+                                                case 0x00: //CC roll-on mode
+                                                           cc_mode=CC_ROLLON;
+                                                           break;
+                                                case 0x25: //CC roll-up, 2 rows
+                                                case 0x26: //CC roll-up, 3 rows
+                                                case 0x27: //CC roll-up, 4 rows
+                                                           cc_lines=c2-0x23;
+                                                           cc_mode=CC_ROLLUP;
+                                                           break;
+                                                case 0x2C: display_buffer(NULL); //EDM
+                                                           clear_buffer(fb); break;
+                                                case 0x2d: append_char('\n');   //carriage return
+                                                           break;
+                                                case 0x2e: clear_buffer(bb);    //ENM
+                                                           break;
+                                                case 0x2f: swap_buffers();      //Swap buffers
+                                                           display_buffer(fb);
+                                                           clear_buffer(bb);
+                                                           break;
+                                        }
+                                        break;
+                                case 0x17:
+                                        if( c2>=0x21 && c2<=0x23) //TAB
+                                        {
+                                                break;
+                                        }
+                        }
+          }
   }
   lastcode=data;
 }
@@ -376,16 +376,16 @@ static void mov_subcc_decode(const uint8_t *data, unsigned len)
 
 void subcc_process_data(const uint8_t *inputdata, unsigned int len)
 {
-	int mov_mode = len >= 10 &&
-	               memcmp(inputdata, mov_cc_signature_1, sizeof(mov_cc_signature_1)) == 0;
-	if(!subcc_enabled) return;
-	if(!initialized) subcc_init();
+        int mov_mode = len >= 10 &&
+                       memcmp(inputdata, mov_cc_signature_1, sizeof(mov_cc_signature_1)) == 0;
+        if(!subcc_enabled) return;
+        if(!initialized) subcc_init();
 
-	if (mov_mode) {
-		mov_subcc_decode(inputdata, len);
-		return;
-	}
-	subcc_decode(inputdata, len);
+        if (mov_mode) {
+                mov_subcc_decode(inputdata, len);
+                return;
+        }
+        subcc_decode(inputdata, len);
 }
 
 /**

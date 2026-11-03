@@ -10,17 +10,17 @@ TimeKeeper::TimeKeeper(double presetDuration, double smoothDuration, double east
     _presetDuration = presetDuration;
     _easterEgg = easterEgg;
 
-	gettimeofday ( &this->startTime, NULL );
+        gettimeofday ( &this->startTime, NULL );
 
-	UpdateTimers();
+        UpdateTimers();
   }
 
   void TimeKeeper::UpdateTimers()
   {
-	_currentTime = getTicks ( &startTime ) * 0.001;
+        _currentTime = getTicks ( &startTime ) * 0.001;
 
-	_presetFrameA++;
-	_presetFrameB++;
+        _presetFrameA++;
+        _presetFrameB++;
 
   }
 
@@ -86,6 +86,6 @@ int TimeKeeper::PresetFrameA()
   }
 
 double TimeKeeper::sampledPresetDuration() {
-		return fmax(1, fmin(60, RandomNumberGenerators::gaussian
-			(_presetDuration, _easterEgg)));
+                return fmax(1, fmin(60, RandomNumberGenerators::gaussian
+                        (_presetDuration, _easterEgg)));
 }

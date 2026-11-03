@@ -354,12 +354,12 @@ static inline int check_marker(GetBitContext *s, const char *msg)
 static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
                                  int bit_size)
 {
-	int ret = 0;
+    int ret = 0;
     int buffer_size = (bit_size+7)>>3;
     if (buffer_size < 0 || bit_size < 0) {
         buffer_size = bit_size = 0;
         buffer = NULL;
-		ret         = AVERROR_INVALIDDATA;
+        ret         = AVERROR_INVALIDDATA;
     }
 
     s->buffer       = buffer;
@@ -368,7 +368,7 @@ static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
     s->buffer_end   = buffer + buffer_size;
     s->index        = 0;
 
-	return ret;
+    return ret;
 }
 
 /**

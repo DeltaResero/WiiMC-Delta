@@ -151,7 +151,7 @@ extern int fixed_vo;
 void uninit_player(unsigned int mask);
 void reinit_audio_chain(void);
 double playing_audio_pts(sh_audio_t *sh_audio, demux_stream_t *d_audio,
-			 const ao_functions_t *audio_out);
+                         const ao_functions_t *audio_out);
 void exit_player(enum exit_reason how);
 void exit_player_with_rc(enum exit_reason how, int rc);
 void add_subtitles(char *filename, float fps, int noerr);

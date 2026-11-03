@@ -4477,9 +4477,9 @@ static const PACKTAB_UINT16 JoiLev0[4096*1] = {
 /* *INDENT-ON* */
 
 #define FRIBIDI_GET_JOINING_TYPE(x) \
-	((x) >= 0x100000 ? U :  \
-	JoiLev1[((x) & 0xff) + \
-	JoiLev0[((x) >> 8)]])
+        ((x) >= 0x100000 ? U :  \
+        JoiLev1[((x) & 0xff) + \
+        JoiLev0[((x) >> 8)]])
 
 #undef PACKTAB_UINT8
 #undef PACKTAB_UINT16

@@ -7,16 +7,16 @@
 
 namespace InitCondUtils {
 class LoadUnspecInitCond {
-	public:
+        public:
 
-	LoadUnspecInitCond(std::map<std::string,InitCond*> & initCondTree, std::map<std::string,InitCond*> & perFrameInitEqnTree):
-		 m_initCondTree(initCondTree), m_perFrameInitEqnTree(perFrameInitEqnTree) {}
+        LoadUnspecInitCond(std::map<std::string,InitCond*> & initCondTree, std::map<std::string,InitCond*> & perFrameInitEqnTree):
+                 m_initCondTree(initCondTree), m_perFrameInitEqnTree(perFrameInitEqnTree) {}
 
-	void operator()(Param * param);
+        void operator()(Param * param);
 
-	private:
-		std::map<std::string,InitCond*> & m_initCondTree;
-		std::map<std::string,InitCond*> & m_perFrameInitEqnTree;
+        private:
+                std::map<std::string,InitCond*> & m_initCondTree;
+                std::map<std::string,InitCond*> & m_perFrameInitEqnTree;
 };
 
 
@@ -45,33 +45,33 @@ inline void LoadUnspecInitCond::operator() (Param * param) {
     if (m_initCondTree.find(param->name) == m_initCondTree.end()) {
 
         /* Make sure initial condition does not exist in the set of per frame initial equations */
-	if (m_perFrameInitEqnTree.find(param->name) != m_perFrameInitEqnTree.end())
-		return;
+        if (m_perFrameInitEqnTree.find(param->name) != m_perFrameInitEqnTree.end())
+                return;
 
-	// Set an initial vialue via correct union member
+        // Set an initial vialue via correct union member
         if (param->type == P_TYPE_BOOL)
             init_val.bool_val = param->default_init_val.bool_val;
         else if (param->type == P_TYPE_INT)
             init_val.int_val = param->default_init_val.int_val;
 
         else if (param->type == P_TYPE_DOUBLE) {
-           		init_val.float_val = param->default_init_val.float_val;
-	}
+                        init_val.float_val = param->default_init_val.float_val;
+        }
 
         //printf("%s\n", param->name);
         /* Create new initial condition */
-	//std::cerr << "[InitCondUtils] creating an unspecified initial condition of name " << param->name << std::endl;
+        //std::cerr << "[InitCondUtils] creating an unspecified initial condition of name " << param->name << std::endl;
         if ((init_cond = new InitCond(param, init_val)) == NULL) {
-	    abort();
+            abort();
         }
 
         /* Insert the initial condition into this presets tree */
-	std::pair<std::map<std::string, InitCond*>::iterator, bool> inserteePair =
-		m_initCondTree.insert(std::make_pair(init_cond->param->name, init_cond));
-	assert(inserteePair.second);
-	assert(inserteePair.first->second);
+        std::pair<std::map<std::string, InitCond*>::iterator, bool> inserteePair =
+                m_initCondTree.insert(std::make_pair(init_cond->param->name, init_cond));
+        assert(inserteePair.second);
+        assert(inserteePair.first->second);
     } else
-	assert(m_initCondTree.find(param->name)->second);
+        assert(m_initCondTree.find(param->name)->second);
 
 
 }

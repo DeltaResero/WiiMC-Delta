@@ -1731,7 +1731,7 @@ float demuxer_chapter_time(demuxer_t *demuxer, int chapter, float *end)
         if (end)
           //  *end = demuxer->chapters[chapter].end / 1000.0;
         //return demuxer->chapters[chapter].start / 1000.0;
-		 *end = demuxer->chapters[chapter].end / 1e9;
+                 *end = demuxer->chapters[chapter].end / 1e9;
         return demuxer->chapters[chapter].start / 1e9;
     }
     return -1.0;

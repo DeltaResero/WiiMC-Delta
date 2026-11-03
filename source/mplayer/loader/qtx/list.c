@@ -54,9 +54,9 @@ int main(void) {
 
     memset(&desc,0,sizeof(desc));
     desc.componentType= (((unsigned char)'S')<<24)|
-			(((unsigned char)'V')<<16)|
-			(((unsigned char)'Q')<<8)|
-			(((unsigned char)'5'));
+                        (((unsigned char)'V')<<16)|
+                        (((unsigned char)'Q')<<8)|
+                        (((unsigned char)'5'));
     desc.componentSubType=0;
     desc.componentManufacturer=0;
     desc.componentFlags=0;

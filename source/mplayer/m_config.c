@@ -336,11 +336,11 @@ m_config_add_option(m_config_t *config, const m_option_t *arg, const char* prefi
     // Check if there is already an option pointing to this address
     if(arg->p) {
       for(i = config->opts ; i ; i = i->next ) {
-	if(i->opt->p == arg->p) { // So we don't save the same vars more than 1 time
-	  co->slots = i->slots;
-	  co->flags |= M_CFG_OPT_ALIAS;
-	  break;
-	}
+        if(i->opt->p == arg->p) { // So we don't save the same vars more than 1 time
+          co->slots = i->slots;
+          co->flags |= M_CFG_OPT_ALIAS;
+          break;
+        }
       }
     }
     if(!(co->flags & M_CFG_OPT_ALIAS)) {
@@ -390,7 +390,7 @@ m_config_get_co(const m_config_t *config, char *arg) {
     if((co->opt->type->flags & M_OPT_TYPE_ALLOW_WILDCARD) &&
        (co->name[l] == '*')) {
       if(strncasecmp(co->name,arg,l) == 0)
-	return co;
+        return co;
     } else if(strcasecmp(co->name,arg) == 0)
       return co;
   }
@@ -447,21 +447,21 @@ m_config_parse_option(const m_config_t *config, char *arg, char *param, int set)
     for(i = 0 ; lst && lst[2*i] ; i++) {
       int l = strlen(co->name) + 1 + strlen(lst[2*i]) + 1;
       if(r >= 0) {
-	// Build the full name
-	char n[l];
-	sprintf(n,"%s:%s",co->name,lst[2*i]);
-	sr = m_config_parse_option(config,n,lst[2*i+1],set);
-	if(sr < 0){
-	  if(sr == M_OPT_UNKNOWN){
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR,MSGTR_InvalidSuboption,co->name,lst[2*i]);
-	    r = M_OPT_INVALID;
-	  } else
-	  if(sr == M_OPT_MISSING_PARAM){
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR,MSGTR_MissingSuboptionParameter,lst[2*i],co->name);
-	    r = M_OPT_INVALID;
-	  } else
-	    r = sr;
-	}
+        // Build the full name
+        char n[l];
+        sprintf(n,"%s:%s",co->name,lst[2*i]);
+        sr = m_config_parse_option(config,n,lst[2*i+1],set);
+        if(sr < 0){
+          if(sr == M_OPT_UNKNOWN){
+            mp_msg(MSGT_CFGPARSER, MSGL_ERR,MSGTR_InvalidSuboption,co->name,lst[2*i]);
+            r = M_OPT_INVALID;
+          } else
+          if(sr == M_OPT_MISSING_PARAM){
+            mp_msg(MSGT_CFGPARSER, MSGL_ERR,MSGTR_MissingSuboptionParameter,lst[2*i],co->name);
+            r = M_OPT_INVALID;
+          } else
+            r = sr;
+        }
       }
       free(lst[2*i]);
       free(lst[2*i+1]);
@@ -540,13 +540,13 @@ m_config_print_option_list(const m_config_t *config) {
     else
       strcpy(max,"No");
     mp_msg(MSGT_CFGPARSER, MSGL_INFO, " %-20.20s %-15.15s %-10.10s %-10.10s %-3.3s   %-3.3s   %-3.3s\n",
-	   co->name,
-	   co->opt->type->name,
-	   min,
-	   max,
-	   opt->flags & CONF_GLOBAL ? "Yes" : "No",
-	   opt->flags & CONF_NOCMD ? "No" : "Yes",
-	   opt->flags & CONF_NOCFG ? "No" : "Yes");
+           co->name,
+           co->opt->type->name,
+           min,
+           max,
+           opt->flags & CONF_GLOBAL ? "Yes" : "No",
+           opt->flags & CONF_NOCMD ? "No" : "Yes",
+           opt->flags & CONF_NOCFG ? "No" : "Yes");
     count++;
   }
   mp_msg(MSGT_CFGPARSER, MSGL_INFO, MSGTR_TotalOptions,count);
@@ -579,7 +579,7 @@ m_profile_set_desc(m_profile_t* p, char* desc) {
 
 int
 m_config_set_profile_option(m_config_t* config, m_profile_t* p,
-			    char* name, char* val) {
+                            char* name, char* val) {
   int i = m_config_check_option(config,name,val);
   if(i < 0) return i;
   if(p->opts) p->opts = realloc(p->opts,2*(p->num_opts+2)*sizeof(char*));

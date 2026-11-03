@@ -29,17 +29,17 @@ static Mtx GXmodelView2D;
 static void
 StartGX ()
 {
-	GXColor background = { 0, 0, 0, 0xff };
+    GXColor background = { 0, 0, 0, 0xff };
 
-	/*** Clear out FIFO area ***/
-	memset (&gp_fifo, 0, DEFAULT_FIFO_SIZE);
+    /*** Clear out FIFO area ***/
+    memset (&gp_fifo, 0, DEFAULT_FIFO_SIZE);
 
-	/*** Initialise GX ***/
-	GX_Init (&gp_fifo, DEFAULT_FIFO_SIZE);
-	GX_SetCopyClear (background, 0x00ffffff);
+    /*** Initialise GX ***/
+    GX_Init (&gp_fifo, DEFAULT_FIFO_SIZE);
+    GX_SetCopyClear (background, 0x00ffffff);
 
-	GX_SetDispCopyGamma (GX_GM_1_0);
-	GX_SetCullMode (GX_CULL_NONE);
+    GX_SetDispCopyGamma (GX_GM_1_0);
+    GX_SetCullMode (GX_CULL_NONE);
 }
 
 /****************************************************************************
@@ -50,67 +50,67 @@ StartGX ()
 void
 ResetVideo_Menu()
 {
-	Mtx44 p;
-	f32 yscale;
-	u32 xfbHeight;
+    Mtx44 p;
+    f32 yscale;
+    u32 xfbHeight;
 
-	VIDEO_Configure (vmode);
-	VIDEO_Flush();
-	VIDEO_WaitVSync();
-	if (vmode->viTVMode & VI_NON_INTERLACE)
-		VIDEO_WaitVSync();
-	else
-		while (VIDEO_GetNextField())
-			VIDEO_WaitVSync();
+    VIDEO_Configure (vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    if (vmode->viTVMode & VI_NON_INTERLACE)
+        VIDEO_WaitVSync();
+    else
+        while (VIDEO_GetNextField())
+            VIDEO_WaitVSync();
 
-	// clears the bg to color and clears the z buffer
-	GXColor background = {0, 0, 0, 255};
-	GX_SetCopyClear (background, 0x00ffffff);
+    // clears the bg to color and clears the z buffer
+    GXColor background = {0, 0, 0, 255};
+    GX_SetCopyClear (background, 0x00ffffff);
 
-	yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
-	xfbHeight = GX_SetDispCopyYScale(yscale);
-	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
-	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
-	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
-	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
-	GX_SetFieldMode(vmode->field_rendering,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+    yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+    xfbHeight = GX_SetDispCopyYScale(yscale);
+    GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+    GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+    GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+    GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
+    GX_SetFieldMode(vmode->field_rendering,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
-	if (vmode->aa)
-		GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
-	else
-		GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    if (vmode->aa)
+        GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
+    else
+        GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 
-	// setup the vertex descriptor
-	// tells the flipper to expect direct data
-	GX_ClearVtxDesc();
-	GX_InvVtxCache ();
-	GX_InvalidateTexAll();
+    // setup the vertex descriptor
+    // tells the flipper to expect direct data
+    GX_ClearVtxDesc();
+    GX_InvVtxCache ();
+    GX_InvalidateTexAll();
 
-	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
-	GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GX_SetVtxDesc (GX_VA_CLR0, GX_DIRECT);
+    GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
+    GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GX_SetVtxDesc (GX_VA_CLR0, GX_DIRECT);
 
-	GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-	GX_SetZMode (GX_FALSE, GX_LEQUAL, GX_TRUE);
+    GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GX_SetVtxAttrFmt (GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GX_SetZMode (GX_FALSE, GX_LEQUAL, GX_TRUE);
 
-	GX_SetNumChans(1);
-	GX_SetNumTexGens(1);
-	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
-	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    GX_SetNumChans(1);
+    GX_SetNumTexGens(1);
+    GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
-	guMtxIdentity(GXmodelView2D);
-	guMtxTransApply (GXmodelView2D, GXmodelView2D, 0.0F, 0.0F, -200.0F);
-	GX_LoadPosMtxImm(GXmodelView2D,GX_PNMTX0);
+    guMtxIdentity(GXmodelView2D);
+    guMtxTransApply (GXmodelView2D, GXmodelView2D, 0.0F, 0.0F, -200.0F);
+    GX_LoadPosMtxImm(GXmodelView2D,GX_PNMTX0);
 
-	guOrtho(p,0,479,0,639,0,300);
-	GX_LoadProjectionMtx(p, GX_ORTHOGRAPHIC);
+    guOrtho(p,0,479,0,639,0,300);
+    GX_LoadProjectionMtx(p, GX_ORTHOGRAPHIC);
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
-	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-	GX_SetAlphaUpdate(GX_TRUE);
+    GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+    GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GX_SetAlphaUpdate(GX_TRUE);
 }
 
 /****************************************************************************
@@ -123,78 +123,78 @@ ResetVideo_Menu()
 void
 InitVideo ()
 {
-	VIDEO_Init();
-	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
+    VIDEO_Init();
+    vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
 
-	bool pal = false;
+    bool pal = false;
 
-	if (vmode == &TVPal528IntDf)
-		pal = true;
+    if (vmode == &TVPal528IntDf)
+        pal = true;
 
-	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-	{
-		vmode->fbWidth = 640;
-		vmode->efbHeight = 456;
-		vmode->viWidth = 704;
+    if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+    {
+        vmode->fbWidth = 640;
+        vmode->efbHeight = 456;
+        vmode->viWidth = 704;
 
-		if (pal)
-		{
-			vmode->xfbHeight = 542;
-			vmode->viHeight = 542;
-		}
-		else
-		{
-			vmode->xfbHeight = 456;
-			vmode->viHeight = 456;
-		}
-	}
-	else
-	{
-		if (pal)
-			vmode = &TVPal576IntDfScale;
+        if (pal)
+        {
+            vmode->xfbHeight = 542;
+            vmode->viHeight = 542;
+        }
+        else
+        {
+            vmode->xfbHeight = 456;
+            vmode->viHeight = 456;
+        }
+    }
+    else
+    {
+        if (pal)
+            vmode = &TVPal576IntDfScale;
 
         vmode->fbWidth = 640;
         vmode->efbHeight = 456;
         vmode->viWidth = 704;
         vmode->xfbHeight = 456;
         vmode->viHeight = 456;
-	}
+    }
 
-	if (pal)
-	{
-		vmode->viXOrigin = (VI_MAX_WIDTH_PAL - vmode->viWidth) / 2;
-		vmode->viYOrigin = (VI_MAX_HEIGHT_PAL - vmode->viHeight) / 2;
-	}
-	else
-	{
-		vmode->viXOrigin = (VI_MAX_WIDTH_NTSC - vmode->viWidth) / 2;
-		vmode->viYOrigin = (VI_MAX_HEIGHT_NTSC - vmode->viHeight) / 2;
-	}
+    if (pal)
+    {
+        vmode->viXOrigin = (VI_MAX_WIDTH_PAL - vmode->viWidth) / 2;
+        vmode->viYOrigin = (VI_MAX_HEIGHT_PAL - vmode->viHeight) / 2;
+    }
+    else
+    {
+        vmode->viXOrigin = (VI_MAX_WIDTH_NTSC - vmode->viWidth) / 2;
+        vmode->viYOrigin = (VI_MAX_HEIGHT_NTSC - vmode->viHeight) / 2;
+    }
 
-	VIDEO_Configure (vmode);
+    VIDEO_Configure (vmode);
 
-	// Allocate the video buffers
-	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
-	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
-	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
-	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
-	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
-	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+    // Allocate the video buffers
+    xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
+    xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
+    DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
+    DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
+    xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
+    xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
 
-	// Clear framebuffers etc.
-	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
-	VIDEO_SetNextFramebuffer (xfb[0]);
+    // Clear framebuffers etc.
+    VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+    VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+    VIDEO_SetNextFramebuffer (xfb[0]);
 
-	VIDEO_SetBlack (FALSE);
-	VIDEO_Flush ();
-	VIDEO_WaitVSync ();
-	if (vmode->viTVMode & VI_NON_INTERLACE)
-		VIDEO_WaitVSync ();
+    VIDEO_SetBlack (FALSE);
+    VIDEO_Flush ();
+    VIDEO_WaitVSync ();
+    if (vmode->viTVMode & VI_NON_INTERLACE)
+        VIDEO_WaitVSync ();
 
-	StartGX();
-	ResetVideo_Menu();
-	// Finally, the video is up and ready for use :)
+    StartGX();
+    ResetVideo_Menu();
+    // Finally, the video is up and ready for use :)
 }
 
 /****************************************************************************
@@ -204,11 +204,11 @@ InitVideo ()
  ***************************************************************************/
 void StopGX()
 {
-	GX_AbortFrame();
-	GX_Flush();
+    GX_AbortFrame();
+    GX_Flush();
 
-	VIDEO_SetBlack(TRUE);
-	VIDEO_Flush();
+    VIDEO_SetBlack(TRUE);
+    VIDEO_Flush();
 }
 
 /****************************************************************************
@@ -218,15 +218,15 @@ void StopGX()
  ***************************************************************************/
 void Menu_Render()
 {
-	GX_DrawDone ();
+    GX_DrawDone ();
 
-	whichfb ^= 1; // flip framebuffer
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-	GX_SetColorUpdate(GX_TRUE);
-	GX_CopyDisp(xfb[whichfb],GX_TRUE);
-	VIDEO_SetNextFramebuffer(xfb[whichfb]);
-	VIDEO_Flush();
-	VIDEO_WaitVSync();
+    whichfb ^= 1; // flip framebuffer
+    GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GX_SetColorUpdate(GX_TRUE);
+    GX_CopyDisp(xfb[whichfb],GX_TRUE);
+    VIDEO_SetNextFramebuffer(xfb[whichfb]);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
 }
 
 /****************************************************************************
@@ -235,53 +235,53 @@ void Menu_Render()
  * Draws the specified image on screen using GX
  ***************************************************************************/
 void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
-	f32 degrees, f32 scaleX, f32 scaleY, u8 alpha)
+    f32 degrees, f32 scaleX, f32 scaleY, u8 alpha)
 {
-	if(data == NULL)
-		return;
+    if(data == NULL)
+        return;
 
-	GXTexObj texObj;
+    GXTexObj texObj;
 
-	GX_InitTexObj(&texObj, data, width, height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	GX_LoadTexObj(&texObj, GX_TEXMAP0);
-	GX_InvalidateTexAll();
+    GX_InitTexObj(&texObj, data, width, height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GX_LoadTexObj(&texObj, GX_TEXMAP0);
+    GX_InvalidateTexAll();
 
-	GX_SetTevOp (GX_TEVSTAGE0, GX_MODULATE);
-	GX_SetVtxDesc (GX_VA_TEX0, GX_DIRECT);
+    GX_SetTevOp (GX_TEVSTAGE0, GX_MODULATE);
+    GX_SetVtxDesc (GX_VA_TEX0, GX_DIRECT);
 
-	Mtx m,m1,m2, mv;
-	width  >>= 1;
-	height >>= 1;
+    Mtx m,m1,m2, mv;
+    width  >>= 1;
+    height >>= 1;
 
-	guMtxIdentity (m1);
-	guMtxScaleApply(m1,m1,scaleX,scaleY,1.0);
-	guVector axis = (guVector) {0 , 0, 1 };
-	guMtxRotAxisDeg (m2, &axis, degrees);
-	guMtxConcat(m2,m1,m);
+    guMtxIdentity (m1);
+    guMtxScaleApply(m1,m1,scaleX,scaleY,1.0);
+    guVector axis = (guVector) {0 , 0, 1 };
+    guMtxRotAxisDeg (m2, &axis, degrees);
+    guMtxConcat(m2,m1,m);
 
-	guMtxTransApply(m,m, xpos+width,ypos+height,0);
-	guMtxConcat (GXmodelView2D, m, mv);
-	GX_LoadPosMtxImm (mv, GX_PNMTX0);
+    guMtxTransApply(m,m, xpos+width,ypos+height,0);
+    guMtxConcat (GXmodelView2D, m, mv);
+    GX_LoadPosMtxImm (mv, GX_PNMTX0);
 
-	GX_Begin(GX_QUADS, GX_VTXFMT0,4);
-	GX_Position3f32(-width, -height,  0);
-	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
-	GX_TexCoord2f32(0, 0);
+    GX_Begin(GX_QUADS, GX_VTXFMT0,4);
+    GX_Position3f32(-width, -height,  0);
+    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_TexCoord2f32(0, 0);
 
-	GX_Position3f32(width, -height,  0);
-	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
-	GX_TexCoord2f32(1, 0);
+    GX_Position3f32(width, -height,  0);
+    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_TexCoord2f32(1, 0);
 
-	GX_Position3f32(width, height,  0);
-	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
-	GX_TexCoord2f32(1, 1);
+    GX_Position3f32(width, height,  0);
+    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_TexCoord2f32(1, 1);
 
-	GX_Position3f32(-width, height,  0);
-	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
-	GX_TexCoord2f32(0, 1);
-	GX_End();
-	GX_LoadPosMtxImm (GXmodelView2D, GX_PNMTX0);
+    GX_Position3f32(-width, height,  0);
+    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_TexCoord2f32(0, 1);
+    GX_End();
+    GX_LoadPosMtxImm (GXmodelView2D, GX_PNMTX0);
 
-	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
-	GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+    GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
+    GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
 }

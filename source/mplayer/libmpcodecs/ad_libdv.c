@@ -41,11 +41,11 @@
 
 static const ad_info_t info =
 {
-	"Raw DV Audio Decoder",
-	"libdv",
-	"Alexander Neundorf <neundorf@kde.org>",
-	"http://libdv.sf.net",
-	""
+        "Raw DV Audio Decoder",
+        "libdv",
+        "Alexander Neundorf <neundorf@kde.org>",
+        "http://libdv.sf.net",
+        ""
 };
 
 LIBAD_EXTERN(libdv)

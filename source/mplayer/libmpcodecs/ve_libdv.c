@@ -57,10 +57,10 @@ struct vf_priv_s {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
 
     if(width!=DV_WIDTH || (height!=DV_PAL_HEIGHT && height!=DV_NTSC_HEIGHT)){
-	mp_msg(MSGT_VFILTER,MSGL_ERR,"DV: only 720x480 (NTSC) and 720x576 (PAL) resolutions allowed! Try with -vf scale=720:480\n");
+        mp_msg(MSGT_VFILTER,MSGL_ERR,"DV: only 720x480 (NTSC) and 720x576 (PAL) resolutions allowed! Try with -vf scale=720:480\n");
     }
 
     vf->priv->enc->isPAL=(height==DV_PAL_HEIGHT);
@@ -91,8 +91,8 @@ static int query_format(struct vf_instance *vf, unsigned int fmt){
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 
     dv_encode_full_frame(vf->priv->enc, mpi->planes,
-	(mpi->flags&MP_IMGFLAG_YUV) ? e_dv_color_yuv : e_dv_color_rgb,
-	mux_v->buffer);
+        (mpi->flags&MP_IMGFLAG_YUV) ? e_dv_color_yuv : e_dv_color_rgb,
+        mux_v->buffer);
 
     muxer_write_chunk(mux_v, 480 * (vf->priv->enc->isPAL ? 300 : 250) , 0x10, pts, pts);
     return 1;

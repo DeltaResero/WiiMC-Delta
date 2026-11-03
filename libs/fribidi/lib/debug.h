@@ -52,55 +52,55 @@
 #ifndef FRIBIDI_FPRINTF
 # ifndef __FRIBIDI_DOC
 #  include <stdio.h>
-# endif	/* !__FRIBIDI_DOC */
+# endif /* !__FRIBIDI_DOC */
 # define FRIBIDI_FPRINTF fprintf
 # define FRIBIDI_STDERR_ stderr,
 #endif /* !FRIBIDI_FPRINTF */
 
 #ifndef MSG
 #define MSG(s) \
-	FRIBIDI_BEGIN_STMT \
-	FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s); \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s); \
+    FRIBIDI_END_STMT
 #define MSG2(s, t) \
-	FRIBIDI_BEGIN_STMT \
-	FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s, t); \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s, t); \
+    FRIBIDI_END_STMT
 #define MSG5(s, t, u, v, w) \
-	FRIBIDI_BEGIN_STMT \
-	FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s, t, u, v, w); \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    FRIBIDI_FPRINTF(FRIBIDI_STDERR_ s, t, u, v, w); \
+    FRIBIDI_END_STMT
 #endif /* !MSG */
 
 #ifndef DBG
 # define DBG(s) \
-	FRIBIDI_BEGIN_STMT \
-	if (fribidi_debug_status()) { MSG(FRIBIDI ": " s "\n"); } \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    if (fribidi_debug_status()) { MSG(FRIBIDI ": " s "\n"); } \
+    FRIBIDI_END_STMT
 # define DBG2(s, t) \
-	FRIBIDI_BEGIN_STMT \
-	if (fribidi_debug_status()) { MSG2(FRIBIDI ": " s "\n", t); } \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    if (fribidi_debug_status()) { MSG2(FRIBIDI ": " s "\n", t); } \
+    FRIBIDI_END_STMT
 #endif /* !DBG */
 
 #ifndef fribidi_assert
 # define fribidi_assert(cond) \
-	FRIBIDI_BEGIN_STMT \
-	if (!(cond)) { \
-		DBG(__FILE__ ":" STRINGIZE(__LINE__) ": " \
-		    "assertion failed (" STRINGIZE(cond) ")"); \
-	} \
-	FRIBIDI_END_STMT
+    FRIBIDI_BEGIN_STMT \
+    if (!(cond)) { \
+        DBG(__FILE__ ":" STRINGIZE(__LINE__) ": " \
+            "assertion failed (" STRINGIZE(cond) ")"); \
+    } \
+    FRIBIDI_END_STMT
 #endif /* !fribidi_assert */
 
 #else /* !DEBUG */
 
 #ifndef DBG
-# define DBG(s)			FRIBIDI_EMPTY_STMT
-# define DBG2(s, t)		FRIBIDI_EMPTY_STMT
+# define DBG(s)         FRIBIDI_EMPTY_STMT
+# define DBG2(s, t)     FRIBIDI_EMPTY_STMT
 #endif /* !DBG */
 #ifndef fribidi_assert
-# define fribidi_assert(cond)	FRIBIDI_EMPTY_STMT
+# define fribidi_assert(cond)   FRIBIDI_EMPTY_STMT
 #endif /* !fribidi_assert */
 
 #endif /* !DEBUG */

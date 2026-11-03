@@ -47,26 +47,26 @@ struct vf_priv_s {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
     if(vf_next_query_format(vf,IMGFMT_MPEGPES)<=0) return 0;
 
     lavc_venc_context.width = width;
     lavc_venc_context.height = height;
 
     if(!lavc_venc_context.time_base.num || !lavc_venc_context.time_base.den){
-	// guess FPS:
-	switch(height){
-	case 240:
-	case 480:
-	    lavc_venc_context.time_base= (AVRational){1001,30000};
-	    break;
-	case 576:
-	case 288:
-	default:
-	    lavc_venc_context.time_base= (AVRational){1,25};
-	    break;
-//	    lavc_venc_context.frame_rate=vo_fps*FRAME_RATE_BASE; // same as src
-	}
+        // guess FPS:
+        switch(height){
+        case 240:
+        case 480:
+            lavc_venc_context.time_base= (AVRational){1001,30000};
+            break;
+        case 576:
+        case 288:
+        default:
+            lavc_venc_context.time_base= (AVRational){1,25};
+            break;
+//          lavc_venc_context.frame_rate=vo_fps*FRAME_RATE_BASE; // same as src
+        }
     }
 
     free(vf->priv->outbuf);
@@ -75,8 +75,8 @@ static int config(struct vf_instance *vf,
     vf->priv->outbuf = malloc(vf->priv->outbuf_size);
 
     if (avcodec_open2(&lavc_venc_context, vf->priv->codec, NULL) != 0) {
-	mp_msg(MSGT_MENCODER,MSGL_ERR,MSGTR_CantOpenCodec);
-	return 0;
+        mp_msg(MSGT_MENCODER,MSGL_ERR,MSGTR_CantOpenCodec);
+        return 0;
     }
 
     return vf_next_config(vf,width,height,d_width,d_height,flags,IMGFMT_MPEGPES);
@@ -95,13 +95,13 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     pic->linesize[2]=mpi->stride[2];
 
     out_size = avcodec_encode_video(&lavc_venc_context,
-	vf->priv->outbuf, vf->priv->outbuf_size, pic);
+        vf->priv->outbuf, vf->priv->outbuf_size, pic);
 
     if(out_size<=0) return 1;
 
     dmpi=vf_get_image(vf->next,IMGFMT_MPEGPES,
-	MP_IMGTYPE_EXPORT, 0,
-	mpi->w, mpi->h);
+        MP_IMGTYPE_EXPORT, 0,
+        mpi->w, mpi->h);
 
     vf->priv->pes.data=vf->priv->outbuf;
     vf->priv->pes.size=out_size;
@@ -120,7 +120,7 @@ static int query_format(struct vf_instance *vf, unsigned int fmt){
     case IMGFMT_YV12:
     case IMGFMT_I420:
     case IMGFMT_IYUV:
-	return vf_next_query_format(vf, IMGFMT_MPEGPES) & (~(VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_ACCEPT_STRIDE));
+        return vf_next_query_format(vf, IMGFMT_MPEGPES) & (~(VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_ACCEPT_STRIDE));
     }
     return 0;
 }
@@ -139,8 +139,8 @@ static int vf_open(vf_instance_t *vf, char *args){
 
     vf->priv->codec = avcodec_find_encoder_by_name("mpeg1video");
     if (!vf->priv->codec) {
-	mp_msg(MSGT_MENCODER,MSGL_ERR,MSGTR_MissingLAVCcodec, "mpeg1video");
-	return 0;
+        mp_msg(MSGT_MENCODER,MSGL_ERR,MSGTR_MissingLAVCcodec, "mpeg1video");
+        return 0;
     }
 
     vf->priv->context=avcodec_alloc_context3(vf->priv->codec);
@@ -150,13 +150,13 @@ static int vf_open(vf_instance_t *vf, char *args){
     if(args) sscanf(args, "%d:%f", &p_quality, &p_fps);
 
     if(p_quality<32){
-	// fixed qscale
-	lavc_venc_context.flags = CODEC_FLAG_QSCALE;
-	lavc_venc_context.global_quality =
-	vf->priv->pic->quality = (int)(FF_QP2LAMBDA * ((p_quality<1) ? 1 : p_quality) + 0.5);
+        // fixed qscale
+        lavc_venc_context.flags = CODEC_FLAG_QSCALE;
+        lavc_venc_context.global_quality =
+        vf->priv->pic->quality = (int)(FF_QP2LAMBDA * ((p_quality<1) ? 1 : p_quality) + 0.5);
     } else {
-	// fixed bitrate (in kbits)
-	lavc_venc_context.bit_rate = 1000*p_quality;
+        // fixed bitrate (in kbits)
+        lavc_venc_context.bit_rate = 1000*p_quality;
     }
     lavc_venc_context.time_base.num = 1000*1001;
     lavc_venc_context.time_base.den = (p_fps<1.0) ? 1000*1001*25 : (p_fps * lavc_venc_context.time_base.num);

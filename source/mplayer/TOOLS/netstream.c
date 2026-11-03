@@ -238,7 +238,7 @@ static int make_fd_set(fd_set* fds, client_t** _cl, int listen) {
       if(cl->next) cl->next->prev = cl->prev;
       if(cl->stream) free_stream(cl->stream);
       if(!cl->prev) // Remove the head
-	*_cl = cl->next;
+        *_cl = cl->next;
       cl = cl->next;
       free(f);
       continue;
@@ -283,7 +283,7 @@ static int main_loop(int listen_fd) {
     int n = select(sel_n,&fds,NULL,NULL,NULL);
     if(n < 0) {
       if(errno == EINTR)
-	continue;
+        continue;
       mp_msg(MSGT_NETST,MSGL_FATAL,"Select error: %s\n",strerror(errno));
       return 1;
     }
@@ -293,8 +293,8 @@ static int main_loop(int listen_fd) {
       socklen_t slen = sizeof(struct sockaddr_in);
       int client_fd = accept(listen_fd,(struct sockaddr*)&addr,&slen);
       if(client_fd < 0) {
-	mp_msg(MSGT_NETST,MSGL_ERR,"accept failed: %s\n",strerror(errno));
-	continue;
+        mp_msg(MSGT_NETST,MSGL_ERR,"accept failed: %s\n",strerror(errno));
+        continue;
       }
       mp_msg(MSGT_NETST,MSGL_V,"New client from %s\n",inet_ntoa(addr.sin_addr));
       clients = add_client(clients,client_fd);
@@ -306,13 +306,13 @@ static int main_loop(int listen_fd) {
       if(!FD_ISSET(iter->fd,&fds)) continue;
       pack = read_packet(iter->fd);
       if(!pack) {
-	close(iter->fd);
-	iter->fd = -1;
-	continue;
+        close(iter->fd);
+        iter->fd = -1;
+        continue;
       }
       if(!handle_client(iter,pack)) {
-	close(iter->fd);
-	iter->fd = -1;
+        close(iter->fd);
+        iter->fd = -1;
       }
       free(pack);
     }

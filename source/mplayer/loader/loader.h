@@ -1,8 +1,8 @@
 /********************************************************
 
-	Win32 binary loader interface
-	Copyright 2000 Eugene Kuznetsov (divx@euro.ru)
-	Shamelessly stolen from Wine project
+    Win32 binary loader interface
+    Copyright 2000 Eugene Kuznetsov (divx@euro.ru)
+    Shamelessly stolen from Wine project
 
 *********************************************************/
 
@@ -26,9 +26,9 @@ extern modref_list* local_wm;
 
 unsigned int GetPrivateProfileIntA_(const char* appname, const char* keyname, int default_value, const char* filename);
 int GetPrivateProfileStringA_(const char* appname, const char* keyname,
-	const char* def_val, char* dest, unsigned int len, const char* filename);
+    const char* def_val, char* dest, unsigned int len, const char* filename);
 int WritePrivateProfileStringA_(const char* appname, const char* keyname,
-	const char* string, const char* filename);
+    const char* string, const char* filename);
 
 INT WINAPI LoadStringA( HINSTANCE instance, UINT resource_id,
                             LPSTR buffer, INT buflen );

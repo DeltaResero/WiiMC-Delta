@@ -18,7 +18,7 @@ extern "C" {
 
 //devoptab
 bool ftpInitDevice(const char* name, const char *user, const char *password,
-					const char *share, const char *hostname, unsigned short port,
+                    const char *share, const char *hostname, unsigned short port,
                     bool ftp_passive);
 void ftpClose(const char* name);
 bool CheckFTPConnection(const char* name);

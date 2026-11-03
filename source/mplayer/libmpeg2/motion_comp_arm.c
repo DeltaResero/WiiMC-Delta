@@ -37,54 +37,54 @@
 #define predict_x(i)  (avg2 (ref[i], ref[i+1]))
 #define predict_y(i)  (avg2 (ref[i], (ref+stride)[i]))
 #define predict_xy(i) (avg4 (ref[i], ref[i+1], \
-			     (ref+stride)[i], (ref+stride)[i+1]))
+                 (ref+stride)[i], (ref+stride)[i+1]))
 
 #define put(predictor,i) dest[i] = predictor (i)
 #define avg(predictor,i) dest[i] = avg2 (predictor (i), dest[i])
 
 /* mc function template */
 
-#define MC_FUNC(op,xy)							\
-static void inline MC_##op##_##xy##_16_c (uint8_t * dest, const uint8_t * ref,	\
-				   const int stride, int height)	\
-{									\
-    do {								\
-	op (predict_##xy, 0);						\
-	op (predict_##xy, 1);						\
-	op (predict_##xy, 2);						\
-	op (predict_##xy, 3);						\
-	op (predict_##xy, 4);						\
-	op (predict_##xy, 5);						\
-	op (predict_##xy, 6);						\
-	op (predict_##xy, 7);						\
-	op (predict_##xy, 8);						\
-	op (predict_##xy, 9);						\
-	op (predict_##xy, 10);						\
-	op (predict_##xy, 11);						\
-	op (predict_##xy, 12);						\
-	op (predict_##xy, 13);						\
-	op (predict_##xy, 14);						\
-	op (predict_##xy, 15);						\
-	ref += stride;							\
-	dest += stride;							\
-    } while (--height);						\
-}									\
-static void MC_##op##_##xy##_8_c (uint8_t * dest, const uint8_t * ref,	\
-				  const int stride, int height)		\
-{									\
-    do {								\
-	op (predict_##xy, 0);						\
-	op (predict_##xy, 1);						\
-	op (predict_##xy, 2);						\
-	op (predict_##xy, 3);						\
-	op (predict_##xy, 4);						\
-	op (predict_##xy, 5);						\
-	op (predict_##xy, 6);						\
-	op (predict_##xy, 7);						\
-	ref += stride;							\
-	dest += stride;							\
-    } while (--height);						\
-}									\
+#define MC_FUNC(op,xy)                          \
+static void inline MC_##op##_##xy##_16_c (uint8_t * dest, const uint8_t * ref,  \
+                   const int stride, int height)    \
+{                                   \
+    do {                                \
+    op (predict_##xy, 0);                       \
+    op (predict_##xy, 1);                       \
+    op (predict_##xy, 2);                       \
+    op (predict_##xy, 3);                       \
+    op (predict_##xy, 4);                       \
+    op (predict_##xy, 5);                       \
+    op (predict_##xy, 6);                       \
+    op (predict_##xy, 7);                       \
+    op (predict_##xy, 8);                       \
+    op (predict_##xy, 9);                       \
+    op (predict_##xy, 10);                      \
+    op (predict_##xy, 11);                      \
+    op (predict_##xy, 12);                      \
+    op (predict_##xy, 13);                      \
+    op (predict_##xy, 14);                      \
+    op (predict_##xy, 15);                      \
+    ref += stride;                          \
+    dest += stride;                         \
+    } while (--height);                     \
+}                                   \
+static void MC_##op##_##xy##_8_c (uint8_t * dest, const uint8_t * ref,  \
+                  const int stride, int height)     \
+{                                   \
+    do {                                \
+    op (predict_##xy, 0);                       \
+    op (predict_##xy, 1);                       \
+    op (predict_##xy, 2);                       \
+    op (predict_##xy, 3);                       \
+    op (predict_##xy, 4);                       \
+    op (predict_##xy, 5);                       \
+    op (predict_##xy, 6);                       \
+    op (predict_##xy, 7);                       \
+    ref += stride;                          \
+    dest += stride;                         \
+    } while (--height);                     \
+}                                   \
 /* definitions of the actual mc functions */
 
 MC_FUNC (avg,o)
@@ -96,86 +96,86 @@ MC_FUNC (avg,xy)
 
 
 extern void MC_put_o_16_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height);
+                 int stride, int height);
 
 extern void MC_put_x_16_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height);
+                 int stride, int height);
 
 
 static void MC_put_y_16_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_put_y_16_c(dest, ref, stride, height);
 }
 
 static void MC_put_xy_16_arm (uint8_t * dest, const uint8_t * ref,
-			       int stride, int height)
+                   int stride, int height)
 {
     MC_put_xy_16_c(dest, ref, stride, height);
 }
 
 extern void MC_put_o_8_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height);
+                 int stride, int height);
 
 extern void MC_put_x_8_arm (uint8_t * dest, const uint8_t * ref,
-			    int stride, int height);
+                int stride, int height);
 
 static void MC_put_y_8_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height)
+                 int stride, int height)
 {
     MC_put_y_8_c(dest, ref, stride, height);
 }
 
 static void MC_put_xy_8_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_put_xy_8_c(dest, ref, stride, height);
 }
 
 static void MC_avg_o_16_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_avg_o_16_c(dest, ref, stride, height);
 }
 
 static void MC_avg_x_16_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_avg_x_16_c(dest, ref, stride, height);
 }
 
 static void MC_avg_y_16_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_avg_y_16_c(dest, ref, stride, height);
 }
 
 static void MC_avg_xy_16_arm (uint8_t * dest, const uint8_t * ref,
-			       int stride, int height)
+                   int stride, int height)
 {
     MC_avg_xy_16_c(dest, ref, stride, height);
 }
 
 static void MC_avg_o_8_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height)
+                 int stride, int height)
 {
     MC_avg_o_8_c(dest, ref, stride, height);
 }
 
 static void MC_avg_x_8_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height)
+                 int stride, int height)
 {
     MC_avg_x_8_c(dest, ref, stride, height);
 }
 
 static void MC_avg_y_8_arm (uint8_t * dest, const uint8_t * ref,
-			     int stride, int height)
+                 int stride, int height)
 {
     MC_avg_y_8_c(dest, ref, stride, height);
 }
 
 static void MC_avg_xy_8_arm (uint8_t * dest, const uint8_t * ref,
-			      int stride, int height)
+                  int stride, int height)
 {
     MC_avg_xy_8_c(dest, ref, stride, height);
 }

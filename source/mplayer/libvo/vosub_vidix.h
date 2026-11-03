@@ -26,14 +26,14 @@
 #include <stdint.h>
 #include "video_out.h"
 
-		    /* drvname can be NULL */
-int	 vidix_preinit(const char *drvname,vo_functions_t *server);
+            /* drvname can be NULL */
+int  vidix_preinit(const char *drvname,vo_functions_t *server);
 int      vidix_init(unsigned src_width,unsigned src_height,
-		    unsigned dest_x,unsigned dest_y,unsigned dst_width,
-		    unsigned dst_height,unsigned format,unsigned dest_bpp,
-		    unsigned vid_w,unsigned vid_h);
-int	 vidix_start(void);
-int	 vidix_stop(void);
+            unsigned dest_x,unsigned dest_y,unsigned dst_width,
+            unsigned dst_height,unsigned format,unsigned dest_bpp,
+            unsigned vid_w,unsigned vid_h);
+int  vidix_start(void);
+int  vidix_stop(void);
 void     vidix_term( void );
 uint32_t vidix_control(uint32_t request, void *data);
 uint32_t vidix_query_fourcc(uint32_t fourcc);

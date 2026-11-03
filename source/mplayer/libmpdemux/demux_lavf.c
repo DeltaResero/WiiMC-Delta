@@ -56,12 +56,12 @@ static char *opt_cryptokey;
 static char *opt_avopt = NULL;
 
 const m_option_t lavfdopts_conf[] = {
-	{"probesize", &(opt_probesize), CONF_TYPE_INT, CONF_RANGE, 32, INT_MAX, NULL},
-	{"format",    &(opt_format),    CONF_TYPE_STRING,       0,  0,       0, NULL},
-	{"analyzeduration",    &(opt_analyzeduration),    CONF_TYPE_INT,       CONF_RANGE,  0,       INT_MAX, NULL},
-	{"cryptokey", &(opt_cryptokey), CONF_TYPE_STRING,       0,  0,       0, NULL},
+        {"probesize", &(opt_probesize), CONF_TYPE_INT, CONF_RANGE, 32, INT_MAX, NULL},
+        {"format",    &(opt_format),    CONF_TYPE_STRING,       0,  0,       0, NULL},
+        {"analyzeduration",    &(opt_analyzeduration),    CONF_TYPE_INT,       CONF_RANGE,  0,       INT_MAX, NULL},
+        {"cryptokey", &(opt_cryptokey), CONF_TYPE_STRING,       0,  0,       0, NULL},
         {"o",                  &opt_avopt,                CONF_TYPE_STRING,    0,           0,             0, NULL},
-	{NULL, NULL, 0, 0, 0, 0, NULL}
+        {NULL, NULL, 0, 0, 0, 0, NULL}
 };
 
 #define BIO_BUFFER_SIZE 32768
@@ -561,7 +561,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         AVChapter *c = avfc->chapters[i];
       //  uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000});
         //uint64_t end   = av_rescale_q(c->end, c->time_base, (AVRational){1,1000});
-		uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000000000});
+                uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000000000});
         uint64_t end   = av_rescale_q(c->end, c->time_base, (AVRational){1,1000000000});
         t = av_dict_get(c->metadata, "title", NULL, 0);
         demuxer_add_chapter(demuxer, t ? t->value : NULL, start, end);
@@ -587,7 +587,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 //    else if(best_audio > 0 && demuxer->audio->id == -1) demuxer->audio->id=best_audio;
     if(!priv->video_streams){
         if(!priv->audio_streams){
-	    mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF: no audio or video headers found - broken file?\n");
+            mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF: no audio or video headers found - broken file?\n");
             return NULL;
         }
         demuxer->video->id=-2; // audio-only
@@ -696,49 +696,49 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
 
     switch (cmd) {
         case DEMUXER_CTRL_CORRECT_PTS:
-	    return DEMUXER_CTRL_OK;
+            return DEMUXER_CTRL_OK;
         case DEMUXER_CTRL_GET_TIME_LENGTH:
-	    if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
-	        return DEMUXER_CTRL_DONTKNOW;
+            if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
+                return DEMUXER_CTRL_DONTKNOW;
 
-	    *((double *)arg) = (double)priv->avfc->duration / AV_TIME_BASE;
-	    return DEMUXER_CTRL_OK;
+            *((double *)arg) = (double)priv->avfc->duration / AV_TIME_BASE;
+            return DEMUXER_CTRL_OK;
 
-	case DEMUXER_CTRL_GET_PERCENT_POS:
-	    if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
-	        return DEMUXER_CTRL_DONTKNOW;
+        case DEMUXER_CTRL_GET_PERCENT_POS:
+            if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
+                return DEMUXER_CTRL_DONTKNOW;
 
-	    *((int *)arg) = (int)((priv->last_pts - priv->avfc->start_time)*100 / priv->avfc->duration);
-	    return DEMUXER_CTRL_OK;
-	case DEMUXER_CTRL_SWITCH_AUDIO:
-	case DEMUXER_CTRL_SWITCH_VIDEO:
-	{
-	    int id = *((int*)arg);
-	    int newid = -2;
-	    int i, curridx = -1;
-	    int nstreams, *pstreams;
-	    demux_stream_t *ds;
+            *((int *)arg) = (int)((priv->last_pts - priv->avfc->start_time)*100 / priv->avfc->duration);
+            return DEMUXER_CTRL_OK;
+        case DEMUXER_CTRL_SWITCH_AUDIO:
+        case DEMUXER_CTRL_SWITCH_VIDEO:
+        {
+            int id = *((int*)arg);
+            int newid = -2;
+            int i, curridx = -1;
+            int nstreams, *pstreams;
+            demux_stream_t *ds;
 
-	    if(cmd == DEMUXER_CTRL_SWITCH_VIDEO)
-	    {
-	        ds = demuxer->video;
-	        nstreams = priv->video_streams;
-	        pstreams = priv->vstreams;
-	    }
-	    else
-	    {
-	        ds = demuxer->audio;
-	        nstreams = priv->audio_streams;
-	        pstreams = priv->astreams;
-	    }
-	    for(i = 0; i < nstreams; i++)
-	    {
-	        if(pstreams[i] == ds->id) //current stream id
-	        {
-	            curridx = i;
-	            break;
-	        }
-	    }
+            if(cmd == DEMUXER_CTRL_SWITCH_VIDEO)
+            {
+                ds = demuxer->video;
+                nstreams = priv->video_streams;
+                pstreams = priv->vstreams;
+            }
+            else
+            {
+                ds = demuxer->audio;
+                nstreams = priv->audio_streams;
+                pstreams = priv->astreams;
+            }
+            for(i = 0; i < nstreams; i++)
+            {
+                if(pstreams[i] == ds->id) //current stream id
+                {
+                    curridx = i;
+                    break;
+                }
+            }
 
             if(id == -2) { // no sound
                 i = -1;
@@ -746,26 +746,26 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
                 i = (curridx + 2) % (nstreams + 1) - 1;
                 if (i >= 0)
                     newid = pstreams[i];
-	    }
-	    else // select track by id
-	    {
-	        if (id >= 0 && id < nstreams) {
-	            i = id;
-	            newid = pstreams[i];
-	        }
-	    }
-	    if(i == curridx)
-	        return DEMUXER_CTRL_NOTIMPL;
-	    else
-	    {
-	        ds_free_packs(ds);
-	        if(ds->id >= 0)
-	            priv->avfc->streams[ds->id]->discard = AVDISCARD_ALL;
-	        *((int*)arg) = ds->id = newid;
-	        if(newid >= 0)
-	            priv->avfc->streams[newid]->discard = AVDISCARD_NONE;
-	        return DEMUXER_CTRL_OK;
-	    }
+            }
+            else // select track by id
+            {
+                if (id >= 0 && id < nstreams) {
+                    i = id;
+                    newid = pstreams[i];
+                }
+            }
+            if(i == curridx)
+                return DEMUXER_CTRL_NOTIMPL;
+            else
+            {
+                ds_free_packs(ds);
+                if(ds->id >= 0)
+                    priv->avfc->streams[ds->id]->discard = AVDISCARD_ALL;
+                *((int*)arg) = ds->id = newid;
+                if(newid >= 0)
+                    priv->avfc->streams[newid]->discard = AVDISCARD_NONE;
+                return DEMUXER_CTRL_OK;
+            }
         }
         case DEMUXER_CTRL_IDENTIFY_PROGRAM:
         {
@@ -774,7 +774,7 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
             int p, i;
             int start;
 
-            prog->vid = prog->aid = prog->sid = -2;	//no audio and no video by default
+            prog->vid = prog->aid = prog->sid = -2;     //no audio and no video by default
             if(priv->avfc->nb_programs < 1)
                 return DEMUXER_CTRL_DONTKNOW;
 
@@ -837,8 +837,8 @@ redo:
             priv->cur_program = prog->progid = program->id;
             return DEMUXER_CTRL_OK;
         }
-	default:
-	    return DEMUXER_CTRL_NOTIMPL;
+        default:
+            return DEMUXER_CTRL_NOTIMPL;
     }
 }
 

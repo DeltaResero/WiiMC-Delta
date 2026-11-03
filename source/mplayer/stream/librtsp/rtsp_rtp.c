@@ -167,7 +167,7 @@ parse_port (const char *line, const char *param,
       parse3 = strstr (parse2, ";");
 
       if (parse3)
-	parse3[0] = 0;
+        parse3[0] = 0;
 
       parse2[0] = 0;
     }

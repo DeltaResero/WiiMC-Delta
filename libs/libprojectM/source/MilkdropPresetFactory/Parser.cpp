@@ -162,7 +162,7 @@ token_t Parser::parseToken(std::istream &  fs, char * string)
 
       if (tokenWrapAroundEnabled)
       {
-	std::ostringstream buffer;
+        std::ostringstream buffer;
 
         if (PARSE_DEBUG) std::cerr << "token wrap! line " << line_count << std::endl;
         while (c != '=')
@@ -177,28 +177,28 @@ token_t Parser::parseToken(std::istream &  fs, char * string)
           }
 
           else {
-	    c = fs.get();
-	    if ( c != '=')
-            	buffer << c;
-	}
+            c = fs.get();
+            if ( c != '=')
+                buffer << c;
+        }
 
         }
         if (PARSE_DEBUG) std::cerr << "parseToken: parsed away equal sign, line prefix is \""  << buffer.str()
-		<< "\"" << std::endl;
+                << "\"" << std::endl;
         --i;
 
-	if (!wrapsToNextLine(buffer.str())) {
-		tokenWrapAroundEnabled = false;
-		int buf_size = (int)buffer.str().length();
-		// <= to also remove equal sign parsing from stream
-		for (int k = 0; k <= buf_size; k++) {
-			if (fs)
-				fs.unget();
-			else
-				abort();
-		}
-		return tEOL;
-	}
+        if (!wrapsToNextLine(buffer.str())) {
+                tokenWrapAroundEnabled = false;
+                int buf_size = (int)buffer.str().length();
+                // <= to also remove equal sign parsing from stream
+                for (int k = 0; k <= buf_size; k++) {
+                        if (fs)
+                                fs.unget();
+                        else
+                                abort();
+                }
+                return tEOL;
+        }
 
 
         break;
@@ -420,35 +420,35 @@ int Parser::parse_line(std::istream &  fs, MilkdropPreset * preset)
     if (!fs)
       return -1;
 
-//	char z = fs.get();
-	char tmpChar;
-	if ((tmpChar = fs.get()) == '\n') {
-		tokenWrapAroundEnabled = false;
-		return -1;
-	} else if (tmpChar == '\r') {
-		tokenWrapAroundEnabled = false;
-		return -1;
-	} else
-		fs.unget();
+//      char z = fs.get();
+        char tmpChar;
+        if ((tmpChar = fs.get()) == '\n') {
+                tokenWrapAroundEnabled = false;
+                return -1;
+        } else if (tmpChar == '\r') {
+                tokenWrapAroundEnabled = false;
+                return -1;
+        } else
+                fs.unget();
 
 
 
-	/* CASE: WARP CODE */
-	if (!strncmp(eqn_string, WARP_STRING, WARP_STRING_LENGTH))
-	{
-		//std::cout << "parsing warp string block\n" << std::endl;
-		parse_string_block(fs, &preset->presetOutputs().warpShader.programSource);
-		return 0;
-	}
+        /* CASE: WARP CODE */
+        if (!strncmp(eqn_string, WARP_STRING, WARP_STRING_LENGTH))
+        {
+                //std::cout << "parsing warp string block\n" << std::endl;
+                parse_string_block(fs, &preset->presetOutputs().warpShader.programSource);
+                return 0;
+        }
 
 
-	/* CASE: COMPOSITE CODE */
-	if (!strncmp(eqn_string, COMPOSITE_STRING, COMPOSITE_STRING_LENGTH))
-	{
-		//std::cout << "parsing composite string block\n" << std::endl;
-		parse_string_block(fs, &preset->presetOutputs().compositeShader.programSource);
-		return 0;
-	}
+        /* CASE: COMPOSITE CODE */
+        if (!strncmp(eqn_string, COMPOSITE_STRING, COMPOSITE_STRING_LENGTH))
+        {
+                //std::cout << "parsing composite string block\n" << std::endl;
+                parse_string_block(fs, &preset->presetOutputs().compositeShader.programSource);
+                return 0;
+        }
 
     /* CASE: PER FRAME INIT EQUATION */
     if (!strncmp(eqn_string, PER_FRAME_INIT_STRING, PER_FRAME_INIT_STRING_LENGTH))
@@ -474,7 +474,7 @@ int Parser::parse_line(std::istream &  fs, MilkdropPreset * preset)
     /* Per frame equation case */
     if (!strncmp(eqn_string, PER_FRAME_STRING, PER_FRAME_STRING_LENGTH))
     {
-	tokenWrapAroundEnabled = true;
+        tokenWrapAroundEnabled = true;
       /* Sometimes per frame equations are implicitly defined without the
       per_frame_ prefix. This informs the parser that one could follow */
       line_mode = PER_FRAME_LINE_MODE;
@@ -509,7 +509,7 @@ int Parser::parse_line(std::istream &  fs, MilkdropPreset * preset)
     if ((!strncmp(eqn_string, WAVE_STRING, WAVE_STRING_LENGTH)) &&
         ((eqn_string[5] >= 48) && (eqn_string[5] <= 57)))
     {
-	tokenWrapAroundEnabled = true;
+        tokenWrapAroundEnabled = true;
       //    if (PARSE_DEBUG) printf("parse_line wave prefix found: \"%s\"\n", eqn_string);
 
       return parse_wave(eqn_string, fs, preset);
@@ -1531,14 +1531,14 @@ InitCond * Parser::parse_init_cond(std::istream &  fs, char * name, MilkdropPres
 void Parser::parse_string_block(std::istream &  fs, std::string * out_string) {
 
 
-	//char name[MAX_TOKEN_SIZE];
-	//token_t token;
+        //char name[MAX_TOKEN_SIZE];
+        //token_t token;
 
-	std::set<char> skipList;
-	skipList.insert('`');
-	readStringUntil(fs, out_string, false, skipList);
+        std::set<char> skipList;
+        skipList.insert('`');
+        readStringUntil(fs, out_string, false, skipList);
 
-	//std::cout << "out_string:\n " << *out_string << "\n" << std::endl;
+        //std::cout << "out_string:\n " << *out_string << "\n" << std::endl;
 
 }
 
@@ -1644,113 +1644,113 @@ bool Parser::scanForComment(std::istream & fs) {
   c = fs.get();
 
   if (c == '/') {
-	while (true)
-	{
-		if (!fs || fs.eof())
-			return true;
-		else
-			c = fs.get();
+        while (true)
+        {
+                if (!fs || fs.eof())
+                        return true;
+                else
+                        c = fs.get();
 
-		if (c == '\n')
-		{
-			return true;
-		}
-	}
+                if (c == '\n')
+                {
+                        return true;
+                }
+        }
   } else {
-	fs.unget();
-	return false;
+        fs.unget();
+        return false;
   }
 }
 
 void Parser::readStringUntil(std::istream & fs, std::string * out_buffer, bool wrapAround, const std::set<char> & skipList) {
 
-	//int string_line_buffer_index = 0;
-	char c;
-	//char p;
-	/* Loop until a delimiter is found, or the maximum string size is found */
-	while (true)
-	{
+        //int string_line_buffer_index = 0;
+        char c;
+        //char p;
+        /* Loop until a delimiter is found, or the maximum string size is found */
+        while (true)
+        {
 
-		if (!fs || fs.eof())
-			c = EOF;
-		else
-			c = fs.get();
+                if (!fs || fs.eof())
+                        c = EOF;
+                else
+                        c = fs.get();
 
-		/* Now interpret the character */
-		switch (c)
-		{
-			case '/':
-			{
-				bool commentExisted = scanForComment(fs);
-				if (!commentExisted) {
-					out_buffer->push_back(c);
-					break;
-				} else {
-					line_count++;
-					return;
-				}
-			}
-			case '\n':
-				if (!out_buffer->empty() && ((*out_buffer)[out_buffer->length() -1] == '\n'))
-					return;
+                /* Now interpret the character */
+                switch (c)
+                {
+                        case '/':
+                        {
+                                bool commentExisted = scanForComment(fs);
+                                if (!commentExisted) {
+                                        out_buffer->push_back(c);
+                                        break;
+                                } else {
+                                        line_count++;
+                                        return;
+                                }
+                        }
+                        case '\n':
+                                if (!out_buffer->empty() && ((*out_buffer)[out_buffer->length() -1] == '\n'))
+                                        return;
 
-				line_count++;
-				if (wrapAround)
-				{
-					std::ostringstream buffer;
+                                line_count++;
+                                if (wrapAround)
+                                {
+                                        std::ostringstream buffer;
 
-		//			if (PARSE_DEBUG) std::cerr << "token wrap! line " << line_count << std::endl;
-					while (c != '=')
-					{
+                //                      if (PARSE_DEBUG) std::cerr << "token wrap! line " << line_count << std::endl;
+                                        while (c != '=')
+                                        {
 
-						if (!fs || fs.eof())
-						{
-							line_count = 1;
-							line_mode = UNSET_LINE_MODE;
-		//					if (PARSE_DEBUG)     std::cerr << "token wrap: end of file" << std::endl;
-							return;
-						}
+                                                if (!fs || fs.eof())
+                                                {
+                                                        line_count = 1;
+                                                        line_mode = UNSET_LINE_MODE;
+                //                                      if (PARSE_DEBUG)     std::cerr << "token wrap: end of file" << std::endl;
+                                                        return;
+                                                }
 
-						else {
-							c = fs.get();
-							if ( c != '=')
-								buffer << c;
-						}
+                                                else {
+                                                        c = fs.get();
+                                                        if ( c != '=')
+                                                                buffer << c;
+                                                }
 
-					}
+                                        }
 
 
-					if (!wrapsToNextLine(buffer.str())) {
-						wrapAround = false;
-						int buf_size = (int)buffer.str().length();
-						// <= to also remove equal sign parsing from stream
-						for (int k = 0; k <= buf_size; k++) {
-							if (fs)
-								fs.unget();
-							else
-								abort();
-						}
-						return;
-					}
+                                        if (!wrapsToNextLine(buffer.str())) {
+                                                wrapAround = false;
+                                                int buf_size = (int)buffer.str().length();
+                                                // <= to also remove equal sign parsing from stream
+                                                for (int k = 0; k <= buf_size; k++) {
+                                                        if (fs)
+                                                                fs.unget();
+                                                        else
+                                                                abort();
+                                                }
+                                                return;
+                                        }
 
-					break;
-				} else
-					out_buffer->push_back(c);
-				return;
-			case EOF:
-				line_count = 1;
-				return;
-			default:
+                                        break;
+                                } else
+                                        out_buffer->push_back(c);
+                                return;
+                        case EOF:
+                                line_count = 1;
+                                return;
+                        default:
 
-				if (out_buffer != NULL)
-				{
-					if (skipList.find(c) == skipList.end())
-						out_buffer->push_back(c);
+                                if (out_buffer != NULL)
+                                {
+                                        if (skipList.find(c) == skipList.end())
+                                                out_buffer->push_back(c);
 
-				}
-		}
+                                }
+                }
 
-	}
+        }
 
 
 }
@@ -2575,15 +2575,15 @@ int Parser::parse_wave_per_frame_eqn(std::istream &  fs, CustomWave * custom_wav
 bool Parser::wrapsToNextLine(const std::string & str) {
 
 std::size_t lastLineEndIndex =
-	lastLinePrefix.find_last_not_of("0123456789");
+        lastLinePrefix.find_last_not_of("0123456789");
 
 std::size_t thisLineEndIndex =
-	str.find_last_not_of("0123456789");
+        str.find_last_not_of("0123456789");
 
 std::size_t startIndex = 0;
 if ((str.compare(startIndex, lastLineEndIndex, lastLinePrefix.c_str(), thisLineEndIndex)) == 0)
-	return true;
+        return true;
 else
-	return false;
+        return false;
 
 }

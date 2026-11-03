@@ -34,13 +34,13 @@ typedef struct CImage // public  your_libvo_mem
 
     /*char* (*Data)();
     {
-	return 0;
-	// pointer to memory block
+        return 0;
+        // pointer to memory block
     }*/
     /*int (*Supported)(fourcc_t csp, int bits);
     {
-	return true;
-	// if you support such surface
+        return true;
+        // if you support such surface
     }*/
 }CImage;
 
@@ -74,42 +74,42 @@ struct IAudioEncoder
 
     enum CAPS
     {
-	CAP_NONE = 0,
-	CAP_YUY2 = 1,
-	CAP_YV12 = 2,
-	CAP_IYUV = 4,
-	CAP_UYVY = 8,
-	CAP_YVYU = 16,
-	CAP_I420 = 32,
-	CAP_YVU9 = 64,
-	CAP_IF09 = 128,
+        CAP_NONE = 0,
+        CAP_YUY2 = 1,
+        CAP_YV12 = 2,
+        CAP_IYUV = 4,
+        CAP_UYVY = 8,
+        CAP_YVYU = 16,
+        CAP_I420 = 32,
+        CAP_YVU9 = 64,
+        CAP_IF09 = 128,
     };
     enum DecodingMode
     {
-	DIRECT = 0,
-	REALTIME,
-	REALTIME_QUALITY_AUTO,
+        DIRECT = 0,
+        REALTIME,
+        REALTIME_QUALITY_AUTO,
     };
     enum DecodingState
     {
-	STOP = 0,
-	START,
+        STOP = 0,
+        START,
     };
 
 typedef struct BitmapInfo
 {
-    long 	biSize;
-    long  	biWidth;
-    long  	biHeight;
-    short 	biPlanes;
-    short 	biBitCount;
-    long 	biCompression;
-    long 	biSizeImage;
-    long  	biXPelsPerMeter;
-    long  	biYPelsPerMeter;
-    long 	biClrUsed;
-    long 	biClrImportant;
-    int 	colors[3];
+    long        biSize;
+    long        biWidth;
+    long        biHeight;
+    short       biPlanes;
+    short       biBitCount;
+    long        biCompression;
+    long        biSizeImage;
+    long        biXPelsPerMeter;
+    long        biYPelsPerMeter;
+    long        biClrUsed;
+    long        biClrImportant;
+    int         colors[3];
 } BitmapInfo;
 
 typedef struct IVideoDecoder
@@ -134,16 +134,16 @@ typedef struct IVideoDecoder
     }
     */
     const CodecInfo record;
-    int m_Mode;	// should we do precaching (or even change Quality on the fly)
+    int m_Mode; // should we do precaching (or even change Quality on the fly)
     int m_State;
     int m_iDecpos;
     int m_iPlaypos;
     float m_fQuality;           // quality for the progress bar 0..1(best)
     int m_bCapable16b;
 
-    BITMAPINFOHEADER* m_bh;	// format of input data (might be larger - e.g. huffyuv)
-    BitmapInfo m_decoder;	// format of decoder output
-    BitmapInfo m_obh;		// format of returned frames
+    BITMAPINFOHEADER* m_bh;     // format of input data (might be larger - e.g. huffyuv)
+    BitmapInfo m_decoder;       // format of decoder output
+    BitmapInfo m_obh;           // format of returned frames
 }IVideoDecoder;
 
 /*
@@ -155,18 +155,18 @@ struct IRtConfig
 // might be minimalized to contain just those which are needed by DS_VideoDecoder
 
 #ifndef mmioFOURCC
-#define mmioFOURCC( ch0, ch1, ch2, ch3 )				\
-		( (long)(unsigned char)(ch0) | ( (long)(unsigned char)(ch1) << 8 ) |	\
-		( (long)(unsigned char)(ch2) << 16 ) | ( (long)(unsigned char)(ch3) << 24 ) )
+#define mmioFOURCC( ch0, ch1, ch2, ch3 )                                \
+                ( (long)(unsigned char)(ch0) | ( (long)(unsigned char)(ch1) << 8 ) |    \
+                ( (long)(unsigned char)(ch2) << 16 ) | ( (long)(unsigned char)(ch3) << 24 ) )
 #endif /* mmioFOURCC */
 
 /* OpenDivX */
-#define fccMP4S	mmioFOURCC('M', 'P', '4', 'S')
-#define fccmp4s	mmioFOURCC('m', 'p', '4', 's')
-#define fccDIVX	mmioFOURCC('D', 'I', 'V', 'X')
-#define fccdivx	mmioFOURCC('d', 'i', 'v', 'x')
-#define fccDIV1	mmioFOURCC('D', 'I', 'V', '1')
-#define fccdiv1	mmioFOURCC('d', 'i', 'v', '1')
+#define fccMP4S mmioFOURCC('M', 'P', '4', 'S')
+#define fccmp4s mmioFOURCC('m', 'p', '4', 's')
+#define fccDIVX mmioFOURCC('D', 'I', 'V', 'X')
+#define fccdivx mmioFOURCC('d', 'i', 'v', 'x')
+#define fccDIV1 mmioFOURCC('D', 'I', 'V', '1')
+#define fccdiv1 mmioFOURCC('d', 'i', 'v', '1')
 
 /* DivX codecs */
 #define fccDIV2 mmioFOURCC('D', 'I', 'V', '2')
@@ -179,15 +179,15 @@ struct IRtConfig
 #define fccdiv5 mmioFOURCC('d', 'i', 'v', '5')
 #define fccDIV6 mmioFOURCC('D', 'I', 'V', '6')
 #define fccdiv6 mmioFOURCC('d', 'i', 'v', '6')
-#define fccMP41	mmioFOURCC('M', 'P', '4', '1')
-#define fccmp41	mmioFOURCC('m', 'p', '4', '1')
-#define fccMP43	mmioFOURCC('M', 'P', '4', '3')
+#define fccMP41 mmioFOURCC('M', 'P', '4', '1')
+#define fccmp41 mmioFOURCC('m', 'p', '4', '1')
+#define fccMP43 mmioFOURCC('M', 'P', '4', '3')
 #define fccmp43 mmioFOURCC('m', 'p', '4', '3')
 /* old ms mpeg-4 codecs */
-#define fccMP42	mmioFOURCC('M', 'P', '4', '2')
-#define fccmp42	mmioFOURCC('m', 'p', '4', '2')
-#define fccMPG4	mmioFOURCC('M', 'P', 'G', '4')
-#define fccmpg4	mmioFOURCC('m', 'p', 'g', '4')
+#define fccMP42 mmioFOURCC('M', 'P', '4', '2')
+#define fccmp42 mmioFOURCC('m', 'p', '4', '2')
+#define fccMPG4 mmioFOURCC('M', 'P', 'G', '4')
+#define fccmpg4 mmioFOURCC('m', 'p', 'g', '4')
 /* Windows media codecs */
 #define fccWMV1 mmioFOURCC('W', 'M', 'V', '1')
 #define fccwmv1 mmioFOURCC('w', 'm', 'v', '1')
@@ -196,12 +196,12 @@ struct IRtConfig
 #define fccMWV1 mmioFOURCC('M', 'W', 'V', '1')
 
 /* Angel codecs */
-#define fccAP41	mmioFOURCC('A', 'P', '4', '1')
-#define fccap41	mmioFOURCC('a', 'p', '4', '1')
-#define fccAP42	mmioFOURCC('A', 'P', '4', '2')
-#define fccap42	mmioFOURCC('a', 'p', '4', '2')
+#define fccAP41 mmioFOURCC('A', 'P', '4', '1')
+#define fccap41 mmioFOURCC('a', 'p', '4', '1')
+#define fccAP42 mmioFOURCC('A', 'P', '4', '2')
+#define fccap42 mmioFOURCC('a', 'p', '4', '2')
 
-/* other codecs	*/
+/* other codecs */
 #define fccIV31 mmioFOURCC('I', 'V', '3', '1')
 #define fcciv31 mmioFOURCC('i', 'v', '3', '1')
 #define fccIV32 mmioFOURCC('I', 'V', '3', '2')

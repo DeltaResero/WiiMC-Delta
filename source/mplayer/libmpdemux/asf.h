@@ -19,7 +19,7 @@
 #ifndef MPLAYER_ASF_H
 #define MPLAYER_ASF_H
 
-//#include "config.h"	/* for HAVE_BIGENDIAN */
+//#include "config.h"   /* for HAVE_BIGENDIAN */
 #include <inttypes.h>
 #include "libavutil/common.h"
 #include "mpbswap.h"
@@ -97,42 +97,42 @@ typedef struct __attribute__((packed)) {
 // ASF Stream Chunck
 //////////////////////
 typedef struct __attribute__((packed)) {
-	uint16_t	type;
-	uint16_t	size;
-	uint32_t	sequence_number;
-	uint16_t	unknown;
-	uint16_t	size_confirm;
+        uint16_t        type;
+        uint16_t        size;
+        uint32_t        sequence_number;
+        uint16_t        unknown;
+        uint16_t        size_confirm;
 } ASF_stream_chunck_t;
 
 // Definition of the stream type
 #if HAVE_BIGENDIAN
-	#define ASF_STREAMING_CLEAR	0x2443		// $C
-	#define ASF_STREAMING_DATA	0x2444		// $D
-	#define ASF_STREAMING_END_TRANS	0x2445		// $E
-	#define	ASF_STREAMING_HEADER	0x2448		// $H
+        #define ASF_STREAMING_CLEAR     0x2443          // $C
+        #define ASF_STREAMING_DATA      0x2444          // $D
+        #define ASF_STREAMING_END_TRANS 0x2445          // $E
+        #define ASF_STREAMING_HEADER    0x2448          // $H
 #else
-	#define ASF_STREAMING_CLEAR	0x4324		// $C
-	#define ASF_STREAMING_DATA	0x4424		// $D
-	#define ASF_STREAMING_END_TRANS	0x4524		// $E
-	#define	ASF_STREAMING_HEADER	0x4824		// $H
+        #define ASF_STREAMING_CLEAR     0x4324          // $C
+        #define ASF_STREAMING_DATA      0x4424          // $D
+        #define ASF_STREAMING_END_TRANS 0x4524          // $E
+        #define ASF_STREAMING_HEADER    0x4824          // $H
 #endif
 
 // Definition of the differents type of ASF streaming
 typedef enum {
-	ASF_Unknown_e,
-	ASF_Live_e,
-	ASF_Prerecorded_e,
-	ASF_Redirector_e,
-	ASF_PlainText_e,
-	ASF_Authenticate_e
+        ASF_Unknown_e,
+        ASF_Live_e,
+        ASF_Prerecorded_e,
+        ASF_Redirector_e,
+        ASF_PlainText_e,
+        ASF_Authenticate_e
 } ASF_StreamType_e;
 
 typedef struct {
-	ASF_StreamType_e streaming_type;
-	int request;
-	int packet_size;
-	int *audio_streams,n_audio,*video_streams,n_video;
-	int audio_id, video_id;
+        ASF_StreamType_e streaming_type;
+        int request;
+        int packet_size;
+        int *audio_streams,n_audio,*video_streams,n_video;
+        int audio_id, video_id;
 } asf_http_streaming_ctrl_t;
 
 
@@ -141,75 +141,75 @@ typedef struct {
  * into machine endian format
  */
 #if HAVE_BIGENDIAN
-#define	le2me_ASF_obj_header_t(h) {					\
-    (h)->size = le2me_64((h)->size);					\
+#define le2me_ASF_obj_header_t(h) {                                     \
+    (h)->size = le2me_64((h)->size);                                    \
 }
-#define	le2me_ASF_header_t(h) {						\
-    le2me_ASF_obj_header_t(&(h)->objh);					\
-    (h)->cno = le2me_32((h)->cno);					\
+#define le2me_ASF_header_t(h) {                                         \
+    le2me_ASF_obj_header_t(&(h)->objh);                                 \
+    (h)->cno = le2me_32((h)->cno);                                      \
 }
-#define le2me_ASF_stream_header_t(h) {					\
-    (h)->unk1 = le2me_64((h)->unk1);					\
-    (h)->type_size = le2me_32((h)->type_size);				\
-    (h)->stream_size = le2me_32((h)->stream_size);			\
-    (h)->stream_no = le2me_16((h)->stream_no);				\
-    (h)->unk2 = le2me_32((h)->unk2);					\
+#define le2me_ASF_stream_header_t(h) {                                  \
+    (h)->unk1 = le2me_64((h)->unk1);                                    \
+    (h)->type_size = le2me_32((h)->type_size);                          \
+    (h)->stream_size = le2me_32((h)->stream_size);                      \
+    (h)->stream_no = le2me_16((h)->stream_no);                          \
+    (h)->unk2 = le2me_32((h)->unk2);                                    \
 }
-#define le2me_ASF_file_header_t(h) {					\
-    (h)->file_size = le2me_64((h)->file_size);				\
-    (h)->creation_time = le2me_64((h)->creation_time);			\
-    (h)->num_packets = le2me_64((h)->num_packets);			\
-    (h)->play_duration = le2me_64((h)->play_duration);			\
-    (h)->send_duration = le2me_64((h)->send_duration);			\
-    (h)->preroll = le2me_64((h)->preroll);				\
-    (h)->flags = le2me_32((h)->flags);					\
-    (h)->min_packet_size = le2me_32((h)->min_packet_size);		\
-    (h)->max_packet_size = le2me_32((h)->max_packet_size);		\
-    (h)->max_bitrate = le2me_32((h)->max_bitrate);			\
+#define le2me_ASF_file_header_t(h) {                                    \
+    (h)->file_size = le2me_64((h)->file_size);                          \
+    (h)->creation_time = le2me_64((h)->creation_time);                  \
+    (h)->num_packets = le2me_64((h)->num_packets);                      \
+    (h)->play_duration = le2me_64((h)->play_duration);                  \
+    (h)->send_duration = le2me_64((h)->send_duration);                  \
+    (h)->preroll = le2me_64((h)->preroll);                              \
+    (h)->flags = le2me_32((h)->flags);                                  \
+    (h)->min_packet_size = le2me_32((h)->min_packet_size);              \
+    (h)->max_packet_size = le2me_32((h)->max_packet_size);              \
+    (h)->max_bitrate = le2me_32((h)->max_bitrate);                      \
 }
-#define le2me_ASF_content_description_t(h) {				\
-    (h)->title_size = le2me_16((h)->title_size);			\
-    (h)->author_size = le2me_16((h)->author_size);			\
-    (h)->copyright_size = le2me_16((h)->copyright_size);		\
-    (h)->comment_size = le2me_16((h)->comment_size);			\
-    (h)->rating_size = le2me_16((h)->rating_size);			\
+#define le2me_ASF_content_description_t(h) {                            \
+    (h)->title_size = le2me_16((h)->title_size);                        \
+    (h)->author_size = le2me_16((h)->author_size);                      \
+    (h)->copyright_size = le2me_16((h)->copyright_size);                \
+    (h)->comment_size = le2me_16((h)->comment_size);                    \
+    (h)->rating_size = le2me_16((h)->rating_size);                      \
 }
-#define le2me_BITMAPINFOHEADER(h) {					\
-    (h)->biSize = le2me_32((h)->biSize);				\
-    (h)->biWidth = le2me_32((h)->biWidth);				\
-    (h)->biHeight = le2me_32((h)->biHeight);				\
-    (h)->biPlanes = le2me_16((h)->biPlanes);				\
-    (h)->biBitCount = le2me_16((h)->biBitCount);			\
-    (h)->biCompression = le2me_32((h)->biCompression);			\
-    (h)->biSizeImage = le2me_32((h)->biSizeImage);			\
-    (h)->biXPelsPerMeter = le2me_32((h)->biXPelsPerMeter);		\
-    (h)->biYPelsPerMeter = le2me_32((h)->biYPelsPerMeter);		\
-    (h)->biClrUsed = le2me_32((h)->biClrUsed);				\
-    (h)->biClrImportant = le2me_32((h)->biClrImportant);		\
+#define le2me_BITMAPINFOHEADER(h) {                                     \
+    (h)->biSize = le2me_32((h)->biSize);                                \
+    (h)->biWidth = le2me_32((h)->biWidth);                              \
+    (h)->biHeight = le2me_32((h)->biHeight);                            \
+    (h)->biPlanes = le2me_16((h)->biPlanes);                            \
+    (h)->biBitCount = le2me_16((h)->biBitCount);                        \
+    (h)->biCompression = le2me_32((h)->biCompression);                  \
+    (h)->biSizeImage = le2me_32((h)->biSizeImage);                      \
+    (h)->biXPelsPerMeter = le2me_32((h)->biXPelsPerMeter);              \
+    (h)->biYPelsPerMeter = le2me_32((h)->biYPelsPerMeter);              \
+    (h)->biClrUsed = le2me_32((h)->biClrUsed);                          \
+    (h)->biClrImportant = le2me_32((h)->biClrImportant);                \
 }
-#define le2me_WAVEFORMATEX(h) {						\
-    (h)->wFormatTag = le2me_16((h)->wFormatTag);			\
-    (h)->nChannels = le2me_16((h)->nChannels);				\
-    (h)->nSamplesPerSec = le2me_32((h)->nSamplesPerSec);		\
-    (h)->nAvgBytesPerSec = le2me_32((h)->nAvgBytesPerSec);		\
-    (h)->nBlockAlign = le2me_16((h)->nBlockAlign);			\
-    (h)->wBitsPerSample = le2me_16((h)->wBitsPerSample);		\
-    (h)->cbSize = le2me_16((h)->cbSize);				\
+#define le2me_WAVEFORMATEX(h) {                                         \
+    (h)->wFormatTag = le2me_16((h)->wFormatTag);                        \
+    (h)->nChannels = le2me_16((h)->nChannels);                          \
+    (h)->nSamplesPerSec = le2me_32((h)->nSamplesPerSec);                \
+    (h)->nAvgBytesPerSec = le2me_32((h)->nAvgBytesPerSec);              \
+    (h)->nBlockAlign = le2me_16((h)->nBlockAlign);                      \
+    (h)->wBitsPerSample = le2me_16((h)->wBitsPerSample);                \
+    (h)->cbSize = le2me_16((h)->cbSize);                                \
 }
-#define le2me_ASF_stream_chunck_t(h) {					\
-    (h)->size = le2me_16((h)->size);					\
-    (h)->sequence_number = le2me_32((h)->sequence_number);		\
-    (h)->unknown = le2me_16((h)->unknown);				\
-    (h)->size_confirm = le2me_16((h)->size_confirm);			\
+#define le2me_ASF_stream_chunck_t(h) {                                  \
+    (h)->size = le2me_16((h)->size);                                    \
+    (h)->sequence_number = le2me_32((h)->sequence_number);              \
+    (h)->unknown = le2me_16((h)->unknown);                              \
+    (h)->size_confirm = le2me_16((h)->size_confirm);                    \
 }
 #else
-#define	le2me_ASF_obj_header_t(h)	/**/
-#define	le2me_ASF_header_t(h)		/**/
-#define le2me_ASF_stream_header_t(h)	/**/
-#define le2me_ASF_file_header_t(h)	/**/
+#define le2me_ASF_obj_header_t(h)       /**/
+#define le2me_ASF_header_t(h)           /**/
+#define le2me_ASF_stream_header_t(h)    /**/
+#define le2me_ASF_file_header_t(h)      /**/
 #define le2me_ASF_content_description_t(h) /**/
 #define le2me_BITMAPINFOHEADER(h)   /**/
-#define le2me_WAVEFORMATEX(h)	    /**/
+#define le2me_WAVEFORMATEX(h)       /**/
 #define le2me_ASF_stream_chunck_t(h) /**/
 #endif
 

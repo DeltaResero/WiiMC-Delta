@@ -91,7 +91,7 @@ void mixer_setvolume(mixer_t *mixer, float l, float r)
             }
             soft_vol = 1;
           }
-	}
+        }
       }
     }
   }
@@ -157,7 +157,7 @@ void mixer_setbalance(mixer_t *mixer, float val)
   if(!mixer->afilter)
     return;
   if (af_control_any_rev(mixer->afilter,
-	AF_CONTROL_PAN_BALANCE | AF_CONTROL_SET, &val))
+        AF_CONTROL_PAN_BALANCE | AF_CONTROL_SET, &val))
     return;
 
   if (!(af_pan_balance = af_add(mixer->afilter, "pan"))) {
@@ -172,7 +172,7 @@ void mixer_setbalance(mixer_t *mixer, float val)
     arg_ext.ch = i;
     level[i] = 1.f;
     af_pan_balance->control(af_pan_balance,
-	AF_CONTROL_PAN_LEVEL | AF_CONTROL_SET, &arg_ext);
+        AF_CONTROL_PAN_LEVEL | AF_CONTROL_SET, &arg_ext);
     level[i] = 0.f;
   }
 

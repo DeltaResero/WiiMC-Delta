@@ -92,66 +92,66 @@ m_config_parse_me_command_line(m_config_t *config, int argc, char **argv)
     /* check for -- (no more options id.) except --help! */
     if ((*opt == '-') && (*(opt+1) == '-') && (*(opt+2) == 0))
       {
-	no_more_opts = 1;
-	if (i+1 >= argc)
-	  {
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, MSGTR_NoFileGivenOnCommandLine);
-	    goto err_out;
-	  }
-	continue;
+        no_more_opts = 1;
+        if (i+1 >= argc)
+          {
+            mp_msg(MSGT_CFGPARSER, MSGL_ERR, MSGTR_NoFileGivenOnCommandLine);
+            goto err_out;
+          }
+        continue;
       }
 
     if ((no_more_opts == 0) && (*opt == '-') && (*(opt+1) != 0)) /* option */
       {
-	const m_option_t* mp_opt = NULL;
-	/* remove trailing '-' */
-	opt++;
-	mp_msg(MSGT_CFGPARSER, MSGL_DBG3, "this_opt = option: %s\n", opt);
-	mp_opt = m_config_get_option(config,opt);
-	if(!mp_opt) {
-	  tmp = M_OPT_UNKNOWN;
-	  mp_msg(MSGT_CFGPARSER, MSGL_ERR, MSGTR_NotAnMEncoderOption, opt);
-	  goto err_out;
-	}
-	if(!entry || (mp_opt->flags & M_OPT_GLOBAL)){
-	  tmp = m_config_set_option(config, opt, argv[i + 1]);
-	  if (tmp <= M_OPT_EXIT) {
-	    opt_exit = 1;
-	    tmp = M_OPT_EXIT - tmp;
-	  }
-	  else
-	  if(tmp < 0){
-//	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, "m_config_set_option() failed (%d)\n",tmp);
-	    mp_msg(MSGT_CFGPARSER, MSGL_FATAL, MSGTR_ErrorParsingOptionOnCommandLine, opt);
-	    goto err_out;
-	  }
-	} else {
-	  tmp = m_config_check_option(config, opt, argv[i + 1]);
-	  if (tmp <= M_OPT_EXIT) {
-	    opt_exit = 1;
-	    tmp = M_OPT_EXIT - tmp;
-	  }
-	  if(tmp >= 0) {
-	    entry->opts = realloc(entry->opts,(no+2)*2*sizeof(char*));
-	    entry->opts[2*no] = strdup(opt);
-	    entry->opts[2*no+1] = argv[i + 1] ? strdup(argv[i + 1]) : NULL;
-	    entry->opts[2*no+2] =  entry->opts[2*no+3] = NULL;
-	    no++;
-	  } else {
-//	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, "m_config_set_option() failed (%d)\n",tmp);
-	    goto err_out;
-	  }
-	}
-	i += tmp;
+        const m_option_t* mp_opt = NULL;
+        /* remove trailing '-' */
+        opt++;
+        mp_msg(MSGT_CFGPARSER, MSGL_DBG3, "this_opt = option: %s\n", opt);
+        mp_opt = m_config_get_option(config,opt);
+        if(!mp_opt) {
+          tmp = M_OPT_UNKNOWN;
+          mp_msg(MSGT_CFGPARSER, MSGL_ERR, MSGTR_NotAnMEncoderOption, opt);
+          goto err_out;
+        }
+        if(!entry || (mp_opt->flags & M_OPT_GLOBAL)){
+          tmp = m_config_set_option(config, opt, argv[i + 1]);
+          if (tmp <= M_OPT_EXIT) {
+            opt_exit = 1;
+            tmp = M_OPT_EXIT - tmp;
+          }
+          else
+          if(tmp < 0){
+//          mp_msg(MSGT_CFGPARSER, MSGL_ERR, "m_config_set_option() failed (%d)\n",tmp);
+            mp_msg(MSGT_CFGPARSER, MSGL_FATAL, MSGTR_ErrorParsingOptionOnCommandLine, opt);
+            goto err_out;
+          }
+        } else {
+          tmp = m_config_check_option(config, opt, argv[i + 1]);
+          if (tmp <= M_OPT_EXIT) {
+            opt_exit = 1;
+            tmp = M_OPT_EXIT - tmp;
+          }
+          if(tmp >= 0) {
+            entry->opts = realloc(entry->opts,(no+2)*2*sizeof(char*));
+            entry->opts[2*no] = strdup(opt);
+            entry->opts[2*no+1] = argv[i + 1] ? strdup(argv[i + 1]) : NULL;
+            entry->opts[2*no+2] =  entry->opts[2*no+3] = NULL;
+            no++;
+          } else {
+//          mp_msg(MSGT_CFGPARSER, MSGL_ERR, "m_config_set_option() failed (%d)\n",tmp);
+            goto err_out;
+          }
+        }
+        i += tmp;
       } else  {/* filename */
-	mp_msg(MSGT_CFGPARSER, MSGL_DBG2,"Adding file %s\n",argv[i]);
-	lst = realloc(lst,(nf+2)*sizeof(m_entry_t));
-	lst[nf].name = strdup(argv[i]);
-	lst[nf].opts = calloc(2,sizeof(char*));
-	entry = &lst[nf];
-	no = 0;
-	memset(&lst[nf+1],0,sizeof(m_entry_t));
-	nf++;
+        mp_msg(MSGT_CFGPARSER, MSGL_DBG2,"Adding file %s\n",argv[i]);
+        lst = realloc(lst,(nf+2)*sizeof(m_entry_t));
+        lst[nf].name = strdup(argv[i]);
+        lst[nf].opts = calloc(2,sizeof(char*));
+        entry = &lst[nf];
+        no = 0;
+        memset(&lst[nf+1],0,sizeof(m_entry_t));
+        nf++;
       }
   }
 

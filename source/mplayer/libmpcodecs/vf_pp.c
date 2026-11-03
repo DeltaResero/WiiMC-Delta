@@ -54,11 +54,11 @@ struct vf_priv_s {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int voflags, unsigned int outfmt){
+        unsigned int voflags, unsigned int outfmt){
     int flags=
           (gCpuCaps.hasMMX   ? PP_CPU_CAPS_MMX   : 0)
-	| (gCpuCaps.hasMMX2  ? PP_CPU_CAPS_MMX2  : 0)
-	| (gCpuCaps.has3DNow ? PP_CPU_CAPS_3DNOW : 0);
+        | (gCpuCaps.hasMMX2  ? PP_CPU_CAPS_MMX2  : 0)
+        | (gCpuCaps.has3DNow ? PP_CPU_CAPS_3DNOW : 0);
 
     switch(outfmt){
     case IMGFMT_444P: flags|= PP_FORMAT_444; break;
@@ -77,7 +77,7 @@ static void uninit(struct vf_instance *vf){
     int i;
     for(i=0; i<=PP_QUALITY_MAX; i++){
         if(vf->priv->ppMode[i])
-	    pp_free_mode(vf->priv->ppMode[i]);
+            pp_free_mode(vf->priv->ppMode[i]);
     }
     if(vf->priv->context) pp_free_context(vf->priv->context);
     free(vf->priv);
@@ -91,7 +91,7 @@ static int query_format(struct vf_instance *vf, unsigned int fmt){
     case IMGFMT_444P:
     case IMGFMT_422P:
     case IMGFMT_411P:
-	return vf_next_query_format(vf,fmt);
+        return vf_next_query_format(vf,fmt);
     }
     return 0;
 }
@@ -99,10 +99,10 @@ static int query_format(struct vf_instance *vf, unsigned int fmt){
 static int control(struct vf_instance *vf, int request, void* data){
     switch(request){
     case VFCTRL_QUERY_MAX_PP_LEVEL:
-	return PP_QUALITY_MAX;
+        return PP_QUALITY_MAX;
     case VFCTRL_SET_PP_LEVEL:
-	vf->priv->pp= *((unsigned int*)data);
-	return CONTROL_TRUE;
+        vf->priv->pp= *((unsigned int*)data);
+        return CONTROL_TRUE;
     }
     return vf_next_control(vf,request,data);
 }
@@ -110,9 +110,9 @@ static int control(struct vf_instance *vf, int request, void* data){
 static void get_image(struct vf_instance *vf, mp_image_t *mpi){
     if(vf->priv->pp&0xFFFF) return; // non-local filters enabled
     if((mpi->type==MP_IMGTYPE_IPB || vf->priv->pp) &&
-	mpi->flags&MP_IMGFLAG_PRESERVE) return; // don't change
+        mpi->flags&MP_IMGFLAG_PRESERVE) return; // don't change
     if(!(mpi->flags&MP_IMGFLAG_ACCEPT_STRIDE) && mpi->imgfmt!=vf->priv->outfmt)
-	return; // colorspace differ
+        return; // colorspace differ
     // ok, we can do pp in-place (or pp disabled):
     vf->dmpi=vf_get_image(vf->next,mpi->imgfmt,
         mpi->type, mpi->flags | MP_IMGFLAG_READABLE, mpi->width, mpi->height);
@@ -122,35 +122,35 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi){
     if(mpi->flags&MP_IMGFLAG_PLANAR){
         mpi->planes[1]=vf->dmpi->planes[1];
         mpi->planes[2]=vf->dmpi->planes[2];
-	mpi->stride[1]=vf->dmpi->stride[1];
-	mpi->stride[2]=vf->dmpi->stride[2];
+        mpi->stride[1]=vf->dmpi->stride[1];
+        mpi->stride[2]=vf->dmpi->stride[2];
     }
     mpi->flags|=MP_IMGFLAG_DIRECT;
 }
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     if(!(mpi->flags&MP_IMGFLAG_DIRECT)){
-	// no DR, so get a new image! hope we'll get DR buffer:
-	vf->dmpi=vf_get_image(vf->next,mpi->imgfmt,
-	    MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE |
-	    MP_IMGFLAG_PREFER_ALIGNED_STRIDE | MP_IMGFLAG_READABLE,
-//	    MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
-//	    mpi->w,mpi->h);
-	    (mpi->width+7)&(~7),(mpi->height+7)&(~7));
-	vf->dmpi->w=mpi->w; vf->dmpi->h=mpi->h; // display w;h
+        // no DR, so get a new image! hope we'll get DR buffer:
+        vf->dmpi=vf_get_image(vf->next,mpi->imgfmt,
+            MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE |
+            MP_IMGFLAG_PREFER_ALIGNED_STRIDE | MP_IMGFLAG_READABLE,
+//          MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
+//          mpi->w,mpi->h);
+            (mpi->width+7)&(~7),(mpi->height+7)&(~7));
+        vf->dmpi->w=mpi->w; vf->dmpi->h=mpi->h; // display w;h
     }
 
     if(vf->priv->pp || !(mpi->flags&MP_IMGFLAG_DIRECT)){
-	// do the postprocessing! (or copy if no DR)
-	pp_postprocess(mpi->planes           ,mpi->stride,
-		    vf->dmpi->planes,vf->dmpi->stride,
-		    (mpi->w+7)&(~7),mpi->h,
-		    mpi->qscale, mpi->qstride,
-		    vf->priv->ppMode[ vf->priv->pp ], vf->priv->context,
+        // do the postprocessing! (or copy if no DR)
+        pp_postprocess(mpi->planes           ,mpi->stride,
+                    vf->dmpi->planes,vf->dmpi->stride,
+                    (mpi->w+7)&(~7),mpi->h,
+                    mpi->qscale, mpi->qstride,
+                    vf->priv->ppMode[ vf->priv->pp ], vf->priv->context,
 #ifdef PP_PICT_TYPE_QP2
-		    mpi->pict_type | (mpi->qscale_type ? PP_PICT_TYPE_QP2 : 0));
+                    mpi->pict_type | (mpi->qscale_type ? PP_PICT_TYPE_QP2 : 0));
 #else
-		    mpi->pict_type);
+                    mpi->pict_type);
 #endif
     }
     return vf_next_put_image(vf,vf->dmpi, pts);
@@ -188,10 +188,10 @@ static int vf_open(vf_instance_t *vf, char *args){
     if(!vf->priv->outfmt) return 0; // no csp match :(
 
     if(args){
-	hex_mode= strtol(args, &endptr, 0);
-	if(*endptr){
+        hex_mode= strtol(args, &endptr, 0);
+        if(*endptr){
             name= args;
-	}else
+        }else
             name= NULL;
     }else{
         name="de";
@@ -200,7 +200,7 @@ static int vf_open(vf_instance_t *vf, char *args){
 #ifdef EMU_OLD
     if(name){
 #endif
-	for(i=0; i<=PP_QUALITY_MAX; i++){
+        for(i=0; i<=PP_QUALITY_MAX; i++){
             vf->priv->ppMode[i]= pp_get_mode_by_name_and_quality(name, i);
             if(vf->priv->ppMode[i]==NULL) return -1;
         }
@@ -208,19 +208,19 @@ static int vf_open(vf_instance_t *vf, char *args){
     }else{
         /* hex mode for compatibility */
         for(i=0; i<=PP_QUALITY_MAX; i++){
-	    PPMode *ppMode;
+            PPMode *ppMode;
 
             ppMode = av_malloc(sizeof(PPMode));
 
-	    ppMode->lumMode= hex_mode;
-	    ppMode->chromMode= ((hex_mode&0xFF)>>4) | (hex_mode&0xFFFFFF00);
-	    ppMode->maxTmpNoise[0]= 700;
-	    ppMode->maxTmpNoise[1]= 1500;
-	    ppMode->maxTmpNoise[2]= 3000;
-	    ppMode->maxAllowedY= 234;
-	    ppMode->minAllowedY= 16;
-	    ppMode->baseDcDiff= 256/4;
-	    ppMode->flatnessThreshold=40;
+            ppMode->lumMode= hex_mode;
+            ppMode->chromMode= ((hex_mode&0xFF)>>4) | (hex_mode&0xFFFFFF00);
+            ppMode->maxTmpNoise[0]= 700;
+            ppMode->maxTmpNoise[1]= 1500;
+            ppMode->maxTmpNoise[2]= 3000;
+            ppMode->maxAllowedY= 234;
+            ppMode->minAllowedY= 16;
+            ppMode->baseDcDiff= 256/4;
+            ppMode->flatnessThreshold=40;
 
             vf->priv->ppMode[i]= ppMode;
         }

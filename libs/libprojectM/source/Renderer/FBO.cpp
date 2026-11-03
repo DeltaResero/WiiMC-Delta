@@ -35,20 +35,20 @@
 RenderTarget::~RenderTarget() {
 
 
-	glDeleteTextures( 1, &this->textureID[0]);
+        glDeleteTextures( 1, &this->textureID[0]);
 
 #ifdef USE_FBO
-	if (useFBO)
+        if (useFBO)
          {
-		glDeleteTextures( 1, &this->textureID[1] );
-		glDeleteRenderbuffersEXT(1,  &this->depthb[0]);
-		glDeleteFramebuffersEXT(1, &this->fbuffer[0]);
-		if(renderToTexture)
-		  {
-		    glDeleteTextures( 1, &this->textureID[2] );
-		    glDeleteRenderbuffersEXT(1,  &this->depthb[1]);
-		    glDeleteFramebuffersEXT(1, &this->fbuffer[1]);
-		  }
+                glDeleteTextures( 1, &this->textureID[1] );
+                glDeleteRenderbuffersEXT(1,  &this->depthb[0]);
+                glDeleteFramebuffersEXT(1, &this->fbuffer[0]);
+                if(renderToTexture)
+                  {
+                    glDeleteTextures( 1, &this->textureID[2] );
+                    glDeleteRenderbuffersEXT(1,  &this->depthb[1]);
+                    glDeleteFramebuffersEXT(1, &this->fbuffer[1]);
+                  }
          }
 #endif
 
@@ -101,50 +101,50 @@ RenderTarget::RenderTarget(int texsize, int width, int height) : useFBO(false) {
       // Forceably disable FBO if user requested it but the video card / driver lacks
       // the appropraite frame buffer extension.
       if (useFBO = glewIsSupported("GL_EXT_framebuffer_object"))
-	{
+        {
 
-	  GLuint   fb,  depth_rb, rgba_tex,  other_tex;
-	  glGenFramebuffersEXT(1, &fb);
-	  glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, fb );
+          GLuint   fb,  depth_rb, rgba_tex,  other_tex;
+          glGenFramebuffersEXT(1, &fb);
+          glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, fb );
 
-	  glGenRenderbuffersEXT(1, &depth_rb);
-	  glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, depth_rb );
-	  glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, this->texsize,this->texsize  );
-	  glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth_rb );
-	  this->fbuffer[0] = fb;
-	  this->depthb[0]=  depth_rb;
+          glGenRenderbuffersEXT(1, &depth_rb);
+          glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, depth_rb );
+          glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, this->texsize,this->texsize  );
+          glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth_rb );
+          this->fbuffer[0] = fb;
+          this->depthb[0]=  depth_rb;
 
-	  glGenTextures(1, &other_tex);
-	  glBindTexture(GL_TEXTURE_2D,other_tex);
-	  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texsize, texsize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-	  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	  //glGenerateMipmapEXT(GL_TEXTURE_2D);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-
-
-	  glGenTextures(1, &rgba_tex);
-	  glBindTexture(GL_TEXTURE_2D, rgba_tex);
-	  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texsize, texsize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	  //glGenerateMipmapEXT(GL_TEXTURE_2D);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+          glGenTextures(1, &other_tex);
+          glBindTexture(GL_TEXTURE_2D,other_tex);
+          glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texsize, texsize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+          glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          //glGenerateMipmapEXT(GL_TEXTURE_2D);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 
 
-	  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, rgba_tex, 0 );
-	  this->textureID[0] = rgba_tex;
-	  this->textureID[1] = other_tex;
+          glGenTextures(1, &rgba_tex);
+          glBindTexture(GL_TEXTURE_2D, rgba_tex);
+          glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texsize, texsize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          //glGenerateMipmapEXT(GL_TEXTURE_2D);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	  GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	  if (status == GL_FRAMEBUFFER_COMPLETE_EXT) {
-	    return;
-	  }
-	}
+
+
+          glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, rgba_tex, 0 );
+          this->textureID[0] = rgba_tex;
+          this->textureID[1] = other_tex;
+
+          GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+          if (status == GL_FRAMEBUFFER_COMPLETE_EXT) {
+            return;
+          }
+        }
 
 #endif
 
@@ -165,17 +165,17 @@ RenderTarget::RenderTarget(int texsize, int width, int height) : useFBO(false) {
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glTexImage2D(GL_TEXTURE_2D,
-		    0,
-		    GL_RGB,
-		    this->texsize, this->texsize,
-		    0,
-		    GL_RGBA,
-		    GL_UNSIGNED_BYTE,
-		    NULL);
+                    0,
+                    GL_RGB,
+                    this->texsize, this->texsize,
+                    0,
+                    GL_RGBA,
+                    GL_UNSIGNED_BYTE,
+                    NULL);
 
 
 
@@ -184,7 +184,7 @@ RenderTarget::RenderTarget(int texsize, int width, int height) : useFBO(false) {
 
   void RenderTarget::fallbackRescale(int width, int height)
   {
-	int mindim = width < height ? width : height;
+        int mindim = width < height ? width : height;
     //int origtexsize = this->texsize;
     this->texsize = nearestPower2( mindim, SCALE_MINIFY );
 
@@ -203,17 +203,17 @@ RenderTarget::RenderTarget(int texsize, int width, int height) : useFBO(false) {
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glTexImage2D(GL_TEXTURE_2D,
-		    0,
-		    GL_RGB,
-		    this->texsize, this->texsize,
-		    0,
-		    GL_RGBA,
-		    GL_UNSIGNED_BYTE,
-		    NULL);
+                    0,
+                    GL_RGB,
+                    this->texsize, this->texsize,
+                    0,
+                    GL_RGBA,
+                    GL_UNSIGNED_BYTE,
+                    NULL);
 
 
   }
@@ -249,7 +249,7 @@ void RenderTarget::unlock() {
 
     glBindTexture( GL_TEXTURE_2D, this->textureID[0] );
 
-	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, this->texsize, this->texsize );
+        glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, this->texsize, this->texsize );
   }
 
 /**

@@ -175,7 +175,7 @@ extern u8 *pos_pic;
 
 static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
 {
-//	return 0; //memleak is here!
+//      return 0; //memleak is here!
   //  AVPacket pkt;
   //  AVStream *st;
   //  MOVStreamContext *sc;
@@ -201,7 +201,7 @@ static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
       //  return AVERROR(ENOMEM);
    // st->priv_data = sc;
 
-	//here lies caratula memleak, rip
+        //here lies caratula memleak, rip
    // ret = av_get_packet(pb, &pkt, len);
   //  if (ret < 0)
       //  return ret;
@@ -215,19 +215,19 @@ static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id   = id;
 */
-	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
-	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
-	//avio_seek(pb, -len, SEEK_CUR);
+        //pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
+        pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+        //avio_seek(pb, -len, SEEK_CUR);
 
-	//If the len is higher than the allocated buffer fix it
-	if(len > 1.5*1024*1024)
-		len = 1.5*1024*1024;
+        //If the len is higher than the allocated buffer fix it
+        if(len > 1.5*1024*1024)
+                len = 1.5*1024*1024;
 
-	avio_read(pb, pos_pic, len);
-	//avio_seek(pb, +len, SEEK_CUR);
-	embedded_pic = 1;
+        avio_read(pb, pos_pic, len);
+        //avio_seek(pb, +len, SEEK_CUR);
+        embedded_pic = 1;
 
-	//wiim_inf = 2;
+        //wiim_inf = 2;
     return 0;
 }
 
@@ -292,14 +292,14 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             str_size = data_size - 16;
             atom.size -= 16;
 
-			//Cover stuff
-			if (atom.type == MKTAG('c', 'o', 'v', 'r')) {
+                        //Cover stuff
+                        if (atom.type == MKTAG('c', 'o', 'v', 'r')) {
                 int ret = mov_read_covr(c, pb, data_type, str_size);
                 if (ret < 0) {
                     av_log(c->fc, AV_LOG_ERROR, "Error parsing cover art.\n");
                     return ret;
                 }
-				//return ret; // fixes double read
+                                //return ret; // fixes double read
             }
         } else return 0;
     } else if (atom.size > 4 && key && !c->itunes_metadata) {
@@ -332,10 +332,10 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         } else {
             int ret = avio_read(pb, str, str_size);
             str[str_size] = 0;
-			// 2014
-		//	if(ret != str_size) {
+                        // 2014
+                //      if(ret != str_size) {
          //       av_freep(&str);
-			//}
+                        //}
         }
         av_dict_set(&c->fc->metadata, key, str, 0);
         if (*language && strcmp(language, "und")) {
@@ -1741,8 +1741,8 @@ static int mov_read_stss(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     }
     if (entries >= UINT_MAX / sizeof(int))
         return AVERROR_INVALIDDATA;
-	// 2014 change test
-	av_freep(&sc->keyframes);
+        // 2014 change test
+        av_freep(&sc->keyframes);
 
     sc->keyframes = av_malloc(entries * sizeof(int));
     if (!sc->keyframes)
@@ -1903,8 +1903,8 @@ static int mov_read_ctts(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     av_dlog(c->fc, "track[%i].ctts.entries = %i\n", c->fc->nb_streams-1, entries);
 
-	// 2015 change test
-	av_freep(&sc->ctts_data);
+        // 2015 change test
+        av_freep(&sc->ctts_data);
 
     if (!entries)
         return 0;

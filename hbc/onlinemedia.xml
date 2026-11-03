@@ -1,132 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <file app="WiiMC" version="3.0.0">
 <folder name="YouTube">
-	<link name="YouTube - Search" type="search" addr="http://riitube.rc24.xyz/wiimc/?q=" />
-	<link name="YouTube - Most Popular" addr="http://riitube.rc24.xyz/wiimc/" />
-	<link name="YouTube - Trending" addr="http://riitube.rc24.xyz/wiimc/?trending=1" />
+    <link name="YouTube - Search" type="search" addr="http://riitube.rc24.xyz/wiimc/?q=" />
+    <link name="YouTube - Most Popular" addr="http://riitube.rc24.xyz/wiimc/" />
+    <link name="YouTube - Trending" addr="http://riitube.rc24.xyz/wiimc/?trending=1" />
 </folder>
 <folder name="Online Radio">
-	<link name="Radio Browser - Most Popular" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100" />
-	<link name="Radio Browser - Search by Name" type="search" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100&amp;name=" />
-	<link name="Radio Browser - Search by Genre" type="search" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100&amp;tag=" />
-	<link name="Radio SEGA" addr="http://content.radiosega.net:8006/live" image="http://cdn-profiles.tunein.com/s117456/images/logoq.png" tunein="http://feed.tunein.com/profiles/s117456/nowPlaying?&amp;partnerId=RadioTime" />
-	<link name="Anison.FM" addr="http://pool.anison.fm:9000/AniSonFM(320)" image="http://cdn-radiotime-logos.tunein.com/s185342q.png" />
-	<link name="R/a/dio" addr="http://relay0.r-a-d.io/main.mp3" image="http://cdn-radiotime-logos.tunein.com/s174185q.png" tunein="http://feed.tunein.com/profiles/s174185/nowPlaying?&amp;partnerId=RadioTime" />
-	<link name="Yggdrasil Radio" addr="http://yggdrasilradio.net:8000" image="http://cdn-radiotime-logos.tunein.com/s120196q.png" tunein="http://feed.tunein.com/profiles/s120196/nowPlaying?&amp;partnerId=RadioTime" />
-	<folder name="181.FM">
-		<link name="80's Hairband" addr="http://listen.181fm.com/181-hairband_128k.mp3" />
-		<link name="90's Alternative" addr="http://listen.181fm.com/181-90salt_128k.mp3" />
-		<link name="90's Country" addr="http://listen.181fm.com/181-90scountry_128k.mp3" />
-		<link name="90's Dance" addr="http://listen.181fm.com/181-90sdance_128k.mp3" />
-		<link name="Acid Jazz" addr="http://listen.181fm.com/181-acidjazz_128k.mp3" />
-		<link name="Awesome 80's" addr="http://listen.181fm.com/181-awesome80s_128k.mp3" />
-		<link name="Beatles" addr="http://listen.181fm.com/181-beatles_128k.mp3" />
-		<link name="BeBop Jazz" addr="http://listen.181fm.com/181-bebop_128k.mp3" />
-		<link name="Chilled Out" addr="http://listen.181fm.com/181-chilled_128k.mp3" />
-		<link name="Chloe @181.FM" addr="http://listen.181fm.com/181-chloe_128k.mp3" />
-		<link name="Classic Buzz (Alt)" addr="http://listen.181fm.com/181-classicbuzz_128k.mp3" />
-		<link name="Classic Hits 181" addr="http://listen.181fm.com/181-greatoldies_128k.mp3" />
-		<link name="Classical Guitar" addr="http://listen.181fm.com/181-classicalguitar_128k.mp3" />
-		<link name="Classical Jazz" addr="http://listen.181fm.com/181-classicaljazz_128k.mp3" />
-		<link name="Classical Music" addr="http://listen.181fm.com/181-classical_128k.mp3" />
-		<link name="Comedy Club" addr="http://listen.181fm.com/181-comedy_128k.mp3" />
-		<link name="Energy 93 (EuroDance)" addr="http://listen.181fm.com/181-energy93_128k.mp3" />
-		<link name="Energy 98" addr="http://listen.181fm.com/181-energy98_128k.mp3" />
-		<link name="Front Porch (Bluegrass)" addr="http://listen.181fm.com/181-frontporch_128k.mp3" />
-		<link name="Fusion Jazz" addr="http://listen.181fm.com/181-fusionjazz_128k.mp3" />
-		<link name="Good Time Oldies" addr="http://listen.181fm.com/181-goodtime_128k.mp3" />
-		<link name="Highway 181" addr="http://listen.181fm.com/181-highway_128k.mp3" />
-		<link name="Jammin 181" addr="http://listen.181fm.com/181-jammin_128k.mp3" />
-		<link name="Kickin' Country" addr="http://listen.181fm.com/181-kickincountry_128k.mp3" />
-		<link name="Lite 80's" addr="http://listen.181fm.com/181-lite80s_128k.mp3" />
-		<link name="Lite 90's" addr="http://listen.181fm.com/181-lite90s_128k.mp3" />
-		<link name="Mellow Gold" addr="http://listen.181fm.com/181-mellow_128k.mp3" />
-		<link name="Old School HipHop/RnB" addr="http://listen.181fm.com/181-oldschool_128k.mp3" />
-		<link name="Party 181" addr="http://listen.181fm.com/181-party_128k.mp3" />
-		<link name="Power 181 (Top40)" addr="http://listen.181fm.com/181-power_128k.mp3" />
-		<link name="Real Country" addr="http://listen.181fm.com/181-realcountry_128k.mp3" />
-		<link name="Reggae Roots" addr="http://listen.181fm.com/181-reggae_128k.mp3" />
-		<link name="Rock 40 (Rock n Roll)" addr="http://listen.181fm.com/181-rock40_128k.mp3" />
-		<link name="Rock 181" addr="http://listen.181fm.com/181-rock_128k.mp3" />
-		<link name="Salsa" addr="http://listen.181fm.com/181-salsa_128k.mp3" />
-		<link name="Sensual World" addr="http://listen.181fm.com/181-sensual_128k.mp3" />
-		<link name="Smooth AC" addr="http://listen.181fm.com/181-smoothac_128k.mp3" />
-		<link name="Soul" addr="http://listen.181fm.com/181-soul_128k.mp3" />
-		<link name="Star 90's" addr="http://listen.181fm.com/181-star90s_128k.mp3" />
-		<link name="Super 70s" addr="http://listen.181fm.com/181-70s_128k.mp3" />
-		<link name="Techno Club" addr="http://listen.181fm.com/181-technoclub_128k.mp3" />
-		<link name="The Ball (1stGenDance)" addr="http://listen.181fm.com/181-ball_128k.mp3" />
-		<link name="The Beat (HipHop/RnB)" addr="http://listen.181fm.com/181-beat_128k.mp3" />
-		<link name="The Box (Urban)" addr="http://listen.181fm.com/181-thebox_128k.mp3" />
-		<link name="The Breeze" addr="http://listen.181fm.com/181-breeze_128k.mp3" />
-		<link name="The Buzz (Alt.Rock)" addr="http://listen.181fm.com/181-buzz_128k.mp3" />
-		<link name="The Eagle (Classic)" addr="http://listen.181fm.com/181-eagle_128k.mp3" />
-		<link name="The Heart (LoveSongs)" addr="http://listen.181fm.com/181-heart_128k.mp3" />
-		<link name="The Mix" addr="http://listen.181fm.com/181-themix_128k.mp3" />
-		<link name="The Office" addr="http://listen.181fm.com/181-office_128k.mp3" />
-		<link name="The Point" addr="http://listen.181fm.com/181-thepoint_128k.mp3" />
-		<link name="The Rock! (HardRock)" addr="http://listen.181fm.com/181-hardrock_128k.mp3" />
-		<link name="Trance Jazz" addr="http://listen.181fm.com/181-trancejazz_128k.mp3" />
-		<link name="True Blues" addr="http://listen.181fm.com/181-blues_128k.mp3" />
-		<link name="True RnB" addr="http://listen.181fm.com/181-rnb_128k.mp3" />
-		<link name="UK top 40" addr="http://listen.181fm.com/181-uktop40_128k.mp3" />
-		<link name="US 181" addr="http://listen.181fm.com/181-us181_128k.mp3" />
-		<link name="Vocal Jazz" addr="http://listen.181fm.com/181-vocals_128k.mp3" />
-		<folder name="Christmas">
-			<link name="Christmas Blender" addr="http://listen.181fm.com/181-xblender_128k.mp3" />
-			<link name="Christmas Classics" addr="http://listen.181fm.com/181-xtraditional_128k.mp3" />
-			<link name="Christmas Country" addr="http://listen.181fm.com/181-xcountry_128k.mp3" />
-			<link name="Christmas Fun" addr="http://listen.181fm.com/181-xfun_128k.mp3" />
-			<link name="Christmas Gospel" addr="http://listen.181fm.com/181-xgospel_128k.mp3" />
-			<link name="Christmas Highway" addr="http://listen.181fm.com/181-xhighway_128k.mp3" />
-			<link name="Christmas Kids" addr="http://listen.181fm.com/181-xkids_128k.mp3" />
-			<link name="Christmas Kountry" addr="http://listen.181fm.com/181-xkkountry_128k.mp3" />
-			<link name="Christmas Mix" addr="http://listen.181fm.com/181-xmix_128k.mp3" />
-			<link name="Christmas Oldies" addr="http://listen.181fm.com/181-xoldies_128k.mp3" />
-			<link name="Christmas Power" addr="http://listen.181fm.com/181-xpower_128k.mp3" />
-			<link name="Christmas RnB" addr="http://listen.181fm.com/181-xtrue_128k.mp3" />
-			<link name="Christmas Rock" addr="http://listen.181fm.com/181-xrock_128k.mp3" />
-			<link name="Christmas Smooth Jazz" addr="http://listen.181fm.com/181-xsmooth_128k.mp3" />
-			<link name="Christmas Soundtracks" addr="http://listen.181fm.com/181-xsoundtrax_128k.mp3" />
-			<link name="Christmas Spirit" addr="http://listen.181fm.com/181-xspirit_128k.mp3" />
-			<link name="Christmas Standards" addr="http://listen.181fm.com/181-xstandards_128k.mp3" />
-			<link name="Christmas Swing" addr="http://listen.181fm.com/181-xswing_128k.mp3" />
-		</folder>
-	</folder>
-	<link name="Classic Rock Florida" addr="http://us2.internet-radio.com:8046/listen.pls" />
-	<folder name="SomaFM">
-		<link name="Groove Salad" addr="http://somafm.com/groovesalad.pls" />
-		<link name="Secret Agent" addr="http://somafm.com/secretagent.pls" />
-		<link name="Drone Zone" addr="http://somafm.com/dronezone.pls" />
-		<link name="Indie Pop Rocks" addr="http://somafm.com/indiepop.pls" />
-		<link name="Cliqhop IDM" addr="http://somafm.com/cliqhop.pls" />
-		<link name="BeatBlender" addr="http://somafm.com/beatblender.pls" />
-		<link name="Illinois Street Lounge" addr="http://somafm.com/illstreet.pls" />
-		<link name="Space Station Soma" addr="http://somafm.com/spacestation.pls" />
-		<link name="Doomed" addr="http://somafm.com/doomed.pls" />
-		<link name="Boot Liquor" addr="http://somafm.com/bootliquor.pls" />
-		<link name="Lush" addr="http://somafm.com/lush.pls" />
-		<link name="Digitalis" addr="http://somafm.com/digitalis.pls" />
-		<link name="Suburbs of Goa" addr="http://somafm.com/suburbsofgoa.pls" />
-		<link name="Sonic Universe" addr="http://somafm.com/sonicuniverse.pls" />
-		<link name="PopTron" addr="http://somafm.com/poptron.pls" />
-		<link name="Covers" addr="http://somafm.com/covers.pls" />
-		<link name="Black Rock FM" addr="http://somafm.com/brfm.pls" />
-		<link name="Mission Control" addr="http://somafm.com/missioncontrol.pls" />
-		<link name="Underground 80s" addr="http://somafm.com/u80s.pls" />
-		<link name="Deep Space One" addr="http://somafm.com/deepspaceone.pls" />
-		<link name="Left Coast 70s" addr="http://somafm.com/seventies130.pls" />
-		<link name="DEF CON Radio" addr="http://somafm.com/defcon.pls" />
-		<link name="The Trip" addr="http://somafm.com/thetrip.pls" />
-		<link name="Folk Forward" addr="http://somafm.com/folkfwd.pls" />
-		<link name="BAGeL Radio AltRock" addr="http://somafm.com/bagel.pls" />
-		<link name="Fluid" addr="http://somafm.com/fluid.pls" />
-		<link name="Seven Inch Soul" addr="http://somafm.com/7soul.pls" />
-		<link name="ThistleRadio" addr="http://somafm.com/thistle.pls" />
-		<link name="Dub Step Beyond" addr="http://somafm.com/dubstep.pls" />
-		<link name="SF 10-33" addr="http://somafm.com/sf1033.pls" />
-		<link name="Metal Detector" addr="http://somafm.com/metal.pls" />
-		<link name="Earwaves" addr="http://somafm.com/earwaves.pls" />
-	</folder>
+    <link name="Radio Browser - Most Popular" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100" />
+    <link name="Radio Browser - Search by Name" type="search" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100&amp;name=" />
+    <link name="Radio Browser - Search by Genre" type="search" addr="http://all.api.radio-browser.info/m3u/stations/search?is_https=false&amp;hidebroken=true&amp;order=clickcount&amp;reverse=true&amp;limit=100&amp;tag=" />
+    <link name="Radio SEGA" addr="http://content.radiosega.net:8006/live" image="http://cdn-profiles.tunein.com/s117456/images/logoq.png" tunein="http://feed.tunein.com/profiles/s117456/nowPlaying?&amp;partnerId=RadioTime" />
+    <link name="Anison.FM" addr="http://pool.anison.fm:9000/AniSonFM(320)" image="http://cdn-radiotime-logos.tunein.com/s185342q.png" />
+    <link name="R/a/dio" addr="http://relay0.r-a-d.io/main.mp3" image="http://cdn-radiotime-logos.tunein.com/s174185q.png" tunein="http://feed.tunein.com/profiles/s174185/nowPlaying?&amp;partnerId=RadioTime" />
+    <link name="Yggdrasil Radio" addr="http://yggdrasilradio.net:8000" image="http://cdn-radiotime-logos.tunein.com/s120196q.png" tunein="http://feed.tunein.com/profiles/s120196/nowPlaying?&amp;partnerId=RadioTime" />
+    <folder name="181.FM">
+        <link name="80's Hairband" addr="http://listen.181fm.com/181-hairband_128k.mp3" />
+        <link name="90's Alternative" addr="http://listen.181fm.com/181-90salt_128k.mp3" />
+        <link name="90's Country" addr="http://listen.181fm.com/181-90scountry_128k.mp3" />
+        <link name="90's Dance" addr="http://listen.181fm.com/181-90sdance_128k.mp3" />
+        <link name="Acid Jazz" addr="http://listen.181fm.com/181-acidjazz_128k.mp3" />
+        <link name="Awesome 80's" addr="http://listen.181fm.com/181-awesome80s_128k.mp3" />
+        <link name="Beatles" addr="http://listen.181fm.com/181-beatles_128k.mp3" />
+        <link name="BeBop Jazz" addr="http://listen.181fm.com/181-bebop_128k.mp3" />
+        <link name="Chilled Out" addr="http://listen.181fm.com/181-chilled_128k.mp3" />
+        <link name="Chloe @181.FM" addr="http://listen.181fm.com/181-chloe_128k.mp3" />
+        <link name="Classic Buzz (Alt)" addr="http://listen.181fm.com/181-classicbuzz_128k.mp3" />
+        <link name="Classic Hits 181" addr="http://listen.181fm.com/181-greatoldies_128k.mp3" />
+        <link name="Classical Guitar" addr="http://listen.181fm.com/181-classicalguitar_128k.mp3" />
+        <link name="Classical Jazz" addr="http://listen.181fm.com/181-classicaljazz_128k.mp3" />
+        <link name="Classical Music" addr="http://listen.181fm.com/181-classical_128k.mp3" />
+        <link name="Comedy Club" addr="http://listen.181fm.com/181-comedy_128k.mp3" />
+        <link name="Energy 93 (EuroDance)" addr="http://listen.181fm.com/181-energy93_128k.mp3" />
+        <link name="Energy 98" addr="http://listen.181fm.com/181-energy98_128k.mp3" />
+        <link name="Front Porch (Bluegrass)" addr="http://listen.181fm.com/181-frontporch_128k.mp3" />
+        <link name="Fusion Jazz" addr="http://listen.181fm.com/181-fusionjazz_128k.mp3" />
+        <link name="Good Time Oldies" addr="http://listen.181fm.com/181-goodtime_128k.mp3" />
+        <link name="Highway 181" addr="http://listen.181fm.com/181-highway_128k.mp3" />
+        <link name="Jammin 181" addr="http://listen.181fm.com/181-jammin_128k.mp3" />
+        <link name="Kickin' Country" addr="http://listen.181fm.com/181-kickincountry_128k.mp3" />
+        <link name="Lite 80's" addr="http://listen.181fm.com/181-lite80s_128k.mp3" />
+        <link name="Lite 90's" addr="http://listen.181fm.com/181-lite90s_128k.mp3" />
+        <link name="Mellow Gold" addr="http://listen.181fm.com/181-mellow_128k.mp3" />
+        <link name="Old School HipHop/RnB" addr="http://listen.181fm.com/181-oldschool_128k.mp3" />
+        <link name="Party 181" addr="http://listen.181fm.com/181-party_128k.mp3" />
+        <link name="Power 181 (Top40)" addr="http://listen.181fm.com/181-power_128k.mp3" />
+        <link name="Real Country" addr="http://listen.181fm.com/181-realcountry_128k.mp3" />
+        <link name="Reggae Roots" addr="http://listen.181fm.com/181-reggae_128k.mp3" />
+        <link name="Rock 40 (Rock n Roll)" addr="http://listen.181fm.com/181-rock40_128k.mp3" />
+        <link name="Rock 181" addr="http://listen.181fm.com/181-rock_128k.mp3" />
+        <link name="Salsa" addr="http://listen.181fm.com/181-salsa_128k.mp3" />
+        <link name="Sensual World" addr="http://listen.181fm.com/181-sensual_128k.mp3" />
+        <link name="Smooth AC" addr="http://listen.181fm.com/181-smoothac_128k.mp3" />
+        <link name="Soul" addr="http://listen.181fm.com/181-soul_128k.mp3" />
+        <link name="Star 90's" addr="http://listen.181fm.com/181-star90s_128k.mp3" />
+        <link name="Super 70s" addr="http://listen.181fm.com/181-70s_128k.mp3" />
+        <link name="Techno Club" addr="http://listen.181fm.com/181-technoclub_128k.mp3" />
+        <link name="The Ball (1stGenDance)" addr="http://listen.181fm.com/181-ball_128k.mp3" />
+        <link name="The Beat (HipHop/RnB)" addr="http://listen.181fm.com/181-beat_128k.mp3" />
+        <link name="The Box (Urban)" addr="http://listen.181fm.com/181-thebox_128k.mp3" />
+        <link name="The Breeze" addr="http://listen.181fm.com/181-breeze_128k.mp3" />
+        <link name="The Buzz (Alt.Rock)" addr="http://listen.181fm.com/181-buzz_128k.mp3" />
+        <link name="The Eagle (Classic)" addr="http://listen.181fm.com/181-eagle_128k.mp3" />
+        <link name="The Heart (LoveSongs)" addr="http://listen.181fm.com/181-heart_128k.mp3" />
+        <link name="The Mix" addr="http://listen.181fm.com/181-themix_128k.mp3" />
+        <link name="The Office" addr="http://listen.181fm.com/181-office_128k.mp3" />
+        <link name="The Point" addr="http://listen.181fm.com/181-thepoint_128k.mp3" />
+        <link name="The Rock! (HardRock)" addr="http://listen.181fm.com/181-hardrock_128k.mp3" />
+        <link name="Trance Jazz" addr="http://listen.181fm.com/181-trancejazz_128k.mp3" />
+        <link name="True Blues" addr="http://listen.181fm.com/181-blues_128k.mp3" />
+        <link name="True RnB" addr="http://listen.181fm.com/181-rnb_128k.mp3" />
+        <link name="UK top 40" addr="http://listen.181fm.com/181-uktop40_128k.mp3" />
+        <link name="US 181" addr="http://listen.181fm.com/181-us181_128k.mp3" />
+        <link name="Vocal Jazz" addr="http://listen.181fm.com/181-vocals_128k.mp3" />
+        <folder name="Christmas">
+            <link name="Christmas Blender" addr="http://listen.181fm.com/181-xblender_128k.mp3" />
+            <link name="Christmas Classics" addr="http://listen.181fm.com/181-xtraditional_128k.mp3" />
+            <link name="Christmas Country" addr="http://listen.181fm.com/181-xcountry_128k.mp3" />
+            <link name="Christmas Fun" addr="http://listen.181fm.com/181-xfun_128k.mp3" />
+            <link name="Christmas Gospel" addr="http://listen.181fm.com/181-xgospel_128k.mp3" />
+            <link name="Christmas Highway" addr="http://listen.181fm.com/181-xhighway_128k.mp3" />
+            <link name="Christmas Kids" addr="http://listen.181fm.com/181-xkids_128k.mp3" />
+            <link name="Christmas Kountry" addr="http://listen.181fm.com/181-xkkountry_128k.mp3" />
+            <link name="Christmas Mix" addr="http://listen.181fm.com/181-xmix_128k.mp3" />
+            <link name="Christmas Oldies" addr="http://listen.181fm.com/181-xoldies_128k.mp3" />
+            <link name="Christmas Power" addr="http://listen.181fm.com/181-xpower_128k.mp3" />
+            <link name="Christmas RnB" addr="http://listen.181fm.com/181-xtrue_128k.mp3" />
+            <link name="Christmas Rock" addr="http://listen.181fm.com/181-xrock_128k.mp3" />
+            <link name="Christmas Smooth Jazz" addr="http://listen.181fm.com/181-xsmooth_128k.mp3" />
+            <link name="Christmas Soundtracks" addr="http://listen.181fm.com/181-xsoundtrax_128k.mp3" />
+            <link name="Christmas Spirit" addr="http://listen.181fm.com/181-xspirit_128k.mp3" />
+            <link name="Christmas Standards" addr="http://listen.181fm.com/181-xstandards_128k.mp3" />
+            <link name="Christmas Swing" addr="http://listen.181fm.com/181-xswing_128k.mp3" />
+        </folder>
+    </folder>
+    <link name="Classic Rock Florida" addr="http://us2.internet-radio.com:8046/listen.pls" />
+    <folder name="SomaFM">
+        <link name="Groove Salad" addr="http://somafm.com/groovesalad.pls" />
+        <link name="Secret Agent" addr="http://somafm.com/secretagent.pls" />
+        <link name="Drone Zone" addr="http://somafm.com/dronezone.pls" />
+        <link name="Indie Pop Rocks" addr="http://somafm.com/indiepop.pls" />
+        <link name="Cliqhop IDM" addr="http://somafm.com/cliqhop.pls" />
+        <link name="BeatBlender" addr="http://somafm.com/beatblender.pls" />
+        <link name="Illinois Street Lounge" addr="http://somafm.com/illstreet.pls" />
+        <link name="Space Station Soma" addr="http://somafm.com/spacestation.pls" />
+        <link name="Doomed" addr="http://somafm.com/doomed.pls" />
+        <link name="Boot Liquor" addr="http://somafm.com/bootliquor.pls" />
+        <link name="Lush" addr="http://somafm.com/lush.pls" />
+        <link name="Digitalis" addr="http://somafm.com/digitalis.pls" />
+        <link name="Suburbs of Goa" addr="http://somafm.com/suburbsofgoa.pls" />
+        <link name="Sonic Universe" addr="http://somafm.com/sonicuniverse.pls" />
+        <link name="PopTron" addr="http://somafm.com/poptron.pls" />
+        <link name="Covers" addr="http://somafm.com/covers.pls" />
+        <link name="Black Rock FM" addr="http://somafm.com/brfm.pls" />
+        <link name="Mission Control" addr="http://somafm.com/missioncontrol.pls" />
+        <link name="Underground 80s" addr="http://somafm.com/u80s.pls" />
+        <link name="Deep Space One" addr="http://somafm.com/deepspaceone.pls" />
+        <link name="Left Coast 70s" addr="http://somafm.com/seventies130.pls" />
+        <link name="DEF CON Radio" addr="http://somafm.com/defcon.pls" />
+        <link name="The Trip" addr="http://somafm.com/thetrip.pls" />
+        <link name="Folk Forward" addr="http://somafm.com/folkfwd.pls" />
+        <link name="BAGeL Radio AltRock" addr="http://somafm.com/bagel.pls" />
+        <link name="Fluid" addr="http://somafm.com/fluid.pls" />
+        <link name="Seven Inch Soul" addr="http://somafm.com/7soul.pls" />
+        <link name="ThistleRadio" addr="http://somafm.com/thistle.pls" />
+        <link name="Dub Step Beyond" addr="http://somafm.com/dubstep.pls" />
+        <link name="SF 10-33" addr="http://somafm.com/sf1033.pls" />
+        <link name="Metal Detector" addr="http://somafm.com/metal.pls" />
+        <link name="Earwaves" addr="http://somafm.com/earwaves.pls" />
+    </folder>
 </folder>
 </file>

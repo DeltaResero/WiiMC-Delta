@@ -18,7 +18,7 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef _GETOPT_INT_H
-#define _GETOPT_INT_H	1
+#define _GETOPT_INT_H   1
 
 extern int _getopt_internal (
   int ___argc,
@@ -112,7 +112,7 @@ struct _getopt_data
 
 /* The initializer is necessary to set OPTIND and OPTERR to their
    default values and to clear the initialization flag.  */
-#define _GETOPT_DATA_INITIALIZER	{ 1, 1 }
+#define _GETOPT_DATA_INITIALIZER        { 1, 1 }
 
 extern int _getopt_internal_r (
   int ___argc,

@@ -19,7 +19,7 @@ typedef struct CMediaBuffer CMediaBuffer;
  * Create DMO_Filter object - similar syntax as for DS_Filter
  */
 DMO_Filter* DMO_FilterCreate(const char* dllname, const GUID* id,
-			     AM_MEDIA_TYPE* in_fmt, AM_MEDIA_TYPE* out_fmt);
+                 AM_MEDIA_TYPE* in_fmt, AM_MEDIA_TYPE* out_fmt);
 /**
  * Destroy DMO_Filter object - release all allocated resources
  */

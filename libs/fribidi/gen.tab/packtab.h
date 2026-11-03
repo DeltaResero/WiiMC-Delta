@@ -43,8 +43,8 @@ extern "C"
   FILE *out
   );
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 }
 #endif
 
-#endif				/* PACKTAB_H */
+#endif                          /* PACKTAB_H */

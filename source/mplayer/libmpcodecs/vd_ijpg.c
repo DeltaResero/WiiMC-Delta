@@ -34,11 +34,11 @@
 #include "vd_internal.h"
 
 static const vd_info_t info = {
-	"JPEG Images decoder",
-	"ijpg",
-	"Pontscho",
-	"based on vd_mpng.c",
-	"uses Independent JPEG Group's jpeglib"
+        "JPEG Images decoder",
+        "ijpg",
+        "Pontscho",
+        "based on vd_mpng.c",
+        "uses Independent JPEG Group's jpeglib"
 };
 
 LIBVD_EXTERN(ijpg)
@@ -146,7 +146,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
  struct jpeg_decompress_struct cinfo;
  struct my_error_mgr jerr;
  mp_image_t * mpi = NULL;
- int	      width,height,depth,i;
+ int          width,height,depth,i;
 
  if ( len <= 0 ) return NULL; // skipped frame
 

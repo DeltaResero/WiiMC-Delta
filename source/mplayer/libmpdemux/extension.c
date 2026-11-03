@@ -74,10 +74,10 @@ static struct {
 #ifdef CONFIG_WIN32DLL
         { "avs", DEMUXER_TYPE_AVS },
 #endif
-	{ "302", DEMUXER_TYPE_LAVF },
+        { "302", DEMUXER_TYPE_LAVF },
         { "264", DEMUXER_TYPE_H264_ES },
         { "26l", DEMUXER_TYPE_H264_ES },
-	{ "ac3", DEMUXER_TYPE_LAVF },
+        { "ac3", DEMUXER_TYPE_LAVF },
         { "ape", DEMUXER_TYPE_LAVF },
         { "apl", DEMUXER_TYPE_LAVF },
         { "eac3",DEMUXER_TYPE_LAVF },

@@ -61,16 +61,16 @@
  * Arabic properties computed by this function.
  */
 FRIBIDI_ENTRY void fribidi_join_arabic (
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as
-					   returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len,	/* input string length */
-  const FriBidiLevel *embedding_levels,	/* input list of embedding
-					   levels, as returned by
-					   fribidi_get_par_embedding_levels */
-  FriBidiArabicProp *ar_props	/* Arabic properties to analyze, initilized by
-				   joining types, as returned by
-				   fribidi_get_joining_types */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as
+                                           returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len,    /* input string length */
+  const FriBidiLevel *embedding_levels, /* input list of embedding
+                                           levels, as returned by
+                                           fribidi_get_par_embedding_levels */
+  FriBidiArabicProp *ar_props   /* Arabic properties to analyze, initilized by
+                                   joining types, as returned by
+                                   fribidi_get_joining_types */
 );
 
 #include "fribidi-enddecls.h"

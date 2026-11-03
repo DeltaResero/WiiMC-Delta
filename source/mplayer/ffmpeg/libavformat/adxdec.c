@@ -58,8 +58,8 @@ static int adx_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     size = BLOCK_SIZE * avctx->channels;
 
-	//for read_seek
-	//chans = avctx->channels;
+    //for read_seek
+    //chans = avctx->channels;
 
     pkt->pos = avio_tell(s->pb);
     pkt->stream_index = 0;
@@ -116,7 +116,7 @@ static int adx_read_header(AVFormatContext *s)
 
     st->codec->codec_type  = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id    = s->iformat->raw_codec_id;
-	st->codec->bit_rate    = avctx->sample_rate * avctx->channels * BLOCK_SIZE * 8LL / BLOCK_SAMPLES;
+    st->codec->bit_rate    = avctx->sample_rate * avctx->channels * BLOCK_SIZE * 8LL / BLOCK_SAMPLES;
 
     avpriv_set_pts_info(st, 64, BLOCK_SAMPLES, avctx->sample_rate);
 
@@ -126,7 +126,7 @@ static int adx_read_header(AVFormatContext *s)
 AVInputFormat ff_adx_demuxer = {
     .name           = "adx",
     .long_name      = NULL_IF_CONFIG_SMALL("CRI ADX"),
-	.read_probe     = adx_probe,
+    .read_probe     = adx_probe,
     .priv_data_size = sizeof(ADXDemuxerContext),
     .read_header    = adx_read_header,
     .read_packet    = adx_read_packet,

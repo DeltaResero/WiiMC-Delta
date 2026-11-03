@@ -25,11 +25,11 @@
 #include "vd_internal.h"
 
 static const vd_info_t info = {
-	"Hauppauge Macroblock/NV12/NV21 Decoder",
-	"hmblck",
-	"Alex <d18c7db@hotmail.com>, A'rpi, Alex Beregszaszi",
-	"Alex <d18c7db@hotmail.com>",
-	"uncompressed"
+        "Hauppauge Macroblock/NV12/NV21 Decoder",
+        "hmblck",
+        "Alex <d18c7db@hotmail.com>, A'rpi, Alex Beregszaszi",
+        "Alex <d18c7db@hotmail.com>",
+        "uncompressed"
 };
 
 LIBVD_EXTERN(hmblck)
@@ -38,9 +38,9 @@ static void de_macro_y(unsigned char* dst,unsigned char* src,int dstride,int w,i
     unsigned int y;
     // descramble Y plane
     for (y=0; y<h; y+=16) {
-	unsigned int x;
+        unsigned int x;
         for (x=0; x<w; x+=16) {
-	    unsigned int i;
+            unsigned int i;
             for (i=0; i<16; i++) {
                 memcpy(dst + x + (y+i)*dstride, src, 16);
                 src+=16;
@@ -53,19 +53,19 @@ static void de_macro_uv(unsigned char* dstu,unsigned char* dstv,unsigned char* s
     unsigned int y;
     // descramble U/V plane
     for (y=0; y<h; y+=16) {
-	unsigned int x;
+        unsigned int x;
         for (x=0; x<w; x+=8) {
-	    unsigned int i;
+            unsigned int i;
             for (i=0; i<16; i++) {
-		int idx=x + (y+i)*dstride;
-		dstu[idx+0]=src[0]; dstv[idx+0]=src[1];
-		dstu[idx+1]=src[2]; dstv[idx+1]=src[3];
-		dstu[idx+2]=src[4]; dstv[idx+2]=src[5];
-		dstu[idx+3]=src[6]; dstv[idx+3]=src[7];
-		dstu[idx+4]=src[8]; dstv[idx+4]=src[9];
-		dstu[idx+5]=src[10]; dstv[idx+5]=src[11];
-		dstu[idx+6]=src[12]; dstv[idx+6]=src[13];
-		dstu[idx+7]=src[14]; dstv[idx+7]=src[15];
+                int idx=x + (y+i)*dstride;
+                dstu[idx+0]=src[0]; dstv[idx+0]=src[1];
+                dstu[idx+1]=src[2]; dstv[idx+1]=src[3];
+                dstu[idx+2]=src[4]; dstv[idx+2]=src[5];
+                dstu[idx+3]=src[6]; dstv[idx+3]=src[7];
+                dstu[idx+4]=src[8]; dstv[idx+4]=src[9];
+                dstu[idx+5]=src[10]; dstv[idx+5]=src[11];
+                dstu[idx+6]=src[12]; dstv[idx+6]=src[13];
+                dstu[idx+7]=src[14]; dstv[idx+7]=src[15];
                 src+=16;
             }
         }
@@ -138,12 +138,12 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
 
     if(sh->format == IMGFMT_HM12) {
         //if(!de_macro(sh, data, len, flags, mpi)) return NULL;
-	de_macro_y(mpi->planes[0],data,mpi->stride[0],mpi->w,mpi->h);
-	de_macro_uv(mpi->planes[1],mpi->planes[2],
+        de_macro_y(mpi->planes[0],data,mpi->stride[0],mpi->w,mpi->h);
+        de_macro_uv(mpi->planes[1],mpi->planes[2],
                     (unsigned char *)data+mpi->w*mpi->h,mpi->stride[1],
                     mpi->w/2,mpi->h/2);
     } else {
-	if(!nv12_to_yv12(data, len, mpi,(sh->format == IMGFMT_NV21))) return NULL;
+        if(!nv12_to_yv12(data, len, mpi,(sh->format == IMGFMT_NV21))) return NULL;
     }
 
     return mpi;

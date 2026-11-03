@@ -144,7 +144,7 @@ static int net_write(int fd, char* buf, int len) {
     if(w <= 0) {
       if(errno == EINTR) continue;
       if(w < 0)
-	mp_msg(MSGT_NETST,MSGL_ERR,"Write failed: %s\n",strerror(errno));
+        mp_msg(MSGT_NETST,MSGL_ERR,"Write failed: %s\n",strerror(errno));
       return 0;
     }
     len -= w;

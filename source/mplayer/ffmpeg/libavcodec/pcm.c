@@ -349,10 +349,10 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
             samples += 2;
         }
         break;
-	case CODEC_ID_PCM_S16BE_PLANAR:
+    case CODEC_ID_PCM_S16BE_PLANAR:
         DECODE_PLANAR(16, be16, src, samples, n, 0, 0);
         break;
-	case CODEC_ID_PCM_S16LE_PLANAR:
+    case CODEC_ID_PCM_S16LE_PLANAR:
         DECODE_PLANAR(16, le16, src, samples, n, 0, 0);
         break;
    // case CODEC_ID_PCM_S16BE_PLANAR:
@@ -365,7 +365,7 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
             //for (i = n; i > 0; i--) {
               //  AV_WN16A(samples, bytestream_get_le16(&src));
               //  samples += 2;
-			//  samples = frame->extended_data[c];
+            //  samples = frame->extended_data[c];
             bytestream_get_buffer(&src, samples, n * sample_size);
            // }
         }

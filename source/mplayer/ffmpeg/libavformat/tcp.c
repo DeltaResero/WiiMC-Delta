@@ -101,11 +101,11 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         ff_socket_nonblock(fd, 1);
     } else {
  redo:
-  		#ifdef GEKKO
-		// turn off Nagle
-		u32 nodelay = 1;
-		net_setsockopt(cur_ai->ai_family, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay));
-		#endif
+          #ifdef GEKKO
+        // turn off Nagle
+        u32 nodelay = 1;
+        net_setsockopt(cur_ai->ai_family, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay));
+        #endif
         ff_socket_nonblock(fd, 1);
         ret = connect(fd, cur_ai->ai_addr, cur_ai->ai_addrlen);
     }

@@ -54,8 +54,8 @@ const char *fsdp_error_t_s[] = {
   "Unknown media type in media item", /** FSDPE_UNKNOWN_MEDIA_TYPE **/
   "Unknown media transport", /** FSDPE_UNKNOWN_MEDIA_TRANSPORT **/
   "Unknown extra lines in description item", /** FSDPE_OVERFILLED **/
-  "Unknown line found",	/** FSDPE_INVALID_LINE **/
-  "No connection information provided",	/** FSDPE_MISSING_CONNECTION_INFO **/
+  "Unknown line found", /** FSDPE_INVALID_LINE **/
+  "No connection information provided", /** FSDPE_MISSING_CONNECTION_INFO **/
   "Description item does not fit in MAXSIZE", /** FSDPE_INVALID_INDEX **/
   "Internal error", /** FSDPE_INTERNAL_ERROR **/
   "Invalid function parameters", /** FSDPE_INVALID_PARAMETER **/

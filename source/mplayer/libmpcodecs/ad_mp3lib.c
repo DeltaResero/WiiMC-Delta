@@ -28,11 +28,11 @@
 
 static const ad_info_t info =
 {
-	"MPEG layer-2, layer-3",
-	"mp3lib",
-	"Nick Kurshev",
-	"mpg123",
-	"Optimized to MMX/SSE/3Dnow!"
+        "MPEG layer-2, layer-3",
+        "mp3lib",
+        "Nick Kurshev",
+        "mpg123",
+        "Optimized to MMX/SSE/3Dnow!"
 };
 
 LIBAD_EXTERN(mp3lib)
@@ -85,10 +85,10 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
           MP3_DecodeFrame(NULL,-2); // resync
           MP3_DecodeFrame(NULL,-2); // resync
           MP3_DecodeFrame(NULL,-2); // resync
-	  return CONTROL_TRUE;
+          return CONTROL_TRUE;
       case ADCTRL_SKIP_FRAME:
-	  MP3_DecodeFrame(NULL,-2); // skip MPEG frame
-	  return CONTROL_TRUE;
+          MP3_DecodeFrame(NULL,-2); // skip MPEG frame
+          return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }

@@ -63,13 +63,13 @@ extern int ao_mpegpes_fd;
 static const vo_info_t info =
 {
 #ifdef CONFIG_DVB
-	"MPEG-PES to DVB card",
+        "MPEG-PES to DVB card",
 #else
-	"MPEG-PES file",
+        "MPEG-PES file",
 #endif
-	"mpegpes",
-	"A'rpi",
-	""
+        "mpegpes",
+        "A'rpi",
+        ""
 };
 
 const LIBVO_EXTERN (mpegpes)
@@ -83,10 +83,10 @@ config(uint32_t s_width, uint32_t s_height, uint32_t width, uint32_t height, uin
     case 576:
     case 240:
     case 480:
-	break;
+        break;
     default:
-	mp_msg(MSGT_VO,MSGL_ERR,"DVB: height=%d not supported (try 240/480 (ntsc) or 288/576 (pal)\n",s_height);
-	return -1;
+        mp_msg(MSGT_VO,MSGL_ERR,"DVB: height=%d not supported (try 240/480 (ntsc) or 288/576 (pal)\n",s_height);
+        return -1;
     }
 #endif
     return 0;
@@ -98,15 +98,15 @@ static int preinit(const char *arg){
     char vo_file[30], ao_file[30], *tmp;
 
     if(arg != NULL){
-	if((tmp = strstr(arg, "card=")) != NULL) {
-	    card = atoi(&tmp[5]);
-	    if((card < 1) || (card > 4)) {
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB card number must be between 1 and 4\n");
-		return -1;
-	    }
-	    card--;
-	    arg = NULL;
-	}
+        if((tmp = strstr(arg, "card=")) != NULL) {
+            card = atoi(&tmp[5]);
+            if((card < 1) || (card > 4)) {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB card number must be between 1 and 4\n");
+                return -1;
+            }
+            card--;
+            arg = NULL;
+        }
     }
 
     if(!arg){
@@ -126,34 +126,34 @@ static int preinit(const char *arg){
           mp_msg(MSGT_VO,MSGL_INFO, "Couldn't find a usable dvb video device, exiting\n");
           return -1;
         }
-	mp_msg(MSGT_VO,MSGL_INFO, "Opening /dev/dvb/adapter%d/video0+audio0\n", card);
-	sprintf(vo_file, "/dev/dvb/adapter%d/video0", card);
-	sprintf(ao_file, "/dev/dvb/adapter%d/audio0", card);
-	if((vo_mpegpes_fd = open(vo_file,O_RDWR)) < 0){
-        	perror("DVB VIDEO DEVICE: ");
-        	return -1;
-	}
-	if ( (ioctl(vo_mpegpes_fd,VIDEO_SET_BLANK, false) < 0)){
-		perror("DVB VIDEO SET BLANK: ");
-		return -1;
-	}
-	if ( (ioctl(vo_mpegpes_fd,VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY) < 0)){
-		perror("DVB VIDEO SELECT SOURCE: ");
-		return -1;
-	}
-	if ( (ioctl(vo_mpegpes_fd,VIDEO_PLAY) < 0)){
-		perror("DVB VIDEO PLAY: ");
-		return -1;
-	}
-	return 0;
+        mp_msg(MSGT_VO,MSGL_INFO, "Opening /dev/dvb/adapter%d/video0+audio0\n", card);
+        sprintf(vo_file, "/dev/dvb/adapter%d/video0", card);
+        sprintf(ao_file, "/dev/dvb/adapter%d/audio0", card);
+        if((vo_mpegpes_fd = open(vo_file,O_RDWR)) < 0){
+                perror("DVB VIDEO DEVICE: ");
+                return -1;
+        }
+        if ( (ioctl(vo_mpegpes_fd,VIDEO_SET_BLANK, false) < 0)){
+                perror("DVB VIDEO SET BLANK: ");
+                return -1;
+        }
+        if ( (ioctl(vo_mpegpes_fd,VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY) < 0)){
+                perror("DVB VIDEO SELECT SOURCE: ");
+                return -1;
+        }
+        if ( (ioctl(vo_mpegpes_fd,VIDEO_PLAY) < 0)){
+                perror("DVB VIDEO PLAY: ");
+                return -1;
+        }
+        return 0;
     }
 #endif
     arg = (arg ? arg : "grab.mpg");
     mp_msg(MSGT_VO,MSGL_INFO, "Saving PES stream to %s\n", arg);
     vo_mpegpes_fd=open(arg,O_WRONLY|O_CREAT,0666);
     if(vo_mpegpes_fd<0){
-	perror("vo_mpegpes");
-	return -1;
+        perror("vo_mpegpes");
+        return -1;
     }
     return 0;
 }
@@ -172,25 +172,25 @@ static int my_write(const unsigned char* data,int len){
 
 //    printf("write %d bytes  \n",len);
 
-	pfd[0].fd = vo_mpegpes_fd;
-	pfd[0].events = POLLOUT;
+        pfd[0].fd = vo_mpegpes_fd;
+        pfd[0].events = POLLOUT;
 
-	pfd[1].fd = ao_mpegpes_fd;
-	pfd[1].events = POLLOUT;
+        pfd[1].fd = ao_mpegpes_fd;
+        pfd[1].events = POLLOUT;
 
     while(len>0){
-	if (poll(pfd,NFD,1)){
-	    if (pfd[0].revents & POLLOUT){
-		int ret=write(vo_mpegpes_fd,data,len);
-//		printf("ret=%d  \n",ret);
-		if(ret<=0){
-		    perror("write");
-		    usleep(0);
-		} else {
-		    len-=ret; data+=ret;
-		}
-	    } else usleep(1000);
-	}
+        if (poll(pfd,NFD,1)){
+            if (pfd[0].revents & POLLOUT){
+                int ret=write(vo_mpegpes_fd,data,len);
+//              printf("ret=%d  \n",ret);
+                if(ret<=0){
+                    perror("write");
+                    usleep(0);
+                } else {
+                    len-=ret; data+=ret;
+                }
+            } else usleep(1000);
+        }
     }
 
 #else

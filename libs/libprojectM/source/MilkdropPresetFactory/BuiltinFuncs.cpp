@@ -43,7 +43,7 @@ Func * BuiltinFuncs::find_func(const std::string & name) {
 
   // Case: function not found, return null
   if (pos == builtin_func_tree.end())
-	return 0;
+        return 0;
 
   // Case: function found, return a pointer to it
   return pos->second;
@@ -142,11 +142,11 @@ int BuiltinFuncs::insert_func( Func *func ) {
 
   assert(func);
   std::pair<std::map<std::string, Func*>::iterator, bool> inserteePair =
-  	builtin_func_tree.insert(std::make_pair(std::string(func->getName()), func));
+        builtin_func_tree.insert(std::make_pair(std::string(func->getName()), func));
 
   if (!inserteePair.second) {
-	std::cerr << "Failed to insert builtin function \"" << func->getName() << "\" into collection! Bailing..." << std::endl;
-	abort();
+        std::cerr << "Failed to insert builtin function \"" << func->getName() << "\" into collection! Bailing..." << std::endl;
+        abort();
 
   }
 

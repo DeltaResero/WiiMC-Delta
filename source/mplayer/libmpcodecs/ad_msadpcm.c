@@ -37,11 +37,11 @@
 
 static const ad_info_t info =
 {
-	"MS ADPCM audio decoder",
-	"msadpcm",
-	"Nick Kurshev",
-	"Mike Melanson",
-	""
+        "MS ADPCM audio decoder",
+        "msadpcm",
+        "Nick Kurshev",
+        "Mike Melanson",
+        ""
 };
 
 LIBAD_EXTERN(msadpcm)

@@ -43,28 +43,28 @@
 #define MAX_DEV_PER_VENDOR_CFG1 64
 #define MAX_PCI_DEVICES_PER_BUS 32
 #define MAX_PCI_DEVICES         256
-#define PCI_MULTIFUNC_DEV	0x80
+#define PCI_MULTIFUNC_DEV       0x80
 #define PCI_COMMAND_IO          0x1     /* Enable response to I/O space */
 
 typedef struct pciinfo_s
 {
-  int		bus,card,func;			/* PCI/AGP bus:card:func */
+  int           bus,card,func;                  /* PCI/AGP bus:card:func */
   unsigned short command;                       /* Device control register */
-  unsigned short vendor,device;			/* Card vendor+device ID */
-  unsigned	base0,base1,base2,baserom;	/* Memory and I/O base addresses */
-//  unsigned	base0_limit, base1_limit, base2_limit, baserom_limit;
+  unsigned short vendor,device;                 /* Card vendor+device ID */
+  unsigned      base0,base1,base2,baserom;      /* Memory and I/O base addresses */
+//  unsigned    base0_limit, base1_limit, base2_limit, baserom_limit;
 }pciinfo_t;
 
 /* needed for mga_vid */
 int pci_config_read(unsigned char bus, unsigned char dev, unsigned char func,
-			unsigned char cmd, int len, unsigned long *val);
-			/* Fill array pci_list which must have size MAX_PCI_DEVICES
-			   and return 0 if sucessful */
+                        unsigned char cmd, int len, unsigned long *val);
+                        /* Fill array pci_list which must have size MAX_PCI_DEVICES
+                           and return 0 if sucessful */
 int pci_scan(pciinfo_t *pci_list,unsigned *num_card);
 
 
-	    /* Enables/disables accessing to IO space from application side.
-	       Should return 0 if o'k or errno on error. */
+            /* Enables/disables accessing to IO space from application side.
+               Should return 0 if o'k or errno on error. */
 int enable_app_io(void);
 int disable_app_io(void);
 

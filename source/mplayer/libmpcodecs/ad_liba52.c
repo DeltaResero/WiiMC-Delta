@@ -59,11 +59,11 @@ static int a52_drc_action = DRC_NO_ACTION;
 
 static const ad_info_t info =
 {
-	"AC3 decoding with liba52",
-	"liba52",
-	"Nick Kurshev",
-	"Michel LESPINASSE",
-	""
+        "AC3 decoding with liba52",
+        "liba52",
+        "Nick Kurshev",
+        "Michel LESPINASSE",
+        ""
 };
 
 LIBAD_EXTERN(liba52)
@@ -79,8 +79,8 @@ int bit_rate=0;
     /* sync frame:*/
 while(1){
     while(sh_audio->a_in_buffer_len<8){
-	int c=demux_getc(sh_audio->ds);
-	if(c<0) return -1; /* EOF*/
+        int c=demux_getc(sh_audio->ds);
+        if(c<0) return -1; /* EOF*/
         sh_audio->a_in_buffer[sh_audio->a_in_buffer_len++]=c;
     }
     if(sh_audio->format==MKTAG('d','n','e','t')) swab(sh_audio->a_in_buffer,sh_audio->a_in_buffer,8);
@@ -97,11 +97,11 @@ while(1){
     sh_audio->samplesize=sh_audio->sample_format==AF_FORMAT_FLOAT_NE ? 4 : 2;
     demux_read_data(sh_audio->ds,sh_audio->a_in_buffer+8,length-8);
     if(sh_audio->format==MKTAG('d','n','e','t'))
-	swab(sh_audio->a_in_buffer+8,sh_audio->a_in_buffer+8,length-8);
+        swab(sh_audio->a_in_buffer+8,sh_audio->a_in_buffer+8,length-8);
 
 #ifdef CONFIG_LIBA52_INTERNAL
     if(crc16_block(sh_audio->a_in_buffer+2,length-2)!=0)
-	mp_msg(MSGT_DECAUDIO,MSGL_STATUS,"a52: CRC check failed!  \n");
+        mp_msg(MSGT_DECAUDIO,MSGL_STATUS,"a52: CRC check failed!  \n");
 #endif
 
     return length;
@@ -127,16 +127,16 @@ int channels=0;
     case A52_DOLBY: mode="dolby"; channels=2; break;
   }
   mp_msg(MSGT_DECAUDIO,MSGL_V,"AC3: %d.%d (%s%s)  %d Hz  %3.1f kbit/s\n",
-	channels, (flags&A52_LFE)?1:0,
-	mode, (flags&A52_LFE)?"+lfe":"",
-	sample_rate, bit_rate*0.001f);
+        channels, (flags&A52_LFE)?1:0,
+        mode, (flags&A52_LFE)?"+lfe":"",
+        sample_rate, bit_rate*0.001f);
   return (flags&A52_LFE) ? (channels+1) : channels;
 }
 
 static sample_t dynrng_call (sample_t c, void *data)
 {
-//	fprintf(stderr, "(%f, %f): %f\n", (double)c, (double)drc_level, (double)pow((double)c, drc_level));
-	return pow((double)c, drc_level);
+//      fprintf(stderr, "(%f, %f): %f\n", (double)c, (double)drc_level, (double)pow((double)c, drc_level));
+        return pow((double)c, drc_level);
 }
 
 
@@ -162,15 +162,15 @@ static int a52_resample_float(float *in, int16_t *out)
     unsigned long i;
     float *p = (float*) out;
     for (i = 0; i != 256; i++) {
-	unsigned long map = channel_map;
-	do {
-	    unsigned long ch = map & 15;
-	    if (ch == 15)
-		*p = 0;
-	    else
-		*p = in[i + ((ch-1)<<8)];
-	    p++;
-	} while ((map >>= 4));
+        unsigned long map = channel_map;
+        do {
+            unsigned long ch = map & 15;
+            if (ch == 15)
+                *p = 0;
+            else
+                *p = in[i + ((ch-1)<<8)];
+            p++;
+        } while ((map >>= 4));
     }
     return (int16_t*) p - out;
 }
@@ -195,25 +195,25 @@ static int init(sh_audio_t *sh_audio)
 #endif
   a52_state=a52_init (a52_accel);
   if (a52_state == NULL) {
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,"A52 init failed\n");
-	return 0;
+        mp_msg(MSGT_DECAUDIO,MSGL_ERR,"A52 init failed\n");
+        return 0;
   }
   sh_audio->sample_format = AF_FORMAT_FLOAT_NE;
   if(a52_fillbuff(sh_audio)<0){
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,"A52 sync failed\n");
-	return 0;
+        mp_msg(MSGT_DECAUDIO,MSGL_ERR,"A52 sync failed\n");
+        return 0;
   }
 
 
   /* Init a52 dynrng */
   if (drc_level < 0.001) {
-	  /* level == 0 --> no compression, init library without callback */
-	  a52_drc_action = DRC_NO_COMPRESSION;
+          /* level == 0 --> no compression, init library without callback */
+          a52_drc_action = DRC_NO_COMPRESSION;
   } else if (drc_level > 0.999) {
-	  /* level == 1 --> full compression, do nothing at all (library default = full compression) */
-	  a52_drc_action = DRC_NO_ACTION;
+          /* level == 1 --> full compression, do nothing at all (library default = full compression) */
+          a52_drc_action = DRC_NO_ACTION;
   } else {
-	  a52_drc_action = DRC_CALLBACK;
+          a52_drc_action = DRC_CALLBACK;
   }
   /* Library init for dynrng has to be done for each frame, see decode_audio() */
 
@@ -223,14 +223,14 @@ static int init(sh_audio_t *sh_audio)
   sh_audio->channels=audio_output_channels;
 while(sh_audio->channels>0){
   switch(sh_audio->channels){
-	    case 1: a52_flags=A52_MONO; break;
-/*	    case 2: a52_flags=A52_STEREO; break;*/
-	    case 2: a52_flags=A52_DOLBY; break;
-/*	    case 3: a52_flags=A52_3F; break;*/
-	    case 3: a52_flags=A52_2F1R; break;
-	    case 4: a52_flags=A52_2F2R; break; /* 2+2*/
-	    case 5: a52_flags=A52_3F2R; break;
-	    case 6: a52_flags=A52_3F2R|A52_LFE; break; /* 5.1*/
+            case 1: a52_flags=A52_MONO; break;
+/*          case 2: a52_flags=A52_STEREO; break;*/
+            case 2: a52_flags=A52_DOLBY; break;
+/*          case 3: a52_flags=A52_3F; break;*/
+            case 3: a52_flags=A52_2F1R; break;
+            case 4: a52_flags=A52_2F2R; break; /* 2+2*/
+            case 5: a52_flags=A52_3F2R; break;
+            case 6: a52_flags=A52_3F2R|A52_LFE; break; /* 5.1*/
   }
   /* test:*/
   flags=a52_flags|A52_ADJUST_LEVEL;
@@ -244,31 +244,31 @@ while(sh_audio->channels>0){
   channel_map = 0;
   if (sh_audio->sample_format == AF_FORMAT_FLOAT_NE) {
       if (!(flags & A52_LFE)) {
-	  switch ((flags<<3) | sh_audio->channels) {
-	    case (A52_MONO    << 3) | 1: channel_map = 0x1; break;
-	    case (A52_CHANNEL << 3) | 2:
-	    case (A52_STEREO  << 3) | 2:
-	    case (A52_DOLBY   << 3) | 2: channel_map =    0x21; break;
-	    case (A52_2F1R    << 3) | 3: channel_map =   0x321; break;
-	    case (A52_2F2R    << 3) | 4: channel_map =  0x4321; break;
-	    case (A52_3F      << 3) | 5: channel_map = 0x2ff31; break;
-	    case (A52_3F2R    << 3) | 5: channel_map = 0x25431; break;
-	  }
+          switch ((flags<<3) | sh_audio->channels) {
+            case (A52_MONO    << 3) | 1: channel_map = 0x1; break;
+            case (A52_CHANNEL << 3) | 2:
+            case (A52_STEREO  << 3) | 2:
+            case (A52_DOLBY   << 3) | 2: channel_map =    0x21; break;
+            case (A52_2F1R    << 3) | 3: channel_map =   0x321; break;
+            case (A52_2F2R    << 3) | 4: channel_map =  0x4321; break;
+            case (A52_3F      << 3) | 5: channel_map = 0x2ff31; break;
+            case (A52_3F2R    << 3) | 5: channel_map = 0x25431; break;
+          }
       } else if (sh_audio->channels == 6) {
-	  switch (flags & ~A52_LFE) {
-	    case A52_MONO   : channel_map = 0x12ffff; break;
-	    case A52_CHANNEL:
-	    case A52_STEREO :
-	    case A52_DOLBY  : channel_map = 0x1fff32; break;
-	    case A52_3F     : channel_map = 0x13ff42; break;
-	    case A52_2F1R   : channel_map = 0x1f4432; break;
-	    case A52_2F2R   : channel_map = 0x1f5432; break;
-	    case A52_3F2R   : channel_map = 0x136542; break;
-	  }
+          switch (flags & ~A52_LFE) {
+            case A52_MONO   : channel_map = 0x12ffff; break;
+            case A52_CHANNEL:
+            case A52_STEREO :
+            case A52_DOLBY  : channel_map = 0x1fff32; break;
+            case A52_3F     : channel_map = 0x13ff42; break;
+            case A52_2F1R   : channel_map = 0x1f4432; break;
+            case A52_2F2R   : channel_map = 0x1f5432; break;
+            case A52_3F2R   : channel_map = 0x136542; break;
+          }
       }
       if (channel_map) {
-	  a52_resample = a52_resample_float;
-	  break;
+          a52_resample = a52_resample_float;
+          break;
       }
   } else
   break;
@@ -291,19 +291,19 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
     {
       case ADCTRL_RESYNC_STREAM:
       case ADCTRL_SKIP_FRAME:
-	  a52_fillbuff(sh);
-	  return CONTROL_TRUE;
+          a52_fillbuff(sh);
+          return CONTROL_TRUE;
       case ADCTRL_SET_VOLUME: {
-	  float vol = *(float*)arg;
-	  if (vol > 60.0) vol = 60.0;
-	  a52_level = vol <= -200.0 ? 0 : pow(10.0,vol/20.0);
-	  return CONTROL_TRUE;
+          float vol = *(float*)arg;
+          if (vol > 60.0) vol = 60.0;
+          a52_level = vol <= -200.0 ? 0 : pow(10.0,vol/20.0);
+          return CONTROL_TRUE;
       }
       case ADCTRL_QUERY_FORMAT:
-	  if (*(int*)arg == AF_FORMAT_S16_NE ||
-	      *(int*)arg == AF_FORMAT_FLOAT_NE)
-	      return CONTROL_TRUE;
-	  return CONTROL_FALSE;
+          if (*(int*)arg == AF_FORMAT_S16_NE ||
+              *(int*)arg == AF_FORMAT_FLOAT_NE)
+              return CONTROL_TRUE;
+          return CONTROL_FALSE;
     }
   return CONTROL_UNKNOWN;
 }
@@ -313,32 +313,32 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
     sample_t level=a52_level, bias=384;
     int flags=a52_flags|A52_ADJUST_LEVEL;
     int i,len=-1;
-	if (sh_audio->sample_format == AF_FORMAT_FLOAT_NE)
-	    bias = 0;
-	if(!sh_audio->a_in_buffer_len)
-	    if(a52_fillbuff(sh_audio)<0) return len; /* EOF */
-	sh_audio->a_in_buffer_len=0;
-	if (a52_frame (a52_state, sh_audio->a_in_buffer, &flags, &level, bias)){
-	    mp_msg(MSGT_DECAUDIO,MSGL_WARN,"a52: error decoding frame\n");
-	    return len;
-	}
+        if (sh_audio->sample_format == AF_FORMAT_FLOAT_NE)
+            bias = 0;
+        if(!sh_audio->a_in_buffer_len)
+            if(a52_fillbuff(sh_audio)<0) return len; /* EOF */
+        sh_audio->a_in_buffer_len=0;
+        if (a52_frame (a52_state, sh_audio->a_in_buffer, &flags, &level, bias)){
+            mp_msg(MSGT_DECAUDIO,MSGL_WARN,"a52: error decoding frame\n");
+            return len;
+        }
 
-	/* handle dynrng */
-	if (a52_drc_action != DRC_NO_ACTION) {
-	    if (a52_drc_action == DRC_NO_COMPRESSION)
-		a52_dynrng(a52_state, NULL, NULL);
-	    else
-		a52_dynrng(a52_state, dynrng_call, NULL);
-	}
+        /* handle dynrng */
+        if (a52_drc_action != DRC_NO_ACTION) {
+            if (a52_drc_action == DRC_NO_COMPRESSION)
+                a52_dynrng(a52_state, NULL, NULL);
+            else
+                a52_dynrng(a52_state, dynrng_call, NULL);
+        }
 
-	len=0;
-	for (i = 0; i < 6; i++) {
-	    if (a52_block (a52_state)){
-		mp_msg(MSGT_DECAUDIO,MSGL_WARN,"a52: error at resampling\n");
-		break;
-	    }
-	    len+=2*a52_resample(a52_samples(a52_state),(int16_t *)&buf[len]);
-	}
-	assert(len <= maxlen);
+        len=0;
+        for (i = 0; i < 6; i++) {
+            if (a52_block (a52_state)){
+                mp_msg(MSGT_DECAUDIO,MSGL_WARN,"a52: error at resampling\n");
+                break;
+            }
+            len+=2*a52_resample(a52_samples(a52_state),(int16_t *)&buf[len]);
+        }
+        assert(len <= maxlen);
   return len;
 }

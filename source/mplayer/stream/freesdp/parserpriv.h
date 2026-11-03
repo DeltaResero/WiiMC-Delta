@@ -43,8 +43,8 @@
  **/
 static fsdp_error_t
 fsdp_parse_c (const char **p, fsdp_network_type_t * ntype,
-	      fsdp_address_type_t * atype,
-	      fsdp_connection_address_t * address);
+              fsdp_address_type_t * atype,
+              fsdp_connection_address_t * address);
 
 /**
  * Parse b (b=<modifier>:<bandwidth-value>) consecutive lines. If the
@@ -61,7 +61,7 @@ fsdp_parse_c (const char **p, fsdp_network_type_t * ntype,
  **/
 static fsdp_error_t
 fsdp_parse_b (const char **p, fsdp_bw_modifier_t ** bw_modifiers,
-	      unsigned int *bw_modifiers_count);
+              unsigned int *bw_modifiers_count);
 
 /**
  * Parse a k (k=<method>) or (k=<method>:<encryption key>) line. If
@@ -76,7 +76,7 @@ fsdp_parse_b (const char **p, fsdp_bw_modifier_t ** bw_modifiers,
  **/
 static fsdp_error_t
 fsdp_parse_k (const char **p, fsdp_encryption_method_t * method,
-	      char **content);
+              char **content);
 
 
 /**
@@ -94,7 +94,7 @@ fsdp_repeat_time_to_uint (const char *time, unsigned long int *seconds);
 
 static fsdp_error_t
 fsdp_parse_rtpmap (fsdp_rtpmap_t *** rtpmap, unsigned int *counter,
-		   const char *value);
+                   const char *value);
 
 /**
  * Maximun default field len for "expected to be short" fields, like

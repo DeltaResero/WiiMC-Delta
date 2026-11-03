@@ -57,10 +57,10 @@ static muxer_stream_t* rawvideofile_new_stream(muxer_t *muxer,int type){
 
 static void write_rawvideo_chunk(stream_t *stream,int len,void* data){
     if(len>0){
-	if(data){
-	    // DATA
+        if(data){
+            // DATA
             stream_write_buffer(stream,data,len);
-	}
+        }
     }
 }
 

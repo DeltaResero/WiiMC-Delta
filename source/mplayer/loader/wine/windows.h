@@ -18,7 +18,7 @@
 #if 0
   Where does this belong? Nobody uses this stuff anyway.
 typedef struct {
-	BYTE i;  /* much more .... */
+    BYTE i;  /* much more .... */
 } KANJISTRUCT;
 typedef KANJISTRUCT *LPKANJISTRUCT;
 typedef KANJISTRUCT *NPKANJISTRUCT;

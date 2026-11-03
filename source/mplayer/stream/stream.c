@@ -165,21 +165,21 @@ static stream_t* open_stream_plugin(const stream_info_t* sinfo, const char* file
     arg = m_struct_alloc(desc);
     if(sinfo->opts_url) {
       m_option_t url_opt =
-	{ "stream url", arg , CONF_TYPE_CUSTOM_URL, 0, 0 ,0, sinfo->opts };
+        { "stream url", arg , CONF_TYPE_CUSTOM_URL, 0, 0 ,0, sinfo->opts };
       if(m_option_parse(&url_opt,"stream url",filename,arg,M_CONFIG_FILE) < 0) {
-	mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_URLParsingFailed,filename);
-	m_struct_free(desc,arg);
-	return NULL;
+        mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_URLParsingFailed,filename);
+        m_struct_free(desc,arg);
+        return NULL;
       }
     }
     if(options) {
       int i;
       for(i = 0 ; options[i] != NULL ; i += 2) {
-	mp_msg(MSGT_OPEN,MSGL_DBG2, "Set stream arg %s=%s\n",
-	       options[i],options[i+1]);
-	if(!m_struct_set(desc,arg,options[i],options[i+1]))
-	  mp_msg(MSGT_OPEN,MSGL_WARN, MSGTR_FailedSetStreamOption,
-		 options[i],options[i+1]);
+        mp_msg(MSGT_OPEN,MSGL_DBG2, "Set stream arg %s=%s\n",
+               options[i],options[i+1]);
+        if(!m_struct_set(desc,arg,options[i],options[i+1]))
+          mp_msg(MSGT_OPEN,MSGL_WARN, MSGTR_FailedSetStreamOption,
+                 options[i],options[i+1]);
       }
     }
   }
@@ -238,23 +238,23 @@ stream_t* open_stream_full(const char* filename,int mode, char** options, int* f
       // l == 0 => Don't do protocol matching (ie network and filenames)
       if((l == 0 && !strstr(filename, "://")) ||
          ((strncasecmp(sinfo->protocols[j],filename,l) == 0) &&
-		      (strncmp("://",filename+l,3) == 0))) {
-	*file_format = DEMUXER_TYPE_UNKNOWN;
-	s = open_stream_plugin(sinfo,filename,mode,options,file_format,&r,
-				&redirected_url);
-	if(s) return s;
-	if(r == STREAM_REDIRECTED && redirected_url) {
-	  mp_msg(MSGT_OPEN,MSGL_V, "[%s] open %s redirected to %s\n",
-		 sinfo->info, filename, redirected_url);
-	  s = open_stream_full(redirected_url, mode, options, file_format);
-	  free(redirected_url);
-	  return s;
-	}
-	else if(r != STREAM_UNSUPPORTED) {
-	  mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_FailedToOpen,filename);
-	  return NULL;
-	}
-	break;
+                      (strncmp("://",filename+l,3) == 0))) {
+        *file_format = DEMUXER_TYPE_UNKNOWN;
+        s = open_stream_plugin(sinfo,filename,mode,options,file_format,&r,
+                                &redirected_url);
+        if(s) return s;
+        if(r == STREAM_REDIRECTED && redirected_url) {
+          mp_msg(MSGT_OPEN,MSGL_V, "[%s] open %s redirected to %s\n",
+                 sinfo->info, filename, redirected_url);
+          s = open_stream_full(redirected_url, mode, options, file_format);
+          free(redirected_url);
+          return s;
+        }
+        else if(r != STREAM_UNSUPPORTED) {
+          mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_FailedToOpen,filename);
+          return NULL;
+        }
+        break;
       }
     }
   }
@@ -338,7 +338,7 @@ int stream_read_internal(stream_t *s, void *buf, int len)
 #ifdef GEKKO
   if(len==0)
   {
-  	 printf("stream error len==0, try: %i\n",_try);
+         printf("stream error len==0, try: %i\n",_try);
     if(_try>3)
       s->eof=1;
     else if(_try == 0)
@@ -446,8 +446,8 @@ if(newpos==0 || newpos!=s->pos){
 #ifdef CONFIG_NETWORKING
     if(s->seek) { // new stream seek is much cleaner than streaming_ctrl one
       if(!s->seek(s,newpos)) {
-      	mp_msg(MSGT_STREAM,MSGL_ERR, MSGTR_StreamSeekFailed);
-      	return 0;
+        mp_msg(MSGT_STREAM,MSGL_ERR, MSGTR_StreamSeekFailed);
+        return 0;
       }
       break;
     }

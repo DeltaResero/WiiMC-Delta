@@ -60,13 +60,13 @@
  */
 FRIBIDI_ENTRY void fribidi_shape (
   FriBidiFlags flags, /* shaping flags */
-  const FriBidiLevel *embedding_levels,	/* input list of embedding
-					   levels, as returned by
-					   fribidi_get_par_embedding_levels */
-  const FriBidiStrIndex len,	/* input string length */
+  const FriBidiLevel *embedding_levels, /* input list of embedding
+                                           levels, as returned by
+                                           fribidi_get_par_embedding_levels */
+  const FriBidiStrIndex len,    /* input string length */
   FriBidiArabicProp *ar_props, /* input/output Arabic properties as
-				       * computed by fribidi_join_arabic */
-  FriBidiChar *str		/* string to shape */
+                                       * computed by fribidi_join_arabic */
+  FriBidiChar *str              /* string to shape */
 );
 
 

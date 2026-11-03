@@ -136,26 +136,26 @@ typedef enum tagPhysicalConnectorType { PhysConn_Video_Tuner = 1,
 } PhysicalConnectorType;
 
 typedef struct VIDEO_STREAM_CONFIG_CAPS {
-    GUID guid;			// will be MEDIATYPE_Video
-    ULONG VideoStandard;	// logical OR of all AnalogVideoStandards
+    GUID guid;                  // will be MEDIATYPE_Video
+    ULONG VideoStandard;        // logical OR of all AnalogVideoStandards
     // supported
-    SIZE InputSize;		// the inherent size of the incoming signal
+    SIZE InputSize;             // the inherent size of the incoming signal
     // (every pixel unique)
-    SIZE MinCroppingSize;	// smallest rcSrc cropping rect allowed
-    SIZE MaxCroppingSize;	// largest rcSrc cropping rect allowed
-    int CropGranularityX;	// granularity of cropping size
+    SIZE MinCroppingSize;       // smallest rcSrc cropping rect allowed
+    SIZE MaxCroppingSize;       // largest rcSrc cropping rect allowed
+    int CropGranularityX;       // granularity of cropping size
     int CropGranularityY;
-    int CropAlignX;		// alignment of cropping rect
+    int CropAlignX;             // alignment of cropping rect
     int CropAlignY;
-    SIZE MinOutputSize;		// smallest bitmap stream can produce
-    SIZE MaxOutputSize;		// largest  bitmap stream can produce
-    int OutputGranularityX;	// granularity of output bitmap size
+    SIZE MinOutputSize;         // smallest bitmap stream can produce
+    SIZE MaxOutputSize;         // largest  bitmap stream can produce
+    int OutputGranularityX;     // granularity of output bitmap size
     int OutputGranularityY;
-    int StretchTapsX;		// 0, no stretch, 1 pix dup, 2 interp, ...
-    int StretchTapsY;		//    Describes quality of hardware scaler
-    int ShrinkTapsX;		//
-    int ShrinkTapsY;		//
-    LONGLONG MinFrameInterval;	// 100 nS units
+    int StretchTapsX;           // 0, no stretch, 1 pix dup, 2 interp, ...
+    int StretchTapsY;           //    Describes quality of hardware scaler
+    int ShrinkTapsX;            //
+    int ShrinkTapsY;            //
+    LONGLONG MinFrameInterval;  // 100 nS units
     LONGLONG MaxFrameInterval;
     LONG MinBitsPerSecond;
     LONG MaxBitsPerSecond;
@@ -196,30 +196,30 @@ typedef KSIDENTIFIER KSPROPERTY;
 
 typedef struct {
     KSPROPERTY Property;
-    ULONG Mode;			// IN: KSPROPERTY_TUNER_MODE
-    ULONG StandardsSupported;	// KS_AnalogVideo_* (if TV or DSS)
-    ULONG MinFrequency;		// Hz
-    ULONG MaxFrequency;		// Hz
-    ULONG TuningGranularity;	// Hz
-    ULONG NumberOfInputs;	// count of inputs
-    ULONG SettlingTime;		// milliSeconds
-    ULONG Strategy;		// KS_TUNER_STRATEGY
+    ULONG Mode;                 // IN: KSPROPERTY_TUNER_MODE
+    ULONG StandardsSupported;   // KS_AnalogVideo_* (if TV or DSS)
+    ULONG MinFrequency;         // Hz
+    ULONG MaxFrequency;         // Hz
+    ULONG TuningGranularity;    // Hz
+    ULONG NumberOfInputs;       // count of inputs
+    ULONG SettlingTime;         // milliSeconds
+    ULONG Strategy;             // KS_TUNER_STRATEGY
 } KSPROPERTY_TUNER_MODE_CAPS_S, *PKSPROPERTY_TUNER_MODE_CAPS_S;
 
 typedef struct {
     KSPROPERTY Property;
-    ULONG Mode;			// IN: KSPROPERTY_TUNER_MODE
+    ULONG Mode;                 // IN: KSPROPERTY_TUNER_MODE
 } KSPROPERTY_TUNER_MODE_S, *PKSPROPERTY_TUNER_MODE_S;
 
 typedef struct {
     KSPROPERTY Property;
-    ULONG Frequency;		// Hz
-    ULONG LastFrequency;	// Hz (last known good)
-    ULONG TuningFlags;		// KS_TUNER_TUNING_FLAGS
-    ULONG VideoSubChannel;	// DSS
-    ULONG AudioSubChannel;	// DSS
-    ULONG Channel;		// VBI decoders
-    ULONG Country;		// VBI decoders
+    ULONG Frequency;            // Hz
+    ULONG LastFrequency;        // Hz (last known good)
+    ULONG TuningFlags;          // KS_TUNER_TUNING_FLAGS
+    ULONG VideoSubChannel;      // DSS
+    ULONG AudioSubChannel;      // DSS
+    ULONG Channel;              // VBI decoders
+    ULONG Country;              // VBI decoders
 } KSPROPERTY_TUNER_FREQUENCY_S, *PKSPROPERTY_TUNER_FREQUENCY_S;
 typedef struct {
     KSPROPERTY Property;
@@ -229,25 +229,25 @@ typedef struct {
     ULONG Busy;
 } KSPROPERTY_TUNER_STATUS_S, *PKSPROPERTY_TUNER_STATUS_S;
 typedef enum {
-    KS_TUNER_TUNING_EXACT = 1,	// No fine tuning
-    KS_TUNER_TUNING_FINE,	// Fine grained search
-    KS_TUNER_TUNING_COARSE,	// Coarse search
+    KS_TUNER_TUNING_EXACT = 1,  // No fine tuning
+    KS_TUNER_TUNING_FINE,       // Fine grained search
+    KS_TUNER_TUNING_COARSE,     // Coarse search
 } KS_TUNER_TUNING_FLAGS;
 
 typedef enum {
-    KSPROPERTY_TUNER_CAPS,	// R  -overall device capabilities
-    KSPROPERTY_TUNER_MODE_CAPS,	// R  -capabilities in this mode
-    KSPROPERTY_TUNER_MODE,	// RW -set a mode (TV, FM, AM, DSS)
-    KSPROPERTY_TUNER_STANDARD,	// R  -get TV standard (only if TV mode)
-    KSPROPERTY_TUNER_FREQUENCY,	// RW -set/get frequency
-    KSPROPERTY_TUNER_INPUT,	// RW -select an input
-    KSPROPERTY_TUNER_STATUS,	// R  -tuning status
-    KSPROPERTY_TUNER_IF_MEDIUM	// R O-Medium for IF or Transport Pin
+    KSPROPERTY_TUNER_CAPS,      // R  -overall device capabilities
+    KSPROPERTY_TUNER_MODE_CAPS, // R  -capabilities in this mode
+    KSPROPERTY_TUNER_MODE,      // RW -set a mode (TV, FM, AM, DSS)
+    KSPROPERTY_TUNER_STANDARD,  // R  -get TV standard (only if TV mode)
+    KSPROPERTY_TUNER_FREQUENCY, // RW -set/get frequency
+    KSPROPERTY_TUNER_INPUT,     // RW -select an input
+    KSPROPERTY_TUNER_STATUS,    // R  -tuning status
+    KSPROPERTY_TUNER_IF_MEDIUM  // R O-Medium for IF or Transport Pin
 } KSPROPERTY_TUNER;
 typedef enum {
-    KS_TUNER_STRATEGY_PLL = 0X01,	// Tune by PLL offset
-    KS_TUNER_STRATEGY_SIGNAL_STRENGTH = 0X02,	// Tune by signal strength
-    KS_TUNER_STRATEGY_DRIVER_TUNES = 0X04,	// Driver does fine tuning
+    KS_TUNER_STRATEGY_PLL = 0X01,       // Tune by PLL offset
+    KS_TUNER_STRATEGY_SIGNAL_STRENGTH = 0X02,   // Tune by signal strength
+    KS_TUNER_STRATEGY_DRIVER_TUNES = 0X04,      // Driver does fine tuning
 } KS_TUNER_STRATEGY;
 typedef enum tagTVAudioMode {
     AMTVAUDIO_MODE_MONO = 0x0001,
@@ -312,7 +312,7 @@ DECLARE_INTERFACE(IBaseFilter)
     STDMETHOD(FindPin) (THIS_ const unsigned short *, LPPIN *);
     STDMETHOD(QueryFilterInfo) (THIS_ void *);
     STDMETHOD(JoinFilterGraph) (THIS_ LPFILTERGRAPH,
-				const unsigned short *);
+                                const unsigned short *);
     STDMETHOD(QueryVendorInfo) (THIS_ unsigned short **);
 };
 
@@ -337,9 +337,9 @@ DECLARE_INTERFACE(IAMTVTuner)
     STDMETHOD(get_Mode) (THIS_ AMTunerModeType *);
     STDMETHOD(GetAvailableModes) (THIS_ long *);
     STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION,
-					     long);
+                                             long);
     STDMETHOD(UnRegisterNotificationCallBack) (THIS_
-					       LPAMTUNERNOTIFICATION);
+                                               LPAMTUNERNOTIFICATION);
     STDMETHOD(get_AvailableTVFormats) (THIS_ long *);
     STDMETHOD(get_TVFormat) (THIS_ long *);
     STDMETHOD(AutoTune) (THIS_ long, long *);
@@ -363,9 +363,9 @@ DECLARE_INTERFACE(IMediaControl)
     STDMETHOD(GetTypeInfoCount) (THIS_ UINT *);
     STDMETHOD(GetTypeInfo) (THIS_ UINT, LCID, LPTYPEINFO *);
     STDMETHOD(GetIDsOfNames) (THIS_ REFIID, LPOLESTR *, UINT, LCID,
-			      DISPID *);
+                              DISPID *);
     STDMETHOD(Invoke) (THIS_ DISPID, REFIID, LCID, WORD, LPDISPPARAMS,
-		       VARIANT *, EXCEPINFO *, UINT *);
+                       VARIANT *, EXCEPINFO *, UINT *);
     STDMETHOD(Run) (THIS);
     STDMETHOD(Pause) (THIS);
     STDMETHOD(Stop) (THIS);
@@ -412,19 +412,19 @@ DECLARE_INTERFACE(ICaptureGraphBuilder2)
     STDMETHOD(SetFiltergraph) (THIS_ IGraphBuilder *);
     STDMETHOD(GetFiltergraph) (THIS_ IGraphBuilder **);
     STDMETHOD(SetOutputFileName) (THIS_ const GUID *, LPCOLESTR,
-				  IBaseFilter **, LPFILESINKFILTER *);
+                                  IBaseFilter **, LPFILESINKFILTER *);
     STDMETHOD(FindInterface) (THIS_ const GUID *, const GUID *,
-			      IBaseFilter *, REFIID, void **);
+                              IBaseFilter *, REFIID, void **);
     STDMETHOD(RenderStream) (THIS_ const GUID *, const GUID *, IUnknown *,
-			     IBaseFilter *, IBaseFilter *);
+                             IBaseFilter *, IBaseFilter *);
     STDMETHOD(ControlStream) (THIS_ const GUID *, const GUID *,
-			      IBaseFilter *, REFERENCE_TIME *,
-			      REFERENCE_TIME *, WORD, WORD);
+                              IBaseFilter *, REFERENCE_TIME *,
+                              REFERENCE_TIME *, WORD, WORD);
     STDMETHOD(AllocCapFile) (THIS_ LPCOLESTR, DWORDLONG);
     STDMETHOD(CopyCaptureFile) (THIS_ LPOLESTR, LPOLESTR, int,
-				LPAMCOPYCAPTUREFILEPROGRESS);
+                                LPAMCOPYCAPTUREFILEPROGRESS);
     STDMETHOD(FindPin) (THIS_ IUnknown *, PIN_DIRECTION, const GUID *,
-			const GUID *, BOOL, int, IPin **);
+                        const GUID *, BOOL, int, IPin **);
 };
 
 #undef INTERFACE
@@ -435,7 +435,7 @@ DECLARE_INTERFACE(ICreateDevEnum)
     STDMETHOD_(long, AddRef) (THIS);
     STDMETHOD_(long, Release) (THIS);
     STDMETHOD(CreateClassEnumerator) (THIS_ REFCLSID, IEnumMoniker **,
-				      DWORD);
+                                      DWORD);
 };
 
 #undef INTERFACE
@@ -533,9 +533,9 @@ DECLARE_INTERFACE(IAMTVAudio)
     STDMETHOD(get_TVAudioMode) (THIS_ long *);
     STDMETHOD(put_TVAudioMode) (THIS_ long);
     STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION,
-					     long);
+                                             long);
     STDMETHOD(UnRegisterNotificationCallBack) (THIS_
-					       LPAMTUNERNOTIFICATION);
+                                               LPAMTUNERNOTIFICATION);
 };
 
 
@@ -725,4 +725,4 @@ DECLARE_ENUMERATOR_(IEnumMediaTypes, AM_MEDIA_TYPE *);
 #define OLE_RELEASE_SAFE(p) if(p){ OLE_CALL((IUnknown*)p,Release); p=NULL;}
 #define OLE_QUERYINTERFACE(p,iface,ptr) OLE_CALL_ARGS((IUnknown*)p,QueryInterface,&iface,(void*)&ptr)
 
-#endif	/* MPLAYER_TVI_DSHOW_H */
+#endif  /* MPLAYER_TVI_DSHOW_H */

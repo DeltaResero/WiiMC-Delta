@@ -40,18 +40,18 @@
 #include <fribidi-unicode.h>
 
 /* The following are proposed extensions to ISO8859-8. */
-#define ISO_8859_8_LRM		0xFD
-#define ISO_8859_8_RLM		0xFE
-#define ISO_8859_8_LRE		0xFB
-#define ISO_8859_8_RLE		0xFC
-#define ISO_8859_8_PDF		0xDD
-#define ISO_8859_8_LRO		0xDB
-#define ISO_8859_8_RLO		0xDC
-#define ISO_ALEF		0xE0
-#define ISO_TAV			0xFA
+#define ISO_8859_8_LRM          0xFD
+#define ISO_8859_8_RLM          0xFE
+#define ISO_8859_8_LRE          0xFB
+#define ISO_8859_8_RLE          0xFC
+#define ISO_8859_8_PDF          0xDD
+#define ISO_8859_8_LRO          0xDB
+#define ISO_8859_8_RLO          0xDC
+#define ISO_ALEF                0xE0
+#define ISO_TAV                 0xFA
 
-#define UNI_ALEF		0x05D0
-#define UNI_TAV			0x05EA
+#define UNI_ALEF                0x05D0
+#define UNI_TAV                 0x05EA
 
 FriBidiChar
 fribidi_iso8859_8_to_unicode_c (

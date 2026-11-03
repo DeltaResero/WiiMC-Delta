@@ -251,13 +251,13 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
     }
 
     if (!desc->stream[i]->mlti_data) {
-	len = 0;
-	buf = xbuffer_free(buf);
+        len = 0;
+        buf = xbuffer_free(buf);
     } else
     len=select_mlti_data(desc->stream[i]->mlti_data, desc->stream[i]->mlti_data_size, rulematches[0], &buf);
 
     header->streams[i]=rmff_new_mdpr(
-	desc->stream[i]->stream_id,
+        desc->stream[i]->stream_id,
         desc->stream[i]->max_bit_rate,
         desc->stream[i]->avg_bit_rate,
         desc->stream[i]->max_packet_size,
@@ -267,8 +267,8 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
         desc->stream[i]->duration,
         desc->stream[i]->stream_name,
         desc->stream[i]->mime_type,
-	len,
-	buf);
+        len,
+        buf);
 
     duration=FFMAX(duration,desc->stream[i]->duration);
     max_bit_rate+=desc->stream[i]->max_bit_rate;
@@ -411,8 +411,8 @@ static int convert_timestamp(char *str, int *sec, int *msec) {
     if (sscanf(str, "%d:%d.%d", &mm, &ss, &ms) < 2) {
       mm = 0;
       if (sscanf(str, "%d.%d", &ss, &ms) < 1) {
-	ss = 0;
-	ms = 0;
+        ss = 0;
+        ms = 0;
       }
     }
   }

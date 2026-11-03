@@ -40,10 +40,10 @@
 
 static const ao_info_t info =
 {
-	"DXR2 audio output",
-	"dxr2",
-	"Tobias Diedrich <ranma+mplayer@tdiedrich.de>",
-	""
+        "DXR2 audio output",
+        "dxr2",
+        "Tobias Diedrich <ranma+mplayer@tdiedrich.de>",
+        ""
 };
 
 LIBAO_EXTERN(dxr2)
@@ -72,11 +72,11 @@ static int control(int cmd,void *arg){
       if(v.arg > 19) v.arg = 19;
       if(v.arg < 0) v.arg = 0;
       if(v.arg != volume) {
-	volume = v.arg;
-	if( ioctl(dxr2_fd,DXR2_IOC_SET_AUDIO_VOLUME,&v) < 0) {
-	  mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_DXR2_SetVolFailed,volume);
-	  return CONTROL_ERROR;
-	}
+        volume = v.arg;
+        if( ioctl(dxr2_fd,DXR2_IOC_SET_AUDIO_VOLUME,&v) < 0) {
+          mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_DXR2_SetVolFailed,volume);
+          return CONTROL_ERROR;
+        }
       }
       return CONTROL_OK;
     }
@@ -92,55 +92,55 @@ static int freq_id=0;
 // return: 1=success 0=fail
 static int init(int rate,int channels,int format,int flags){
 
-	if(dxr2_fd <= 0)
-	  return 0;
+        if(dxr2_fd <= 0)
+          return 0;
 
         last_freq_id = -1;
 
-	ao_data.outburst=2048;
-	ao_data.samplerate=rate;
-	ao_data.channels=channels;
-	ao_data.buffersize=2048;
-	ao_data.bps=rate*4;
-	ao_data.format=format;
-	freq=rate;
+        ao_data.outburst=2048;
+        ao_data.samplerate=rate;
+        ao_data.channels=channels;
+        ao_data.buffersize=2048;
+        ao_data.bps=rate*4;
+        ao_data.format=format;
+        freq=rate;
 
-	switch(rate){
-	case 48000:
-		freq_id=DXR2_AUDIO_FREQ_48;
-		break;
-	case 96000:
-		freq_id=DXR2_AUDIO_FREQ_96;
-		break;
-	case 44100:
-		freq_id=DXR2_AUDIO_FREQ_441;
-		break;
-	case 32000:
-		freq_id=DXR2_AUDIO_FREQ_32;
-		break;
-	case 22050:
-		freq_id=DXR2_AUDIO_FREQ_2205;
-		break;
+        switch(rate){
+        case 48000:
+                freq_id=DXR2_AUDIO_FREQ_48;
+                break;
+        case 96000:
+                freq_id=DXR2_AUDIO_FREQ_96;
+                break;
+        case 44100:
+                freq_id=DXR2_AUDIO_FREQ_441;
+                break;
+        case 32000:
+                freq_id=DXR2_AUDIO_FREQ_32;
+                break;
+        case 22050:
+                freq_id=DXR2_AUDIO_FREQ_2205;
+                break;
 #ifdef DXR2_AUDIO_FREQ_24
-	// This is not yet in the dxr2 driver CVS
-	// you can get the patch at
-	// http://www.tdiedrich.de/~ranma/patches/dxr2.pcm1723.20020513
-	case 24000:
-		freq_id=DXR2_AUDIO_FREQ_24;
-		break;
-	case 64000:
-		freq_id=DXR2_AUDIO_FREQ_64;
-		break;
-	case 88200:
-		freq_id=DXR2_AUDIO_FREQ_882;
-		break;
+        // This is not yet in the dxr2 driver CVS
+        // you can get the patch at
+        // http://www.tdiedrich.de/~ranma/patches/dxr2.pcm1723.20020513
+        case 24000:
+                freq_id=DXR2_AUDIO_FREQ_24;
+                break;
+        case 64000:
+                freq_id=DXR2_AUDIO_FREQ_64;
+                break;
+        case 88200:
+                freq_id=DXR2_AUDIO_FREQ_882;
+                break;
 #endif
-	default:
-		mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_DXR2_UnsupSamplerate,rate);
-		return 0;
-	}
+        default:
+                mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_DXR2_UnsupSamplerate,rate);
+                return 0;
+        }
 
-	return 1;
+        return 1;
 }
 
 // close audio device
@@ -202,13 +202,13 @@ static int play(void* data,int len,int flags){
     else if(AF_FORMAT_IS_AC3(ao_data.format))
       send_mpeg_ps_packet (data, len, 0x80, ao_data.pts, 2, write_dxr2);
     else {
-	int i;
-	//unsigned short *s=data;
-	uint16_t *s=data;
+        int i;
+        //unsigned short *s=data;
+        uint16_t *s=data;
 #if !HAVE_BIGENDIAN
-	for(i=0;i<len/2;i++) s[i] = bswap_16(s[i]);
+        for(i=0;i<len/2;i++) s[i] = bswap_16(s[i]);
 #endif
-	dxr2_send_lpcm_packet(data,len,0xA0,ao_data.pts-10000,freq_id);
+        dxr2_send_lpcm_packet(data,len,0xA0,ao_data.pts-10000,freq_id);
     }
     return len;
 }

@@ -69,7 +69,7 @@ private:
 
   inline static Point PerPixel(Point p, PerPixelContext &context)
   {
-	  return currentPipe->PerPixel(p,context);
+          return currentPipe->PerPixel(p,context);
   }
 
   void rescale_per_pixel_matrices();

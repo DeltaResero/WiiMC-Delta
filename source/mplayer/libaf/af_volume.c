@@ -48,13 +48,13 @@
 // Data for specific instances of this filter
 typedef struct af_volume_s
 {
-  int   enable[AF_NCH];		// Enable/disable / channel
-  float	pow[AF_NCH];		// Estimated power level [dB]
-  float	max[AF_NCH];		// Max Power level [dB]
-  float level[AF_NCH];		// Gain level for each channel
-  float time;			// Forgetting factor for power estimate
-  int soft;			// Enable/disable soft clipping
-  int fast;			// Use fix-point volume control
+  int   enable[AF_NCH];         // Enable/disable / channel
+  float pow[AF_NCH];            // Estimated power level [dB]
+  float max[AF_NCH];            // Max Power level [dB]
+  float level[AF_NCH];          // Gain level for each channel
+  float time;                   // Forgetting factor for power estimate
+  int soft;                     // Enable/disable soft clipping
+  int fast;                     // Use fix-point volume control
 }af_volume_t;
 
 // Initialization and runtime control
@@ -121,9 +121,9 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     int i;
     if(!s->fast){
       for(i=0;i<AF_NCH;i++)
-	m=max(m,s->max[i]);
-	af_to_dB(1, &m, &m, 10.0);
-	mp_msg(MSGT_AFILTER, MSGL_INFO, "[volume] The maximum volume was %0.2fdB \n", m);
+        m=max(m,s->max[i]);
+        af_to_dB(1, &m, &m, 10.0);
+        mp_msg(MSGT_AFILTER, MSGL_INFO, "[volume] The maximum volume was %0.2fdB \n", m);
     }
     return AF_OK;
   }
@@ -141,57 +141,57 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*    c   = data;			// Current working data
-  af_volume_t*  s   = (af_volume_t*)af->setup; 	// Setup for this instance
-  int           ch  = 0;			// Channel counter
-  register int	nch = c->nch;			// Number of channels
+  af_data_t*    c   = data;                     // Current working data
+  af_volume_t*  s   = (af_volume_t*)af->setup;  // Setup for this instance
+  int           ch  = 0;                        // Channel counter
+  register int  nch = c->nch;                   // Number of channels
   register int  i   = 0;
 
   // Basic operation volume control only (used on slow machines)
   if(af->data->format == (AF_FORMAT_S16_NE)){
-    int16_t*    a   = (int16_t*)c->audio;	// Audio data
-    int         len = c->len/2;			// Number of samples
+    int16_t*    a   = (int16_t*)c->audio;       // Audio data
+    int         len = c->len/2;                 // Number of samples
     for(ch = 0; ch < nch ; ch++){
       if(s->enable[ch]){
-	register int vol = (int)(255.0 * s->level[ch]);
-	for(i=ch;i<len;i+=nch){
-	  register int x = (a[i] * vol) >> 8;
-	  a[i]=clamp(x,SHRT_MIN,SHRT_MAX);
-	}
+        register int vol = (int)(255.0 * s->level[ch]);
+        for(i=ch;i<len;i+=nch){
+          register int x = (a[i] * vol) >> 8;
+          a[i]=clamp(x,SHRT_MIN,SHRT_MAX);
+        }
       }
     }
   }
   // Machine is fast and data is floating point
   else if(af->data->format == (AF_FORMAT_FLOAT_NE)){
-    float*   	a   	= (float*)c->audio;	// Audio data
-    int       	len 	= c->len/4;		// Number of samples
+    float*      a       = (float*)c->audio;     // Audio data
+    int         len     = c->len/4;             // Number of samples
     for(ch = 0; ch < nch ; ch++){
       // Volume control (fader)
       if(s->enable[ch]){
-	float	t   = 1.0 - s->time;
-	for(i=ch;i<len;i+=nch){
-	  register float x 	= a[i];
-	  register float pow 	= x*x;
-	  // Check maximum power value
-	  if(pow > s->max[ch])
-	    s->max[ch] = pow;
-	  // Set volume
-	  x *= s->level[ch];
-	  // Peak meter
-	  pow 	= x*x;
-	  if(pow > s->pow[ch])
-	    s->pow[ch] = pow;
-	  else
-	    s->pow[ch] = t*s->pow[ch] + pow*s->time; // LP filter
-	  /* Soft clipping, the sound of a dream, thanks to Jon Wattes
-	     post to Musicdsp.org */
-	  if(s->soft)
-	    x=af_softclip(x);
-	  // Hard clipping
-	  else
-	    x=clamp(x,-1.0,1.0);
-	  a[i] = x;
-	}
+        float   t   = 1.0 - s->time;
+        for(i=ch;i<len;i+=nch){
+          register float x      = a[i];
+          register float pow    = x*x;
+          // Check maximum power value
+          if(pow > s->max[ch])
+            s->max[ch] = pow;
+          // Set volume
+          x *= s->level[ch];
+          // Peak meter
+          pow   = x*x;
+          if(pow > s->pow[ch])
+            s->pow[ch] = pow;
+          else
+            s->pow[ch] = t*s->pow[ch] + pow*s->time; // LP filter
+          /* Soft clipping, the sound of a dream, thanks to Jon Wattes
+             post to Musicdsp.org */
+          if(s->soft)
+            x=af_softclip(x);
+          // Hard clipping
+          else
+            x=clamp(x,-1.0,1.0);
+          a[i] = x;
+        }
       }
     }
   }

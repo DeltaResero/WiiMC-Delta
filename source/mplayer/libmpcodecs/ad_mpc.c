@@ -35,11 +35,11 @@
 
 static const ad_info_t info =
 {
-	"Musepack audio decoder",
-	"mpcdec",
-	"Reza Jelveh and Reimar Döffinger",
-	"",
-	""
+        "Musepack audio decoder",
+        "mpcdec",
+        "Reza Jelveh and Reimar Döffinger",
+        "",
+        ""
 };
 
 LIBAD_EXTERN(libmusepack)

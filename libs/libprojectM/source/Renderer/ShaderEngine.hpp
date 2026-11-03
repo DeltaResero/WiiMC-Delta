@@ -82,17 +82,17 @@ class ShaderEngine
 
 #endif
 public:
-	ShaderEngine();
-	virtual ~ShaderEngine();
+        ShaderEngine();
+        virtual ~ShaderEngine();
 #ifdef USE_CG
     void RenderBlurTextures(const Pipeline  &pipeline, const PipelineContext &pipelineContext, const int texsize);
-	void loadShader(Shader &shader);
+        void loadShader(Shader &shader);
 
-	void setParams(const int texsize, const unsigned int texId, const float aspect, BeatDetect *beatDetect, TextureManager *textureManager);
-	void enableShader(Shader &shader, const Pipeline &pipeline, const PipelineContext &pipelineContext);
-	void disableShader();
-	void reset();
-	void setAspect(float aspect);
+        void setParams(const int texsize, const unsigned int texId, const float aspect, BeatDetect *beatDetect, TextureManager *textureManager);
+        void enableShader(Shader &shader, const Pipeline &pipeline, const PipelineContext &pipelineContext);
+        void disableShader();
+        void reset();
+        void setAspect(float aspect);
     std::string profileName;
 
 #endif

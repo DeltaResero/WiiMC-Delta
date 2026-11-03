@@ -65,21 +65,21 @@ static int             tyOSDUpdate = 0;
 
 static void ty_DrawOSD(void)
 {
-	// printf( "Calling ty_DrawOSD()\n" );
-	tyOSDUpdate = 1;
+        // printf( "Calling ty_DrawOSD()\n" );
+        tyOSDUpdate = 1;
 }
 
 void ty_ClearOSD( int start )
 {
-	int index;
-	// printf( "Calling ty_ClearOSD()\n" );
+        int index;
+        // printf( "Calling ty_ClearOSD()\n" );
    for ( index = start ; index < SUB_MAX_TEXT ; index++ )
-	{
-		memset( ty_OSD1.text[ index ], ' ', TY_CC_MAX_X - 1 );
-		ty_OSD1.text[ index ][ TY_CC_MAX_X - 1 ] = 0;
-		memset( ty_OSD2.text[ index ], ' ', TY_CC_MAX_X - 1 );
-		ty_OSD2.text[ index ][ TY_CC_MAX_X - 1 ] = 0;
-	}
+        {
+                memset( ty_OSD1.text[ index ], ' ', TY_CC_MAX_X - 1 );
+                ty_OSD1.text[ index ][ TY_CC_MAX_X - 1 ] = 0;
+                memset( ty_OSD2.text[ index ], ' ', TY_CC_MAX_X - 1 );
+                ty_OSD2.text[ index ][ TY_CC_MAX_X - 1 ] = 0;
+        }
 }
 
 static void ty_DrawChar( int *x, int *y, char disChar, int fgColor, int bgColor )
@@ -90,58 +90,58 @@ static void ty_DrawChar( int *x, int *y, char disChar, int fgColor, int bgColor 
    cx = *x;
    cy = *y;
 
-	if ( *x >= ( TY_CC_MAX_X - 1 ) )
-	{
+        if ( *x >= ( TY_CC_MAX_X - 1 ) )
+        {
       cx = 0;
-	}
-	if ( ( *y + TY_CC_Y_Offset ) > SUB_MAX_TEXT )
-	{
-	   cy = SUB_MAX_TEXT - TY_CC_Y_Offset - 1;
+        }
+        if ( ( *y + TY_CC_Y_Offset ) > SUB_MAX_TEXT )
+        {
+           cy = SUB_MAX_TEXT - TY_CC_Y_Offset - 1;
    }
 
-	// printf( "Calling ty_DrawChar() x:%d y:%d %c fg:%d bg:%d\n",
-	// 	cx, cy, disChar, fgColor, bgColor );
+        // printf( "Calling ty_DrawChar() x:%d y:%d %c fg:%d bg:%d\n",
+        //      cx, cy, disChar, fgColor, bgColor );
 
    ty_OSD1.text[ TY_CC_Y_Offset + cy ][ cx ] = disChar;
    memset( &( ty_OSD1.text[ TY_CC_Y_Offset + cy ][ cx + 1 ] ), ' ',
       TY_CC_MAX_X - cx - 2 );
-	( *x )++;
+        ( *x )++;
 }
 
 static void ty_RollupBuf( int dest, int source, int numLines )
 {
-	int index;
+        int index;
 
-	// printf( "Calling ty_RollupBuf() dest:%d source %d, numLines %d\n",
-	//    dest, source, numLines );
-	//
-	if ( ( source + TY_CC_Y_Offset + numLines ) > SUB_MAX_TEXT )
-	{
+        // printf( "Calling ty_RollupBuf() dest:%d source %d, numLines %d\n",
+        //    dest, source, numLines );
+        //
+        if ( ( source + TY_CC_Y_Offset + numLines ) > SUB_MAX_TEXT )
+        {
       ty_ClearOSD( 1 );
-		return;
-	}
+                return;
+        }
 
-	if ( ( source + TY_CC_Y_Offset + numLines ) < 0 )
-	{
+        if ( ( source + TY_CC_Y_Offset + numLines ) < 0 )
+        {
       ty_ClearOSD( 1 );
-		return;
-	}
+                return;
+        }
 
-	if ( numLines > SUB_MAX_TEXT )
-	{
+        if ( numLines > SUB_MAX_TEXT )
+        {
       ty_ClearOSD( 1 );
-		return;
-	}
+                return;
+        }
 
-	for ( index = 0 ; index < numLines ; index++ )
-	{
-		strcpy( ty_OSD1.text[ TY_CC_Y_Offset + dest ],
-			ty_OSD1.text[ TY_CC_Y_Offset + source ] );
-	   dest++;
-		source++;
-	}
-	memset( ty_OSD1.text[ TY_CC_Y_Offset + source - 1 ], ' ', TY_CC_MAX_X - 1 );
-	ty_OSD1.text[ TY_CC_Y_Offset + source - 1 ][ TY_CC_MAX_X - 1 ] = 0;
+        for ( index = 0 ; index < numLines ; index++ )
+        {
+                strcpy( ty_OSD1.text[ TY_CC_Y_Offset + dest ],
+                        ty_OSD1.text[ TY_CC_Y_Offset + source ] );
+           dest++;
+                source++;
+        }
+        memset( ty_OSD1.text[ TY_CC_Y_Offset + source - 1 ], ' ', TY_CC_MAX_X - 1 );
+        ty_OSD1.text[ TY_CC_Y_Offset + source - 1 ][ TY_CC_MAX_X - 1 ] = 0;
 }
 
 static void ty_drawchar( char c )
@@ -234,19 +234,19 @@ static int ty_CCdecode( char b1, char b2 )
       {
          TY_CC_CUR_Y = CC_row[ ( ( b1 << 1 ) & 14 ) | ( ( b2 >> 5 ) & 1 ) ];
 
-			// Offset into MPlayer's Buffer
-			if ( ( TY_CC_CUR_Y >= 1 ) && ( TY_CC_CUR_Y <= 4 ) )
-			{
-				TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 1;
-			}
-			if ( ( TY_CC_CUR_Y >= 5 ) && ( TY_CC_CUR_Y <= 10 ) )
-			{
-				TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 5;
-			}
-			if ( ( TY_CC_CUR_Y >= 12 ) && ( TY_CC_CUR_Y <= 15 ) )
-			{
-				TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 12;
-			}
+                        // Offset into MPlayer's Buffer
+                        if ( ( TY_CC_CUR_Y >= 1 ) && ( TY_CC_CUR_Y <= 4 ) )
+                        {
+                                TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 1;
+                        }
+                        if ( ( TY_CC_CUR_Y >= 5 ) && ( TY_CC_CUR_Y <= 10 ) )
+                        {
+                                TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 5;
+                        }
+                        if ( ( TY_CC_CUR_Y >= 12 ) && ( TY_CC_CUR_Y <= 15 ) )
+                        {
+                                TY_CC_Y_Offset = SUB_MAX_TEXT - 5 - 12;
+                        }
 
          if ( TY_OSD_debug > 3 )
             mp_msg( MSGT_DEMUX, MSGL_DBG3, "<< preamble %d >>\n", TY_CC_CUR_Y );
@@ -280,13 +280,13 @@ static int ty_CCdecode( char b1, char b2 )
          switch (b1 & 0x07)
          {
             case 0x00:                      // attribute
-				{
+                                {
                if ( TY_OSD_debug > 1 )
                   mp_msg( MSGT_DEMUX, MSGL_DBG3, "<<A: %d>>\n", b2 );
                break;
-				}
+                                }
             case 0x01:                      // midrow or char
-				{
+                                {
                switch (b2 & 0x70)
                {
                   case 0x20:                // midrow attribute change
@@ -339,11 +339,11 @@ static int ty_CCdecode( char b1, char b2 )
                   }
                }
                break;
-				}
+                                }
 
             case 0x04:                      // misc
             case 0x05:                      // misc + F
-				{
+                                {
                if ( TY_OSD_debug > 3 )
                   mp_msg( MSGT_DEMUX, MSGL_DBG3, "<< misc %02x >>\n", b2 );
                switch ( b2 )
@@ -352,7 +352,7 @@ static int ty_CCdecode( char b1, char b2 )
                   {
                      if ( TY_OSD_flags & TY_OSD_MODE &&
                         TY_CC_stat != TY_CCPOPUP )
-								ty_ClearOSD( 1 );
+                                                                ty_ClearOSD( 1 );
                      TY_CC_stat = TY_CCPOPUP;
                      break;
                   }
@@ -453,7 +453,7 @@ static int ty_CCdecode( char b1, char b2 )
                   }
                }
                break;
-				}
+                                }
             case 0x07:                      // misc (TAB)
             {
                for ( x = 0 ; x < ( b2 - 0x20 ) ; x++ )
@@ -554,8 +554,8 @@ static void ty_DisplayXDSInfo(void)
       ty_XDSDisplayCount++;
       if ( ty_XDSDisplayCount >= XDS_DISPLAY_FRAMES )
       {
-		   memset( ty_OSD1.text[ 0 ], ' ', TY_CC_MAX_X - 1 );
-		      ty_OSD1.text[ 0 ][ TY_CC_MAX_X - 1 ] = 0;
+                   memset( ty_OSD1.text[ 0 ], ' ', TY_CC_MAX_X - 1 );
+                      ty_OSD1.text[ 0 ][ TY_CC_MAX_X - 1 ] = 0;
          ty_XDSDisplayCount = -1;
          tyOSDUpdate = 1;
       }
@@ -641,20 +641,20 @@ static int ty_XDSdecode( char b1, char b2 )
          // nasty hack: only print time codes if seconds are 0
          if ( TY_XDS_mode == 3 && TY_XDS_type == 1 &&
             !( TY_XDS_new[ 3 ][ 1 ][ 3 ] & 0x20 ) )
-			{
+                        {
             return 0;
-			}
+                        }
          if ( TY_XDS_mode == 0 && TY_XDS_type == 2 &&
             ( TY_XDS_new[ 0 ][ 2 ][ 4 ] & 0x3f ) > 1 )
-			{
+                        {
             return 0;
-			}
+                        }
 
          mp_msg( MSGT_DEMUX, MSGL_DBG3, "%% %s ", TY_XDS_modes[ TY_XDS_mode ] );
 
          line[ 0 ] = 0;
          // printf( "XDS Code %x\n",
-			//    ( TY_XDS_mode << 9 ) + TY_XDS_type + 0x100 );
+                        //    ( TY_XDS_mode << 9 ) + TY_XDS_type + 0x100 );
          switch ( ( TY_XDS_mode << 9 ) + TY_XDS_type + 0x100 )
          {
             // cases are specified in 2 bytes hex representing mode, type.
@@ -863,48 +863,48 @@ static int ty_XDSdecode( char b1, char b2 )
 // ===========================================================================
 void ty_processuserdata( const unsigned char* buf, int len )
 {
-	int index;
+        int index;
 
-	sub_justify = 1;
+        sub_justify = 1;
 
-	if ( subcc_enabled )
-	{
-		if ( tyOSDInitialized == 0 )
-		{
-			for ( index = 0; index < SUB_MAX_TEXT ; index++ )
-			{
-				ty_OSD1.text[ index ] = malloc( TY_CC_MAX_X );
-				ty_OSD2.text[ index ] = malloc( TY_CC_MAX_X );
-			}
-			ty_ClearOSD( 0 );
-			ty_OSD1.lines = SUB_MAX_TEXT;
-			ty_OSD2.lines = SUB_MAX_TEXT;
-			ty_pOSD1 = &ty_OSD1;
-			ty_pOSD2 = &ty_OSD2;
-			tyOSDUpdate = 0;
-			tyOSDInitialized = 1;
-		}
+        if ( subcc_enabled )
+        {
+                if ( tyOSDInitialized == 0 )
+                {
+                        for ( index = 0; index < SUB_MAX_TEXT ; index++ )
+                        {
+                                ty_OSD1.text[ index ] = malloc( TY_CC_MAX_X );
+                                ty_OSD2.text[ index ] = malloc( TY_CC_MAX_X );
+                        }
+                        ty_ClearOSD( 0 );
+                        ty_OSD1.lines = SUB_MAX_TEXT;
+                        ty_OSD2.lines = SUB_MAX_TEXT;
+                        ty_pOSD1 = &ty_OSD1;
+                        ty_pOSD2 = &ty_OSD2;
+                        tyOSDUpdate = 0;
+                        tyOSDInitialized = 1;
+                }
 
-		if ( buf[ 0 ] == 0x01 )
-		{
-			ty_CCdecode( buf[ 1 ], buf[ 2 ] );
-		}
-		if ( buf[ 0 ] == 0x02 )
-		{
-			ty_XDSdecode( buf[ 1 ], buf[ 2 ] );
-		}
+                if ( buf[ 0 ] == 0x01 )
+                {
+                        ty_CCdecode( buf[ 1 ], buf[ 2 ] );
+                }
+                if ( buf[ 0 ] == 0x02 )
+                {
+                        ty_XDSdecode( buf[ 1 ], buf[ 2 ] );
+                }
 
       ty_DisplayXDSInfo();
 
-		if ( tyOSDUpdate )
-		{
-			// for ( index = 0; index < SUB_MAX_TEXT ; index++ )
-			// {
+                if ( tyOSDUpdate )
+                {
+                        // for ( index = 0; index < SUB_MAX_TEXT ; index++ )
+                        // {
          //    printf( "OSD:%d:%s\n", index, ty_OSD1.text[ index ] );
          // }
-		   vo_sub = &ty_OSD1;
-   		vo_osd_changed( OSDTYPE_SUBTITLE );
-			tyOSDUpdate = 0;
-		}
-	}
+                   vo_sub = &ty_OSD1;
+                vo_osd_changed( OSDTYPE_SUBTITLE );
+                        tyOSDUpdate = 0;
+                }
+        }
 }

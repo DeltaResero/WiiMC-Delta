@@ -50,14 +50,14 @@
  * starting with FRIBIDI_FLAG_SHAPE_ARAB_ affect this function.
  * Currently these are:
  *
- *	* FRIBIDI_FLAG_SHAPE_MIRRORING: Do mirroring.
- *	* FRIBIDI_FLAG_SHAPE_ARAB_PRES: Shape Arabic characters to their
- *					presentation form glyphs.
- *	* FRIBIDI_FLAG_SHAPE_ARAB_LIGA: Form mandatory Arabic ligatures.
- *	* FRIBIDI_FLAG_SHAPE_ARAB_CONSOLE: Perform additional Arabic shaping
- *					   suitable for text rendered on
- *					   grid terminals with no mark
- *					   rendering capabilities.
+ *      * FRIBIDI_FLAG_SHAPE_MIRRORING: Do mirroring.
+ *      * FRIBIDI_FLAG_SHAPE_ARAB_PRES: Shape Arabic characters to their
+ *                                      presentation form glyphs.
+ *      * FRIBIDI_FLAG_SHAPE_ARAB_LIGA: Form mandatory Arabic ligatures.
+ *      * FRIBIDI_FLAG_SHAPE_ARAB_CONSOLE: Perform additional Arabic shaping
+ *                                         suitable for text rendered on
+ *                                         grid terminals with no mark
+ *                                         rendering capabilities.
  *
  * Of the above, FRIBIDI_FLAG_SHAPE_ARAB_CONSOLE is only used in special
  * cases, but the rest are recommended in any enviroment that doesn't have
@@ -68,10 +68,10 @@ FRIBIDI_ENTRY void
 fribidi_shape_arabic (
   FriBidiFlags flags, /* shaping flags */
   const FriBidiLevel *embedding_levels,
-  const FriBidiStrIndex len,	/* input string length */
+  const FriBidiStrIndex len,    /* input string length */
   FriBidiArabicProp *ar_props, /* input/output Arabic properties as
-				* computed by fribidi_join_arabic */
-  FriBidiChar *str		/* string to shape */
+                                * computed by fribidi_join_arabic */
+  FriBidiChar *str              /* string to shape */
 );
 
 #include "fribidi-enddecls.h"

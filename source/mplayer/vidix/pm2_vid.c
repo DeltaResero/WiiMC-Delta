@@ -47,9 +47,9 @@
 #define TRACE_EXIT()
 #endif
 
-#define WRITE_REG(offset,val)						\
+#define WRITE_REG(offset,val)                                           \
     *(volatile unsigned long *)(((unsigned char *)(pm2_reg_base)) + offset) = (val)
-#define READ_REG(offset)						    \
+#define READ_REG(offset)                                                    \
     *(volatile unsigned long *)(((unsigned char *)(pm2_reg_base)) + offset)
 
 static pciinfo_t pci_info;
@@ -87,7 +87,7 @@ static int find_chip(unsigned int vendor, uint32_t chip_id)
     unsigned int vci = (vendor << 16) | chip_id;
     unsigned i;
     for(i = 0; i < sizeof(pm2_card_ids)/sizeof(unsigned int); i++){
-	if(vci == pm2_card_ids[i]) return i;
+        if(vci == pm2_card_ids[i]) return i;
     }
     return -1;
 }
@@ -101,36 +101,36 @@ static int pm2_probe(int verbose, int force)
     err = pci_scan(lst,&num_pci);
     if(err)
     {
-	printf("[pm2] Error occurred during pci scan: %s\n",strerror(err));
-	return err;
+        printf("[pm2] Error occurred during pci scan: %s\n",strerror(err));
+        return err;
     }
     else
     {
-	err = ENXIO;
-	for(i=0; i < num_pci; i++)
-	{
-	    int idx;
-	    const char *dname;
-	    idx = find_chip(lst[i].vendor, lst[i].device);
-	    if(idx == -1)
-		continue;
-	    dname = pci_device_name(lst[i].vendor, lst[i].device);
-	    dname = dname ? dname : "Unknown chip";
-	    printf("[pm2] Found chip: %s\n", dname);
-	    pm2_cap.device_id = lst[i].device;
-	    err = 0;
-	    memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
-	    break;
-	}
+        err = ENXIO;
+        for(i=0; i < num_pci; i++)
+        {
+            int idx;
+            const char *dname;
+            idx = find_chip(lst[i].vendor, lst[i].device);
+            if(idx == -1)
+                continue;
+            dname = pci_device_name(lst[i].vendor, lst[i].device);
+            dname = dname ? dname : "Unknown chip";
+            printf("[pm2] Found chip: %s\n", dname);
+            pm2_cap.device_id = lst[i].device;
+            err = 0;
+            memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
+            break;
+        }
     }
     if(err && verbose) printf("[pm2] Can't find chip.\n");
     return err;
 }
 
-#define PRINT_REG(reg)							\
-{									\
-    long _foo = READ_REG(reg);						\
-    printf("[pm2] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);	\
+#define PRINT_REG(reg)                                                  \
+{                                                                       \
+    long _foo = READ_REG(reg);                                          \
+    printf("[pm2] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);      \
 }
 
 static int pm2_init(void)
@@ -139,7 +139,7 @@ static int pm2_init(void)
     pm2_reg_base = map_phys_mem(pci_info.base0, 0x10000);
     pm2_mem = map_phys_mem(pci_info.base1, 1 << 23);
     if((vm = getenv("PM2_VIDMEM"))){
-	pm2_vidmem = strtol(vm, NULL, 0);
+        pm2_vidmem = strtol(vm, NULL, 0);
     }
     return 0;
 }
@@ -160,9 +160,9 @@ static int is_supported_fourcc(uint32_t fourcc)
 {
     switch(fourcc){
     case IMGFMT_YUY2:
-	return 1;
+        return 1;
     default:
-	return 0;
+        return 0;
     }
 }
 
@@ -170,15 +170,15 @@ static int pm2_query_fourcc(vidix_fourcc_t *to)
 {
     if(is_supported_fourcc(to->fourcc))
     {
-	to->depth = VID_DEPTH_ALL;
-	to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
-	return 0;
+        to->depth = VID_DEPTH_ALL;
+        to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
+        return 0;
     }
     else  to->depth = to->flags = 0;
     return ENOSYS;
 }
 
-#define FORMAT_YUV422	((1 << 6) | 3 | (1 << 4))
+#define FORMAT_YUV422   ((1 << 6) | 3 | (1 << 4))
 
 #define PPROD(a,b,c) (a | (b << 3) | (c << 6))
 
@@ -235,10 +235,10 @@ static int pm2_config_playback(vidix_playback_t *info)
 
     switch(info->fourcc){
     case IMGFMT_YUY2:
-	format = FORMAT_YUV422;
-	break;
+        format = FORMAT_YUV422;
+        break;
     default:
-	return -1;
+        return -1;
     }
 
     src_w = info->src.w;
@@ -251,21 +251,21 @@ static int pm2_config_playback(vidix_playback_t *info)
 
     stride = 0;
     for(i = 1; i < sizeof(ppcodes) / sizeof(ppcodes[0]); i++){
-	if((!stride) && (ppcodes[i][0] >= src_w)){
-	    stride = ppcodes[i][0];
-	    ppcode = ppcodes[i][1];
-	    pitch = ppcodes[i][0] - ppcodes[i-1][0];
-	}
-	if(ppcodes[i][0] == sstr)
-	    sppc = ppcodes[i][1];
+        if((!stride) && (ppcodes[i][0] >= src_w)){
+            stride = ppcodes[i][0];
+            ppcode = ppcodes[i][1];
+            pitch = ppcodes[i][0] - ppcodes[i-1][0];
+        }
+        if(ppcodes[i][0] == sstr)
+            sppc = ppcodes[i][1];
     }
 
     if(!stride)
-	return -1;
+        return -1;
 
     info->num_frames = pm2_vidmem*1024*1024 / (stride * src_h * 2);
     if(info->num_frames > VID_PLAY_MAXFRAMES)
-	info->num_frames = VID_PLAY_MAXFRAMES;
+        info->num_frames = VID_PLAY_MAXFRAMES;
 
     /* Use end of video memory. Assume the card has 8 MB */
     base0 = (8 - pm2_vidmem)*1024*1024;
@@ -280,8 +280,8 @@ static int pm2_config_playback(vidix_playback_t *info)
     info->frame_size = stride * src_h * 2;
 
     for(i = 0; i < info->num_frames; i++){
-	info->offsets[i] = info->frame_size * i;
-	frames[i] = (base0 + info->offsets[i]) >> 1;
+        info->offsets[i] = info->frame_size * i;
+        frames[i] = (base0 + info->offsets[i]) >> 1;
     }
 
     WRITE_REG(WindowOrigin, 0);
@@ -298,7 +298,7 @@ static int pm2_config_playback(vidix_playback_t *info)
     WRITE_REG(PMTextureMapFormat, (1 << 19) | ppcode);
     WRITE_REG(PMTextureDataFormat, format);
     WRITE_REG(PMTextureReadMode, (1 << 17) | /* FilterMode */
-	      (11 << 13) | (11 << 9) /* TextureSize log2 */ | 1);
+              (11 << 13) | (11 << 9) /* TextureSize log2 */ | 1);
     WRITE_REG(ColorDDAMode, 0);
     WRITE_REG(TextureColorMode, (0 << 4) /* RGB */ | (3 << 1) /* Copy */ | 1);
     WRITE_REG(AlphaBlendMode, 0);
@@ -342,7 +342,7 @@ static int pm2_frame_select(unsigned int frame)
 {
     WRITE_REG(PMTextureBaseAddress, frames[frame]);
     WRITE_REG(Render, PrimitiveRectangle | XPositive | YPositive |
-	      TextureEnable);
+              TextureEnable);
     return 0;
 }
 

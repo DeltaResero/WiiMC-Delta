@@ -88,7 +88,7 @@ static const FriBidiChar NSMShap[][4] = {
 
 #ifndef FRIBIDI_ACCESS_SHAPE_TABLE
 # define FRIBIDI_ACCESS_SHAPE_TABLE(table,min,max,x,shape) \
-	(((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
+        (((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
 #endif
 
 #define FRIBIDI_GET_ARABIC_SHAPE_NSM(x,shape) FRIBIDI_ACCESS_SHAPE_TABLE(NSMShap, 0x064B, 0x0652, (x), (shape))

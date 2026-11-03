@@ -56,7 +56,7 @@ typedef struct mpg_demuxer {
   float first_to_final_pts_len; // difference between final pts and first pts
   int has_valid_timestamps;     // !=0 iff time stamps look linear
                                 // (not necessarily starting with 0)
-  unsigned int es_map[0x40];	//es map of stream types (associated to the pes id) from 0xb0 to 0xef
+  unsigned int es_map[0x40];    //es map of stream types (associated to the pes id) from 0xb0 to 0xef
   int num_a_streams;
   int a_stream_ids[MAX_A_STREAMS];
 } mpg_demuxer_t;
@@ -79,10 +79,10 @@ static int parse_psm(demuxer_t *demux, int len) {
     return 0;
   }
   stream_skip(demux->stream, 1);
-  prog_len = stream_read_word(demux->stream);		//length of program descriptors
-  stream_skip(demux->stream, prog_len);			//.. that we ignore
-  es_map_len = stream_read_word(demux->stream);		//length of elementary streams map
-  es_map_len = FFMIN(es_map_len, len - prog_len - 8);	//sanity check
+  prog_len = stream_read_word(demux->stream);           //length of program descriptors
+  stream_skip(demux->stream, prog_len);                 //.. that we ignore
+  es_map_len = stream_read_word(demux->stream);         //length of elementary streams map
+  es_map_len = FFMIN(es_map_len, len - prog_len - 8);   //sanity check
   while(es_map_len > 0) {
     type = stream_read_char(demux->stream);
     id = stream_read_char(demux->stream);
@@ -115,12 +115,12 @@ static int parse_psm(demuxer_t *demux, int len) {
       }
       mp_dbg(MSGT_DEMUX,MSGL_V, "PSM ES, id=0x%x, type=%x, stype: %x\n", id, type, priv->es_map[idoffset]);
     }
-    plen = stream_read_word(demux->stream);		//length of elementary stream descriptors
-    plen = FFMIN(plen, es_map_len);			//sanity check
-    stream_skip(demux->stream, plen);			//skip descriptors for now
+    plen = stream_read_word(demux->stream);             //length of elementary stream descriptors
+    plen = FFMIN(plen, es_map_len);                     //sanity check
+    stream_skip(demux->stream, plen);                   //skip descriptors for now
     es_map_len -= 4 + plen;
   }
-  stream_skip(demux->stream, 4);			//skip crc32
+  stream_skip(demux->stream, 4);                        //skip crc32
   return 1;
 }
 
@@ -508,21 +508,21 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
         len-=3;
         }
         if((aid&0xE0)==0xA0 && len>=3){
-	  unsigned char* hdr;
-	  // save audio header as codecdata!
-	  if(!((sh_audio_t*)(ds->sh))->codecdata_len){
-	      ((sh_audio_t*)(ds->sh))->codecdata=malloc(3);
-	      ((sh_audio_t*)(ds->sh))->codecdata_len=3;
-	  }
-	  hdr=((sh_audio_t*)(ds->sh))->codecdata;
+          unsigned char* hdr;
+          // save audio header as codecdata!
+          if(!((sh_audio_t*)(ds->sh))->codecdata_len){
+              ((sh_audio_t*)(ds->sh))->codecdata=malloc(3);
+              ((sh_audio_t*)(ds->sh))->codecdata_len=3;
+          }
+          hdr=((sh_audio_t*)(ds->sh))->codecdata;
           // read LPCM header:
-	  // emphasis[1], mute[1], rvd[1], frame number[5]:
+          // emphasis[1], mute[1], rvd[1], frame number[5]:
           hdr[0]=stream_read_char(demux->stream);
 //          printf(" [%01X:%02d]",c>>5,c&31);
-	  // quantization[2],freq[2],rvd[1],channels[3]
+          // quantization[2],freq[2],rvd[1],channels[3]
           hdr[1]=stream_read_char(demux->stream);
 //          printf("[%01X:%01X] ",c>>4,c&15);
-	  // dynamic range control (0x80=off):
+          // dynamic range control (0x80=off):
           hdr[2]=stream_read_char(demux->stream);
 //          printf("[%02X] ",c);
           len-=3;
@@ -929,10 +929,10 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
     if (newpts < 0) newpts = 0;
 
     if(flags&SEEK_FACTOR){
-	// float seek 0..1
-	newpos+=(demuxer->movi_end-demuxer->movi_start)*rel_seek_secs;
+        // float seek 0..1
+        newpos+=(demuxer->movi_end-demuxer->movi_start)*rel_seek_secs;
     } else {
-	// time seek (secs)
+        // time seek (secs)
         if (mpg_d && mpg_d->has_valid_timestamps) {
           if (mpg_d->first_to_final_pts_len > 0.0)
             newpos += rel_seek_secs * (demuxer->movi_end - demuxer->movi_start) / mpg_d->first_to_final_pts_len;
@@ -946,50 +946,50 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
 
     while (1) {
         if(newpos<demuxer->movi_start){
-	    if(demuxer->stream->type!=STREAMTYPE_VCD) demuxer->movi_start=0; // for VCD
-	    if(newpos<demuxer->movi_start) newpos=demuxer->movi_start;
-	}
+            if(demuxer->stream->type!=STREAMTYPE_VCD) demuxer->movi_start=0; // for VCD
+            if(newpos<demuxer->movi_start) newpos=demuxer->movi_start;
+        }
 
         stream_seek(demuxer->stream,newpos);
 
         // re-sync video:
         videobuf_code_len=0; // reset ES stream buffer
 
-	ds_fill_buffer(d_video);
-	if(sh_audio){
-	  ds_fill_buffer(d_audio);
-	}
+        ds_fill_buffer(d_video);
+        if(sh_audio){
+          ds_fill_buffer(d_audio);
+        }
 
-	while(1){
-	  int i;
+        while(1){
+          int i;
           if(sh_audio && !d_audio->eof && d_video->pts && d_audio->pts){
-	    float a_pts=d_audio->pts;
+            float a_pts=d_audio->pts;
             a_pts+=(ds_tell_pts(d_audio)-sh_audio->a_in_buffer_len)/(float)sh_audio->i_bps;
-	    if(d_video->pts>a_pts){
-	      skip_audio_frame(sh_audio);  // sync audio
-	      continue;
-	    }
+            if(d_video->pts>a_pts){
+              skip_audio_frame(sh_audio);  // sync audio
+              continue;
+            }
           }
-	  if(!sh_video) break;
+          if(!sh_video) break;
           i=sync_video_packet(d_video);
           if(sh_video->format == mmioFOURCC('W', 'V', 'C', '1')) {
             if(i==0x10E || i==0x10F) //entry point or sequence header
               break;
           } else
-          if(sh_video->format == 0x10000004) {	//mpeg4
-            if(i==0x1B6) {			//vop (frame) startcode
-	      int pos = videobuf_len;
-	      if(!read_video_packet(d_video)) break; // EOF
-	      if((videobuffer[pos+4] & 0x3F) == 0) break;	//I-frame
-	    }
-          } else if(sh_video->format == 0x10000005){	//h264
+          if(sh_video->format == 0x10000004) {  //mpeg4
+            if(i==0x1B6) {                      //vop (frame) startcode
+              int pos = videobuf_len;
+              if(!read_video_packet(d_video)) break; // EOF
+              if((videobuffer[pos+4] & 0x3F) == 0) break;       //I-frame
+            }
+          } else if(sh_video->format == 0x10000005){    //h264
             if((i & ~0x60) == 0x105) break;
-          } else { 	//default mpeg1/2
-	    if(i==0x1B3 || i==0x1B8) break; // found it!
-	  }
+          } else {      //default mpeg1/2
+            if(i==0x1B3 || i==0x1B8) break; // found it!
+          }
           if(!i || !skip_video_packet(d_video)) break; // EOF?
         }
-	if(!mpg_d)
+        if(!mpg_d)
           break;
         if (!precision || abs(newpts - mpg_d->last_pts) < 0.5 || (mpg_d->last_pts == oldpts)) break;
         if ((newpos - oldpos) * (mpg_d->last_pts - oldpts) < 0) { // invalid timestamps
@@ -998,13 +998,13 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
         }
         precision--;
         //prepare another seek because we are off by more than 0.5s
-	if(mpg_d) {
+        if(mpg_d) {
         newpos += (newpts - mpg_d->last_pts) * (newpos - oldpos) / (mpg_d->last_pts - oldpts);
         demux_flush(demuxer);
         demuxer->stream->eof=0; // clear eof flag
         d_video->eof=0;
         d_audio->eof=0;
-	}
+        }
     }
 }
 
@@ -1013,7 +1013,7 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
     mpg_demuxer_t *mpg_d=(mpg_demuxer_t*)demuxer->priv;
 
     switch(cmd) {
-	case DEMUXER_CTRL_GET_TIME_LENGTH:
+        case DEMUXER_CTRL_GET_TIME_LENGTH:
             if(stream_control(demuxer->stream, STREAM_CTRL_GET_TIME_LENGTH, arg) != STREAM_UNSUPPORTED) {
               mp_msg(MSGT_DEMUXER,MSGL_DBG2,"\r\nDEMUX_MPG_CTRL, (%.3f)\r\n", *((double*)arg));
               return DEMUXER_CTRL_GUESS;
@@ -1022,25 +1022,25 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
               *((double *)arg)=(double)mpg_d->first_to_final_pts_len;
               return DEMUXER_CTRL_OK;
             }
-    		return DEMUXER_CTRL_DONTKNOW;
+                return DEMUXER_CTRL_DONTKNOW;
 
-	case DEMUXER_CTRL_GET_PERCENT_POS:
+        case DEMUXER_CTRL_GET_PERCENT_POS:
             if (mpg_d && mpg_d->has_valid_timestamps && mpg_d->first_to_final_pts_len > 0.0) {
               *((int *)arg)=(int)(100 * (mpg_d->last_pts-mpg_d->first_pts) / mpg_d->first_to_final_pts_len);
               return DEMUXER_CTRL_OK;
             }
-	    return DEMUXER_CTRL_DONTKNOW;
+            return DEMUXER_CTRL_DONTKNOW;
 
-	case DEMUXER_CTRL_SWITCH_AUDIO:
+        case DEMUXER_CTRL_SWITCH_AUDIO:
             if(! (mpg_d && mpg_d->num_a_streams > 1 && demuxer->audio && demuxer->audio->sh))
-	      return DEMUXER_CTRL_NOTIMPL;
-	    else {
+              return DEMUXER_CTRL_NOTIMPL;
+            else {
               demux_stream_t *d_audio = demuxer->audio;
               sh_audio_t *sh_audio = d_audio->sh;
               sh_audio_t *sh_a = sh_audio;
               int i;
-	      if(!sh_audio)
-	        return DEMUXER_CTRL_NOTIMPL;
+              if(!sh_audio)
+                return DEMUXER_CTRL_NOTIMPL;
               if (*((int*)arg) < 0)
               {
               for (i = 0; i < mpg_d->num_a_streams; i++) {
@@ -1064,8 +1064,8 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
             *((int*)arg) = demuxer->audio->id;
             return DEMUXER_CTRL_OK;
 
-	default:
-	    return DEMUXER_CTRL_NOTIMPL;
+        default:
+            return DEMUXER_CTRL_NOTIMPL;
     }
 }
 

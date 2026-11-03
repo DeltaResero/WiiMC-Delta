@@ -27,11 +27,11 @@
 
 static const vd_info_t info =
 {
-	"MPEG 1/2 Video passthrough",
-	"mpegpes",
-	"A'rpi",
-	"A'rpi",
-	"for hw decoders"
+    "MPEG 1/2 Video passthrough",
+    "mpegpes",
+    "A'rpi",
+    "A'rpi",
+    "for hw decoders"
 };
 
 LIBVD_EXTERN(mpegpes)

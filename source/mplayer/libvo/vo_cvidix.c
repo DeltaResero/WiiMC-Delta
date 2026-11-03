@@ -76,10 +76,10 @@ static uint32_t setup_vidix(void){
     vidix_grkey_get(&gr_key);
     gr_key.key_op = KEYS_PUT;
     if (!vo_fs && !(vo_colorkey & 0xff000000)){
-	  gr_key.ckey.op = CKEY_TRUE;
-	  gr_key.ckey.red = (vo_colorkey & 0x00FF0000) >> 16;
-	  gr_key.ckey.green = (vo_colorkey & 0x0000FF00) >> 8;
-	  gr_key.ckey.blue = vo_colorkey & 0x000000FF;
+          gr_key.ckey.op = CKEY_TRUE;
+          gr_key.ckey.red = (vo_colorkey & 0x00FF0000) >> 16;
+          gr_key.ckey.green = (vo_colorkey & 0x0000FF00) >> 8;
+          gr_key.ckey.blue = vo_colorkey & 0x000000FF;
     }
     else gr_key.ckey.op = CKEY_FALSE;
     vidix_grkey_set(&gr_key);
@@ -158,7 +158,7 @@ static int preinit(const char *arg){
   if(arg)vidix_name = strdup(arg);
   else {
     mp_msg(MSGT_VO, MSGL_INFO, "vo_cvidix: No vidix driver name provided, probing available ones (-v option for details)!\n");
-	vidix_name = NULL;
+        vidix_name = NULL;
   }
   if(vidix_preinit(vidix_name, &video_out_cvidix))return 1;
   return 0;

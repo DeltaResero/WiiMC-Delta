@@ -61,7 +61,7 @@ static char *col_dup(const char *src)
     int length = 0;
 
     while (src[length] > 31)
-	length++;
+        length++;
 
     dst = malloc(length + 1);
     strncpy(dst, src, length);
@@ -79,7 +79,7 @@ static int right_hand_strcmp(const char *cookie_domain, const char *url_domain)
     u_l = strlen(url_domain);
 
     if (c_l > u_l)
-	return -1;
+        return -1;
     return strcmp(cookie_domain, url_domain + u_l - c_l);
 }
 
@@ -95,13 +95,13 @@ static int parse_line(char **ptr, char *cols[6])
     cols[0] = *ptr;
 
     for (col = 1; col < 7; col++) {
-	for (; (**ptr) > 31; (*ptr)++);
-	if (**ptr == 0)
-	    return 0;
-	(*ptr)++;
-	if ((*ptr)[-1] != 9)
-	    return 0;
-	cols[col] = (*ptr);
+        for (; (**ptr) > 31; (*ptr)++);
+        if (**ptr == 0)
+            return 0;
+        (*ptr)++;
+        if ((*ptr)[-1] != 9)
+            return 0;
+        cols[col] = (*ptr);
     }
 
     return 1;
@@ -117,32 +117,32 @@ static char *load_file(const char *filename, off_t * length)
 
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
-	mp_msg(MSGT_NETWORK, MSGL_V, "Could not open");
-	return NULL;
+        mp_msg(MSGT_NETWORK, MSGL_V, "Could not open");
+        return NULL;
     }
 
     *length = lseek(fd, 0, SEEK_END);
 
     if (*length < 0) {
-	mp_msg(MSGT_NETWORK, MSGL_V, "Could not find EOF");
-	return NULL;
+        mp_msg(MSGT_NETWORK, MSGL_V, "Could not find EOF");
+        return NULL;
     }
 
     if (*length > SIZE_MAX - 1) {
-	mp_msg(MSGT_NETWORK, MSGL_V, "File too big, could not malloc.");
-	return NULL;
+        mp_msg(MSGT_NETWORK, MSGL_V, "File too big, could not malloc.");
+        return NULL;
     }
 
     lseek(fd, 0, SEEK_SET);
 
     if (!(buffer = malloc(*length + 1))) {
-	mp_msg(MSGT_NETWORK, MSGL_V, "Could not malloc.");
-	return NULL;
+        mp_msg(MSGT_NETWORK, MSGL_V, "Could not malloc.");
+        return NULL;
     }
 
     if (read(fd, buffer, *length) != *length) {
-	mp_msg(MSGT_NETWORK, MSGL_V, "Read is behaving funny.");
-	return NULL;
+        mp_msg(MSGT_NETWORK, MSGL_V, "Read is behaving funny.");
+        return NULL;
     }
     close(fd);
     buffer[*length] = 0;
@@ -152,29 +152,29 @@ static char *load_file(const char *filename, off_t * length)
 
 /* Loads a cookies.txt file into a linked list. */
 static struct cookie_list_type *load_cookies_from(const char *filename,
-						  struct cookie_list_type
-						  *list)
+                                                  struct cookie_list_type
+                                                  *list)
 {
     char *ptr;
     off_t length;
 
     ptr = load_file(filename, &length);
     if (!ptr)
-	return list;
+        return list;
 
     while (*ptr > 0) {
-	char *cols[7];
-	if (parse_line(&ptr, cols)) {
-	    struct cookie_list_type *new;
-	    new = malloc(sizeof(cookie_list_t));
-	    new->name = col_dup(cols[5]);
-	    new->value = col_dup(cols[6]);
-	    new->path = col_dup(cols[2]);
-	    new->domain = col_dup(cols[0]);
-	    new->secure = (*(cols[3]) == 't') || (*(cols[3]) == 'T');
-	    new->next = list;
-	    list = new;
-	}
+        char *cols[7];
+        if (parse_line(&ptr, cols)) {
+            struct cookie_list_type *new;
+            new = malloc(sizeof(cookie_list_t));
+            new->name = col_dup(cols[5]);
+            new->value = col_dup(cols[6]);
+            new->path = col_dup(cols[2]);
+            new->domain = col_dup(cols[0]);
+            new->secure = (*(cols[3]) == 't') || (*(cols[3]) == 'T');
+            new->next = list;
+            list = new;
+        }
     }
     return list;
 }
@@ -190,11 +190,11 @@ static struct cookie_list_type *load_cookies(void)
     char *homedir;
 
     if (cookies_file)
-	return load_cookies_from(cookies_file, list);
+        return load_cookies_from(cookies_file, list);
 
     homedir = getenv("HOME");
     if (!homedir)
-	return list;
+        return list;
 
 
     buf = malloc(strlen(homedir) + sizeof("/.mozilla/default") + 1);
@@ -203,18 +203,18 @@ static struct cookie_list_type *load_cookies(void)
     free(buf);
 
     if (dir) {
-	while ((ent = readdir(dir)) != NULL) {
-	    if ((ent->d_name)[0] != '.') {
-		buf = malloc(strlen(getenv("HOME")) +
+        while ((ent = readdir(dir)) != NULL) {
+            if ((ent->d_name)[0] != '.') {
+                buf = malloc(strlen(getenv("HOME")) +
                              sizeof("/.mozilla/default/") +
                              strlen(ent->d_name) + sizeof("cookies.txt") + 1);
-		sprintf(buf, "%s/.mozilla/default/%s/cookies.txt",
-			 getenv("HOME"), ent->d_name);
-		list = load_cookies_from(buf, list);
-		free(buf);
-	    }
-	}
-	closedir(dir);
+                sprintf(buf, "%s/.mozilla/default/%s/cookies.txt",
+                         getenv("HOME"), ent->d_name);
+                list = load_cookies_from(buf, list);
+                free(buf);
+            }
+        }
+        closedir(dir);
     }
 
     buf = malloc(strlen(homedir) + sizeof("/.netscape/cookies.txt") + 1);
@@ -238,56 +238,56 @@ cookies_set(HTTP_header_t * http_hdr, const char *domain, const char *url)
 
     path = strchr(url, '/');
     if (!path)
-	path = "";
+        path = "";
 
     if (!cookie_list)
-	cookie_list = load_cookies();
+        cookie_list = load_cookies();
 
 
     list = start = cookie_list;
 
     /* Find which cookies we want, removing duplicates. Cookies with the longest domain, then longest path take priority */
     while (list) {
-	/* Check the cookie domain and path. Also, we never send "secure" cookies. These should only be sent over HTTPS. */
-	if ((right_hand_strcmp(list->domain, domain) == 0)
-	    && (left_hand_strcmp(list->path, path) == 0) && !list->secure) {
-	    int replacing = 0;
-	    for (i = 0; i < found_cookies; i++) {
-		if (strcmp(list->name, cookies[i]->name) == 0) {
-		    replacing = 0;
-		    if (strlen(list->domain) <= strlen(cookies[i]->domain)) {
-			cookies[i] = list;
-		    } else if (strlen(list->path) <= strlen(cookies[i]->path)) {
-			cookies[i] = list;
-		    }
-		}
-	    }
-	    if (found_cookies > MAX_COOKIES) {
-		/* Cookie jar overflow! */
-		break;
-	    }
-	    if (!replacing)
-		cookies[found_cookies++] = list;
-	}
-	list = list->next;
+        /* Check the cookie domain and path. Also, we never send "secure" cookies. These should only be sent over HTTPS. */
+        if ((right_hand_strcmp(list->domain, domain) == 0)
+            && (left_hand_strcmp(list->path, path) == 0) && !list->secure) {
+            int replacing = 0;
+            for (i = 0; i < found_cookies; i++) {
+                if (strcmp(list->name, cookies[i]->name) == 0) {
+                    replacing = 0;
+                    if (strlen(list->domain) <= strlen(cookies[i]->domain)) {
+                        cookies[i] = list;
+                    } else if (strlen(list->path) <= strlen(cookies[i]->path)) {
+                        cookies[i] = list;
+                    }
+                }
+            }
+            if (found_cookies > MAX_COOKIES) {
+                /* Cookie jar overflow! */
+                break;
+            }
+            if (!replacing)
+                cookies[found_cookies++] = list;
+        }
+        list = list->next;
     }
 
 
     buf = strdup("Cookie:");
 
     for (i = 0; i < found_cookies; i++) {
-	char *nbuf;
+        char *nbuf;
 
-	nbuf = malloc(strlen(buf) + strlen(" ") + strlen(cookies[i]->name) +
-		    strlen("=") + strlen(cookies[i]->value) + strlen(";") + 1);
-	sprintf(nbuf, "%s %s=%s;", buf, cookies[i]->name,
-		 cookies[i]->value);
-	free(buf);
-	buf = nbuf;
+        nbuf = malloc(strlen(buf) + strlen(" ") + strlen(cookies[i]->name) +
+                    strlen("=") + strlen(cookies[i]->value) + strlen(";") + 1);
+        sprintf(nbuf, "%s %s=%s;", buf, cookies[i]->name,
+                 cookies[i]->value);
+        free(buf);
+        buf = nbuf;
     }
 
     if (found_cookies)
-	http_set_field(http_hdr, buf);
+        http_set_field(http_hdr, buf);
     else
-	free(buf);
+        free(buf);
 }

@@ -410,7 +410,7 @@ case CODEC_ID_VORBIS:
 /* case CODEC_ID_OPUS:
     { extern AVCodec ff_opus_decoder;
       return ff_opus_decoder.name; } */
-	  /*
+          /*
 case CODEC_ID_OPUS:
     { extern AVCodec ff_libopus_decoder;
       return ff_libopus_decoder.name; } */

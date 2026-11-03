@@ -13,10 +13,10 @@ class IdlePresets {
 
     static const std::string IDLE_PRESET_NAME;
 
-	/// Allocate a new idle preset instance
-	/// \returns a newly allocated auto pointer of an idle preset instance
-	static std::auto_ptr<Preset> allocate(const std::string & path, PresetOutputs & outputs);
+        /// Allocate a new idle preset instance
+        /// \returns a newly allocated auto pointer of an idle preset instance
+        static std::auto_ptr<Preset> allocate(const std::string & path, PresetOutputs & outputs);
   private:
-	static std::string presetText();
+        static std::string presetText();
 };
 #endif

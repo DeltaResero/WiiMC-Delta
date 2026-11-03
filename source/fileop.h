@@ -22,11 +22,11 @@
 
 typedef struct
 {
-	char name[50];
-	char mount[10];
-	int type;
-	const DISC_INTERFACE* interface;
-	sec_t sector;
+    char name[50];
+    char mount[10];
+    int type;
+    const DISC_INTERFACE* interface;
+    sec_t sector;
 } DEVICE_STRUCT;
 
 void ResumeDeviceThread();

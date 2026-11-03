@@ -60,15 +60,15 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 #if 0
     if (((af_data_t*)arg)->format == AF_FORMAT_FLOAT_NE)
     {
-	af->data->format = AF_FORMAT_FLOAT_NE;
-	af->data->bps = 4;
-	af->play = play_float;
+        af->data->format = AF_FORMAT_FLOAT_NE;
+        af->data->bps = 4;
+        af->play = play_float;
     }// else
 #endif
     {
-	af->data->format = AF_FORMAT_S16_NE;
-	af->data->bps = 2;
-	af->play = play_s16;
+        af->data->format = AF_FORMAT_S16_NE;
+        af->data->bps = 2;
+        af->play = play_s16;
     }
 
     return af_test_output(af,(af_data_t*)arg);
@@ -108,8 +108,8 @@ static af_data_t* play_s16(struct af_instance_s* af, af_data_t* data)
 {
   af_sinesuppress_t *s = af->setup;
   register int i = 0;
-  int16_t *a = (int16_t*)data->audio;	// Audio data
-  int len = data->len/2;		// Number of samples
+  int16_t *a = (int16_t*)data->audio;   // Audio data
+  int len = data->len/2;                // Number of samples
 
   for (i = 0; i < len; i++)
   {
@@ -139,8 +139,8 @@ static af_data_t* play_float(struct af_instance_s* af, af_data_t* data)
 {
   af_sinesuppress_t *s = af->setup;
   register int i = 0;
-  float *a = (float*)data->audio;	// Audio data
-  int len = data->len/4;		// Number of samples
+  float *a = (float*)data->audio;       // Audio data
+  int len = data->len/4;                // Number of samples
   float avg, l, r;
 
   for (i = 0; i < len; i+=2)

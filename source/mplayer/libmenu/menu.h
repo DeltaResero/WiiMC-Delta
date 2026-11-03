@@ -101,27 +101,27 @@ void menu_update_mouse_pos(double x, double y);
 
 /////////// Helpers
 
-#define MENU_TEXT_TOP	(1<<0)
-#define MENU_TEXT_VCENTER	(1<<1)
-#define MENU_TEXT_BOT	(1<<2)
-#define MENU_TEXT_VMASK	(MENU_TEXT_TOP|MENU_TEXT_VCENTER|MENU_TEXT_BOT)
-#define MENU_TEXT_LEFT	(1<<3)
-#define MENU_TEXT_HCENTER	(1<<4)
-#define MENU_TEXT_RIGHT	(1<<5)
-#define MENU_TEXT_HMASK	(MENU_TEXT_LEFT|MENU_TEXT_HCENTER|MENU_TEXT_RIGHT)
-#define MENU_TEXT_CENTER	(MENU_TEXT_VCENTER|MENU_TEXT_HCENTER)
+#define MENU_TEXT_TOP   (1<<0)
+#define MENU_TEXT_VCENTER       (1<<1)
+#define MENU_TEXT_BOT   (1<<2)
+#define MENU_TEXT_VMASK (MENU_TEXT_TOP|MENU_TEXT_VCENTER|MENU_TEXT_BOT)
+#define MENU_TEXT_LEFT  (1<<3)
+#define MENU_TEXT_HCENTER       (1<<4)
+#define MENU_TEXT_RIGHT (1<<5)
+#define MENU_TEXT_HMASK (MENU_TEXT_LEFT|MENU_TEXT_HCENTER|MENU_TEXT_RIGHT)
+#define MENU_TEXT_CENTER        (MENU_TEXT_VCENTER|MENU_TEXT_HCENTER)
 
 void menu_draw_text(mp_image_t* mpi, char* txt, int x, int y);
 int menu_text_length(char* txt);
 int menu_text_num_lines(char* txt, int max_width);
 
 void menu_text_size(char* txt,int max_width,
-		    int vspace, int warp,
-		    int* _w, int* _h);
+                    int vspace, int warp,
+                    int* _w, int* _h);
 
 void menu_draw_text_full(mp_image_t* mpi,char* txt,
-			 int x, int y,int w, int h,
-			 int vspace, int warp, int align, int anchor);
+                         int x, int y,int w, int h,
+                         int vspace, int warp, int align, int anchor);
 
 void menu_draw_box(mp_image_t* mpi, unsigned char grey, unsigned char alpha, int x, int y, int w, int h);
 

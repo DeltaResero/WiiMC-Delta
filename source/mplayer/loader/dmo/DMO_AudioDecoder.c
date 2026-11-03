@@ -1,7 +1,7 @@
 /********************************************************
 
          DirectShow audio decoder
-	 Copyright 2001 Eugene Kuznetsov  (divx@euro.ru)
+         Copyright 2001 Eugene Kuznetsov  (divx@euro.ru)
 
 *********************************************************/
 #include "config.h"
@@ -88,7 +88,7 @@ print_wave_header((WAVEFORMATEX *)this->m_sVhdr,  MSGL_V);
 print_wave_header((WAVEFORMATEX *)this->m_sVhdr2, MSGL_V);
 
         this->m_pDMO_Filter = DMO_FilterCreate(dllname, guid, &this->m_sOurType, &this->m_sDestType);
-	if( !this->m_pDMO_Filter ) {
+        if( !this->m_pDMO_Filter ) {
            free(this);
            return NULL;
         }
@@ -105,8 +105,8 @@ void DMO_AudioDecoder_Destroy(DMO_AudioDecoder *this)
 }
 
 int DMO_AudioDecoder_Convert(DMO_AudioDecoder *this, const void* in_data, unsigned int in_size,
-			     void* out_data, unsigned int out_size,
-			     unsigned int* size_read, unsigned int* size_written)
+                             void* out_data, unsigned int out_size,
+                             unsigned int* size_read, unsigned int* size_written)
 {
     DMO_OUTPUT_DATA_BUFFER db;
     CMediaBuffer* bufferin;
@@ -115,7 +115,7 @@ int DMO_AudioDecoder_Convert(DMO_AudioDecoder *this, const void* in_data, unsign
     int r = 0;
 
     if (!in_data || !out_data)
-	return -1;
+        return -1;
 
 #ifdef WIN32_LOADER
     Setup_FS_Segment();
@@ -124,41 +124,41 @@ int DMO_AudioDecoder_Convert(DMO_AudioDecoder *this, const void* in_data, unsign
     //m_pDMO_Filter->m_pMedia->vt->Lock(m_pDMO_Filter->m_pMedia, 1);
     bufferin = CMediaBufferCreate(in_size, (void*)in_data, in_size, 1);
     r = this->m_pDMO_Filter->m_pMedia->vt->ProcessInput(this->m_pDMO_Filter->m_pMedia, 0,
-						  (IMediaBuffer*)bufferin,
-						  (this->m_iFlushed) ? DMO_INPUT_DATA_BUFFERF_SYNCPOINT : 0,
-						  0, 0);
+                                                  (IMediaBuffer*)bufferin,
+                                                  (this->m_iFlushed) ? DMO_INPUT_DATA_BUFFERF_SYNCPOINT : 0,
+                                                  0, 0);
     if (r == 0){
-	((IMediaBuffer*)bufferin)->vt->GetBufferAndLength((IMediaBuffer*)bufferin, 0, &read);
-	this->m_iFlushed = 0;
+        ((IMediaBuffer*)bufferin)->vt->GetBufferAndLength((IMediaBuffer*)bufferin, 0, &read);
+        this->m_iFlushed = 0;
     }
 
     ((IMediaBuffer*)bufferin)->vt->Release((IUnknown*)bufferin);
 
     //printf("RESULTA: %d 0x%x %ld    %d   %d\n", r, r, read, m_iFlushed, out_size);
     if (r == 0 || (unsigned)r == DMO_E_NOTACCEPTING){
-	unsigned long status = 0;
-	/* something for process */
-	db.rtTimestamp = 0;
-	db.rtTimelength = 0;
-	db.dwStatus = 0;
-	db.pBuffer = (IMediaBuffer*) CMediaBufferCreate(out_size, out_data, 0, 0);
-	//printf("OUTSIZE  %d\n", out_size);
-	r = this->m_pDMO_Filter->m_pMedia->vt->ProcessOutput(this->m_pDMO_Filter->m_pMedia,
-						       0, 1, &db, &status);
+        unsigned long status = 0;
+        /* something for process */
+        db.rtTimestamp = 0;
+        db.rtTimelength = 0;
+        db.dwStatus = 0;
+        db.pBuffer = (IMediaBuffer*) CMediaBufferCreate(out_size, out_data, 0, 0);
+        //printf("OUTSIZE  %d\n", out_size);
+        r = this->m_pDMO_Filter->m_pMedia->vt->ProcessOutput(this->m_pDMO_Filter->m_pMedia,
+                                                       0, 1, &db, &status);
 
-	((IMediaBuffer*)db.pBuffer)->vt->GetBufferAndLength((IMediaBuffer*)db.pBuffer, 0, &written);
-	((IMediaBuffer*)db.pBuffer)->vt->Release((IUnknown*)db.pBuffer);
+        ((IMediaBuffer*)db.pBuffer)->vt->GetBufferAndLength((IMediaBuffer*)db.pBuffer, 0, &written);
+        ((IMediaBuffer*)db.pBuffer)->vt->Release((IUnknown*)db.pBuffer);
 
-	//printf("RESULTB: %d 0x%x %ld\n", r, r, written);
-	//printf("Converted  %d  -> %d\n", in_size, out_size);
+        //printf("RESULTB: %d 0x%x %ld\n", r, r, written);
+        //printf("Converted  %d  -> %d\n", in_size, out_size);
     }
     else if (in_size > 0)
-	printf("ProcessInputError  r:0x%x=%d\n", r, r);
+        printf("ProcessInputError  r:0x%x=%d\n", r, r);
 
     if (size_read)
-	*size_read = read;
+        *size_read = read;
     if (size_written)
-	*size_written = written;
+        *size_written = written;
     return r;
 }
 

@@ -12,23 +12,23 @@
 #include <brotli/decode.h>
 
 BrotliDecoderResult BrotliDecoderDecompress(size_t encoded_size,
-	const uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)], size_t *decoded_size,
-	uint8_t decoded_buffer[BROTLI_ARRAY_PARAM(*decoded_size)])
+    const uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)], size_t *decoded_size,
+    uint8_t decoded_buffer[BROTLI_ARRAY_PARAM(*decoded_size)])
 {
-	return BROTLI_DECODER_RESULT_ERROR;
+    return BROTLI_DECODER_RESULT_ERROR;
 }
 
 int BZ2_bzDecompressInit(bz_stream *strm, int verbosity, int small)
 {
-	return BZ_CONFIG_ERROR;
+    return BZ_CONFIG_ERROR;
 }
 
 int BZ2_bzDecompress(bz_stream *strm)
 {
-	return BZ_PARAM_ERROR;
+    return BZ_PARAM_ERROR;
 }
 
 int BZ2_bzDecompressEnd(bz_stream *strm)
 {
-	return BZ_OK;
+    return BZ_OK;
 }

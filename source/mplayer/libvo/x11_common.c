@@ -947,7 +947,7 @@ int vo_x11_check_events(Display * mydisplay)
                 mp_msg(MSGT_VO, MSGL_WARN, "Our window was destroyed, exiting\n");
                 mplayer_put_key(KEY_CLOSE_WIN);
                 break;
-	    case ClientMessage:
+            case ClientMessage:
                 if (Event.xclient.message_type == XAWM_PROTOCOLS &&
                     Event.xclient.data.l[0] == XAWM_DELETE_WINDOW)
                     mplayer_put_key(KEY_CLOSE_WIN);

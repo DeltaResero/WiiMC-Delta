@@ -25,11 +25,11 @@
 #include "ad_internal.h"
 
 static const ad_info_t info = {
-	"libmad mpeg audio decoder",
-	"libmad",
-	"A'rpi",
-	"libmad...",
-	"based on Xine's libmad/xine_decoder.c"
+        "libmad mpeg audio decoder",
+        "libmad",
+        "A'rpi",
+        "libmad...",
+        "based on Xine's libmad/xine_decoder.c"
 };
 
 LIBAD_EXTERN(libmad)
@@ -77,11 +77,11 @@ while((len=demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
     mad_stream_buffer (&this->stream, sh->a_in_buffer, sh->a_in_buffer_len);
     ret=mad_frame_decode (&this->frame, &this->stream);
     if (this->stream.next_frame) {
-	int num_bytes =
-	    (char*)sh->a_in_buffer+sh->a_in_buffer_len - (char*)this->stream.next_frame;
-	memmove(sh->a_in_buffer, this->stream.next_frame, num_bytes);
-	mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",sh->a_in_buffer_len-num_bytes);
-	sh->a_in_buffer_len = num_bytes;
+        int num_bytes =
+            (char*)sh->a_in_buffer+sh->a_in_buffer_len - (char*)this->stream.next_frame;
+        memmove(sh->a_in_buffer, this->stream.next_frame, num_bytes);
+        mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",sh->a_in_buffer_len-num_bytes);
+        sh->a_in_buffer_len = num_bytes;
     }
     if (ret == 0) return 1; // OK!!!
     // error! try to resync!
@@ -141,29 +141,29 @@ static int decode_audio(sh_audio_t *sh,unsigned char *buf,int minlen,int maxlen)
 
     mad_synth_frame (&this->synth, &this->frame);
 
-	{ unsigned int         nchannels, nsamples;
-	  mad_fixed_t const   *left_ch, *right_ch;
-	  struct mad_pcm      *pcm = &this->synth.pcm;
-	  uint16_t            *output = (uint16_t*) buf;
+        { unsigned int         nchannels, nsamples;
+          mad_fixed_t const   *left_ch, *right_ch;
+          struct mad_pcm      *pcm = &this->synth.pcm;
+          uint16_t            *output = (uint16_t*) buf;
 
-	  nchannels = pcm->channels;
-	  nsamples  = pcm->length;
-	  left_ch   = pcm->samples[0];
-	  right_ch  = pcm->samples[1];
+          nchannels = pcm->channels;
+          nsamples  = pcm->length;
+          left_ch   = pcm->samples[0];
+          right_ch  = pcm->samples[1];
 
-	  len+=2*nchannels*nsamples;
-	  buf+=2*nchannels*nsamples;
+          len+=2*nchannels*nsamples;
+          buf+=2*nchannels*nsamples;
 
-	  while (nsamples--) {
-	    /* output sample(s) in 16-bit signed little-endian PCM */
+          while (nsamples--) {
+            /* output sample(s) in 16-bit signed little-endian PCM */
 
-	    *output++ = scale(*left_ch++);
+            *output++ = scale(*left_ch++);
 
-	    if (nchannels == 2)
-	      *output++ = scale(*right_ch++);
+            if (nchannels == 2)
+              *output++ = scale(*right_ch++);
 
-	  }
-	}
+          }
+        }
   }
 
   return len?len:-1;
@@ -174,14 +174,14 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...){
     // various optional functions you MAY implement:
     switch(cmd){
       case ADCTRL_RESYNC_STREAM:
-	this->have_frame=0;
-	mad_synth_init  (&this->synth);
-	mad_stream_init (&this->stream);
-	mad_frame_init  (&this->frame);
-	return CONTROL_TRUE;
+        this->have_frame=0;
+        mad_synth_init  (&this->synth);
+        mad_stream_init (&this->stream);
+        mad_frame_init  (&this->frame);
+        return CONTROL_TRUE;
       case ADCTRL_SKIP_FRAME:
         this->have_frame=read_frame(sh);
-	return CONTROL_TRUE;
+        return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }

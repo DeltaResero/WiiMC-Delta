@@ -81,13 +81,13 @@ fribidi_mem_chunk_new (
 #endif /* !FRIBIDI_USE_GLIB */
 
 #define fribidi_chunk_new(type, chunk)        ( \
-		(type *) fribidi_mem_chunk_alloc (chunk) \
-	)
+                (type *) fribidi_mem_chunk_alloc (chunk) \
+        )
 
 #define fribidi_chunk_new_for_type(type) ( \
-		fribidi_mem_chunk_new(FRIBIDI, sizeof (type), \
-				FRIBIDI_CHUNK_SIZE, FRIBIDI_ALLOC_ONLY) \
-	)
+                fribidi_mem_chunk_new(FRIBIDI, sizeof (type), \
+                                FRIBIDI_CHUNK_SIZE, FRIBIDI_ALLOC_ONLY) \
+        )
 
 #include <fribidi-enddecls.h>
 

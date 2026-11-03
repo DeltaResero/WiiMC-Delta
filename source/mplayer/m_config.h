@@ -209,7 +209,7 @@ m_profile_set_desc(m_profile_t* p, char* desc);
  */
 int
 m_config_set_profile_option(m_config_t* config, m_profile_t* p,
-			    char* name, char* val);
+                            char* name, char* val);
 
 /// Enables profile usage
 /** Used by the config file parser when loading a profile.

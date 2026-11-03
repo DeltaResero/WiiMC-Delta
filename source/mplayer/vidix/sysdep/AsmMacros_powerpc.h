@@ -68,43 +68,43 @@ extern unsigned char *ioBase;
 
 static inline volatile void eieio(void)
 {
-	__asm__ volatile ("eieio");
+    __asm__ volatile ("eieio");
 }
 
 static inline void outb(short port, unsigned char value)
 {
-	*(unsigned char *)(ioBase + port) = value; eieio();
+    *(unsigned char *)(ioBase + port) = value; eieio();
 }
 
 static inline void outw(short port, unsigned short value)
 {
-	*(unsigned short *)(ioBase + port) = value; eieio();
+    *(unsigned short *)(ioBase + port) = value; eieio();
 }
 
 static inline void outl(short port, unsigned short value)
 {
-	*(unsigned long *)(ioBase + port) = value; eieio();
+    *(unsigned long *)(ioBase + port) = value; eieio();
 }
 
 static inline unsigned char inb(short port)
 {
-	unsigned char val;
-	val = *((unsigned char *)(ioBase + port)); eieio();
-	return val;
+    unsigned char val;
+    val = *((unsigned char *)(ioBase + port)); eieio();
+    return val;
 }
 
 static inline unsigned short inw(short port)
 {
-	unsigned short val;
-	val = *((unsigned short *)(ioBase + port)); eieio();
-	return val;
+    unsigned short val;
+    val = *((unsigned short *)(ioBase + port)); eieio();
+    return val;
 }
 
 static inline unsigned long inl(short port)
 {
-	unsigned long val;
-	val = *((unsigned long *)(ioBase + port)); eieio();
-	return val;
+    unsigned long val;
+    val = *((unsigned long *)(ioBase + port)); eieio();
+    return val;
 }
 
 #define intr_disable()

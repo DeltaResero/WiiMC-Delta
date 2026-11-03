@@ -97,50 +97,50 @@ new_run (
 
 
 #define swap(a,b) \
-	FRIBIDI_BEGIN_STMT \
-	void *t; \
-	(t) = (a); \
-	(a) = (b); \
-	(b) = (t); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        void *t; \
+        (t) = (a); \
+        (a) = (b); \
+        (b) = (t); \
+        FRIBIDI_END_STMT
 
 #define merge_lists(a,b) \
-	FRIBIDI_BEGIN_STMT \
-	swap((a)->prev->next, (b)->prev->next); \
-	swap((a)->prev, (b)->prev); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        swap((a)->prev->next, (b)->prev->next); \
+        swap((a)->prev, (b)->prev); \
+        FRIBIDI_END_STMT
 
 #define delete_node(x) \
-	FRIBIDI_BEGIN_STMT \
-	(x)->prev->next = (x)->next; \
-	(x)->next->prev = (x)->prev; \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        (x)->prev->next = (x)->next; \
+        (x)->next->prev = (x)->prev; \
+        FRIBIDI_END_STMT
 
 #define insert_node_before(x, list) \
-	FRIBIDI_BEGIN_STMT \
-	(x)->prev = (list)->prev; \
-	(list)->prev->next = (x); \
-	(x)->next = (list); \
-	(list)->prev = (x); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        (x)->prev = (list)->prev; \
+        (list)->prev->next = (x); \
+        (x)->next = (list); \
+        (list)->prev = (x); \
+        FRIBIDI_END_STMT
 
 #define move_node_before(x, list) \
-	FRIBIDI_BEGIN_STMT \
-	if ((x)->prev) { \
-	  delete_node(x); \
-	} \
-	insert_node_before((x), (list)); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        if ((x)->prev) { \
+          delete_node(x); \
+        } \
+        insert_node_before((x), (list)); \
+        FRIBIDI_END_STMT
 
 #define for_run_list(x, list) \
-	for ((x) = (list)->next; (x)->type != FRIBIDI_TYPE_SENTINEL; (x) = (x)->next)
+        for ((x) = (list)->next; (x)->type != FRIBIDI_TYPE_SENTINEL; (x) = (x)->next)
 
 
 #if DEBUG+0
 
 #define fribidi_validate_run_list FRIBIDI_PRIVATESPACE(validate_run_list)
      void fribidi_validate_run_list (
-  FriBidiRun *run_list		/* input run list */
+  FriBidiRun *run_list          /* input run list */
 ) FRIBIDI_GNUC_HIDDEN;
 
 #else /* !DEBUG */

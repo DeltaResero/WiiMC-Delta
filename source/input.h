@@ -13,8 +13,8 @@
 #include <wiiuse/wpad.h>
 #include "utils/3ds.h"
 
-#define PI 				3.14159265f
-#define PADCAL			30
+#define PI              3.14159265f
+#define PADCAL          30
 
 void SetupPads();
 void UpdatePads();

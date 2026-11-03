@@ -56,30 +56,30 @@
 # if (defined(WIN32)) || (defined(_WIN32_WCE))
 #  define FRIBIDI_ENTRY __declspec(dllimport)
 # else /* !WIN32 */
-#  define FRIBIDI_ENTRY		/* empty */
-# endif	/* !WIN32 */
+#  define FRIBIDI_ENTRY     /* empty */
+# endif /* !WIN32 */
 #endif /* !FRIBIDI_ENTRY */
 
 #if FRIBIDI_USE_GLIB+0
 # ifndef __FRIBIDI_DOC
 #  include <glib/gmacros.h>
-# endif	/* !__FRIBIDI_DOC */
-# define FRIBIDI_BEGIN_DECLS		G_BEGIN_DECLS
-# define FRIBIDI_END_DECLS		G_END_DECLS
-# define FRIBIDI_GNUC_CONST		G_GNUC_CONST
-# define FRIBIDI_GNUC_DEPRECATED	G_GNUC_DEPRECATED
+# endif /* !__FRIBIDI_DOC */
+# define FRIBIDI_BEGIN_DECLS        G_BEGIN_DECLS
+# define FRIBIDI_END_DECLS      G_END_DECLS
+# define FRIBIDI_GNUC_CONST     G_GNUC_CONST
+# define FRIBIDI_GNUC_DEPRECATED    G_GNUC_DEPRECATED
 # if __GNUC__ > 2
-#  define FRIBIDI_GNUC_WARN_UNUSED	\
-	__attribute__((__warn_unused_result__))
-#  define FRIBIDI_GNUC_MALLOC		\
-	__attribute__((__malloc__))
-#  define FRIBIDI_GNUC_HIDDEN		\
-	__attribute__((__visibility__ ("hidden")))
+#  define FRIBIDI_GNUC_WARN_UNUSED  \
+    __attribute__((__warn_unused_result__))
+#  define FRIBIDI_GNUC_MALLOC       \
+    __attribute__((__malloc__))
+#  define FRIBIDI_GNUC_HIDDEN       \
+    __attribute__((__visibility__ ("hidden")))
 # else /* __GNUC__ <= 2 */
 #  define FRIBIDI_GNUC_WARN_UNUSED
 #  define FRIBIDI_GNUC_MALLOC
 #  define FRIBIDI_GNUC_HIDDEN
-# endif	/* __GNUC__ <= 2 */
+# endif /* __GNUC__ <= 2 */
 #else /* !FRIBIDI_USE_GLIB */
 # define FRIBIDI_GNUC_CONST
 # define FRIBIDI_GNUC_DEPRECATED
@@ -96,9 +96,9 @@
 #  define FRIBIDI_BEGIN_DECLS extern "C" {
 #  define FRIBIDI_END_DECLS }
 # else /* !__cplusplus */
-#  define FRIBIDI_BEGIN_DECLS	/* empty */
-#  define FRIBIDI_END_DECLS	/* empty */
-# endif	/* !__cplusplus */
+#  define FRIBIDI_BEGIN_DECLS   /* empty */
+#  define FRIBIDI_END_DECLS /* empty */
+# endif /* !__cplusplus */
 #endif /* !FRIBIDI_BEGIN_DECLS */
 
 
@@ -111,7 +111,7 @@ FRIBIDI_ENTRY int fribidi_debug_status (
 #define fribidi_set_debug FRIBIDI_NAMESPACE(set_debug)
 FRIBIDI_ENTRY int
 fribidi_set_debug (
-  int state		/* new state to set */
+  int state     /* new state to set */
 );
 
 

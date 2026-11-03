@@ -63,26 +63,26 @@ static gint     fsCurrFNameListSelected, fsLastFNameListSelected;
 
 char * fsVideoFilterNames[][2] =
          {
-	   { MSGTR_Filter_AVIFiles,      "*.avi" },
-	   { MSGTR_Filter_DivXFiles,     "*.divx" },
-	   { MSGTR_Filter_FlashVideo,    "*.flv" },
-	   { MSGTR_Filter_MP3Files,      "*.mp3" },
-	   { MSGTR_Filter_MP4Files,      "*.aac,*.f4a,*.f4b,*.f4v,*.m4a,*.m4b,*.m4v,*.mp4" },
-	   { MSGTR_Filter_MPEGFiles,     "*.m1v,*.m2v,*.mp2,*.mpe,*.mpeg,*.mpg,*.mpga,*.vdr,*.vob" },
-	   { MSGTR_Filter_MP2TS,         "*.bdm,*.bdmv,*.clpi,*.cpi,*.m2t,*.m2ts,*.mpl,*.mpls,*.mts,*.rec,*.trp,*.ts,*.ty" },
-	   { MSGTR_Filter_MatroskaMedia, "*.mka,*.mkv" },
-	   { MSGTR_Filter_OGGMedia,      "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx" },
-	   { MSGTR_Filter_QTMedia,       "*.moov,*.mov,*.qt,*.qtvr" },
-	   { MSGTR_Filter_RNMedia,       "*.ra,*.rm,*.rmvb,*.rv" },
-	   { MSGTR_Filter_VideoCDImages, "*.bin" },
-	   { MSGTR_Filter_WAVFiles,      "*.wav" },
-	   { MSGTR_Filter_WindowsMedia,  "*.asf,*.wma,*.wmv" },
-	   { MSGTR_Filter_Playlists,     "*.asx,*.m3u,*.m3u8,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx" },
-	   { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp" },
-	   { MSGTR_Filter_AllVideoFiles, "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m" },
-	   { MSGTR_Filter_AllFiles,      "*" },
-	   { NULL,NULL }
-	 };
+           { MSGTR_Filter_AVIFiles,      "*.avi" },
+           { MSGTR_Filter_DivXFiles,     "*.divx" },
+           { MSGTR_Filter_FlashVideo,    "*.flv" },
+           { MSGTR_Filter_MP3Files,      "*.mp3" },
+           { MSGTR_Filter_MP4Files,      "*.aac,*.f4a,*.f4b,*.f4v,*.m4a,*.m4b,*.m4v,*.mp4" },
+           { MSGTR_Filter_MPEGFiles,     "*.m1v,*.m2v,*.mp2,*.mpe,*.mpeg,*.mpg,*.mpga,*.vdr,*.vob" },
+           { MSGTR_Filter_MP2TS,         "*.bdm,*.bdmv,*.clpi,*.cpi,*.m2t,*.m2ts,*.mpl,*.mpls,*.mts,*.rec,*.trp,*.ts,*.ty" },
+           { MSGTR_Filter_MatroskaMedia, "*.mka,*.mkv" },
+           { MSGTR_Filter_OGGMedia,      "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx" },
+           { MSGTR_Filter_QTMedia,       "*.moov,*.mov,*.qt,*.qtvr" },
+           { MSGTR_Filter_RNMedia,       "*.ra,*.rm,*.rmvb,*.rv" },
+           { MSGTR_Filter_VideoCDImages, "*.bin" },
+           { MSGTR_Filter_WAVFiles,      "*.wav" },
+           { MSGTR_Filter_WindowsMedia,  "*.asf,*.wma,*.wmv" },
+           { MSGTR_Filter_Playlists,     "*.asx,*.m3u,*.m3u8,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx" },
+           { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp" },
+           { MSGTR_Filter_AllVideoFiles, "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m" },
+           { MSGTR_Filter_AllFiles,      "*" },
+           { NULL,NULL }
+         };
 int fsLastVideoFilterSelected = -1;
 
 char * fsSubtitleFilterNames[][2] =
@@ -99,42 +99,42 @@ char * fsSubtitleFilterNames[][2] =
            { MSGTR_Filter_UTF8Subtitles,          "*.utf,*.utf-8,*.utf8" },
            { MSGTR_Filter_AllSubtitles,           "*.aqt,*.ass,*.jss,*.rt,*.smi,*.srt,*.ssa,*.sub,*.txt,*.utf" },
            { MSGTR_Filter_AllFiles,               "*" },
-	   { NULL,NULL }
-	 };
+           { NULL,NULL }
+         };
 int fsLastSubtitleFilterSelected = -1;
 
 char * fsOtherFilterNames[][2] =
          {
-	   { MSGTR_Filter_AllFiles, "*" },
-	   { NULL,NULL }
-	 };
+           { MSGTR_Filter_AllFiles, "*" },
+           { NULL,NULL }
+         };
 
 char * fsAudioFileNames[][2] =
-	 {
-	   { MSGTR_Filter_DDRawAudio,    "*.ac3,*.pcm" },
-	   { MSGTR_Filter_MPEGAudio,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga" },
-	   { MSGTR_Filter_MatroskaAudio, "*.mka" },
-	   { MSGTR_Filter_OGGAudio,      "*.oga,*.ogg,*.spx" },
-	   { MSGTR_Filter_WAVAudio,      "*.wav" },
-	   { MSGTR_Filter_WMAAudio,      "*.wma" },
-	   { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.f4a,*.m4a,*.mka,*.mp2,*.mp3,*.mpga,*.oga,*.ogg,*.pcm,*.spx,*.wav,*.wma" },
-	   { MSGTR_Filter_AllFiles,      "*" },
-	   { NULL, NULL }
-	 };
+         {
+           { MSGTR_Filter_DDRawAudio,    "*.ac3,*.pcm" },
+           { MSGTR_Filter_MPEGAudio,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga" },
+           { MSGTR_Filter_MatroskaAudio, "*.mka" },
+           { MSGTR_Filter_OGGAudio,      "*.oga,*.ogg,*.spx" },
+           { MSGTR_Filter_WAVAudio,      "*.wav" },
+           { MSGTR_Filter_WMAAudio,      "*.wma" },
+           { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.f4a,*.m4a,*.mka,*.mp2,*.mp3,*.mpga,*.oga,*.ogg,*.pcm,*.spx,*.wav,*.wma" },
+           { MSGTR_Filter_AllFiles,      "*" },
+           { NULL, NULL }
+         };
 int fsLastAudioFilterSelected = -1;
 
 char * fsFontFileNames[][2] =
          {
 #ifdef CONFIG_FREETYPE
-	   { MSGTR_Filter_TTF,       "*.ttf" },
-	   { MSGTR_Filter_Type1,     "*.pfb" },
-	   { MSGTR_Filter_AllFonts,  "*.pfb,*.ttf" },
+           { MSGTR_Filter_TTF,       "*.ttf" },
+           { MSGTR_Filter_Type1,     "*.pfb" },
+           { MSGTR_Filter_AllFonts,  "*.pfb,*.ttf" },
 #else
-	   { MSGTR_Filter_FontFiles, "*.desc" },
+           { MSGTR_Filter_FontFiles, "*.desc" },
 #endif
-	   { MSGTR_Filter_AllFiles,  "*" },
-	   { NULL,NULL }
-	 };
+           { MSGTR_Filter_AllFiles,  "*" },
+           { NULL,NULL }
+         };
 int fsLastFontFilterSelected = -1;
 
 GtkWidget   * fsFileNamesList;
@@ -269,22 +269,22 @@ void ShowFileSelect( int type,int modal )
         fsList_items=NULL;
         for( i=0;fsVideoFilterNames[i][0];i++ )
           fsList_items=g_list_append( fsList_items,fsVideoFilterNames[i][0] );
-	k = fsLastVideoFilterSelected;
+        k = fsLastVideoFilterSelected;
         gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
         g_list_free( fsList_items );
         gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsVideoFilterNames[k >= 0 ? k : i-2][0] );
-	tmp=guiInfo.Filename;
+        tmp=guiInfo.Filename;
         break;
    case fsSubtitleSelector:
         gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_SubtitleSelect );
         fsList_items=NULL;
         for( i=0;fsSubtitleFilterNames[i][0];i++ )
           fsList_items=g_list_append( fsList_items,fsSubtitleFilterNames[i][0] );
-	k = fsLastSubtitleFilterSelected;
+        k = fsLastSubtitleFilterSelected;
         gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
         g_list_free( fsList_items );
         gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsSubtitleFilterNames[k >= 0 ? k : i-2][0] );
-	tmp=guiInfo.SubtitleFilename;
+        tmp=guiInfo.SubtitleFilename;
         break;
 /*   case fsOtherSelector:
         gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_OtherSelect );
@@ -294,30 +294,30 @@ void ShowFileSelect( int type,int modal )
         gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
         g_list_free( fsList_items );
         gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsOtherFilterNames[0][0] );
-	tmp=guiInfo.Othername;
+        tmp=guiInfo.Othername;
         break;*/
    case fsAudioSelector:
-	gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_AudioFileSelect );
-	fsList_items=NULL;
-	for( i=0;fsAudioFileNames[i][0];i++ )
-	  fsList_items=g_list_append( fsList_items,fsAudioFileNames[i][0] );
-	k = fsLastAudioFilterSelected;
-	gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
-	g_list_free( fsList_items );
-	gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsAudioFileNames[k >= 0 ? k : i-2][0] );
-	tmp=guiInfo.AudioFilename;
-	break;
+        gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_AudioFileSelect );
+        fsList_items=NULL;
+        for( i=0;fsAudioFileNames[i][0];i++ )
+          fsList_items=g_list_append( fsList_items,fsAudioFileNames[i][0] );
+        k = fsLastAudioFilterSelected;
+        gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
+        g_list_free( fsList_items );
+        gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsAudioFileNames[k >= 0 ? k : i-2][0] );
+        tmp=guiInfo.AudioFilename;
+        break;
    case fsFontSelector:
         gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_FontSelect );
-	fsList_items=NULL;
-	for( i=0;fsFontFileNames[i][0];i++ )
-	  fsList_items=g_list_append( fsList_items,fsFontFileNames[i][0] );
-	k = fsLastFontFilterSelected;
-	gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
-	g_list_free( fsList_items );
-	gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsFontFileNames[k >= 0 ? k : i-2][0] );
-	tmp=font_name;
-	break;
+        fsList_items=NULL;
+        for( i=0;fsFontFileNames[i][0];i++ )
+          fsList_items=g_list_append( fsList_items,fsFontFileNames[i][0] );
+        k = fsLastFontFilterSelected;
+        gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
+        g_list_free( fsList_items );
+        gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsFontFileNames[k >= 0 ? k : i-2][0] );
+        tmp=font_name;
+        break;
   }
 
  fsMedium=(fsType == fsVideoSelector || fsType == fsSubtitleSelector || fsType == fsAudioSelector);
@@ -422,7 +422,7 @@ static void fs_fsFilterCombo_changed( GtkEditable * editable,
    case fsVideoSelector:
           for( i=0;fsVideoFilterNames[i][0];i++ )
            if( !strcmp( str,fsVideoFilterNames[i][0] ) )
-            { fsFilter=fsVideoFilterNames[i][1]; fsLastVideoFilterSelected = i;	break; }
+            { fsFilter=fsVideoFilterNames[i][1]; fsLastVideoFilterSelected = i; break; }
           break;
    case fsSubtitleSelector:
           for( i=0;fsSubtitleFilterNames[i][0];i++ )
@@ -438,12 +438,12 @@ static void fs_fsFilterCombo_changed( GtkEditable * editable,
           for( i=0;fsAudioFileNames[i][0];i++ )
            if( !strcmp( str,fsAudioFileNames[i][0] ) )
             { fsFilter=fsAudioFileNames[i][1]; fsLastAudioFilterSelected = i; break; }
-	  break;
+          break;
    case fsFontSelector:
           for( i=0;fsFontFileNames[i][0];i++ )
-	    if( !strcmp( str,fsFontFileNames[i][0] ) )
-	     { fsFilter=fsFontFileNames[i][1]; fsLastFontFilterSelected = i; break; }
-	  break;
+            if( !strcmp( str,fsFontFileNames[i][0] ) )
+             { fsFilter=fsFontFileNames[i][1]; fsLastFontFilterSelected = i; break; }
+          break;
    default: return;
   }
  CheckDir( fsFNameList );
@@ -511,7 +511,7 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
           break;
    case fsSubtitleSelector:
           setddup( &guiInfo.SubtitleFilename,fsSelectedDirectory,fsSelectedFile );
-	  mplayerLoadSubtitle( guiInfo.SubtitleFilename );
+          mplayerLoadSubtitle( guiInfo.SubtitleFilename );
           break;
 /*   case fsOtherSelector:
           setddup( &guiInfo.Othername,fsSelectedDirectory,fsSelectedFile );
@@ -521,9 +521,9 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
           break;
    case fsFontSelector:
           setddup( &font_name,fsSelectedDirectory,fsSelectedFile );
-	  mplayerLoadFont();
-	  if ( Preferences ) gtk_entry_set_text( GTK_ENTRY( prEFontName ),font_name );
-	  break;
+          mplayerLoadFont();
+          if ( Preferences ) gtk_entry_set_text( GTK_ENTRY( prEFontName ),font_name );
+          break;
   }
 
  HideFileSelect();

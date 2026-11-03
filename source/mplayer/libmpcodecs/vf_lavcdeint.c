@@ -108,9 +108,9 @@ config (struct vf_instance *vf,
   priv->height = height;
 
   return vf_next_config(vf,
-			width, height,
-			d_width, d_height,
-			flags, outfmt);
+                        width, height,
+                        d_width, d_height,
+                        flags, outfmt);
 }
 
 static int
@@ -129,8 +129,8 @@ put_image (struct vf_instance *vf, mp_image_t *mpi, double pts)
   lavc_picture.linesize[2] = mpi->stride[2];
 
   dmpi = vf_get_image(vf->next, mpi->imgfmt,
-		      MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
-		      priv->width, priv->height);
+                      MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
+                      priv->width, priv->height);
 
   pic.data[0]     = dmpi->planes[0];
   pic.data[1]     = dmpi->planes[1];
@@ -140,7 +140,7 @@ put_image (struct vf_instance *vf, mp_image_t *mpi, double pts)
   pic.linesize[2] = dmpi->stride[2];
 
   if (avpicture_deinterlace(&pic, &lavc_picture,
-			    priv->pix_fmt, priv->width, priv->height) < 0)
+                            priv->pix_fmt, priv->width, priv->height) < 0)
     {
       /* This should not happen -- see config() */
       return 0;

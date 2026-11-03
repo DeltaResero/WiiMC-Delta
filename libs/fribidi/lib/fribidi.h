@@ -48,13 +48,13 @@
 
 #if FRIBIDI_CHARSETS+0
 # include "fribidi-char-sets.h"
-#endif				/* FRIBIDI_CHARSETS */
+#endif              /* FRIBIDI_CHARSETS */
 
 
 #if FRIBIDI_NO_DEPRECATED+0
 #else
 # include "fribidi-deprecated.h"
-#endif				/* !FRIBIDI_NO_DEPRECATED */
+#endif              /* !FRIBIDI_NO_DEPRECATED */
 
 
 #include "fribidi-begindecls.h"

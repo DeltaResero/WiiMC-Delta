@@ -25,11 +25,11 @@
 
 static const ad_info_t info =
 {
-	"aLaw/uLaw audio decoder",
-	"alaw",
-	"Nick Kurshev",
-	"A'rpi",
-	""
+        "aLaw/uLaw audio decoder",
+        "alaw",
+        "Nick Kurshev",
+        "A'rpi",
+        ""
 };
 
 LIBAD_EXTERN(alaw)
@@ -65,12 +65,12 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
     switch(cmd)
     {
       case ADCTRL_SKIP_FRAME:
-	skip=sh->i_bps/16;
-	skip=skip&(~3);
-	demux_read_data(sh->ds,NULL,skip);
-	return CONTROL_TRUE;
+        skip=sh->i_bps/16;
+        skip=skip&(~3);
+        demux_read_data(sh->ds,NULL,skip);
+        return CONTROL_TRUE;
       default:
-	return CONTROL_UNKNOWN;
+        return CONTROL_UNKNOWN;
     }
   return CONTROL_UNKNOWN;
 }

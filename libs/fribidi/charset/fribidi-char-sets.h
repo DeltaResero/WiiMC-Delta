@@ -63,10 +63,10 @@ FriBidiCharSet;
  * Returns: The length of the new string.
  */
 FRIBIDI_ENTRY FriBidiStrIndex fribidi_charset_to_unicode (
-  FriBidiCharSet char_set,	/* character set to convert from */
-  const char *s,		/* input string encoded in char_set */
-  FriBidiStrIndex len,		/* input string length */
-  FriBidiChar *us		/* output Unicode string */
+  FriBidiCharSet char_set,      /* character set to convert from */
+  const char *s,                /* input string encoded in char_set */
+  FriBidiStrIndex len,          /* input string length */
+  FriBidiChar *us               /* output Unicode string */
 );
 
 #define fribidi_unicode_to_charset FRIBIDI_NAMESPACE(unicode_to_charset)
@@ -78,10 +78,10 @@ FRIBIDI_ENTRY FriBidiStrIndex fribidi_charset_to_unicode (
  * Returns: The length of the new string.
  */
 FRIBIDI_ENTRY FriBidiStrIndex fribidi_unicode_to_charset (
-  FriBidiCharSet char_set,	/* character set to conver to */
-  const FriBidiChar *us,	/* input Unicode string */
-  FriBidiStrIndex len,		/* input string length */
-  char *s			/* output string encoded in char_set */
+  FriBidiCharSet char_set,      /* character set to conver to */
+  const FriBidiChar *us,        /* input Unicode string */
+  FriBidiStrIndex len,          /* input string length */
+  char *s                       /* output string encoded in char_set */
 );
 
 #define fribidi_parse_charset FRIBIDI_NAMESPACE(parse_charset)
@@ -91,7 +91,7 @@ FRIBIDI_ENTRY FriBidiStrIndex fribidi_unicode_to_charset (
  * character set is not available.
  */
 FRIBIDI_ENTRY FriBidiCharSet fribidi_parse_charset (
-  const char *s			/* input name of the character set */
+  const char *s                 /* input name of the character set */
 );
 
 

@@ -36,7 +36,7 @@
 #define TDFX_VID_ROP_COPY        0xcc     // src
 #define TDFX_VID_ROP_INVERT      0x55     // NOT dst
 #define TDFX_VID_ROP_XOR         0x66     // src XOR dst
-#define TDFX_VID_ROP_OR		 0xee     // src OR dst
+#define TDFX_VID_ROP_OR          0xee     // src OR dst
 
 #define TDFX_VID_FORMAT_BGR1  (('B'<<24)|('G'<<16)|('R'<<8)|1)
 #define TDFX_VID_FORMAT_BGR8  (('B'<<24)|('G'<<16)|('R'<<8)|8)

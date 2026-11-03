@@ -395,12 +395,12 @@ void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
     //------------------------ frame decoded. --------------------
 
     if (mpi && mpi->type == MP_IMGTYPE_INCOMPLETE) {
-	got_picture = 0;
-	mpi = NULL;
+        got_picture = 0;
+        mpi = NULL;
     }
 
     if (full_frame)
-	*full_frame = got_picture;
+        *full_frame = got_picture;
 
     delay = get_current_video_decoder_lag(sh_video);
     if (correct_pts && pts != MP_NOPTS_VALUE

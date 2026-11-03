@@ -73,13 +73,13 @@ m_struct_set(const m_struct_t* st, void* obj, const char* field, const char* par
 
   if(!f) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR,"Struct %s doesn't have any %s field\n",
-	   st->name,field);
+           st->name,field);
     return 0;
   }
 
   if(f->type->parse(f,field,param,M_ST_MB_P(obj,f->p),M_CONFIG_FILE) < 0) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR,"Struct %s, field %s parsing error: %s\n",
-	   st->name,field,param);
+           st->name,field,param);
     return 0;
   }
 
@@ -101,7 +101,7 @@ m_struct_reset(const m_struct_t* st, void* obj, const char* field) {
   f = m_struct_get_field(st,field);
   if(!f) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR,"Struct %s doesn't have any %s field\n",
-	   st->name,field);
+           st->name,field);
     return;
   }
   m_option_copy(f,M_ST_MB_P(obj,f->p),M_ST_MB_P(st->defaults,f->p));

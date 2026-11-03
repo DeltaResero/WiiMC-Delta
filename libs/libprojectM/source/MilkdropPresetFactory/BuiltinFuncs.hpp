@@ -99,13 +99,13 @@ float l=1;
 
 //  printf("RAND ARG:(%d)\n", (int)arg_list[0]);
 if ((int)arg_list[0] > 0)
-	l  = (float) RandomNumberGenerators::uniformInteger((int)arg_list[0]);
+    l  = (float) RandomNumberGenerators::uniformInteger((int)arg_list[0]);
 
 return l;
 }
 
 static inline float equal_wrapper(float * arg_list) {
-	return (arg_list[0] == arg_list[1]);
+    return (arg_list[0] == arg_list[1]);
 }
 
 

@@ -149,72 +149,72 @@ static OSStatus theRenderProc(void *inRefCon,
 int amt=av_fifo_size(ao->buffer);
 int req=(inNumFrames)*ao->packetSize;
 
-	if(amt>req)
- 		amt=req;
+        if(amt>req)
+                amt=req;
 
-	if(amt)
-		read_buffer((unsigned char *)ioData->mBuffers[0].mData, amt);
-	else audio_pause();
-	ioData->mBuffers[0].mDataByteSize = amt;
+        if(amt)
+                read_buffer((unsigned char *)ioData->mBuffers[0].mData, amt);
+        else audio_pause();
+        ioData->mBuffers[0].mDataByteSize = amt;
 
- 	return noErr;
+        return noErr;
 }
 
 static int control(int cmd,void *arg){
 ao_control_vol_t *control_vol;
 OSStatus err;
 Float32 vol;
-	switch (cmd) {
-	case AOCONTROL_GET_VOLUME:
-		control_vol = (ao_control_vol_t*)arg;
-		if (ao->b_digital) {
-			// Digital output has no volume adjust.
-			return CONTROL_FALSE;
-		}
-		err = AudioUnitGetParameter(ao->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Global, 0, &vol);
+        switch (cmd) {
+        case AOCONTROL_GET_VOLUME:
+                control_vol = (ao_control_vol_t*)arg;
+                if (ao->b_digital) {
+                        // Digital output has no volume adjust.
+                        return CONTROL_FALSE;
+                }
+                err = AudioUnitGetParameter(ao->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Global, 0, &vol);
 
-		if(err==0) {
-			// printf("GET VOL=%f\n", vol);
-			control_vol->left=control_vol->right=vol*100.0/4.0;
-			return CONTROL_TRUE;
-		}
-		else {
-			ao_msg(MSGT_AO, MSGL_WARN, "could not get HAL output volume: [%4.4s]\n", (char *)&err);
-			return CONTROL_FALSE;
-		}
+                if(err==0) {
+                        // printf("GET VOL=%f\n", vol);
+                        control_vol->left=control_vol->right=vol*100.0/4.0;
+                        return CONTROL_TRUE;
+                }
+                else {
+                        ao_msg(MSGT_AO, MSGL_WARN, "could not get HAL output volume: [%4.4s]\n", (char *)&err);
+                        return CONTROL_FALSE;
+                }
 
-	case AOCONTROL_SET_VOLUME:
-		control_vol = (ao_control_vol_t*)arg;
+        case AOCONTROL_SET_VOLUME:
+                control_vol = (ao_control_vol_t*)arg;
 
-		if (ao->b_digital) {
-			// Digital output can not set volume. Here we have to return true
-			// to make mixer forget it. Else mixer will add a soft filter,
-			// that's not we expected and the filter not support ac3 stream
-			// will cause mplayer die.
+                if (ao->b_digital) {
+                        // Digital output can not set volume. Here we have to return true
+                        // to make mixer forget it. Else mixer will add a soft filter,
+                        // that's not we expected and the filter not support ac3 stream
+                        // will cause mplayer die.
 
-			// Although not support set volume, but at least we support mute.
-			// MPlayer set mute by set volume to zero, we handle it.
-			if (control_vol->left == 0 && control_vol->right == 0)
-				ao->b_muted = 1;
-			else
-				ao->b_muted = 0;
-			return CONTROL_TRUE;
-		}
+                        // Although not support set volume, but at least we support mute.
+                        // MPlayer set mute by set volume to zero, we handle it.
+                        if (control_vol->left == 0 && control_vol->right == 0)
+                                ao->b_muted = 1;
+                        else
+                                ao->b_muted = 0;
+                        return CONTROL_TRUE;
+                }
 
-		vol=(control_vol->left+control_vol->right)*4.0/200.0;
-		err = AudioUnitSetParameter(ao->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Global, 0, vol, 0);
-		if(err==0) {
-			// printf("SET VOL=%f\n", vol);
-			return CONTROL_TRUE;
-		}
-		else {
-			ao_msg(MSGT_AO, MSGL_WARN, "could not set HAL output volume: [%4.4s]\n", (char *)&err);
-			return CONTROL_FALSE;
-		}
-	  /* Everything is currently unimplemented */
-	default:
-	  return CONTROL_FALSE;
-	}
+                vol=(control_vol->left+control_vol->right)*4.0/200.0;
+                err = AudioUnitSetParameter(ao->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Global, 0, vol, 0);
+                if(err==0) {
+                        // printf("SET VOL=%f\n", vol);
+                        return CONTROL_TRUE;
+                }
+                else {
+                        ao_msg(MSGT_AO, MSGL_WARN, "could not set HAL output volume: [%4.4s]\n", (char *)&err);
+                        return CONTROL_FALSE;
+                }
+          /* Everything is currently unimplemented */
+        default:
+          return CONTROL_FALSE;
+        }
 
 }
 
@@ -222,20 +222,20 @@ Float32 vol;
 static void print_format(int lev, const char* str, const AudioStreamBasicDescription *f){
     uint32_t flags=(uint32_t) f->mFormatFlags;
     ao_msg(MSGT_AO,lev, "%s %7.1fHz %"PRIu32"bit [%c%c%c%c][%"PRIu32"][%"PRIu32"][%"PRIu32"][%"PRIu32"][%"PRIu32"] %s %s %s%s%s%s\n",
-	    str, f->mSampleRate, f->mBitsPerChannel,
-	    (int)(f->mFormatID & 0xff000000) >> 24,
-	    (int)(f->mFormatID & 0x00ff0000) >> 16,
-	    (int)(f->mFormatID & 0x0000ff00) >>  8,
-	    (int)(f->mFormatID & 0x000000ff) >>  0,
-	    f->mFormatFlags, f->mBytesPerPacket,
-	    f->mFramesPerPacket, f->mBytesPerFrame,
-	    f->mChannelsPerFrame,
-	    (flags&kAudioFormatFlagIsFloat) ? "float" : "int",
-	    (flags&kAudioFormatFlagIsBigEndian) ? "BE" : "LE",
-	    (flags&kAudioFormatFlagIsSignedInteger) ? "S" : "U",
-	    (flags&kAudioFormatFlagIsPacked) ? " packed" : "",
-	    (flags&kAudioFormatFlagIsAlignedHigh) ? " aligned" : "",
-	    (flags&kAudioFormatFlagIsNonInterleaved) ? " ni" : "" );
+            str, f->mSampleRate, f->mBitsPerChannel,
+            (int)(f->mFormatID & 0xff000000) >> 24,
+            (int)(f->mFormatID & 0x00ff0000) >> 16,
+            (int)(f->mFormatID & 0x0000ff00) >>  8,
+            (int)(f->mFormatID & 0x000000ff) >>  0,
+            f->mFormatFlags, f->mBytesPerPacket,
+            f->mFramesPerPacket, f->mBytesPerFrame,
+            f->mChannelsPerFrame,
+            (flags&kAudioFormatFlagIsFloat) ? "float" : "int",
+            (flags&kAudioFormatFlagIsBigEndian) ? "BE" : "LE",
+            (flags&kAudioFormatFlagIsSignedInteger) ? "S" : "U",
+            (flags&kAudioFormatFlagIsPacked) ? " packed" : "",
+            (flags&kAudioFormatFlagIsAlignedHigh) ? " aligned" : "",
+            (flags&kAudioFormatFlagIsNonInterleaved) ? " ni" : "" );
 }
 
 static OSStatus GetAudioProperty(AudioObjectID id,
@@ -492,23 +492,23 @@ int device_id, display_help = 0;
     // Save selected device id
     ao->i_selected_dev = devid_def;
 
-	// Build Description for the input format
-	inDesc.mSampleRate=rate;
-	inDesc.mFormatID=ao->b_supports_digital ? kAudioFormat60958AC3 : kAudioFormatLinearPCM;
-	inDesc.mChannelsPerFrame=channels;
-	inDesc.mBitsPerChannel=af_fmt2bits(format);
+        // Build Description for the input format
+        inDesc.mSampleRate=rate;
+        inDesc.mFormatID=ao->b_supports_digital ? kAudioFormat60958AC3 : kAudioFormatLinearPCM;
+        inDesc.mChannelsPerFrame=channels;
+        inDesc.mBitsPerChannel=af_fmt2bits(format);
 
     if((format&AF_FORMAT_POINT_MASK)==AF_FORMAT_F) {
-	// float
-		inDesc.mFormatFlags = kAudioFormatFlagIsFloat|kAudioFormatFlagIsPacked;
+        // float
+                inDesc.mFormatFlags = kAudioFormatFlagIsFloat|kAudioFormatFlagIsPacked;
     }
     else if((format&AF_FORMAT_SIGN_MASK)==AF_FORMAT_SI) {
-	// signed int
-		inDesc.mFormatFlags = kAudioFormatFlagIsSignedInteger|kAudioFormatFlagIsPacked;
+        // signed int
+                inDesc.mFormatFlags = kAudioFormatFlagIsSignedInteger|kAudioFormatFlagIsPacked;
     }
     else {
-	// unsigned int
-		inDesc.mFormatFlags = kAudioFormatFlagIsPacked;
+        // unsigned int
+                inDesc.mFormatFlags = kAudioFormatFlagIsPacked;
     }
     if ((format & AF_FORMAT_END_MASK) == AF_FORMAT_BE)
         inDesc.mFormatFlags |= kAudioFormatFlagIsBigEndian;
@@ -549,75 +549,75 @@ int device_id, display_help = 0;
         return OpenSPDIF();
     }
 
-	/* original analog output code */
-	desc.componentType = kAudioUnitType_Output;
-	desc.componentSubType = (device_id == 0) ? kAudioUnitSubType_DefaultOutput : kAudioUnitSubType_HALOutput;
-	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-	desc.componentFlags = 0;
-	desc.componentFlagsMask = 0;
+        /* original analog output code */
+        desc.componentType = kAudioUnitType_Output;
+        desc.componentSubType = (device_id == 0) ? kAudioUnitSubType_DefaultOutput : kAudioUnitSubType_HALOutput;
+        desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+        desc.componentFlags = 0;
+        desc.componentFlagsMask = 0;
 
-	comp = FindNextComponent(NULL, &desc);  //Finds an component that meets the desc spec's
-	if (comp == NULL) {
-		ao_msg(MSGT_AO, MSGL_WARN, "Unable to find Output Unit component\n");
-		goto err_out;
-	}
+        comp = FindNextComponent(NULL, &desc);  //Finds an component that meets the desc spec's
+        if (comp == NULL) {
+                ao_msg(MSGT_AO, MSGL_WARN, "Unable to find Output Unit component\n");
+                goto err_out;
+        }
 
-	err = OpenAComponent(comp, &(ao->theOutputUnit));  //gains access to the services provided by the component
-	if (err) {
-		ao_msg(MSGT_AO, MSGL_WARN, "Unable to open Output Unit component: [%4.4s]\n", (char *)&err);
-		goto err_out;
-	}
+        err = OpenAComponent(comp, &(ao->theOutputUnit));  //gains access to the services provided by the component
+        if (err) {
+                ao_msg(MSGT_AO, MSGL_WARN, "Unable to open Output Unit component: [%4.4s]\n", (char *)&err);
+                goto err_out;
+        }
 
-	// Initialize AudioUnit
-	err = AudioUnitInitialize(ao->theOutputUnit);
-	if (err) {
-		ao_msg(MSGT_AO, MSGL_WARN, "Unable to initialize Output Unit component: [%4.4s]\n", (char *)&err);
-		goto err_out1;
-	}
+        // Initialize AudioUnit
+        err = AudioUnitInitialize(ao->theOutputUnit);
+        if (err) {
+                ao_msg(MSGT_AO, MSGL_WARN, "Unable to initialize Output Unit component: [%4.4s]\n", (char *)&err);
+                goto err_out1;
+        }
 
-	size =  sizeof(AudioStreamBasicDescription);
-	err = AudioUnitSetProperty(ao->theOutputUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &inDesc, size);
+        size =  sizeof(AudioStreamBasicDescription);
+        err = AudioUnitSetProperty(ao->theOutputUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &inDesc, size);
 
-	if (err) {
-		ao_msg(MSGT_AO, MSGL_WARN, "Unable to set the input format: [%4.4s]\n", (char *)&err);
-		goto err_out2;
-	}
+        if (err) {
+                ao_msg(MSGT_AO, MSGL_WARN, "Unable to set the input format: [%4.4s]\n", (char *)&err);
+                goto err_out2;
+        }
 
-	size = sizeof(UInt32);
-	err = AudioUnitGetProperty(ao->theOutputUnit, kAudioDevicePropertyBufferSize, kAudioUnitScope_Input, 0, &maxFrames, &size);
+        size = sizeof(UInt32);
+        err = AudioUnitGetProperty(ao->theOutputUnit, kAudioDevicePropertyBufferSize, kAudioUnitScope_Input, 0, &maxFrames, &size);
 
-	if (err)
-	{
-		ao_msg(MSGT_AO,MSGL_WARN, "AudioUnitGetProperty returned [%4.4s] when getting kAudioDevicePropertyBufferSize\n", (char *)&err);
-		goto err_out2;
-	}
+        if (err)
+        {
+                ao_msg(MSGT_AO,MSGL_WARN, "AudioUnitGetProperty returned [%4.4s] when getting kAudioDevicePropertyBufferSize\n", (char *)&err);
+                goto err_out2;
+        }
 
-	//Set the Current Device to the Default Output Unit.
+        //Set the Current Device to the Default Output Unit.
     err = AudioUnitSetProperty(ao->theOutputUnit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &ao->i_selected_dev, sizeof(ao->i_selected_dev));
 
-	ao->chunk_size = maxFrames;//*inDesc.mBytesPerFrame;
+        ao->chunk_size = maxFrames;//*inDesc.mBytesPerFrame;
 
-	ao_data.samplerate = inDesc.mSampleRate;
-	ao_data.channels = inDesc.mChannelsPerFrame;
+        ao_data.samplerate = inDesc.mSampleRate;
+        ao_data.channels = inDesc.mChannelsPerFrame;
     ao_data.bps = ao_data.samplerate * inDesc.mBytesPerFrame;
     ao_data.outburst = ao->chunk_size;
-	ao_data.buffersize = ao_data.bps;
+        ao_data.buffersize = ao_data.bps;
 
-	ao->num_chunks = (ao_data.bps+ao->chunk_size-1)/ao->chunk_size;
+        ao->num_chunks = (ao_data.bps+ao->chunk_size-1)/ao->chunk_size;
     ao->buffer_len = ao->num_chunks * ao->chunk_size;
     ao->buffer = av_fifo_alloc(ao->buffer_len);
 
-	ao_msg(MSGT_AO,MSGL_V, "using %5d chunks of %d bytes (buffer len %d bytes)\n", (int)ao->num_chunks, (int)ao->chunk_size, (int)ao->buffer_len);
+        ao_msg(MSGT_AO,MSGL_V, "using %5d chunks of %d bytes (buffer len %d bytes)\n", (int)ao->num_chunks, (int)ao->chunk_size, (int)ao->buffer_len);
 
     renderCallback.inputProc = theRenderProc;
     renderCallback.inputProcRefCon = 0;
     err = AudioUnitSetProperty(ao->theOutputUnit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &renderCallback, sizeof(AURenderCallbackStruct));
-	if (err) {
-		ao_msg(MSGT_AO, MSGL_WARN, "Unable to set the render callback: [%4.4s]\n", (char *)&err);
-		goto err_out2;
-	}
+        if (err) {
+                ao_msg(MSGT_AO, MSGL_WARN, "Unable to set the render callback: [%4.4s]\n", (char *)&err);
+                goto err_out2;
+        }
 
-	reset();
+        reset();
 
     return CONTROL_OK;
 

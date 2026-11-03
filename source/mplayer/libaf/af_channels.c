@@ -110,7 +110,7 @@ static void copy(void* in, void* out, int ins, int inos,int outs, int outos, int
   }
   default:
     mp_msg(MSGT_AFILTER, MSGL_ERR, "[channels] Unsupported number of bytes/sample: %i"
-	   " please report this error on the MPlayer mailing list. \n",bps);
+           " please report this error on the MPlayer mailing list. \n",bps);
   }
 }
 
@@ -120,7 +120,7 @@ static int check_routes(af_channels_t* s, int nin, int nout)
   int i;
   if((s->nr < 1) || (s->nr > AF_NCH)){
     mp_msg(MSGT_AFILTER, MSGL_ERR, "[channels] The number of routing pairs must be"
-	   " between 1 and %i. Current value is %i\n",AF_NCH,s->nr);
+           " between 1 and %i. Current value is %i\n",AF_NCH,s->nr);
     return AF_ERROR;
   }
 
@@ -145,22 +145,22 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       int i;
       // Make sure this filter isn't redundant
       if(af->data->nch == ((af_data_t*)arg)->nch)
-	return AF_DETACH;
+        return AF_DETACH;
 
       // If mono: fake stereo
       if(((af_data_t*)arg)->nch == 1){
-	s->nr = min(af->data->nch,2);
-	for(i=0;i<s->nr;i++){
-	  s->route[i][FR] = 0;
-	  s->route[i][TO] = i;
-	}
+        s->nr = min(af->data->nch,2);
+        for(i=0;i<s->nr;i++){
+          s->route[i][FR] = 0;
+          s->route[i][TO] = i;
+        }
       }
       else{
-	s->nr = min(af->data->nch, ((af_data_t*)arg)->nch);
-	for(i=0;i<s->nr;i++){
-	  s->route[i][FR] = i;
-	  s->route[i][TO] = i;
-	}
+        s->nr = min(af->data->nch, ((af_data_t*)arg)->nch);
+        for(i=0;i<s->nr;i++){
+          s->route[i][FR] = i;
+          s->route[i][TO] = i;
+        }
       }
     }
 
@@ -181,17 +181,17 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       int ch = 0;
       // Sanity check
       if((s->nr < 1) || (s->nr > AF_NCH)){
-	mp_msg(MSGT_AFILTER, MSGL_ERR, "[channels] The number of routing pairs must be"
-	     " between 1 and %i. Current value is %i\n",AF_NCH,s->nr);
+        mp_msg(MSGT_AFILTER, MSGL_ERR, "[channels] The number of routing pairs must be"
+             " between 1 and %i. Current value is %i\n",AF_NCH,s->nr);
       }
       s->router = 1;
       // Scan for pairs on commandline
       while((*cp == ':') && (ch < s->nr)){
-	sscanf(cp, ":%i:%i%n" ,&s->route[ch][FR], &s->route[ch][TO], &n);
-	mp_msg(MSGT_AFILTER, MSGL_V, "[channels] Routing from channel %i to"
-	       " channel %i\n",s->route[ch][FR],s->route[ch][TO]);
-	cp = &cp[n];
-	ch++;
+        sscanf(cp, ":%i:%i%n" ,&s->route[ch][FR], &s->route[ch][TO], &n);
+        mp_msg(MSGT_AFILTER, MSGL_V, "[channels] Routing from channel %i to"
+               " channel %i\n",s->route[ch][FR],s->route[ch][TO]);
+        cp = &cp[n];
+        ch++;
       }
     }
 
@@ -205,14 +205,14 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     // Sanity check
     if(((int*)arg)[0] <= 0 || ((int*)arg)[0] > AF_NCH){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[channels] The number of output channels must be"
-	     " between 1 and %i. Current value is %i\n",AF_NCH,((int*)arg)[0]);
+             " between 1 and %i. Current value is %i\n",AF_NCH,((int*)arg)[0]);
       return AF_ERROR;
     }
 
     af->data->nch=((int*)arg)[0];
     if(!s->router)
       mp_msg(MSGT_AFILTER, MSGL_V, "[channels] Changing number of channels"
-	     " to %i\n",af->data->nch);
+             " to %i\n",af->data->nch);
     return AF_OK;
   case AF_CONTROL_CHANNELS | AF_CONTROL_GET:
     *(int*)arg = af->data->nch;
@@ -259,10 +259,10 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   	 c = data;			// Current working data
-  af_data_t*   	 l = af->data;	 		// Local data
+  af_data_t*     c = data;                      // Current working data
+  af_data_t*     l = af->data;                  // Local data
   af_channels_t* s = af->setup;
-  int 		 i;
+  int            i;
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
     return NULL;
@@ -273,7 +273,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
   if(AF_OK == check_routes(s,c->nch,l->nch))
     for(i=0;i<s->nr;i++)
       copy(c->audio,l->audio,c->nch,s->route[i][FR],
-	   l->nch,s->route[i][TO],c->len,c->bps);
+           l->nch,s->route[i][TO],c->len,c->bps);
 
   // Set output data
   c->audio = l->audio;

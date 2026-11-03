@@ -95,7 +95,7 @@ init(sh_video_t *sh)
 static void
 uninit(sh_video_t *sh)
 {
-  SGIInfo	*info = sh->context;
+  SGIInfo       *info = sh->context;
   free(info);
 }
 

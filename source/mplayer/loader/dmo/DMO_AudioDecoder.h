@@ -12,8 +12,8 @@ DMO_AudioDecoder * DMO_AudioDecoder_Open(char* dllname, GUID* guid, WAVEFORMATEX
 void DMO_AudioDecoder_Destroy(DMO_AudioDecoder *this);
 
 int DMO_AudioDecoder_Convert(DMO_AudioDecoder *this, const void* in_data, unsigned int in_size,
-			     void* out_data, unsigned int out_size,
-			     unsigned int* size_read, unsigned int* size_written);
+                 void* out_data, unsigned int out_size,
+                 unsigned int* size_read, unsigned int* size_written);
 
 int DMO_AudioDecoder_GetSrcSize(DMO_AudioDecoder *this, int dest_size);
 

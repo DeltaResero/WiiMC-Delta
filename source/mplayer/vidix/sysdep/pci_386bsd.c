@@ -40,11 +40,11 @@ static inline int enable_os_io(void)
     io_fd = -1 ;
     if ((io_fd = open("/dev/console", O_RDWR, 0)) < 0) {
         perror("/dev/console");
-	return errno;
+    return errno;
     }
     if (ioctl(io_fd, KDENABIO, 0) < 0) {
         perror("ioctl(KDENABIO)");
-	return errno;
+    return errno;
     }
     return 0;
 }
@@ -53,8 +53,8 @@ static inline int disable_os_io(void)
 {
     if (ioctl(io_fd, KDDISABIO, 0) < 0) {
         perror("ioctl(KDDISABIO)");
-	close(io_fd);
-	return errno;
+    close(io_fd);
+    return errno;
     }
     close(io_fd);
     return 0;

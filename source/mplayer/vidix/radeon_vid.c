@@ -264,23 +264,23 @@ static const video_registers_t vregs[] =
 #endif
 };
 
-#define R_FAMILY	0x000000FF
-#define R_100		0x00000001
-#define R_120		0x00000002
-#define R_150		0x00000004
-#define R_200		0x00000008
-#define R_250		0x00000010
-#define R_280		0x00000020
-#define R_300		0x00000040
-#define R_350		0x00000080
-#define R_370		0x00000100
-#define R_380		0x00000200
-#define R_420		0x00000400
-#define R_430		0x00000800
-#define R_480		0x00001000
-#define R_OVL_SHIFT	0x01000000
-#define R_INTEGRATED	0x02000000
-#define R_PCIE		0x04000000
+#define R_FAMILY        0x000000FF
+#define R_100           0x00000001
+#define R_120           0x00000002
+#define R_150           0x00000004
+#define R_200           0x00000008
+#define R_250           0x00000010
+#define R_280           0x00000020
+#define R_300           0x00000040
+#define R_350           0x00000080
+#define R_370           0x00000100
+#define R_380           0x00000200
+#define R_420           0x00000400
+#define R_430           0x00000800
+#define R_480           0x00001000
+#define R_OVL_SHIFT     0x01000000
+#define R_INTEGRATED    0x02000000
+#define R_PCIE          0x04000000
 
 typedef struct ati_card_ids_s
 {
@@ -351,175 +351,175 @@ static const ati_card_ids_t ati_card_ids[] =
  { DEVICE_ATI_RAGE_MOBILITY_M32, 0 },
 #else
 /* Radeon1 (indeed: Rage 256 Pro ;) */
- { DEVICE_ATI_RADEON_R100_QD,		R_100|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R100_QE,		R_100|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R100_QF,		R_100|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R100_QG,		R_100|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_IGP_320,		R_150|R_OVL_SHIFT|R_INTEGRATED },
- { DEVICE_ATI_RADEON_MOBILITY_U1,	R_150|R_OVL_SHIFT|R_INTEGRATED },
- { DEVICE_ATI_RADEON_RV100_QY,		R_120|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV100_QZ,		R_120|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_MOBILITY_M7,	R_150|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV200_LX,		R_150|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_MOBILITY_M6,	R_120|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_MOBILITY_M62,	R_120|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R100_QD,           R_100|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R100_QE,           R_100|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R100_QF,           R_100|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R100_QG,           R_100|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_IGP_320,           R_150|R_OVL_SHIFT|R_INTEGRATED },
+ { DEVICE_ATI_RADEON_MOBILITY_U1,       R_150|R_OVL_SHIFT|R_INTEGRATED },
+ { DEVICE_ATI_RADEON_RV100_QY,          R_120|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV100_QZ,          R_120|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_MOBILITY_M7,       R_150|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV200_LX,          R_150|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_MOBILITY_M6,       R_120|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_MOBILITY_M62,      R_120|R_OVL_SHIFT },
 /* Radeon2 (indeed: Rage 512 Pro ;) */
- { DEVICE_ATI_R200_BB_RADEON,		R_200 },
- { DEVICE_ATI_R200_BC_RADEON,		R_200 },
- { DEVICE_ATI_RADEON_R200_QH,		R_200 },
- { DEVICE_ATI_RADEON_R200_QI,		R_200 },
- { DEVICE_ATI_RADEON_R200_QJ,		R_200 },
- { DEVICE_ATI_RADEON_R200_QK,		R_200 },
- { DEVICE_ATI_RADEON_R200_QL,		R_200 },
- { DEVICE_ATI_RADEON_R200_QM,		R_200 },
- { DEVICE_ATI_RADEON_R200_QN,		R_200 },
- { DEVICE_ATI_RADEON_R200_QO,		R_200 },
- { DEVICE_ATI_RADEON_R200_QH2,		R_200 },
- { DEVICE_ATI_RADEON_R200_QI2,		R_200 },
- { DEVICE_ATI_RADEON_R200_QJ2,		R_200 },
- { DEVICE_ATI_RADEON_R200_QK2,		R_200 },
- { DEVICE_ATI_RADEON_R200_QL2,		R_200 },
- { DEVICE_ATI_RADEON_RV200_QW,		R_150|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV200_QX,		R_150|R_OVL_SHIFT },
+ { DEVICE_ATI_R200_BB_RADEON,           R_200 },
+ { DEVICE_ATI_R200_BC_RADEON,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QH,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QI,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QJ,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QK,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QL,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QM,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QN,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QO,           R_200 },
+ { DEVICE_ATI_RADEON_R200_QH2,          R_200 },
+ { DEVICE_ATI_RADEON_R200_QI2,          R_200 },
+ { DEVICE_ATI_RADEON_R200_QJ2,          R_200 },
+ { DEVICE_ATI_RADEON_R200_QK2,          R_200 },
+ { DEVICE_ATI_RADEON_R200_QL2,          R_200 },
+ { DEVICE_ATI_RADEON_RV200_QW,          R_150|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV200_QX,          R_150|R_OVL_SHIFT },
  { DEVICE_ATI_RADEON_IGP330_340_350,R_200|R_INTEGRATED },
  { DEVICE_ATI_RADEON_IGP_330M_340M_350M,R_200|R_INTEGRATED },
- { DEVICE_ATI_RADEON_RV250_IG,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_7000_IGP,		R_250|R_OVL_SHIFT|R_INTEGRATED },
- { DEVICE_ATI_RADEON_MOBILITY_7000,	R_250|R_OVL_SHIFT|R_INTEGRATED },
- { DEVICE_ATI_RADEON_RV250_ID,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV250_IE,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV250_IF,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV250_IG,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R250_LD,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R250_LE,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R250_MOBILITY,	R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_R250_LG,		R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RV250_RADEON_9000,	R_250|R_OVL_SHIFT },
- { DEVICE_ATI_RADEON_RV250_RADEON2,	R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV250_IG,          R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_7000_IGP,          R_250|R_OVL_SHIFT|R_INTEGRATED },
+ { DEVICE_ATI_RADEON_MOBILITY_7000,     R_250|R_OVL_SHIFT|R_INTEGRATED },
+ { DEVICE_ATI_RADEON_RV250_ID,          R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV250_IE,          R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV250_IF,          R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV250_IG,          R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R250_LD,           R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R250_LE,           R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R250_MOBILITY,     R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_R250_LG,           R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RV250_RADEON_9000,        R_250|R_OVL_SHIFT },
+ { DEVICE_ATI_RADEON_RV250_RADEON2,     R_250|R_OVL_SHIFT },
  // Only 92006 and 92007 tested to actually require this
- { DEVICE_ATI_RV280_RADEON_9200,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92002,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92003,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92004,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92005,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92006,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_RV280_RADEON_92007,	R_280|R_OVL_SHIFT },
- { DEVICE_ATI_M9_5C61_RADEON,		R_280|R_OVL_SHIFT },
- { DEVICE_ATI_M9_5C63_RADEON,		R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_9200,        R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92002,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92003,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92004,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92005,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92006,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_RV280_RADEON_92007,       R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_M9_5C61_RADEON,           R_280|R_OVL_SHIFT },
+ { DEVICE_ATI_M9_5C63_RADEON,           R_280|R_OVL_SHIFT },
 /* Radeon3 (indeed: Rage 1024 Pro ;) */
- { DEVICE_ATI_R300_AG_FIREGL,		R_300 },
- { DEVICE_ATI_RADEON_R300_ND,		R_300 },
- { DEVICE_ATI_RADEON_R300_NE,		R_300 },
- { DEVICE_ATI_RADEON_R300_NG,		R_300 },
- { DEVICE_ATI_R300_AD_RADEON,		R_300 },
- { DEVICE_ATI_R300_AE_RADEON,		R_300 },
- { DEVICE_ATI_R300_AF_RADEON,		R_300 },
- { DEVICE_ATI_RADEON_9100_IGP2,		R_300|R_OVL_SHIFT|R_INTEGRATED },
- { DEVICE_ATI_RS300M_AGP_RADEON,	R_300|R_INTEGRATED },
- { DEVICE_ATI_RS482_RADEON_XPRESS,	R_350|R_INTEGRATED },
- { DEVICE_ATI_R350_AH_RADEON,		R_350 },
- { DEVICE_ATI_R350_AI_RADEON,		R_350 },
- { DEVICE_ATI_R350_AJ_RADEON,		R_350 },
- { DEVICE_ATI_R350_AK_FIRE,		R_350 },
- { DEVICE_ATI_RADEON_R350_RADEON2,	R_350 },
- { DEVICE_ATI_RADEON_R350_RADEON3,	R_350 },
- { DEVICE_ATI_RV350_NJ_RADEON,		R_350 },
- { DEVICE_ATI_R350_NK_FIRE,		R_350 },
- { DEVICE_ATI_RV350_AP_RADEON,		R_350 },
- { DEVICE_ATI_RV350_AQ_RADEON,		R_350 },
- { DEVICE_ATI_RV350_AR_RADEON,		R_350 },
- { DEVICE_ATI_RV350_AS_RADEON,		R_350 },
- { DEVICE_ATI_RV350_AT_FIRE,		R_350 },
- { DEVICE_ATI_RV350_AU_FIRE,		R_350 },
- { DEVICE_ATI_RV350_AV_FIRE,		R_350 },
- { DEVICE_ATI_RV350_AW_FIRE,		R_350 },
- { DEVICE_ATI_RV350_MOBILITY_RADEON,	R_350 },
- { DEVICE_ATI_RV350_NF_RADEON,		R_300 },
- { DEVICE_ATI_RV350_NJ_RADEON,		R_300 },
- { DEVICE_ATI_RV350_AS_RADEON2,		R_350 },
- { DEVICE_ATI_M10_NQ_RADEON,		R_350 },
- { DEVICE_ATI_M10_NQ_RADEON2,		R_350 },
- { DEVICE_ATI_RV350_MOBILITY_RADEON2,	R_350 },
- { DEVICE_ATI_M10_NS_RADEON,		R_350 },
- { DEVICE_ATI_M10_NT_FIREGL,		R_350 },
- { DEVICE_ATI_M11_NV_FIREGL,		R_350 },
- { DEVICE_ATI_RV370_5B60_RADEON,	R_370|R_PCIE  },
- { DEVICE_ATI_RV370_SAPPHIRE_X550,	R_370 },
- { DEVICE_ATI_RV370_5B64_FIREGL,	R_370|R_PCIE  },
- { DEVICE_ATI_RV370_5B65_FIREGL,	R_370|R_PCIE  },
- { DEVICE_ATI_M24_1P_RADEON,		R_370  },
- { DEVICE_ATI_M22_RADEON_MOBILITY,	R_370  },
- { DEVICE_ATI_M24_1T_FIREGL,		R_370  },
- { DEVICE_ATI_M24_RADEON_MOBILITY,	R_370  },
- { DEVICE_ATI_RV370_RADEON_X300SE,	R_370  },
- { DEVICE_ATI_RV370_SECONDARY_SAPPHIRE,	R_370  },
- { DEVICE_ATI_RV370_5B64_FIREGL2,	R_370  },
- { DEVICE_ATI_RV380_0X3E50_RADEON,	R_380|R_PCIE  },
- { DEVICE_ATI_RV380_0X3E54_FIREGL,	R_380|R_PCIE  },
- { DEVICE_ATI_RV380_RADEON_X600,	R_380|R_PCIE  },
- { DEVICE_ATI_RV380_RADEON_X6002,	R_380  },
- { DEVICE_ATI_RV380_RADEON_X6003,	R_380  },
- { DEVICE_ATI_RV410_FIREGL_V5000,	R_420  },
- { DEVICE_ATI_RV410_FIREGL_V3300,	R_420  },
- { DEVICE_ATI_RV410_RADEON_X700XT,	R_420  },
- { DEVICE_ATI_RV410_RADEON_X700,	R_420|R_PCIE  },
- { DEVICE_ATI_RV410_RADEON_X700SE,	R_420  },
- { DEVICE_ATI_RV410_RADEON_X7002,	R_420|R_PCIE  },
- { DEVICE_ATI_RV410_RADEON_X7003,	R_420  },
- { DEVICE_ATI_RV410_RADEON_X7004,	R_420|R_PCIE  },
- { DEVICE_ATI_RV410_RADEON_X7005,	R_420|R_PCIE  },
- { DEVICE_ATI_M26_MOBILITY_FIREGL,	R_420  },
- { DEVICE_ATI_M26_MOBILITY_FIREGL2,	R_420  },
- { DEVICE_ATI_M26_RADEON_MOBILITY,	R_420  },
- { DEVICE_ATI_M26_RADEON_MOBILITY2,	R_420  },
- { DEVICE_ATI_RADEON_MOBILITY_X700,	R_420  },
- { DEVICE_ATI_R420_JH_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JI_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JJ_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JK_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JL_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JM_FIREGL,		R_420|R_PCIE  },
- { DEVICE_ATI_M18_JN_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_JP_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_RADEON_X800,		R_420|R_PCIE  },
- { DEVICE_ATI_R420_RADEON_X8002,	R_420|R_PCIE  },
- { DEVICE_ATI_R420_RADEON_X8003,	R_420|R_PCIE  },
- { DEVICE_ATI_R420_RADEON_X8004,	R_420|R_PCIE  },
- { DEVICE_ATI_R420_RADEON_X8005,	R_420|R_PCIE  },
- { DEVICE_ATI_R420_JM_FIREGL,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_5F57_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_5F57_RADEON2,	R_420|R_PCIE  },
- { DEVICE_ATI_R423_UH_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UI_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UJ_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UK_RADEON,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_FIRE_GL,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UQ_FIREGL,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UR_FIREGL,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UT_FIREGL,		R_420|R_PCIE  },
- { DEVICE_ATI_R423_UI_RADEON2,		R_420|R_PCIE  },
- { DEVICE_ATI_R423GL_SE_ATI_FIREGL,	R_420|R_PCIE  },
- { DEVICE_ATI_R423_RADEON_X800XT,	R_420|R_PCIE  },
- { DEVICE_ATI_RADEON_R423_UK,		R_420|R_PCIE  },
- { DEVICE_ATI_M28_RADEON_MOBILITY,	R_420  },
- { DEVICE_ATI_M28_MOBILITY_FIREGL,	R_420  },
- { DEVICE_ATI_MOBILITY_RADEON_X800,	R_420  },
- { DEVICE_ATI_R430_RADEON_X800,		R_430|R_PCIE  },
- { DEVICE_ATI_R430_RADEON_X8002,	R_430|R_PCIE  },
- { DEVICE_ATI_R430_RADEON_X8003,	R_430|R_PCIE  },
- { DEVICE_ATI_R430_RADEON_X8004,	R_430|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X800,		R_480  },
- { DEVICE_ATI_R480_RADEON_X8002,	R_480  },
- { DEVICE_ATI_R480_RADEON_X850XT,	R_480  },
- { DEVICE_ATI_R480_RADEON_X850PRO,	R_480  },
- { DEVICE_ATI_R481_RADEON_X850XT_PE,	R_480|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X850XT2,	R_480  },
- { DEVICE_ATI_R480_RADEON_X850PRO2,	R_480  },
- { DEVICE_ATI_R481_RADEON_X850XT_PE2,	R_480|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X850XT3,	R_480|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X850XT4,	R_480|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X850XT5,	R_480|R_PCIE  },
- { DEVICE_ATI_R480_RADEON_X850XT6,	R_480|R_PCIE  },
+ { DEVICE_ATI_R300_AG_FIREGL,           R_300 },
+ { DEVICE_ATI_RADEON_R300_ND,           R_300 },
+ { DEVICE_ATI_RADEON_R300_NE,           R_300 },
+ { DEVICE_ATI_RADEON_R300_NG,           R_300 },
+ { DEVICE_ATI_R300_AD_RADEON,           R_300 },
+ { DEVICE_ATI_R300_AE_RADEON,           R_300 },
+ { DEVICE_ATI_R300_AF_RADEON,           R_300 },
+ { DEVICE_ATI_RADEON_9100_IGP2,         R_300|R_OVL_SHIFT|R_INTEGRATED },
+ { DEVICE_ATI_RS300M_AGP_RADEON,        R_300|R_INTEGRATED },
+ { DEVICE_ATI_RS482_RADEON_XPRESS,      R_350|R_INTEGRATED },
+ { DEVICE_ATI_R350_AH_RADEON,           R_350 },
+ { DEVICE_ATI_R350_AI_RADEON,           R_350 },
+ { DEVICE_ATI_R350_AJ_RADEON,           R_350 },
+ { DEVICE_ATI_R350_AK_FIRE,             R_350 },
+ { DEVICE_ATI_RADEON_R350_RADEON2,      R_350 },
+ { DEVICE_ATI_RADEON_R350_RADEON3,      R_350 },
+ { DEVICE_ATI_RV350_NJ_RADEON,          R_350 },
+ { DEVICE_ATI_R350_NK_FIRE,             R_350 },
+ { DEVICE_ATI_RV350_AP_RADEON,          R_350 },
+ { DEVICE_ATI_RV350_AQ_RADEON,          R_350 },
+ { DEVICE_ATI_RV350_AR_RADEON,          R_350 },
+ { DEVICE_ATI_RV350_AS_RADEON,          R_350 },
+ { DEVICE_ATI_RV350_AT_FIRE,            R_350 },
+ { DEVICE_ATI_RV350_AU_FIRE,            R_350 },
+ { DEVICE_ATI_RV350_AV_FIRE,            R_350 },
+ { DEVICE_ATI_RV350_AW_FIRE,            R_350 },
+ { DEVICE_ATI_RV350_MOBILITY_RADEON,    R_350 },
+ { DEVICE_ATI_RV350_NF_RADEON,          R_300 },
+ { DEVICE_ATI_RV350_NJ_RADEON,          R_300 },
+ { DEVICE_ATI_RV350_AS_RADEON2,         R_350 },
+ { DEVICE_ATI_M10_NQ_RADEON,            R_350 },
+ { DEVICE_ATI_M10_NQ_RADEON2,           R_350 },
+ { DEVICE_ATI_RV350_MOBILITY_RADEON2,   R_350 },
+ { DEVICE_ATI_M10_NS_RADEON,            R_350 },
+ { DEVICE_ATI_M10_NT_FIREGL,            R_350 },
+ { DEVICE_ATI_M11_NV_FIREGL,            R_350 },
+ { DEVICE_ATI_RV370_5B60_RADEON,        R_370|R_PCIE  },
+ { DEVICE_ATI_RV370_SAPPHIRE_X550,      R_370 },
+ { DEVICE_ATI_RV370_5B64_FIREGL,        R_370|R_PCIE  },
+ { DEVICE_ATI_RV370_5B65_FIREGL,        R_370|R_PCIE  },
+ { DEVICE_ATI_M24_1P_RADEON,            R_370  },
+ { DEVICE_ATI_M22_RADEON_MOBILITY,      R_370  },
+ { DEVICE_ATI_M24_1T_FIREGL,            R_370  },
+ { DEVICE_ATI_M24_RADEON_MOBILITY,      R_370  },
+ { DEVICE_ATI_RV370_RADEON_X300SE,      R_370  },
+ { DEVICE_ATI_RV370_SECONDARY_SAPPHIRE, R_370  },
+ { DEVICE_ATI_RV370_5B64_FIREGL2,       R_370  },
+ { DEVICE_ATI_RV380_0X3E50_RADEON,      R_380|R_PCIE  },
+ { DEVICE_ATI_RV380_0X3E54_FIREGL,      R_380|R_PCIE  },
+ { DEVICE_ATI_RV380_RADEON_X600,        R_380|R_PCIE  },
+ { DEVICE_ATI_RV380_RADEON_X6002,       R_380  },
+ { DEVICE_ATI_RV380_RADEON_X6003,       R_380  },
+ { DEVICE_ATI_RV410_FIREGL_V5000,       R_420  },
+ { DEVICE_ATI_RV410_FIREGL_V3300,       R_420  },
+ { DEVICE_ATI_RV410_RADEON_X700XT,      R_420  },
+ { DEVICE_ATI_RV410_RADEON_X700,        R_420|R_PCIE  },
+ { DEVICE_ATI_RV410_RADEON_X700SE,      R_420  },
+ { DEVICE_ATI_RV410_RADEON_X7002,       R_420|R_PCIE  },
+ { DEVICE_ATI_RV410_RADEON_X7003,       R_420  },
+ { DEVICE_ATI_RV410_RADEON_X7004,       R_420|R_PCIE  },
+ { DEVICE_ATI_RV410_RADEON_X7005,       R_420|R_PCIE  },
+ { DEVICE_ATI_M26_MOBILITY_FIREGL,      R_420  },
+ { DEVICE_ATI_M26_MOBILITY_FIREGL2,     R_420  },
+ { DEVICE_ATI_M26_RADEON_MOBILITY,      R_420  },
+ { DEVICE_ATI_M26_RADEON_MOBILITY2,     R_420  },
+ { DEVICE_ATI_RADEON_MOBILITY_X700,     R_420  },
+ { DEVICE_ATI_R420_JH_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JI_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JJ_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JK_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JL_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JM_FIREGL,           R_420|R_PCIE  },
+ { DEVICE_ATI_M18_JN_RADEON,            R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JP_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R420_RADEON_X800,         R_420|R_PCIE  },
+ { DEVICE_ATI_R420_RADEON_X8002,        R_420|R_PCIE  },
+ { DEVICE_ATI_R420_RADEON_X8003,        R_420|R_PCIE  },
+ { DEVICE_ATI_R420_RADEON_X8004,        R_420|R_PCIE  },
+ { DEVICE_ATI_R420_RADEON_X8005,        R_420|R_PCIE  },
+ { DEVICE_ATI_R420_JM_FIREGL,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_5F57_RADEON,         R_420|R_PCIE  },
+ { DEVICE_ATI_R423_5F57_RADEON2,        R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UH_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UI_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UJ_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UK_RADEON,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_FIRE_GL,             R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UQ_FIREGL,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UR_FIREGL,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UT_FIREGL,           R_420|R_PCIE  },
+ { DEVICE_ATI_R423_UI_RADEON2,          R_420|R_PCIE  },
+ { DEVICE_ATI_R423GL_SE_ATI_FIREGL,     R_420|R_PCIE  },
+ { DEVICE_ATI_R423_RADEON_X800XT,       R_420|R_PCIE  },
+ { DEVICE_ATI_RADEON_R423_UK,           R_420|R_PCIE  },
+ { DEVICE_ATI_M28_RADEON_MOBILITY,      R_420  },
+ { DEVICE_ATI_M28_MOBILITY_FIREGL,      R_420  },
+ { DEVICE_ATI_MOBILITY_RADEON_X800,     R_420  },
+ { DEVICE_ATI_R430_RADEON_X800,         R_430|R_PCIE  },
+ { DEVICE_ATI_R430_RADEON_X8002,        R_430|R_PCIE  },
+ { DEVICE_ATI_R430_RADEON_X8003,        R_430|R_PCIE  },
+ { DEVICE_ATI_R430_RADEON_X8004,        R_430|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X800,         R_480  },
+ { DEVICE_ATI_R480_RADEON_X8002,        R_480  },
+ { DEVICE_ATI_R480_RADEON_X850XT,       R_480  },
+ { DEVICE_ATI_R480_RADEON_X850PRO,      R_480  },
+ { DEVICE_ATI_R481_RADEON_X850XT_PE,    R_480|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X850XT2,      R_480  },
+ { DEVICE_ATI_R480_RADEON_X850PRO2,     R_480  },
+ { DEVICE_ATI_R481_RADEON_X850XT_PE2,   R_480|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X850XT3,      R_480|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X850XT4,      R_480|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X850XT5,      R_480|R_PCIE  },
+ { DEVICE_ATI_R480_RADEON_X850XT6,      R_480|R_PCIE  },
 #endif
 };
 
@@ -529,39 +529,39 @@ static void * radeon_mem_base = 0;
 static int32_t radeon_overlay_off = 0;
 static uint32_t radeon_ram_size = 0;
 
-#define GETREG(TYPE,PTR,OFFZ)		(*((volatile TYPE*)((PTR)+(OFFZ))))
-#define SETREG(TYPE,PTR,OFFZ,VAL)	(*((volatile TYPE*)((PTR)+(OFFZ))))=VAL
+#define GETREG(TYPE,PTR,OFFZ)           (*((volatile TYPE*)((PTR)+(OFFZ))))
+#define SETREG(TYPE,PTR,OFFZ,VAL)       (*((volatile TYPE*)((PTR)+(OFFZ))))=VAL
 
-#define INREG8(addr)		GETREG(uint8_t,(uint8_t *)(radeon_mmio_base),addr)
-#define OUTREG8(addr,val)	SETREG(uint8_t,(uint8_t *)(radeon_mmio_base),addr,val)
+#define INREG8(addr)            GETREG(uint8_t,(uint8_t *)(radeon_mmio_base),addr)
+#define OUTREG8(addr,val)       SETREG(uint8_t,(uint8_t *)(radeon_mmio_base),addr,val)
 static inline uint32_t INREG (uint32_t addr) {
     uint32_t tmp = GETREG(uint32_t,(uint8_t *)(radeon_mmio_base),addr);
     return le2me_32(tmp);
 }
-#define OUTREG(addr,val)	SETREG(uint32_t,(uint8_t *)(radeon_mmio_base),addr,le2me_32(val))
-#define OUTREGP(addr,val,mask)						\
-	do {								\
-		unsigned int _tmp = INREG(addr);			\
-		_tmp &= (mask);						\
-		_tmp |= (val);						\
-		OUTREG(addr, _tmp);					\
-	} while (0)
+#define OUTREG(addr,val)        SETREG(uint32_t,(uint8_t *)(radeon_mmio_base),addr,le2me_32(val))
+#define OUTREGP(addr,val,mask)                                          \
+        do {                                                            \
+                unsigned int _tmp = INREG(addr);                        \
+                _tmp &= (mask);                                         \
+                _tmp |= (val);                                          \
+                OUTREG(addr, _tmp);                                     \
+        } while (0)
 
 static inline uint32_t INPLL(uint32_t addr)
 {
-	OUTREG8(CLOCK_CNTL_INDEX, addr & 0x0000001f);
-	return INREG(CLOCK_CNTL_DATA);
+        OUTREG8(CLOCK_CNTL_INDEX, addr & 0x0000001f);
+        return INREG(CLOCK_CNTL_DATA);
 }
 
-#define OUTPLL(addr,val)	OUTREG8(CLOCK_CNTL_INDEX, (addr & 0x0000001f) | 0x00000080); \
-				OUTREG(CLOCK_CNTL_DATA, val)
-#define OUTPLLP(addr,val,mask)						\
-	do {								\
-		unsigned int _tmp = INPLL(addr);			\
-		_tmp &= (mask);						\
-		_tmp |= (val);						\
-		OUTPLL(addr, _tmp);					\
-	} while (0)
+#define OUTPLL(addr,val)        OUTREG8(CLOCK_CNTL_INDEX, (addr & 0x0000001f) | 0x00000080); \
+                                OUTREG(CLOCK_CNTL_DATA, val)
+#define OUTPLLP(addr,val,mask)                                          \
+        do {                                                            \
+                unsigned int _tmp = INPLL(addr);                        \
+                _tmp &= (mask);                                         \
+                _tmp |= (val);                                          \
+                OUTPLL(addr, _tmp);                                     \
+        } while (0)
 
 #ifndef RAGE128
 enum radeon_montype
@@ -576,9 +576,9 @@ enum radeon_montype
 
 typedef struct radeon_info_s
 {
-	int hasCRTC2;
-	int crtDispType;
-	int dviDispType;
+        int hasCRTC2;
+        int crtDispType;
+        int dviDispType;
 }rinfo_t;
 
 static rinfo_t rinfo;
@@ -594,51 +594,51 @@ static char * GET_MON_NAME(int type)
     case MT_LCD:  pret = "LCD"; break;
     case MT_CTV:  pret = "CTV"; break;
     case MT_STV:  pret = "STV"; break;
-    default:	  pret = "Unknown";
+    default:      pret = "Unknown";
   }
   return pret;
 }
 
 static void radeon_get_moninfo (rinfo_t *rinfo)
 {
-	unsigned int tmp;
+        unsigned int tmp;
 
-	tmp = INREG(RADEON_BIOS_4_SCRATCH);
+        tmp = INREG(RADEON_BIOS_4_SCRATCH);
 
-	if (rinfo->hasCRTC2) {
-		/* primary DVI port */
-		if (tmp & 0x08)
-			rinfo->dviDispType = MT_DFP;
-		else if (tmp & 0x4)
-			rinfo->dviDispType = MT_LCD;
-		else if (tmp & 0x200)
-			rinfo->dviDispType = MT_CRT;
-		else if (tmp & 0x10)
-			rinfo->dviDispType = MT_CTV;
-		else if (tmp & 0x20)
-			rinfo->dviDispType = MT_STV;
+        if (rinfo->hasCRTC2) {
+                /* primary DVI port */
+                if (tmp & 0x08)
+                        rinfo->dviDispType = MT_DFP;
+                else if (tmp & 0x4)
+                        rinfo->dviDispType = MT_LCD;
+                else if (tmp & 0x200)
+                        rinfo->dviDispType = MT_CRT;
+                else if (tmp & 0x10)
+                        rinfo->dviDispType = MT_CTV;
+                else if (tmp & 0x20)
+                        rinfo->dviDispType = MT_STV;
 
-		/* secondary CRT port */
-		if (tmp & 0x2)
-			rinfo->crtDispType = MT_CRT;
-		else if (tmp & 0x800)
-			rinfo->crtDispType = MT_DFP;
-		else if (tmp & 0x400)
-			rinfo->crtDispType = MT_LCD;
-		else if (tmp & 0x1000)
-			rinfo->crtDispType = MT_CTV;
-		else if (tmp & 0x2000)
-			rinfo->crtDispType = MT_STV;
-	} else {
-		rinfo->dviDispType = MT_NONE;
+                /* secondary CRT port */
+                if (tmp & 0x2)
+                        rinfo->crtDispType = MT_CRT;
+                else if (tmp & 0x800)
+                        rinfo->crtDispType = MT_DFP;
+                else if (tmp & 0x400)
+                        rinfo->crtDispType = MT_LCD;
+                else if (tmp & 0x1000)
+                        rinfo->crtDispType = MT_CTV;
+                else if (tmp & 0x2000)
+                        rinfo->crtDispType = MT_STV;
+        } else {
+                rinfo->dviDispType = MT_NONE;
 
-		tmp = INREG(FP_GEN_CNTL);
+                tmp = INREG(FP_GEN_CNTL);
 
-		if (tmp & FP_EN_TMDS)
-			rinfo->crtDispType = MT_DFP;
-		else
-			rinfo->crtDispType = MT_CRT;
-	}
+                if (tmp & FP_EN_TMDS)
+                        rinfo->crtDispType = MT_DFP;
+                else
+                        rinfo->crtDispType = MT_CRT;
+        }
 }
 #endif
 
@@ -673,10 +673,10 @@ static uint32_t radeon_get_xres( void )
 #ifndef RAGE128
   if(rinfo.hasCRTC2 &&
        (rinfo.dviDispType == MT_CTV || rinfo.dviDispType == MT_STV))
-	h_total = INREG(CRTC2_H_TOTAL_DISP);
+        h_total = INREG(CRTC2_H_TOTAL_DISP);
   else
 #endif
-	h_total = INREG(CRTC_H_TOTAL_DISP);
+        h_total = INREG(CRTC_H_TOTAL_DISP);
   xres = (h_total >> 16) & 0xffff;
   return (xres + 1)*8;
 }
@@ -687,10 +687,10 @@ static uint32_t radeon_get_yres( void )
 #ifndef RAGE128
   if(rinfo.hasCRTC2 &&
        (rinfo.dviDispType == MT_CTV || rinfo.dviDispType == MT_STV))
-	v_total = INREG(CRTC2_V_TOTAL_DISP);
+        v_total = INREG(CRTC2_V_TOTAL_DISP);
   else
 #endif
-	v_total = INREG(CRTC_V_TOTAL_DISP);
+        v_total = INREG(CRTC_V_TOTAL_DISP);
   yres = (v_total >> 16) & 0xffff;
   return yres + 1;
 }
@@ -702,15 +702,15 @@ static void radeon_wait_vsync(void)
     OUTREG(GEN_INT_STATUS, VSYNC_INT_AK);
     for (i = 0; i < 2000000; i++)
     {
-	if (INREG(GEN_INT_STATUS) & VSYNC_INT) break;
+        if (INREG(GEN_INT_STATUS) & VSYNC_INT) break;
     }
 }
 
 #ifdef RAGE128
 static void _radeon_engine_idle(void);
 static void _radeon_fifo_wait(unsigned);
-#define radeon_engine_idle()		_radeon_engine_idle()
-#define radeon_fifo_wait(entries)	_radeon_fifo_wait(entries)
+#define radeon_engine_idle()            _radeon_engine_idle()
+#define radeon_fifo_wait(entries)       _radeon_fifo_wait(entries)
 /* Flush all dirty data in the Pixel Cache to memory. */
 static inline void radeon_engine_flush(void)
 {
@@ -718,7 +718,7 @@ static inline void radeon_engine_flush(void)
 
     OUTREGP(PC_NGUI_CTLSTAT, PC_FLUSH_ALL, ~PC_FLUSH_ALL);
     for (i = 0; i < 2000000; i++) {
-	if (!(INREG(PC_NGUI_CTLSTAT) & PC_BUSY)) break;
+        if (!(INREG(PC_NGUI_CTLSTAT) & PC_BUSY)) break;
     }
 }
 
@@ -732,7 +732,7 @@ static void radeon_engine_reset( void )
     radeon_engine_flush();
 
     clock_cntl_index = INREG(CLOCK_CNTL_INDEX);
-    mclk_cntl	     = INPLL(MCLK_CNTL);
+    mclk_cntl        = INPLL(MCLK_CNTL);
 
     OUTPLL(MCLK_CNTL, mclk_cntl | FORCE_GCP | FORCE_PIPE3D_CP);
 
@@ -741,10 +741,10 @@ static void radeon_engine_reset( void )
     OUTREG(GEN_RESET_CNTL, gen_reset_cntl | SOFT_RESET_GUI);
     INREG(GEN_RESET_CNTL);
     OUTREG(GEN_RESET_CNTL,
-	gen_reset_cntl & (uint32_t)(~SOFT_RESET_GUI));
+        gen_reset_cntl & (uint32_t)(~SOFT_RESET_GUI));
     INREG(GEN_RESET_CNTL);
 
-    OUTPLL(MCLK_CNTL,	     mclk_cntl);
+    OUTPLL(MCLK_CNTL,        mclk_cntl);
     OUTREG(CLOCK_CNTL_INDEX, clock_cntl_index);
     OUTREG(GEN_RESET_CNTL,   gen_reset_cntl);
 }
@@ -752,67 +752,67 @@ static void radeon_engine_reset( void )
 
 static inline void radeon_engine_flush(void)
 {
-	int i;
+        int i;
 
-	/* initiate flush */
-	OUTREGP(RB2D_DSTCACHE_CTLSTAT, RB2D_DC_FLUSH_ALL,
-		~RB2D_DC_FLUSH_ALL);
+        /* initiate flush */
+        OUTREGP(RB2D_DSTCACHE_CTLSTAT, RB2D_DC_FLUSH_ALL,
+                ~RB2D_DC_FLUSH_ALL);
 
-	for (i=0; i < 2000000; i++) {
-		if (!(INREG(RB2D_DSTCACHE_CTLSTAT) & RB2D_DC_BUSY))
-			break;
-	}
+        for (i=0; i < 2000000; i++) {
+                if (!(INREG(RB2D_DSTCACHE_CTLSTAT) & RB2D_DC_BUSY))
+                        break;
+        }
 }
 
 static void _radeon_engine_idle(void);
 static void _radeon_fifo_wait(unsigned);
-#define radeon_engine_idle()		_radeon_engine_idle()
-#define radeon_fifo_wait(entries)	_radeon_fifo_wait(entries)
+#define radeon_engine_idle()            _radeon_engine_idle()
+#define radeon_fifo_wait(entries)       _radeon_fifo_wait(entries)
 
 static void radeon_engine_reset( void )
 {
-	uint32_t clock_cntl_index, mclk_cntl, rbbm_soft_reset;
+        uint32_t clock_cntl_index, mclk_cntl, rbbm_soft_reset;
 
-	radeon_engine_flush ();
+        radeon_engine_flush ();
 
-	clock_cntl_index = INREG(CLOCK_CNTL_INDEX);
-	mclk_cntl = INPLL(MCLK_CNTL);
+        clock_cntl_index = INREG(CLOCK_CNTL_INDEX);
+        mclk_cntl = INPLL(MCLK_CNTL);
 
-	OUTPLL(MCLK_CNTL, (mclk_cntl |
-			   FORCEON_MCLKA |
-			   FORCEON_MCLKB |
-			   FORCEON_YCLKA |
-			   FORCEON_YCLKB |
-			   FORCEON_MC |
-			   FORCEON_AIC));
-	rbbm_soft_reset = INREG(RBBM_SOFT_RESET);
+        OUTPLL(MCLK_CNTL, (mclk_cntl |
+                           FORCEON_MCLKA |
+                           FORCEON_MCLKB |
+                           FORCEON_YCLKA |
+                           FORCEON_YCLKB |
+                           FORCEON_MC |
+                           FORCEON_AIC));
+        rbbm_soft_reset = INREG(RBBM_SOFT_RESET);
 
-	OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset |
-				SOFT_RESET_CP |
-				SOFT_RESET_HI |
-				SOFT_RESET_SE |
-				SOFT_RESET_RE |
-				SOFT_RESET_PP |
-				SOFT_RESET_E2 |
-				SOFT_RESET_RB |
-				SOFT_RESET_HDP);
-	INREG(RBBM_SOFT_RESET);
-	OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset & (uint32_t)
-				~(SOFT_RESET_CP |
-				  SOFT_RESET_HI |
-				  SOFT_RESET_SE |
-				  SOFT_RESET_RE |
-				  SOFT_RESET_PP |
-				  SOFT_RESET_E2 |
-				  SOFT_RESET_RB |
-				  SOFT_RESET_HDP));
-	INREG(RBBM_SOFT_RESET);
+        OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset |
+                                SOFT_RESET_CP |
+                                SOFT_RESET_HI |
+                                SOFT_RESET_SE |
+                                SOFT_RESET_RE |
+                                SOFT_RESET_PP |
+                                SOFT_RESET_E2 |
+                                SOFT_RESET_RB |
+                                SOFT_RESET_HDP);
+        INREG(RBBM_SOFT_RESET);
+        OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset & (uint32_t)
+                                ~(SOFT_RESET_CP |
+                                  SOFT_RESET_HI |
+                                  SOFT_RESET_SE |
+                                  SOFT_RESET_RE |
+                                  SOFT_RESET_PP |
+                                  SOFT_RESET_E2 |
+                                  SOFT_RESET_RB |
+                                  SOFT_RESET_HDP));
+        INREG(RBBM_SOFT_RESET);
 
-	OUTPLL(MCLK_CNTL, mclk_cntl);
-	OUTREG(CLOCK_CNTL_INDEX, clock_cntl_index);
-	OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset);
+        OUTPLL(MCLK_CNTL, mclk_cntl);
+        OUTREG(CLOCK_CNTL_INDEX, clock_cntl_index);
+        OUTREG(RBBM_SOFT_RESET, rbbm_soft_reset);
 
-	return;
+        return;
 }
 #endif
 static void radeon_engine_restore( void )
@@ -831,23 +831,23 @@ static void radeon_engine_restore( void )
 
     radeon_fifo_wait(1);
     OUTREG(DEFAULT_OFFSET, (INREG(DEFAULT_OFFSET) & 0xC0000000) |
-				  (pitch64 << 22));
+                                  (pitch64 << 22));
 
     radeon_fifo_wait(1);
 #if HAVE_BIGENDIAN
     OUTREGP(DP_DATATYPE,
-	    HOST_BIG_ENDIAN_EN, ~HOST_BIG_ENDIAN_EN);
+            HOST_BIG_ENDIAN_EN, ~HOST_BIG_ENDIAN_EN);
 #else
     OUTREGP(DP_DATATYPE, 0, ~HOST_BIG_ENDIAN_EN);
 #endif
 
     radeon_fifo_wait(1);
     OUTREG(DEFAULT_SC_BOTTOM_RIGHT, (DEFAULT_SC_RIGHT_MAX
-				    | DEFAULT_SC_BOTTOM_MAX));
+                                    | DEFAULT_SC_BOTTOM_MAX));
     radeon_fifo_wait(1);
     OUTREG(DP_GUI_MASTER_CNTL, (INREG(DP_GUI_MASTER_CNTL)
-				       | GMC_BRUSH_SOLID_COLOR
-				       | GMC_SRC_DATATYPE_COLOR));
+                                       | GMC_BRUSH_SOLID_COLOR
+                                       | GMC_SRC_DATATYPE_COLOR));
 
     radeon_fifo_wait(7);
     OUTREG(DST_LINE_START,    0);
@@ -868,11 +868,11 @@ static void _radeon_fifo_wait (unsigned entries)
 
     for(;;)
     {
-	for (i=0; i<2000000; i++)
-		if ((INREG(GUI_STAT) & GUI_FIFOCNT_MASK) >= entries)
-			return;
-	radeon_engine_reset();
-	radeon_engine_restore();
+        for (i=0; i<2000000; i++)
+                if ((INREG(GUI_STAT) & GUI_FIFOCNT_MASK) >= entries)
+                        return;
+        radeon_engine_reset();
+        radeon_engine_restore();
     }
 }
 
@@ -884,14 +884,14 @@ static void _radeon_engine_idle ( void )
     radeon_fifo_wait (64);
     for(;;)
     {
-	for (i=0; i<2000000; i++) {
-		if ((INREG(GUI_STAT) & GUI_ACTIVE) == 0) {
-			radeon_engine_flush ();
-			return;
-		}
-	}
-	radeon_engine_reset();
-	radeon_engine_restore();
+        for (i=0; i<2000000; i++) {
+                if ((INREG(GUI_STAT) & GUI_ACTIVE) == 0) {
+                        radeon_engine_flush ();
+                        return;
+                }
+        }
+        radeon_engine_reset();
+        radeon_engine_restore();
     }
 }
 #else
@@ -901,11 +901,11 @@ static void _radeon_fifo_wait (unsigned entries)
 
     for(;;)
     {
-	for (i=0; i<2000000; i++)
-		if ((INREG(RBBM_STATUS) & RBBM_FIFOCNT_MASK) >= entries)
-			return;
-	radeon_engine_reset();
-	radeon_engine_restore();
+        for (i=0; i<2000000; i++)
+                if ((INREG(RBBM_STATUS) & RBBM_FIFOCNT_MASK) >= entries)
+                        return;
+        radeon_engine_reset();
+        radeon_engine_restore();
     }
 }
 static void _radeon_engine_idle ( void )
@@ -916,14 +916,14 @@ static void _radeon_engine_idle ( void )
     radeon_fifo_wait (64);
     for(;;)
     {
-	for (i=0; i<2000000; i++) {
-		if (((INREG(RBBM_STATUS) & RBBM_ACTIVE)) == 0) {
-			radeon_engine_flush ();
-			return;
-		}
-	}
-	radeon_engine_reset();
-	radeon_engine_restore();
+        for (i=0; i<2000000; i++) {
+                if (((INREG(RBBM_STATUS) & RBBM_ACTIVE)) == 0) {
+                        radeon_engine_flush ();
+                        return;
+                }
+        }
+        radeon_engine_reset();
+        radeon_engine_restore();
     }
 }
 #endif
@@ -932,188 +932,188 @@ static void _radeon_engine_idle ( void )
 /* Reference color space transform data */
 typedef struct tagREF_TRANSFORM
 {
-	float RefLuma;
-	float RefRCb;
-	float RefRCr;
-	float RefGCb;
-	float RefGCr;
-	float RefBCb;
-	float RefBCr;
+        float RefLuma;
+        float RefRCb;
+        float RefRCr;
+        float RefGCb;
+        float RefGCr;
+        float RefBCb;
+        float RefBCr;
 } REF_TRANSFORM;
 
 /* Parameters for ITU-R BT.601 and ITU-R BT.709 colour spaces */
 static const REF_TRANSFORM trans[2] =
 {
-	{1.1678, 0.0, 1.6007, -0.3929, -0.8154, 2.0232, 0.0}, /* BT.601 */
-	{1.1678, 0.0, 1.7980, -0.2139, -0.5345, 2.1186, 0.0}  /* BT.709 */
+        {1.1678, 0.0, 1.6007, -0.3929, -0.8154, 2.0232, 0.0}, /* BT.601 */
+        {1.1678, 0.0, 1.7980, -0.2139, -0.5345, 2.1186, 0.0}  /* BT.709 */
 };
 /****************************************************************************
- * SetTransform								    *
- *  Function: Calculates and sets color space transform from supplied	    *
- *	      reference transform, gamma, brightness, contrast, hue and	    *
- *	      saturation.						    *
- *    Inputs: bright - brightness					    *
- *	      cont - contrast						    *
- *	      sat - saturation						    *
- *	      hue - hue							    *
- *	      red_intensity - intense of red component			    *
- *	      green_intensity - intense of green component		    *
- *	      blue_intensity - intense of blue component		    *
- *	      ref - index to the table of refernce transforms		    *
- *   Outputs: NONE							    *
+ * SetTransform                                                             *
+ *  Function: Calculates and sets color space transform from supplied       *
+ *            reference transform, gamma, brightness, contrast, hue and     *
+ *            saturation.                                                   *
+ *    Inputs: bright - brightness                                           *
+ *            cont - contrast                                               *
+ *            sat - saturation                                              *
+ *            hue - hue                                                     *
+ *            red_intensity - intense of red component                      *
+ *            green_intensity - intense of green component                  *
+ *            blue_intensity - intense of blue component                    *
+ *            ref - index to the table of refernce transforms               *
+ *   Outputs: NONE                                                          *
  ****************************************************************************/
 
 static void radeon_set_transform(float bright, float cont, float sat,
-				 float hue, float red_intensity,
-				 float green_intensity,float blue_intensity,
-				 unsigned ref)
+                                 float hue, float red_intensity,
+                                 float green_intensity,float blue_intensity,
+                                 unsigned ref)
 {
-	float OvHueSin, OvHueCos;
-	float CAdjLuma, CAdjOff;
-	float RedAdj,GreenAdj,BlueAdj;
-	float CAdjRCb, CAdjRCr;
-	float CAdjGCb, CAdjGCr;
-	float CAdjBCb, CAdjBCr;
-	float OvLuma, OvROff, OvGOff, OvBOff;
-	float OvRCb, OvRCr;
-	float OvGCb, OvGCr;
-	float OvBCb, OvBCr;
-	float Loff = 64.0;
-	float Coff = 512.0f;
+        float OvHueSin, OvHueCos;
+        float CAdjLuma, CAdjOff;
+        float RedAdj,GreenAdj,BlueAdj;
+        float CAdjRCb, CAdjRCr;
+        float CAdjGCb, CAdjGCr;
+        float CAdjBCb, CAdjBCr;
+        float OvLuma, OvROff, OvGOff, OvBOff;
+        float OvRCb, OvRCr;
+        float OvGCb, OvGCr;
+        float OvBCb, OvBCr;
+        float Loff = 64.0;
+        float Coff = 512.0f;
 
-	uint32_t dwOvLuma, dwOvROff, dwOvGOff, dwOvBOff;
-	uint32_t dwOvRCb, dwOvRCr;
-	uint32_t dwOvGCb, dwOvGCr;
-	uint32_t dwOvBCb, dwOvBCr;
+        uint32_t dwOvLuma, dwOvROff, dwOvGOff, dwOvBOff;
+        uint32_t dwOvRCb, dwOvRCr;
+        uint32_t dwOvGCb, dwOvGCr;
+        uint32_t dwOvBCb, dwOvBCr;
 
-	if (ref >= 2) return;
+        if (ref >= 2) return;
 
-	OvHueSin = sin((double)hue);
-	OvHueCos = cos((double)hue);
+        OvHueSin = sin((double)hue);
+        OvHueCos = cos((double)hue);
 
-	CAdjLuma = cont * trans[ref].RefLuma;
-	CAdjOff = cont * trans[ref].RefLuma * bright * 1023.0;
-	RedAdj = cont * trans[ref].RefLuma * red_intensity * 1023.0;
-	GreenAdj = cont * trans[ref].RefLuma * green_intensity * 1023.0;
-	BlueAdj = cont * trans[ref].RefLuma * blue_intensity * 1023.0;
+        CAdjLuma = cont * trans[ref].RefLuma;
+        CAdjOff = cont * trans[ref].RefLuma * bright * 1023.0;
+        RedAdj = cont * trans[ref].RefLuma * red_intensity * 1023.0;
+        GreenAdj = cont * trans[ref].RefLuma * green_intensity * 1023.0;
+        BlueAdj = cont * trans[ref].RefLuma * blue_intensity * 1023.0;
 
-	CAdjRCb = sat * -OvHueSin * trans[ref].RefRCr;
-	CAdjRCr = sat * OvHueCos * trans[ref].RefRCr;
-	CAdjGCb = sat * (OvHueCos * trans[ref].RefGCb - OvHueSin * trans[ref].RefGCr);
-	CAdjGCr = sat * (OvHueSin * trans[ref].RefGCb + OvHueCos * trans[ref].RefGCr);
-	CAdjBCb = sat * OvHueCos * trans[ref].RefBCb;
-	CAdjBCr = sat * OvHueSin * trans[ref].RefBCb;
+        CAdjRCb = sat * -OvHueSin * trans[ref].RefRCr;
+        CAdjRCr = sat * OvHueCos * trans[ref].RefRCr;
+        CAdjGCb = sat * (OvHueCos * trans[ref].RefGCb - OvHueSin * trans[ref].RefGCr);
+        CAdjGCr = sat * (OvHueSin * trans[ref].RefGCb + OvHueCos * trans[ref].RefGCr);
+        CAdjBCb = sat * OvHueCos * trans[ref].RefBCb;
+        CAdjBCr = sat * OvHueSin * trans[ref].RefBCb;
 
-	OvLuma = CAdjLuma;
-	OvRCb = CAdjRCb;
-	OvRCr = CAdjRCr;
-	OvGCb = CAdjGCb;
-	OvGCr = CAdjGCr;
-	OvBCb = CAdjBCb;
-	OvBCr = CAdjBCr;
-	OvROff = RedAdj + CAdjOff -
-		OvLuma * Loff - (OvRCb + OvRCr) * Coff;
-	OvGOff = GreenAdj + CAdjOff -
-		OvLuma * Loff - (OvGCb + OvGCr) * Coff;
-	OvBOff = BlueAdj + CAdjOff -
-		OvLuma * Loff - (OvBCb + OvBCr) * Coff;
+        OvLuma = CAdjLuma;
+        OvRCb = CAdjRCb;
+        OvRCr = CAdjRCr;
+        OvGCb = CAdjGCb;
+        OvGCr = CAdjGCr;
+        OvBCb = CAdjBCb;
+        OvBCr = CAdjBCr;
+        OvROff = RedAdj + CAdjOff -
+                OvLuma * Loff - (OvRCb + OvRCr) * Coff;
+        OvGOff = GreenAdj + CAdjOff -
+                OvLuma * Loff - (OvGCb + OvGCr) * Coff;
+        OvBOff = BlueAdj + CAdjOff -
+                OvLuma * Loff - (OvBCb + OvBCr) * Coff;
 
-	dwOvROff = ((int)(OvROff * 2.0)) & 0x1fff;
-	dwOvGOff = (int)(OvGOff * 2.0) & 0x1fff;
-	dwOvBOff = (int)(OvBOff * 2.0) & 0x1fff;
-	/* Whatever docs say about R200 having 3.8 format instead of 3.11
-	   as in Radeon is a lie */
+        dwOvROff = ((int)(OvROff * 2.0)) & 0x1fff;
+        dwOvGOff = (int)(OvGOff * 2.0) & 0x1fff;
+        dwOvBOff = (int)(OvBOff * 2.0) & 0x1fff;
+        /* Whatever docs say about R200 having 3.8 format instead of 3.11
+           as in Radeon is a lie */
 
-		dwOvLuma =(((int)(OvLuma * 2048.0))&0x7fff)<<17;
-		dwOvRCb = (((int)(OvRCb * 2048.0))&0x7fff)<<1;
-		dwOvRCr = (((int)(OvRCr * 2048.0))&0x7fff)<<17;
-		dwOvGCb = (((int)(OvGCb * 2048.0))&0x7fff)<<1;
-		dwOvGCr = (((int)(OvGCr * 2048.0))&0x7fff)<<17;
-		dwOvBCb = (((int)(OvBCb * 2048.0))&0x7fff)<<1;
-		dwOvBCr = (((int)(OvBCr * 2048.0))&0x7fff)<<17;
+                dwOvLuma =(((int)(OvLuma * 2048.0))&0x7fff)<<17;
+                dwOvRCb = (((int)(OvRCb * 2048.0))&0x7fff)<<1;
+                dwOvRCr = (((int)(OvRCr * 2048.0))&0x7fff)<<17;
+                dwOvGCb = (((int)(OvGCb * 2048.0))&0x7fff)<<1;
+                dwOvGCr = (((int)(OvGCr * 2048.0))&0x7fff)<<17;
+                dwOvBCb = (((int)(OvBCb * 2048.0))&0x7fff)<<1;
+                dwOvBCr = (((int)(OvBCr * 2048.0))&0x7fff)<<17;
 
-	OUTREG(OV0_LIN_TRANS_A, dwOvRCb | dwOvLuma);
-	OUTREG(OV0_LIN_TRANS_B, dwOvROff | dwOvRCr);
-	OUTREG(OV0_LIN_TRANS_C, dwOvGCb | dwOvLuma);
-	OUTREG(OV0_LIN_TRANS_D, dwOvGOff | dwOvGCr);
-	OUTREG(OV0_LIN_TRANS_E, dwOvBCb | dwOvLuma);
-	OUTREG(OV0_LIN_TRANS_F, dwOvBOff | dwOvBCr);
+        OUTREG(OV0_LIN_TRANS_A, dwOvRCb | dwOvLuma);
+        OUTREG(OV0_LIN_TRANS_B, dwOvROff | dwOvRCr);
+        OUTREG(OV0_LIN_TRANS_C, dwOvGCb | dwOvLuma);
+        OUTREG(OV0_LIN_TRANS_D, dwOvGOff | dwOvGCr);
+        OUTREG(OV0_LIN_TRANS_E, dwOvBCb | dwOvLuma);
+        OUTREG(OV0_LIN_TRANS_F, dwOvBOff | dwOvBCr);
 }
 
 /* Gamma curve definition */
 typedef struct
 {
-	unsigned int gammaReg;
-	unsigned int gammaSlope;
-	unsigned int gammaOffset;
+        unsigned int gammaReg;
+        unsigned int gammaSlope;
+        unsigned int gammaOffset;
 }GAMMA_SETTINGS;
 
 /* Recommended gamma curve parameters */
 static const GAMMA_SETTINGS r200_def_gamma[18] =
 {
-	{OV0_GAMMA_0_F, 0x100, 0x0000},
-	{OV0_GAMMA_10_1F, 0x100, 0x0020},
-	{OV0_GAMMA_20_3F, 0x100, 0x0040},
-	{OV0_GAMMA_40_7F, 0x100, 0x0080},
-	{OV0_GAMMA_80_BF, 0x100, 0x0100},
-	{OV0_GAMMA_C0_FF, 0x100, 0x0100},
-	{OV0_GAMMA_100_13F, 0x100, 0x0200},
-	{OV0_GAMMA_140_17F, 0x100, 0x0200},
-	{OV0_GAMMA_180_1BF, 0x100, 0x0300},
-	{OV0_GAMMA_1C0_1FF, 0x100, 0x0300},
-	{OV0_GAMMA_200_23F, 0x100, 0x0400},
-	{OV0_GAMMA_240_27F, 0x100, 0x0400},
-	{OV0_GAMMA_280_2BF, 0x100, 0x0500},
-	{OV0_GAMMA_2C0_2FF, 0x100, 0x0500},
-	{OV0_GAMMA_300_33F, 0x100, 0x0600},
-	{OV0_GAMMA_340_37F, 0x100, 0x0600},
-	{OV0_GAMMA_380_3BF, 0x100, 0x0700},
-	{OV0_GAMMA_3C0_3FF, 0x100, 0x0700}
+        {OV0_GAMMA_0_F, 0x100, 0x0000},
+        {OV0_GAMMA_10_1F, 0x100, 0x0020},
+        {OV0_GAMMA_20_3F, 0x100, 0x0040},
+        {OV0_GAMMA_40_7F, 0x100, 0x0080},
+        {OV0_GAMMA_80_BF, 0x100, 0x0100},
+        {OV0_GAMMA_C0_FF, 0x100, 0x0100},
+        {OV0_GAMMA_100_13F, 0x100, 0x0200},
+        {OV0_GAMMA_140_17F, 0x100, 0x0200},
+        {OV0_GAMMA_180_1BF, 0x100, 0x0300},
+        {OV0_GAMMA_1C0_1FF, 0x100, 0x0300},
+        {OV0_GAMMA_200_23F, 0x100, 0x0400},
+        {OV0_GAMMA_240_27F, 0x100, 0x0400},
+        {OV0_GAMMA_280_2BF, 0x100, 0x0500},
+        {OV0_GAMMA_2C0_2FF, 0x100, 0x0500},
+        {OV0_GAMMA_300_33F, 0x100, 0x0600},
+        {OV0_GAMMA_340_37F, 0x100, 0x0600},
+        {OV0_GAMMA_380_3BF, 0x100, 0x0700},
+        {OV0_GAMMA_3C0_3FF, 0x100, 0x0700}
 };
 
 static const GAMMA_SETTINGS r100_def_gamma[6] =
 {
-	{OV0_GAMMA_0_F, 0x100, 0x0000},
-	{OV0_GAMMA_10_1F, 0x100, 0x0020},
-	{OV0_GAMMA_20_3F, 0x100, 0x0040},
-	{OV0_GAMMA_40_7F, 0x100, 0x0080},
-	{OV0_GAMMA_380_3BF, 0x100, 0x0100},
-	{OV0_GAMMA_3C0_3FF, 0x100, 0x0100}
+        {OV0_GAMMA_0_F, 0x100, 0x0000},
+        {OV0_GAMMA_10_1F, 0x100, 0x0020},
+        {OV0_GAMMA_20_3F, 0x100, 0x0040},
+        {OV0_GAMMA_40_7F, 0x100, 0x0080},
+        {OV0_GAMMA_380_3BF, 0x100, 0x0100},
+        {OV0_GAMMA_3C0_3FF, 0x100, 0x0100}
 };
 
 static void make_default_gamma_correction( void )
 {
     size_t i;
     if((besr.chip_flags & R_100)==R_100||
-	(besr.chip_flags & R_120)==R_120||
-	(besr.chip_flags & R_150)==R_150){
-	OUTREG(OV0_LIN_TRANS_A, 0x12A00000);
-	OUTREG(OV0_LIN_TRANS_B, 0x199018FE);
-	OUTREG(OV0_LIN_TRANS_C, 0x12A0F9B0);
-	OUTREG(OV0_LIN_TRANS_D, 0xF2F0043B);
-	OUTREG(OV0_LIN_TRANS_E, 0x12A02050);
-	OUTREG(OV0_LIN_TRANS_F, 0x0000174E);
-	for(i=0; i<6; i++){
-		OUTREG(r100_def_gamma[i].gammaReg,
-		       (r100_def_gamma[i].gammaSlope<<16) |
-			r100_def_gamma[i].gammaOffset);
-	}
+        (besr.chip_flags & R_120)==R_120||
+        (besr.chip_flags & R_150)==R_150){
+        OUTREG(OV0_LIN_TRANS_A, 0x12A00000);
+        OUTREG(OV0_LIN_TRANS_B, 0x199018FE);
+        OUTREG(OV0_LIN_TRANS_C, 0x12A0F9B0);
+        OUTREG(OV0_LIN_TRANS_D, 0xF2F0043B);
+        OUTREG(OV0_LIN_TRANS_E, 0x12A02050);
+        OUTREG(OV0_LIN_TRANS_F, 0x0000174E);
+        for(i=0; i<6; i++){
+                OUTREG(r100_def_gamma[i].gammaReg,
+                       (r100_def_gamma[i].gammaSlope<<16) |
+                        r100_def_gamma[i].gammaOffset);
+        }
     }
     else{
-	OUTREG(OV0_LIN_TRANS_A, 0x12a20000);
-	OUTREG(OV0_LIN_TRANS_B, 0x198a190e);
-	OUTREG(OV0_LIN_TRANS_C, 0x12a2f9da);
-	OUTREG(OV0_LIN_TRANS_D, 0xf2fe0442);
-	OUTREG(OV0_LIN_TRANS_E, 0x12a22046);
-	OUTREG(OV0_LIN_TRANS_F, 0x175f);
-	/* Default Gamma,
-	   Of 18 segments for gamma cure, all segments in R200 are programmable,
-	   while only lower 4 and upper 2 segments are programmable in Radeon*/
-	for(i=0; i<18; i++){
-		OUTREG(r200_def_gamma[i].gammaReg,
-		       (r200_def_gamma[i].gammaSlope<<16) |
-			r200_def_gamma[i].gammaOffset);
-	}
+        OUTREG(OV0_LIN_TRANS_A, 0x12a20000);
+        OUTREG(OV0_LIN_TRANS_B, 0x198a190e);
+        OUTREG(OV0_LIN_TRANS_C, 0x12a2f9da);
+        OUTREG(OV0_LIN_TRANS_D, 0xf2fe0442);
+        OUTREG(OV0_LIN_TRANS_E, 0x12a22046);
+        OUTREG(OV0_LIN_TRANS_F, 0x175f);
+        /* Default Gamma,
+           Of 18 segments for gamma cure, all segments in R200 are programmable,
+           while only lower 4 and upper 2 segments are programmable in Radeon*/
+        for(i=0; i<18; i++){
+                OUTREG(r200_def_gamma[i].gammaReg,
+                       (r200_def_gamma[i].gammaSlope<<16) |
+                        r200_def_gamma[i].gammaOffset);
+        }
     }
 }
 #endif
@@ -1220,13 +1220,13 @@ static int radeon_probe(int verbose, int force)
     {
       if(lst[i].vendor == VENDOR_ATI)
       {
-	int idx;
-	const char *dname;
-	idx = find_chip(lst[i].device);
-	if(idx == -1 && force == PROBE_NORMAL) continue;
-	dname = pci_device_name(VENDOR_ATI,lst[i].device);
-	dname = dname ? dname : "Unknown chip";
-	printf(RADEON_MSG" Found chip: %s\n",dname);
+        int idx;
+        const char *dname;
+        idx = find_chip(lst[i].device);
+        if(idx == -1 && force == PROBE_NORMAL) continue;
+        dname = pci_device_name(VENDOR_ATI,lst[i].device);
+        dname = dname ? dname : "Unknown chip";
+        printf(RADEON_MSG" Found chip: %s\n",dname);
 #if 0
         if ((lst[i].command & PCI_COMMAND_IO) == 0)
         {
@@ -1234,27 +1234,27 @@ static int radeon_probe(int verbose, int force)
           continue;
         }
 #endif
-	memset(&besr,0,sizeof(bes_registers_t));
-	if(force > PROBE_NORMAL)
-	{
-	    printf(RADEON_MSG" Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
-	    if(idx == -1)
+        memset(&besr,0,sizeof(bes_registers_t));
+        if(force > PROBE_NORMAL)
+        {
+            printf(RADEON_MSG" Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
+            if(idx == -1)
 #ifdef RAGE128
-		printf(RADEON_MSG" Assuming it as Rage128\n");
+                printf(RADEON_MSG" Assuming it as Rage128\n");
 #else
-		printf(RADEON_MSG" Assuming it as Radeon1\n");
+                printf(RADEON_MSG" Assuming it as Radeon1\n");
 #endif
-	    besr.chip_flags=R_100|R_OVL_SHIFT;
-	}
+            besr.chip_flags=R_100|R_OVL_SHIFT;
+        }
 #if !defined(RAGE128) && defined(CONFIG_X11)
         probe_fireGL_driver();
 #endif
-	if(idx != -1) besr.chip_flags=ati_card_ids[idx].flags;
-	def_cap.device_id = lst[i].device;
-	err = 0;
-	memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
-	probed=1;
-	break;
+        if(idx != -1) besr.chip_flags=ati_card_ids[idx].flags;
+        def_cap.device_id = lst[i].device;
+        err = 0;
+        memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
+        probed=1;
+        break;
       }
     }
   }
@@ -1277,12 +1277,12 @@ static saved_regs_t savreg;
 static void save_regs( void )
 {
     radeon_fifo_wait(6);
-    savreg.ov0_vid_key_clr	= INREG(OV0_VID_KEY_CLR);
-    savreg.ov0_vid_key_msk	= INREG(OV0_VID_KEY_MSK);
+    savreg.ov0_vid_key_clr      = INREG(OV0_VID_KEY_CLR);
+    savreg.ov0_vid_key_msk      = INREG(OV0_VID_KEY_MSK);
     savreg.ov0_graphics_key_clr = INREG(OV0_GRAPHICS_KEY_CLR);
     savreg.ov0_graphics_key_msk = INREG(OV0_GRAPHICS_KEY_MSK);
-    savreg.ov0_key_cntl		= INREG(OV0_KEY_CNTL);
-    savreg.disp_merge_cntl	= INREG(DISP_MERGE_CNTL);
+    savreg.ov0_key_cntl         = INREG(OV0_KEY_CNTL);
+    savreg.disp_merge_cntl      = INREG(DISP_MERGE_CNTL);
 #if HAVE_BIGENDIAN
 #ifdef RAGE128
     savreg.config_cntl          = INREG(CONFIG_CNTL);
@@ -1378,12 +1378,12 @@ static int radeon_init(void)
     if((besr.chip_flags&R_100) != R_100) rinfo.hasCRTC2 = 1;
 
     radeon_get_moninfo(&rinfo);
-	if(rinfo.hasCRTC2) {
-	    printf(RADEON_MSG" DVI port has %s monitor connected\n",GET_MON_NAME(rinfo.dviDispType));
-	    printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
-	}
-	else
-	    printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
+        if(rinfo.hasCRTC2) {
+            printf(RADEON_MSG" DVI port has %s monitor connected\n",GET_MON_NAME(rinfo.dviDispType));
+            printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
+        }
+        else
+            printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
   }
 #endif
   save_regs();
@@ -1449,10 +1449,10 @@ static int radeon_query_fourcc(vidix_fourcc_t *to)
 {
     if(is_supported_fourcc(to->fourcc))
     {
-	to->depth = VID_DEPTH_ALL;
-	to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY |
-		    VID_CAP_BLEND;
-	return 0;
+        to->depth = VID_DEPTH_ALL;
+        to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY |
+                    VID_CAP_BLEND;
+        return 0;
     }
     else  to->depth = to->flags = 0;
     return ENOSYS;
@@ -1471,7 +1471,7 @@ static void radeon_vid_dump_regs( void )
   printf(RADEON_MSG"H_scale_ratio=%8.2f\n",H_scale_ratio);
   printf(RADEON_MSG"*** Begin of OV0 registers dump ***\n");
   for(i=0;i<sizeof(vregs)/sizeof(video_registers_t);i++)
-	printf(RADEON_MSG"%s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
+        printf(RADEON_MSG"%s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
   printf(RADEON_MSG"*** End of OV0 registers dump ***\n");
 }
 
@@ -1494,7 +1494,7 @@ static void radeon_vid_display_video( void )
 {
     int bes_flags,force_second;
     radeon_fifo_wait(2);
-    OUTREG(OV0_REG_LOAD_CNTL,		REG_LD_CTL_LOCK);
+    OUTREG(OV0_REG_LOAD_CNTL,           REG_LD_CTL_LOCK);
     radeon_engine_idle();
     while(!(INREG(OV0_REG_LOAD_CNTL)&REG_LD_CTL_LOCK_READBACK));
     radeon_fifo_wait(15);
@@ -1513,53 +1513,53 @@ static void radeon_vid_display_video( void )
     if(besr.deinterlace_on) OUTREG(OV0_DEINTERLACE_PATTERN,besr.deinterlace_pattern);
 #ifdef RAGE128
     OUTREG(OV0_COLOUR_CNTL, (besr.brightness & 0x7f) |
-			    (besr.saturation << 8) |
-			    (besr.saturation << 16));
+                            (besr.saturation << 8) |
+                            (besr.saturation << 16));
 #endif
     radeon_fifo_wait(2);
     OUTREG(OV0_GRAPHICS_KEY_MSK, besr.graphics_key_msk);
     OUTREG(OV0_GRAPHICS_KEY_CLR, besr.graphics_key_clr);
     OUTREG(OV0_KEY_CNTL,besr.ckey_cntl);
 
-    OUTREG(OV0_H_INC,			besr.h_inc);
-    OUTREG(OV0_STEP_BY,			besr.step_by);
+    OUTREG(OV0_H_INC,                   besr.h_inc);
+    OUTREG(OV0_STEP_BY,                 besr.step_by);
     if(force_second)
     {
-	OUTREG(OV1_Y_X_START,		besr.y_x_start);
-	OUTREG(OV1_Y_X_END,		besr.y_x_end);
+        OUTREG(OV1_Y_X_START,           besr.y_x_start);
+        OUTREG(OV1_Y_X_END,             besr.y_x_end);
     }
     else
     {
-	OUTREG(OV0_Y_X_START,		besr.y_x_start);
-	OUTREG(OV0_Y_X_END,		besr.y_x_end);
+        OUTREG(OV0_Y_X_START,           besr.y_x_start);
+        OUTREG(OV0_Y_X_END,             besr.y_x_end);
     }
-    OUTREG(OV0_V_INC,			besr.v_inc);
-    OUTREG(OV0_P1_BLANK_LINES_AT_TOP,	besr.p1_blank_lines_at_top);
-    OUTREG(OV0_P23_BLANK_LINES_AT_TOP,	besr.p23_blank_lines_at_top);
-    OUTREG(OV0_VID_BUF_PITCH0_VALUE,	besr.vid_buf_pitch0_value);
-    OUTREG(OV0_VID_BUF_PITCH1_VALUE,	besr.vid_buf_pitch1_value);
-    OUTREG(OV0_P1_X_START_END,		besr.p1_x_start_end);
-    OUTREG(OV0_P2_X_START_END,		besr.p2_x_start_end);
-    OUTREG(OV0_P3_X_START_END,		besr.p3_x_start_end);
+    OUTREG(OV0_V_INC,                   besr.v_inc);
+    OUTREG(OV0_P1_BLANK_LINES_AT_TOP,   besr.p1_blank_lines_at_top);
+    OUTREG(OV0_P23_BLANK_LINES_AT_TOP,  besr.p23_blank_lines_at_top);
+    OUTREG(OV0_VID_BUF_PITCH0_VALUE,    besr.vid_buf_pitch0_value);
+    OUTREG(OV0_VID_BUF_PITCH1_VALUE,    besr.vid_buf_pitch1_value);
+    OUTREG(OV0_P1_X_START_END,          besr.p1_x_start_end);
+    OUTREG(OV0_P2_X_START_END,          besr.p2_x_start_end);
+    OUTREG(OV0_P3_X_START_END,          besr.p3_x_start_end);
 #ifdef RADEON
-    OUTREG(OV0_BASE_ADDR,		besr.base_addr);
+    OUTREG(OV0_BASE_ADDR,               besr.base_addr);
 #endif
-    OUTREG(OV0_VID_BUF0_BASE_ADRS,	besr.vid_buf_base_adrs_y[0]);
-    OUTREG(OV0_VID_BUF1_BASE_ADRS,	besr.vid_buf_base_adrs_v[0]);
-    OUTREG(OV0_VID_BUF2_BASE_ADRS,	besr.vid_buf_base_adrs_u[0]);
+    OUTREG(OV0_VID_BUF0_BASE_ADRS,      besr.vid_buf_base_adrs_y[0]);
+    OUTREG(OV0_VID_BUF1_BASE_ADRS,      besr.vid_buf_base_adrs_v[0]);
+    OUTREG(OV0_VID_BUF2_BASE_ADRS,      besr.vid_buf_base_adrs_u[0]);
     radeon_fifo_wait(9);
-    OUTREG(OV0_VID_BUF3_BASE_ADRS,	besr.vid_buf_base_adrs_y[0]);
-    OUTREG(OV0_VID_BUF4_BASE_ADRS,	besr.vid_buf_base_adrs_v[0]);
-    OUTREG(OV0_VID_BUF5_BASE_ADRS,	besr.vid_buf_base_adrs_u[0]);
-    OUTREG(OV0_P1_V_ACCUM_INIT,		besr.p1_v_accum_init);
-    OUTREG(OV0_P1_H_ACCUM_INIT,		besr.p1_h_accum_init);
-    OUTREG(OV0_P23_H_ACCUM_INIT,	besr.p23_h_accum_init);
-    OUTREG(OV0_P23_V_ACCUM_INIT,	besr.p23_v_accum_init);
+    OUTREG(OV0_VID_BUF3_BASE_ADRS,      besr.vid_buf_base_adrs_y[0]);
+    OUTREG(OV0_VID_BUF4_BASE_ADRS,      besr.vid_buf_base_adrs_v[0]);
+    OUTREG(OV0_VID_BUF5_BASE_ADRS,      besr.vid_buf_base_adrs_u[0]);
+    OUTREG(OV0_P1_V_ACCUM_INIT,         besr.p1_v_accum_init);
+    OUTREG(OV0_P1_H_ACCUM_INIT,         besr.p1_h_accum_init);
+    OUTREG(OV0_P23_H_ACCUM_INIT,        besr.p23_h_accum_init);
+    OUTREG(OV0_P23_V_ACCUM_INIT,        besr.p23_v_accum_init);
 
     bes_flags = SCALER_ENABLE |
-		SCALER_SMART_SWITCH |
-		SCALER_Y2R_TEMP |
-		SCALER_PIX_EXPAND;
+                SCALER_SMART_SWITCH |
+                SCALER_Y2R_TEMP |
+                SCALER_PIX_EXPAND;
     if(besr.double_buff) bes_flags |= SCALER_DOUBLE_BUFFER;
     if(besr.deinterlace_on) bes_flags |= SCALER_ADAPTIVE_DEINT;
     if(besr.horz_pick_nearest) bes_flags |= SCALER_HORZ_PICK_NEAREST;
@@ -1569,9 +1569,9 @@ static void radeon_vid_display_video( void )
 #endif
     bes_flags |= (besr.surf_id << 8) & SCALER_SURFAC_FORMAT;
     if(besr.load_prg_start) bes_flags |= SCALER_PRG_LOAD_START;
-    if(force_second)	bes_flags |= SCALER_USE_OV1;
-    else		bes_flags &= ~SCALER_USE_OV1;
-    OUTREG(OV0_SCALE_CNTL,		bes_flags);
+    if(force_second)    bes_flags |= SCALER_USE_OV1;
+    else                bes_flags &= ~SCALER_USE_OV1;
+    OUTREG(OV0_SCALE_CNTL,              bes_flags);
     radeon_fifo_wait(6);
     OUTREG(OV0_FILTER_CNTL,besr.filter_cntl);
     OUTREG(OV0_FOUR_TAP_COEF_0,besr.four_tap_coeff[0]);
@@ -1580,7 +1580,7 @@ static void radeon_vid_display_video( void )
     OUTREG(OV0_FOUR_TAP_COEF_3,besr.four_tap_coeff[3]);
     OUTREG(OV0_FOUR_TAP_COEF_4,besr.four_tap_coeff[4]);
     if(besr.swap_uv) OUTREG(OV0_TEST,INREG(OV0_TEST)|OV0_SWAP_UV);
-    OUTREG(OV0_REG_LOAD_CNTL,		0);
+    OUTREG(OV0_REG_LOAD_CNTL,           0);
     if(verbosity > VERBOSE_LEVEL) printf(RADEON_MSG"we wanted: scaler=%08X\n",bes_flags);
     if(verbosity > VERBOSE_LEVEL) radeon_vid_dump_regs();
 }
@@ -1640,573 +1640,573 @@ static unsigned radeon_query_pitch(unsigned fourcc,const vidix_yuv_t *spitch)
   }
   switch(fourcc)
   {
-	/* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_YV12:
-	case IMGFMT_I420:
-		if(spy > 16 && spu == spy/2 && spv == spy/2)	pitch = spy;
-		else						pitch = 32;
-		break;
-	case IMGFMT_IF09:
-	case IMGFMT_YVU9:
-		if(spy >= 64 && spu == spy/4 && spv == spy/4)	pitch = spy;
-		else						pitch = 64;
-		break;
-	default:
-		if(spy >= 16)	pitch = spy;
-		else		pitch = 16;
-		break;
+        /* 4:2:0 */
+        case IMGFMT_IYUV:
+        case IMGFMT_YV12:
+        case IMGFMT_I420:
+                if(spy > 16 && spu == spy/2 && spv == spy/2)    pitch = spy;
+                else                                            pitch = 32;
+                break;
+        case IMGFMT_IF09:
+        case IMGFMT_YVU9:
+                if(spy >= 64 && spu == spy/4 && spv == spy/4)   pitch = spy;
+                else                                            pitch = 64;
+                break;
+        default:
+                if(spy >= 16)   pitch = spy;
+                else            pitch = 16;
+                break;
   }
   return pitch;
 }
 
 static void Calc_H_INC_STEP_BY (
-	int fieldvalue_OV0_SURFACE_FORMAT,
-	double H_scale_ratio,
-	int DisallowFourTapVertFiltering,
-	int DisallowFourTapUVVertFiltering,
-	uint32_t *val_OV0_P1_H_INC,
-	uint32_t *val_OV0_P1_H_STEP_BY,
-	uint32_t *val_OV0_P23_H_INC,
-	uint32_t *val_OV0_P23_H_STEP_BY,
-	int *P1GroupSize,
-	int *P1StepSize,
-	int *P23StepSize )
+        int fieldvalue_OV0_SURFACE_FORMAT,
+        double H_scale_ratio,
+        int DisallowFourTapVertFiltering,
+        int DisallowFourTapUVVertFiltering,
+        uint32_t *val_OV0_P1_H_INC,
+        uint32_t *val_OV0_P1_H_STEP_BY,
+        uint32_t *val_OV0_P23_H_INC,
+        uint32_t *val_OV0_P23_H_STEP_BY,
+        int *P1GroupSize,
+        int *P1StepSize,
+        int *P23StepSize )
 {
 
     double ClocksNeededFor16Pixels;
 
     switch (fieldvalue_OV0_SURFACE_FORMAT)
     {
-	case 3:
-	case 4: /*16BPP (ARGB1555 and RGB565) */
-	    /* All colour components are fetched in pairs */
-	    *P1GroupSize = 2;
-	    /* We don't support four tap in this mode because G's are split between two bytes. In theory we could support it if */
-	    /* we saved part of the G when fetching the R, and then filter the G, followed by the B in the following cycles. */
-	    if (H_scale_ratio>=.5)
-	    {
-		/* We are actually generating two pixels (but 3 colour components) per tick. Thus we don't have to skip */
-		/* until we reach .5. P1 and P23 are the same. */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 1;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 1;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    else if (H_scale_ratio>=.25)
-	    {
-		/* Step by two */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 2;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 2;
-		*P1StepSize = 2;
-		*P23StepSize = 2;
-	    }
-	    else if (H_scale_ratio>=.125)
-	    {
-		/* Step by four */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 3;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 3;
-		*P1StepSize = 4;
-		*P23StepSize = 4;
-	    }
-	    else if (H_scale_ratio>=.0625)
-	    {
-		/* Step by eight */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 4;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 4;
-		*P1StepSize = 8;
-		*P23StepSize = 8;
-	    }
-	    else if (H_scale_ratio>=0.03125)
-	    {
-		/* Step by sixteen */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    else
-	    {
-		H_scale_ratio=0.03125;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    break;
-	case 6: /*32BPP RGB */
-	    if (H_scale_ratio>=1.5 && !DisallowFourTapVertFiltering)
-	    {
-		/* All colour components are fetched in pairs */
-		*P1GroupSize = 2;
-		/* With four tap filtering, we can generate two colour components every clock, or two pixels every three */
-		/* clocks. This means that we will have four tap filtering when scaling 1.5 or more. */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 0;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 0;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    else if (H_scale_ratio>=0.75)
-	    {
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		/* With two tap filtering, we can generate four colour components every clock. */
-		/* This means that we will have two tap filtering when scaling 1.0 or more. */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 1;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 1;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    else if (H_scale_ratio>=0.375)
-	    {
-		/* Step by two. */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 2;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 2;
-		*P1StepSize = 2;
-		*P23StepSize = 2;
-	    }
-	    else if (H_scale_ratio>=0.25)
-	    {
-		/* Step by two. */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 2;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 3;
-		*P1StepSize = 2;
-		*P23StepSize = 4;
-	    }
-	    else if (H_scale_ratio>=0.1875)
-	    {
-		/* Step by four */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 3;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 3;
-		*P1StepSize = 4;
-		*P23StepSize = 4;
-	    }
-	    else if (H_scale_ratio>=0.125)
-	    {
-		/* Step by four */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 3;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 4;
-		*P1StepSize = 4;
-		*P23StepSize = 8;
-	    }
-	    else if (H_scale_ratio>=0.09375)
-	    {
-		/* Step by eight */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 4;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 4;
-		*P1StepSize = 8;
-		*P23StepSize = 8;
-	    }
-	    else if (H_scale_ratio>=0.0625)
-	    {
-		/* Step by eight */
-		/* Four G colour components are fetched at once */
-		*P1GroupSize = 4;
-		/* R and B colour components are fetched in pairs */
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    else
-	    {
-		H_scale_ratio=0.0625;
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    break;
-	case 9:
-	    /*ToDo_Active: In mode 9 there is a possibility that HScale ratio may be set to an illegal value, so we have extra conditions in the if statement. For consistancy, these conditions be added to the other modes as well. */
-	    /* four tap on both (unless Y is too wide) */
-	    if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+2+2) / 16.0) &&
-	       ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-	       ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
-	       !DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
-	    {	/*0.75 */
-		/* Colour components are fetched in pairs */
-		*P1GroupSize = 2;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 0;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 0;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    /* two tap on Y (because it is too big for four tap), four tap on UV */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+2+2) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
-		    DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
-	    {	/*0.75 */
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 1;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 0;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    /* We scale the Y with the four tap filters, but UV's are generated
-	       with dual two tap configuration. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+1+1) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
-		    !DisallowFourTapVertFiltering)
-	    {	/*0.625 */
-		*P1GroupSize = 2;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 0;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 1;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    /* We scale the Y, U, and V with the two tap filters */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+1+1) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000))
-	    {	/*0.375 */
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 1;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 1;
-		*P1StepSize = 1;
-		*P23StepSize = 1;
-	    }
-	    /* We scale step the U and V by two to allow more bandwidth for fetching Y's,
-	       thus we won't drop Y's yet. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+.5+.5) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5)<=0x2000))
-	    {	/*>=0.3125 and >.333333~ */
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 1;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 2;
-		*P1StepSize = 1;
-		*P23StepSize = 2;
-	    }
-	    /* We step the Y, U, and V by two. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=2+.5+.5) / 16.0)	&&
-		    ((uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 2;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 2;
-		*P1StepSize = 2;
-		*P23StepSize = 2;
-	    }
-	    /* We step the Y by two and the U and V by four. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=2+.25+.25) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 2;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 3;
-		*P1StepSize = 2;
-		*P23StepSize = 4;
-	    }
-	    /* We step the Y, U, and V by four. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=1+.25+.25) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 3;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 3;
-		*P1StepSize = 4;
-		*P23StepSize = 4;
-	    }
-	    /* We would like to step the Y by four and the U and V by eight, but we can't mix step by 3 and step by 4 for packed modes */
+        case 3:
+        case 4: /*16BPP (ARGB1555 and RGB565) */
+            /* All colour components are fetched in pairs */
+            *P1GroupSize = 2;
+            /* We don't support four tap in this mode because G's are split between two bytes. In theory we could support it if */
+            /* we saved part of the G when fetching the R, and then filter the G, followed by the B in the following cycles. */
+            if (H_scale_ratio>=.5)
+            {
+                /* We are actually generating two pixels (but 3 colour components) per tick. Thus we don't have to skip */
+                /* until we reach .5. P1 and P23 are the same. */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 1;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 1;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            else if (H_scale_ratio>=.25)
+            {
+                /* Step by two */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 2;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 2;
+                *P1StepSize = 2;
+                *P23StepSize = 2;
+            }
+            else if (H_scale_ratio>=.125)
+            {
+                /* Step by four */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 3;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 3;
+                *P1StepSize = 4;
+                *P23StepSize = 4;
+            }
+            else if (H_scale_ratio>=.0625)
+            {
+                /* Step by eight */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 4;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 4;
+                *P1StepSize = 8;
+                *P23StepSize = 8;
+            }
+            else if (H_scale_ratio>=0.03125)
+            {
+                /* Step by sixteen */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            else
+            {
+                H_scale_ratio=0.03125;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            break;
+        case 6: /*32BPP RGB */
+            if (H_scale_ratio>=1.5 && !DisallowFourTapVertFiltering)
+            {
+                /* All colour components are fetched in pairs */
+                *P1GroupSize = 2;
+                /* With four tap filtering, we can generate two colour components every clock, or two pixels every three */
+                /* clocks. This means that we will have four tap filtering when scaling 1.5 or more. */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 0;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 0;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            else if (H_scale_ratio>=0.75)
+            {
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                /* With two tap filtering, we can generate four colour components every clock. */
+                /* This means that we will have two tap filtering when scaling 1.0 or more. */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 1;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 1;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            else if (H_scale_ratio>=0.375)
+            {
+                /* Step by two. */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 2;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 2;
+                *P1StepSize = 2;
+                *P23StepSize = 2;
+            }
+            else if (H_scale_ratio>=0.25)
+            {
+                /* Step by two. */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 2;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 3;
+                *P1StepSize = 2;
+                *P23StepSize = 4;
+            }
+            else if (H_scale_ratio>=0.1875)
+            {
+                /* Step by four */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 3;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 3;
+                *P1StepSize = 4;
+                *P23StepSize = 4;
+            }
+            else if (H_scale_ratio>=0.125)
+            {
+                /* Step by four */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 3;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 4;
+                *P1StepSize = 4;
+                *P23StepSize = 8;
+            }
+            else if (H_scale_ratio>=0.09375)
+            {
+                /* Step by eight */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 4;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 4;
+                *P1StepSize = 8;
+                *P23StepSize = 8;
+            }
+            else if (H_scale_ratio>=0.0625)
+            {
+                /* Step by eight */
+                /* Four G colour components are fetched at once */
+                *P1GroupSize = 4;
+                /* R and B colour components are fetched in pairs */
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            else
+            {
+                H_scale_ratio=0.0625;
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            break;
+        case 9:
+            /*ToDo_Active: In mode 9 there is a possibility that HScale ratio may be set to an illegal value, so we have extra conditions in the if statement. For consistancy, these conditions be added to the other modes as well. */
+            /* four tap on both (unless Y is too wide) */
+            if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+2+2) / 16.0) &&
+               ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+               ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
+               !DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
+            {   /*0.75 */
+                /* Colour components are fetched in pairs */
+                *P1GroupSize = 2;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 0;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 0;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            /* two tap on Y (because it is too big for four tap), four tap on UV */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+2+2) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
+                    DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
+            {   /*0.75 */
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 1;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 0;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            /* We scale the Y with the four tap filters, but UV's are generated
+               with dual two tap configuration. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+1+1) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000) &&
+                    !DisallowFourTapVertFiltering)
+            {   /*0.625 */
+                *P1GroupSize = 2;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 0;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 1;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            /* We scale the Y, U, and V with the two tap filters */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+1+1) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x2000))
+            {   /*0.375 */
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 1;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 1;
+                *P1StepSize = 1;
+                *P23StepSize = 1;
+            }
+            /* We scale step the U and V by two to allow more bandwidth for fetching Y's,
+               thus we won't drop Y's yet. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+.5+.5) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5)<=0x2000))
+            {   /*>=0.3125 and >.333333~ */
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 1;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 2;
+                *P1StepSize = 1;
+                *P23StepSize = 2;
+            }
+            /* We step the Y, U, and V by two. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=2+.5+.5) / 16.0)  &&
+                    ((uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 2;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 2;
+                *P1StepSize = 2;
+                *P23StepSize = 2;
+            }
+            /* We step the Y by two and the U and V by four. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=2+.25+.25) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 2;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 3;
+                *P1StepSize = 2;
+                *P23StepSize = 4;
+            }
+            /* We step the Y, U, and V by four. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=1+.25+.25) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 3;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*4)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 3;
+                *P1StepSize = 4;
+                *P23StepSize = 4;
+            }
+            /* We would like to step the Y by four and the U and V by eight, but we can't mix step by 3 and step by 4 for packed modes */
 
-	    /* We step the Y, U, and V by eight. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.125+.125) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*8)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 4;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 4;
-		*P1StepSize = 8;
-		*P23StepSize = 8;
-	    }
-	    /* We step the Y by eight and the U and V by sixteen. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.0625+.0625) / 16.0) &&
-	    ((uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5)<=0x3000) &&
-	    ((uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 4;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 8;
-		*P23StepSize = 16;
-	    }
-	    /* We step the Y, U, and V by sixteen. */
-	    else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.25+.0625+.0625) / 16.0) &&
-		    ((uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5)<=0x3000) &&
-		    ((uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5)<=0x2000))
-	    {
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    else
-	    {
-		H_scale_ratio=(ClocksNeededFor16Pixels=.25+.0625+.0625) / 16;
-		*P1GroupSize = 4;
-		*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P1_H_STEP_BY = 5;
-		*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
-		*val_OV0_P23_H_STEP_BY = 5;
-		*P1StepSize = 16;
-		*P23StepSize = 16;
-	    }
-	    break;
-	case 10:
-	case 11:
-	case 12:
-	case 13:
-	case 14:    /* YUV12, VYUY422, YUYV422, YOverPkCRCB12, YWovenWithPkCRCB12 */
-		/* We scale the Y, U, and V with the four tap filters */
-		/* four tap on both (unless Y is too wide) */
-		if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+4+4) / 16.0) &&
-		    !DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
-		{	/*0.75 */
-		    *P1GroupSize = 2;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 0;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 0;
-		    *P1StepSize = 1;
-		    *P23StepSize = 1;
-		}
-		/* two tap on Y (because it is too big for four tap), four tap on UV */
-		else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+4+4) / 16.0) &&
-			DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
-		{   /*0.75 */
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 1;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 0;
-		    *P1StepSize = 1;
-		    *P23StepSize = 1;
-		}
-		/* We scale the Y with the four tap filters, but UV's are generated
-		   with dual two tap configuration. */
-		else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+2+2) / 16.0) &&
-			  !DisallowFourTapVertFiltering)
-		{   /*0.625 */
-		    *P1GroupSize = 2;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 0;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 1;
-		    *P1StepSize = 1;
-		    *P23StepSize = 1;
-		}
-		/* We scale the Y, U, and V with the two tap filters */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=4+2+2) / 16.0)
-		{   /*0.375 */
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 1;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 1;
-		    *P1StepSize = 1;
-		    *P23StepSize = 1;
-		}
-		/* We scale step the U and V by two to allow more bandwidth for
-		   fetching Y's, thus we won't drop Y's yet. */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=4+1+1) / 16.0)
-		{   /*0.312 */
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 1;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 2;
-		    *P1StepSize = 1;
-		    *P23StepSize = 2;
-		}
-		/* We step the Y, U, and V by two. */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=2+1+1) / 16.0)
-		{
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 2;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 2;
-		    *P1StepSize = 2;
-		    *P23StepSize = 2;
-		}
-		/* We step the Y by two and the U and V by four. */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=2+.5+.5) / 16.0)
-		{
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 2;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*4)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 3;
-		    *P1StepSize = 2;
-		    *P23StepSize = 4;
-		}
-		/* We step the Y, U, and V by four. */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=1+.5+.5) / 16.0)
-		{
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 3;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*4)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 3;
-		    *P1StepSize = 4;
-		    *P23StepSize = 4;
-		}
-		/* We step the Y by four and the U and V by eight. */
-		else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=1+.25+.25) / 16.0) &&
-			 (fieldvalue_OV0_SURFACE_FORMAT==10))
-		{
-		    *P1GroupSize = 4;
-		    /* Can't mix step by 3 and step by 4 for packed modes */
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 3;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 4;
-		    *P1StepSize = 4;
-		    *P23StepSize = 8;
-		}
-		/* We step the Y, U, and V by eight. */
-		else if (H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.25+.25) / 16.0)
-		{
-		    *P1GroupSize = 4;
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 4;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 4;
-		    *P1StepSize = 8;
-		    *P23StepSize = 8;
-		}
-		/* We step the Y by eight and the U and V by sixteen. */
-		else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.125+.125) / 16.0) && (fieldvalue_OV0_SURFACE_FORMAT==10))
-		{
-		    *P1GroupSize = 4;
-		    /* Step by 5 not supported for packed modes */
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 4;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 5;
-		    *P1StepSize = 8;
-		    *P23StepSize = 16;
-		}
-		/* We step the Y, U, and V by sixteen. */
-		else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.25+.125+.125) / 16.0) &&
-			 (fieldvalue_OV0_SURFACE_FORMAT==10))
-		{
-		    *P1GroupSize = 4;
-		    /* Step by 5 not supported for packed modes */
-		    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-		    *val_OV0_P1_H_STEP_BY = 5;
-		    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
-		    *val_OV0_P23_H_STEP_BY = 5;
-		    *P1StepSize = 16;
-		    *P23StepSize = 16;
-		}
-		else
-		{
-		    if (fieldvalue_OV0_SURFACE_FORMAT==10)
-		    {
-			H_scale_ratio=(ClocksNeededFor16Pixels=.25+.125+.125) / 16;
-			*P1GroupSize = 4;
-			*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
-			*val_OV0_P1_H_STEP_BY = 5;
-			*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
-			*val_OV0_P23_H_STEP_BY = 5;
-			*P1StepSize = 16;
-			*P23StepSize = 16;
-		    }
-		    else
-		    {
-			H_scale_ratio=(ClocksNeededFor16Pixels=.5+.25+.25) / 16;
-			*P1GroupSize = 4;
-			*val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
-			*val_OV0_P1_H_STEP_BY = 4;
-			*val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
-			*val_OV0_P23_H_STEP_BY = 4;
-			*P1StepSize = 8;
-			*P23StepSize = 8;
-		    }
-		}
-		break;
-	default:    break;
+            /* We step the Y, U, and V by eight. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.125+.125) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*8)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 4;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 4;
+                *P1StepSize = 8;
+                *P23StepSize = 8;
+            }
+            /* We step the Y by eight and the U and V by sixteen. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.0625+.0625) / 16.0) &&
+            ((uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5)<=0x3000) &&
+            ((uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 4;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 8;
+                *P23StepSize = 16;
+            }
+            /* We step the Y, U, and V by sixteen. */
+            else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.25+.0625+.0625) / 16.0) &&
+                    ((uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5)<=0x3000) &&
+                    ((uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5)<=0x2000))
+            {
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            else
+            {
+                H_scale_ratio=(ClocksNeededFor16Pixels=.25+.0625+.0625) / 16;
+                *P1GroupSize = 4;
+                *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P1_H_STEP_BY = 5;
+                *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*4*16)) * (1<<0xc) + 0.5);
+                *val_OV0_P23_H_STEP_BY = 5;
+                *P1StepSize = 16;
+                *P23StepSize = 16;
+            }
+            break;
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:    /* YUV12, VYUY422, YUYV422, YOverPkCRCB12, YWovenWithPkCRCB12 */
+                /* We scale the Y, U, and V with the four tap filters */
+                /* four tap on both (unless Y is too wide) */
+                if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+4+4) / 16.0) &&
+                    !DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
+                {       /*0.75 */
+                    *P1GroupSize = 2;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 0;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 0;
+                    *P1StepSize = 1;
+                    *P23StepSize = 1;
+                }
+                /* two tap on Y (because it is too big for four tap), four tap on UV */
+                else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=4+4+4) / 16.0) &&
+                        DisallowFourTapVertFiltering && !DisallowFourTapUVVertFiltering)
+                {   /*0.75 */
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 1;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 0;
+                    *P1StepSize = 1;
+                    *P23StepSize = 1;
+                }
+                /* We scale the Y with the four tap filters, but UV's are generated
+                   with dual two tap configuration. */
+                else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=8+2+2) / 16.0) &&
+                          !DisallowFourTapVertFiltering)
+                {   /*0.625 */
+                    *P1GroupSize = 2;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 0;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 1;
+                    *P1StepSize = 1;
+                    *P23StepSize = 1;
+                }
+                /* We scale the Y, U, and V with the two tap filters */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=4+2+2) / 16.0)
+                {   /*0.375 */
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 1;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 1;
+                    *P1StepSize = 1;
+                    *P23StepSize = 1;
+                }
+                /* We scale step the U and V by two to allow more bandwidth for
+                   fetching Y's, thus we won't drop Y's yet. */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=4+1+1) / 16.0)
+                {   /*0.312 */
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 1;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 2;
+                    *P1StepSize = 1;
+                    *P23StepSize = 2;
+                }
+                /* We step the Y, U, and V by two. */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=2+1+1) / 16.0)
+                {
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 2;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 2;
+                    *P1StepSize = 2;
+                    *P23StepSize = 2;
+                }
+                /* We step the Y by two and the U and V by four. */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=2+.5+.5) / 16.0)
+                {
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*2)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 2;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*4)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 3;
+                    *P1StepSize = 2;
+                    *P23StepSize = 4;
+                }
+                /* We step the Y, U, and V by four. */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=1+.5+.5) / 16.0)
+                {
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 3;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*4)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 3;
+                    *P1StepSize = 4;
+                    *P23StepSize = 4;
+                }
+                /* We step the Y by four and the U and V by eight. */
+                else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=1+.25+.25) / 16.0) &&
+                         (fieldvalue_OV0_SURFACE_FORMAT==10))
+                {
+                    *P1GroupSize = 4;
+                    /* Can't mix step by 3 and step by 4 for packed modes */
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*4)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 3;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 4;
+                    *P1StepSize = 4;
+                    *P23StepSize = 8;
+                }
+                /* We step the Y, U, and V by eight. */
+                else if (H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.25+.25) / 16.0)
+                {
+                    *P1GroupSize = 4;
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 4;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 4;
+                    *P1StepSize = 8;
+                    *P23StepSize = 8;
+                }
+                /* We step the Y by eight and the U and V by sixteen. */
+                else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.5+.125+.125) / 16.0) && (fieldvalue_OV0_SURFACE_FORMAT==10))
+                {
+                    *P1GroupSize = 4;
+                    /* Step by 5 not supported for packed modes */
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 4;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 5;
+                    *P1StepSize = 8;
+                    *P23StepSize = 16;
+                }
+                /* We step the Y, U, and V by sixteen. */
+                else if ((H_scale_ratio>=(ClocksNeededFor16Pixels=.25+.125+.125) / 16.0) &&
+                         (fieldvalue_OV0_SURFACE_FORMAT==10))
+                {
+                    *P1GroupSize = 4;
+                    /* Step by 5 not supported for packed modes */
+                    *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                    *val_OV0_P1_H_STEP_BY = 5;
+                    *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
+                    *val_OV0_P23_H_STEP_BY = 5;
+                    *P1StepSize = 16;
+                    *P23StepSize = 16;
+                }
+                else
+                {
+                    if (fieldvalue_OV0_SURFACE_FORMAT==10)
+                    {
+                        H_scale_ratio=(ClocksNeededFor16Pixels=.25+.125+.125) / 16;
+                        *P1GroupSize = 4;
+                        *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*16)) * (1<<0xc) + 0.5);
+                        *val_OV0_P1_H_STEP_BY = 5;
+                        *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*16)) * (1<<0xc) + 0.5);
+                        *val_OV0_P23_H_STEP_BY = 5;
+                        *P1StepSize = 16;
+                        *P23StepSize = 16;
+                    }
+                    else
+                    {
+                        H_scale_ratio=(ClocksNeededFor16Pixels=.5+.25+.25) / 16;
+                        *P1GroupSize = 4;
+                        *val_OV0_P1_H_INC = (uint16_t)((1/(H_scale_ratio*8)) * (1<<0xc) + 0.5);
+                        *val_OV0_P1_H_STEP_BY = 4;
+                        *val_OV0_P23_H_INC = (uint16_t)((1/(H_scale_ratio*2*8)) * (1<<0xc) + 0.5);
+                        *val_OV0_P23_H_STEP_BY = 4;
+                        *P1StepSize = 8;
+                        *P23StepSize = 8;
+                    }
+                }
+                break;
+        default:    break;
 
     }
-    besr.h_inc	 = (*(val_OV0_P1_H_INC)&0x3fff) | ((*(val_OV0_P23_H_INC)&0x3fff)<<16);
+    besr.h_inc   = (*(val_OV0_P1_H_INC)&0x3fff) | ((*(val_OV0_P23_H_INC)&0x3fff)<<16);
     besr.step_by = (*(val_OV0_P1_H_STEP_BY)&0x7) | ((*(val_OV0_P23_H_STEP_BY)&0x7)<<8);
 }
 
@@ -2216,80 +2216,80 @@ static void Calc_H_INC_STEP_BY (
 
 static void ComputeBorders( vidix_playback_t *config, int VertUVSubSample )
 {
-	double tempBLANK_LINES_AT_TOP;
-	unsigned TopLine,BottomLine,SourceLinesUsed,TopUVLine,BottomUVLine,SourceUVLinesUsed;
-	uint32_t val_OV0_P1_ACTIVE_LINES_M1,val_OV0_P1_BLNK_LN_AT_TOP_M1;
-	uint32_t val_OV0_P23_ACTIVE_LINES_M1,val_OV0_P23_BLNK_LN_AT_TOP_M1;
+        double tempBLANK_LINES_AT_TOP;
+        unsigned TopLine,BottomLine,SourceLinesUsed,TopUVLine,BottomUVLine,SourceUVLinesUsed;
+        uint32_t val_OV0_P1_ACTIVE_LINES_M1,val_OV0_P1_BLNK_LN_AT_TOP_M1;
+        uint32_t val_OV0_P23_ACTIVE_LINES_M1,val_OV0_P23_BLNK_LN_AT_TOP_M1;
 
-	if (floor(config->src.y)<0) {
-	    tempBLANK_LINES_AT_TOP = -floor(config->src.y);
-	    TopLine = 0;
-	}
-	else {
-	    tempBLANK_LINES_AT_TOP = 0;
-	    TopLine = (int)floor(config->src.y);
-	}
-	/* Round rSrcBottom up and subtract one */
-	if (ceil(config->src.y+config->src.h) > config->src.h)
-	{
-	    BottomLine = config->src.h - 1;
-	}
-	else
-	{
-	    BottomLine = (int)ceil(config->src.y+config->src.h) - 1;
-	}
+        if (floor(config->src.y)<0) {
+            tempBLANK_LINES_AT_TOP = -floor(config->src.y);
+            TopLine = 0;
+        }
+        else {
+            tempBLANK_LINES_AT_TOP = 0;
+            TopLine = (int)floor(config->src.y);
+        }
+        /* Round rSrcBottom up and subtract one */
+        if (ceil(config->src.y+config->src.h) > config->src.h)
+        {
+            BottomLine = config->src.h - 1;
+        }
+        else
+        {
+            BottomLine = (int)ceil(config->src.y+config->src.h) - 1;
+        }
 
-	if (BottomLine >= TopLine)
-	{
-	    SourceLinesUsed = BottomLine - TopLine + 1;
-	}
-	else
-	{
-	    /*CYCACC_ASSERT(0, "SourceLinesUsed less than or equal to zero.") */
-	    SourceLinesUsed = 1;
-	}
+        if (BottomLine >= TopLine)
+        {
+            SourceLinesUsed = BottomLine - TopLine + 1;
+        }
+        else
+        {
+            /*CYCACC_ASSERT(0, "SourceLinesUsed less than or equal to zero.") */
+            SourceLinesUsed = 1;
+        }
 
-	{
-	    int SourceHeightInPixels;
-	    SourceHeightInPixels = BottomLine - TopLine + 1;
-	}
+        {
+            int SourceHeightInPixels;
+            SourceHeightInPixels = BottomLine - TopLine + 1;
+        }
 
-	val_OV0_P1_ACTIVE_LINES_M1 = SourceLinesUsed - 1;
-	val_OV0_P1_BLNK_LN_AT_TOP_M1 = ((int)tempBLANK_LINES_AT_TOP-1) & 0xfff;
+        val_OV0_P1_ACTIVE_LINES_M1 = SourceLinesUsed - 1;
+        val_OV0_P1_BLNK_LN_AT_TOP_M1 = ((int)tempBLANK_LINES_AT_TOP-1) & 0xfff;
 
-	TopUVLine = ((int)(config->src.y/VertUVSubSample) < 0)	?  0: (int)(config->src.y/VertUVSubSample);   /* Round rSrcTop down */
-	BottomUVLine = (ceil(((config->src.y+config->src.h)/VertUVSubSample)) > (config->src.h/VertUVSubSample))
-	? (config->src.h/VertUVSubSample)-1 : (unsigned int)ceil(((config->src.y+config->src.h)/VertUVSubSample))-1;
+        TopUVLine = ((int)(config->src.y/VertUVSubSample) < 0)  ?  0: (int)(config->src.y/VertUVSubSample);   /* Round rSrcTop down */
+        BottomUVLine = (ceil(((config->src.y+config->src.h)/VertUVSubSample)) > (config->src.h/VertUVSubSample))
+        ? (config->src.h/VertUVSubSample)-1 : (unsigned int)ceil(((config->src.y+config->src.h)/VertUVSubSample))-1;
 
-	if (BottomUVLine >= TopUVLine)
-	{
-	    SourceUVLinesUsed = BottomUVLine - TopUVLine + 1;
-	}
-	else
-	{
-	    /*CYCACC_ASSERT(0, "SourceUVLinesUsed less than or equal to zero.") */
-	    SourceUVLinesUsed = 1;
-	}
-	val_OV0_P23_ACTIVE_LINES_M1 = SourceUVLinesUsed - 1;
-	val_OV0_P23_BLNK_LN_AT_TOP_M1 = ((int)(tempBLANK_LINES_AT_TOP/VertUVSubSample)-1) & 0x7ff;
-	besr.p1_blank_lines_at_top = (val_OV0_P1_BLNK_LN_AT_TOP_M1  & 0xfff) |
-				     ((val_OV0_P1_ACTIVE_LINES_M1   & 0xfff) << 16);
-	besr.p23_blank_lines_at_top = (val_OV0_P23_BLNK_LN_AT_TOP_M1 & 0x7ff) |
-				     ((val_OV0_P23_ACTIVE_LINES_M1   & 0x7ff) << 16);
+        if (BottomUVLine >= TopUVLine)
+        {
+            SourceUVLinesUsed = BottomUVLine - TopUVLine + 1;
+        }
+        else
+        {
+            /*CYCACC_ASSERT(0, "SourceUVLinesUsed less than or equal to zero.") */
+            SourceUVLinesUsed = 1;
+        }
+        val_OV0_P23_ACTIVE_LINES_M1 = SourceUVLinesUsed - 1;
+        val_OV0_P23_BLNK_LN_AT_TOP_M1 = ((int)(tempBLANK_LINES_AT_TOP/VertUVSubSample)-1) & 0x7ff;
+        besr.p1_blank_lines_at_top = (val_OV0_P1_BLNK_LN_AT_TOP_M1  & 0xfff) |
+                                     ((val_OV0_P1_ACTIVE_LINES_M1   & 0xfff) << 16);
+        besr.p23_blank_lines_at_top = (val_OV0_P23_BLNK_LN_AT_TOP_M1 & 0x7ff) |
+                                     ((val_OV0_P23_ACTIVE_LINES_M1   & 0x7ff) << 16);
 }
 
 
 static void ComputeXStartEnd(
-	    int is_400,
-	    uint32_t LeftPixel,uint32_t LeftUVPixel,
-	    uint32_t MemWordsInBytes,uint32_t BytesPerPixel,
-	    uint32_t SourceWidthInPixels, uint32_t P1StepSize,
-	    uint32_t BytesPerUVPixel,uint32_t SourceUVWidthInPixels,
-	    uint32_t P23StepSize, uint32_t *p1_x_start, uint32_t *p2_x_start )
+            int is_400,
+            uint32_t LeftPixel,uint32_t LeftUVPixel,
+            uint32_t MemWordsInBytes,uint32_t BytesPerPixel,
+            uint32_t SourceWidthInPixels, uint32_t P1StepSize,
+            uint32_t BytesPerUVPixel,uint32_t SourceUVWidthInPixels,
+            uint32_t P23StepSize, uint32_t *p1_x_start, uint32_t *p2_x_start )
 {
     uint32_t val_OV0_P1_X_START,val_OV0_P2_X_START,val_OV0_P3_X_START;
     uint32_t val_OV0_P1_X_END,val_OV0_P2_X_END,val_OV0_P3_X_END;
-    /* ToDo_Active: At the moment we are not using iOV0_VID_BUF?_START_PIX, but instead		// are using iOV0_P?_X_START and iOV0_P?_X_END. We should use "start pix" and	    // "width" to derive the start and end. */
+    /* ToDo_Active: At the moment we are not using iOV0_VID_BUF?_START_PIX, but instead         // are using iOV0_P?_X_START and iOV0_P?_X_END. We should use "start pix" and       // "width" to derive the start and end. */
 
     val_OV0_P1_X_START = (int)LeftPixel % (MemWordsInBytes/BytesPerPixel);
     val_OV0_P1_X_END = (int)((val_OV0_P1_X_START + SourceWidthInPixels - 1) / P1StepSize) * P1StepSize;
@@ -2297,32 +2297,32 @@ static void ComputeXStartEnd(
     val_OV0_P2_X_START = val_OV0_P2_X_END = 0;
     switch (besr.surf_id)
     {
-	case 9:
-	case 10:
-	case 13:
-	case 14:    /* ToDo_Active: The driver must insure that the initial value is */
-		    /* a multiple of a power of two when decimating */
-		    val_OV0_P2_X_START = (int)LeftUVPixel %
-					    (MemWordsInBytes/BytesPerUVPixel);
-		    val_OV0_P2_X_END = (int)((val_OV0_P2_X_START +
-			      SourceUVWidthInPixels - 1) / P23StepSize) * P23StepSize;
-		    break;
-	case 11:
-	case 12:    val_OV0_P2_X_START = (int)LeftUVPixel % (MemWordsInBytes/(BytesPerPixel*2));
-		    val_OV0_P2_X_END = (int)((val_OV0_P2_X_START + SourceUVWidthInPixels - 1) / P23StepSize) * P23StepSize;
-		    break;
-	case 3:
-	case 4:	    val_OV0_P2_X_START = val_OV0_P1_X_START;
-		    /* This value is needed only to allow proper setting of */
-		    /* val_OV0_PRESHIFT_P23_TO */
-		    /* val_OV0_P2_X_END = 0; */
-		    break;
-	case 6:	    val_OV0_P2_X_START = (int)LeftPixel % (MemWordsInBytes/BytesPerPixel);
-		    val_OV0_P2_X_END = (int)((val_OV0_P1_X_START + SourceWidthInPixels - 1) / P23StepSize) * P23StepSize;
-		    break;
-	default:    /* insert debug statement here. */
-		    RADEON_ASSERT("unknown fourcc\n");
-		    break;
+        case 9:
+        case 10:
+        case 13:
+        case 14:    /* ToDo_Active: The driver must insure that the initial value is */
+                    /* a multiple of a power of two when decimating */
+                    val_OV0_P2_X_START = (int)LeftUVPixel %
+                                            (MemWordsInBytes/BytesPerUVPixel);
+                    val_OV0_P2_X_END = (int)((val_OV0_P2_X_START +
+                              SourceUVWidthInPixels - 1) / P23StepSize) * P23StepSize;
+                    break;
+        case 11:
+        case 12:    val_OV0_P2_X_START = (int)LeftUVPixel % (MemWordsInBytes/(BytesPerPixel*2));
+                    val_OV0_P2_X_END = (int)((val_OV0_P2_X_START + SourceUVWidthInPixels - 1) / P23StepSize) * P23StepSize;
+                    break;
+        case 3:
+        case 4:     val_OV0_P2_X_START = val_OV0_P1_X_START;
+                    /* This value is needed only to allow proper setting of */
+                    /* val_OV0_PRESHIFT_P23_TO */
+                    /* val_OV0_P2_X_END = 0; */
+                    break;
+        case 6:     val_OV0_P2_X_START = (int)LeftPixel % (MemWordsInBytes/BytesPerPixel);
+                    val_OV0_P2_X_END = (int)((val_OV0_P1_X_START + SourceWidthInPixels - 1) / P23StepSize) * P23StepSize;
+                    break;
+        default:    /* insert debug statement here. */
+                    RADEON_ASSERT("unknown fourcc\n");
+                    break;
     }
     val_OV0_P3_X_START = val_OV0_P2_X_START;
     val_OV0_P3_X_END = val_OV0_P2_X_END;
@@ -2332,118 +2332,118 @@ static void ComputeXStartEnd(
     besr.p3_x_start_end = (val_OV0_P3_X_END&0x7ff) | ((val_OV0_P3_X_START&0x7ff)<<16);
     if(is_400)
     {
-	besr.p2_x_start_end = 0;
-	besr.p3_x_start_end = 0;
+        besr.p2_x_start_end = 0;
+        besr.p3_x_start_end = 0;
     }
     *p1_x_start = val_OV0_P1_X_START;
     *p2_x_start = val_OV0_P2_X_START;
 }
 
 static void ComputeAccumInit(
-	    uint32_t val_OV0_P1_X_START,uint32_t val_OV0_P2_X_START,
-	    uint32_t val_OV0_P1_H_INC,uint32_t val_OV0_P23_H_INC,
-	    uint32_t val_OV0_P1_H_STEP_BY,uint32_t val_OV0_P23_H_STEP_BY,
-	    uint32_t CRT_V_INC,
-	    uint32_t P1GroupSize, uint32_t P23GroupSize,
-	    uint32_t val_OV0_P1_MAX_LN_IN_PER_LN_OUT,
-	    uint32_t val_OV0_P23_MAX_LN_IN_PER_LN_OUT)
+            uint32_t val_OV0_P1_X_START,uint32_t val_OV0_P2_X_START,
+            uint32_t val_OV0_P1_H_INC,uint32_t val_OV0_P23_H_INC,
+            uint32_t val_OV0_P1_H_STEP_BY,uint32_t val_OV0_P23_H_STEP_BY,
+            uint32_t CRT_V_INC,
+            uint32_t P1GroupSize, uint32_t P23GroupSize,
+            uint32_t val_OV0_P1_MAX_LN_IN_PER_LN_OUT,
+            uint32_t val_OV0_P23_MAX_LN_IN_PER_LN_OUT)
 {
     uint32_t val_OV0_P1_H_ACCUM_INIT,val_OV0_PRESHIFT_P1_TO;
     uint32_t val_OV0_P23_H_ACCUM_INIT,val_OV0_PRESHIFT_P23_TO;
     uint32_t val_OV0_P1_V_ACCUM_INIT,val_OV0_P23_V_ACCUM_INIT;
-	/* 2.5 puts the kernal 50% of the way between the source pixel that is off screen */
-	/* and the first on-screen source pixel. "(float)valOV0_P?_H_INC / (1<<0xc)" is */
-	/* the distance (in source pixel coordinates) to the center of the first */
-	/* destination pixel. Need to add additional pixels depending on how many pixels */
-	/* are fetched at a time and how many pixels in a set are masked. */
-	/* P23 values are always fetched in groups of two or four. If the start */
-	/* pixel does not fall on the boundary, then we need to shift preshift for */
-	/* some additional pixels */
+        /* 2.5 puts the kernal 50% of the way between the source pixel that is off screen */
+        /* and the first on-screen source pixel. "(float)valOV0_P?_H_INC / (1<<0xc)" is */
+        /* the distance (in source pixel coordinates) to the center of the first */
+        /* destination pixel. Need to add additional pixels depending on how many pixels */
+        /* are fetched at a time and how many pixels in a set are masked. */
+        /* P23 values are always fetched in groups of two or four. If the start */
+        /* pixel does not fall on the boundary, then we need to shift preshift for */
+        /* some additional pixels */
 
-	{
-	    double ExtraHalfPixel;
-	    double tempAdditionalShift;
-	    double tempP1HStartPoint;
-	    double tempP23HStartPoint;
-	    double tempP1Init;
-	    double tempP23Init;
+        {
+            double ExtraHalfPixel;
+            double tempAdditionalShift;
+            double tempP1HStartPoint;
+            double tempP23HStartPoint;
+            double tempP1Init;
+            double tempP23Init;
 
-	    if (besr.horz_pick_nearest) ExtraHalfPixel = 0.5;
-	    else			ExtraHalfPixel = 0.0;
-	    tempAdditionalShift = val_OV0_P1_X_START % P1GroupSize + ExtraHalfPixel;
-	    tempP1HStartPoint = tempAdditionalShift + 2.5 + ((float)val_OV0_P1_H_INC / (1<<0xd));
-	    tempP1Init = (double)((int)(tempP1HStartPoint * (1<<0x5) + 0.5)) / (1<<0x5);
+            if (besr.horz_pick_nearest) ExtraHalfPixel = 0.5;
+            else                        ExtraHalfPixel = 0.0;
+            tempAdditionalShift = val_OV0_P1_X_START % P1GroupSize + ExtraHalfPixel;
+            tempP1HStartPoint = tempAdditionalShift + 2.5 + ((float)val_OV0_P1_H_INC / (1<<0xd));
+            tempP1Init = (double)((int)(tempP1HStartPoint * (1<<0x5) + 0.5)) / (1<<0x5);
 
-	    /* P23 values are always fetched in pairs. If the start pixel is odd, then we */
-	    /* need to shift an additional pixel */
-	    /* Note that if the pitch is a multiple of two, and if we store fields using */
-	    /* the traditional planer format where the V plane and the U plane share the */
-	    /* same pitch, then OverlayRegFields->val_OV0_P2_X_START % P23Group */
-	    /* OverlayRegFields->val_OV0_P3_X_START % P23GroupSize. Either way */
-	    /* it is a requirement that the U and V start on the same polarity byte */
-	    /* (even or odd). */
-	    tempAdditionalShift = val_OV0_P2_X_START % P23GroupSize + ExtraHalfPixel;
-	    tempP23HStartPoint = tempAdditionalShift + 2.5 + ((float)val_OV0_P23_H_INC / (1<<0xd));
-	    tempP23Init = (double)((int)(tempP23HStartPoint * (1<<0x5) + 0.5)) / (1 << 0x5);
-	    val_OV0_P1_H_ACCUM_INIT = (int)((tempP1Init - (int)tempP1Init) * (1<<0x5));
-	    val_OV0_PRESHIFT_P1_TO = (int)tempP1Init;
-	    val_OV0_P23_H_ACCUM_INIT = (int)((tempP23Init - (int)tempP23Init) * (1<<0x5));
-	    val_OV0_PRESHIFT_P23_TO = (int)tempP23Init;
-	}
+            /* P23 values are always fetched in pairs. If the start pixel is odd, then we */
+            /* need to shift an additional pixel */
+            /* Note that if the pitch is a multiple of two, and if we store fields using */
+            /* the traditional planer format where the V plane and the U plane share the */
+            /* same pitch, then OverlayRegFields->val_OV0_P2_X_START % P23Group */
+            /* OverlayRegFields->val_OV0_P3_X_START % P23GroupSize. Either way */
+            /* it is a requirement that the U and V start on the same polarity byte */
+            /* (even or odd). */
+            tempAdditionalShift = val_OV0_P2_X_START % P23GroupSize + ExtraHalfPixel;
+            tempP23HStartPoint = tempAdditionalShift + 2.5 + ((float)val_OV0_P23_H_INC / (1<<0xd));
+            tempP23Init = (double)((int)(tempP23HStartPoint * (1<<0x5) + 0.5)) / (1 << 0x5);
+            val_OV0_P1_H_ACCUM_INIT = (int)((tempP1Init - (int)tempP1Init) * (1<<0x5));
+            val_OV0_PRESHIFT_P1_TO = (int)tempP1Init;
+            val_OV0_P23_H_ACCUM_INIT = (int)((tempP23Init - (int)tempP23Init) * (1<<0x5));
+            val_OV0_PRESHIFT_P23_TO = (int)tempP23Init;
+        }
 
-	/* ************************************************************** */
-	/* ** Calculate values for initializing the vertical accumulators */
-	/* ************************************************************** */
+        /* ************************************************************** */
+        /* ** Calculate values for initializing the vertical accumulators */
+        /* ************************************************************** */
 
-	{
-	    double ExtraHalfLine;
-	    double ExtraFullLine;
-	    double tempP1VStartPoint;
-	    double tempP23VStartPoint;
+        {
+            double ExtraHalfLine;
+            double ExtraFullLine;
+            double tempP1VStartPoint;
+            double tempP23VStartPoint;
 
-	    if (besr.vert_pick_nearest) ExtraHalfLine = 0.5;
-	    else			ExtraHalfLine = 0.0;
+            if (besr.vert_pick_nearest) ExtraHalfLine = 0.5;
+            else                        ExtraHalfLine = 0.0;
 
-	    if (val_OV0_P1_H_STEP_BY==0)ExtraFullLine = 1.0;
-	    else			ExtraFullLine = 0.0;
+            if (val_OV0_P1_H_STEP_BY==0)ExtraFullLine = 1.0;
+            else                        ExtraFullLine = 0.0;
 
-	    tempP1VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine + ((float)CRT_V_INC / (1<<0xd));
-	    if (tempP1VStartPoint>2.5 + 2*ExtraFullLine)
-	    {
-		tempP1VStartPoint = 2.5 + 2*ExtraFullLine;
-	    }
-	    val_OV0_P1_V_ACCUM_INIT = (int)(tempP1VStartPoint * (1<<0x5) + 0.5);
+            tempP1VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine + ((float)CRT_V_INC / (1<<0xd));
+            if (tempP1VStartPoint>2.5 + 2*ExtraFullLine)
+            {
+                tempP1VStartPoint = 2.5 + 2*ExtraFullLine;
+            }
+            val_OV0_P1_V_ACCUM_INIT = (int)(tempP1VStartPoint * (1<<0x5) + 0.5);
 
-	    if (val_OV0_P23_H_STEP_BY==0)ExtraFullLine = 1.0;
-	    else			ExtraFullLine = 0.0;
+            if (val_OV0_P23_H_STEP_BY==0)ExtraFullLine = 1.0;
+            else                        ExtraFullLine = 0.0;
 
-	    switch (besr.surf_id)
-	    {
-		case 10:
-		case 13:
-		case 14:    tempP23VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine +
-						((float)CRT_V_INC / (1<<0xe));
-			    break;
-		case 9:	    tempP23VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine +
-						((float)CRT_V_INC / (1<<0xf));
-			    break;
-		case 3:
-		case 4:
-		case 6:
-		case 11:
-		case 12:    tempP23VStartPoint = 0;
-			    break;
-		default:    tempP23VStartPoint = 0xFFFF;/* insert debug statement here */
-			    break;
-	    }
+            switch (besr.surf_id)
+            {
+                case 10:
+                case 13:
+                case 14:    tempP23VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine +
+                                                ((float)CRT_V_INC / (1<<0xe));
+                            break;
+                case 9:     tempP23VStartPoint = 1.5 + ExtraFullLine + ExtraHalfLine +
+                                                ((float)CRT_V_INC / (1<<0xf));
+                            break;
+                case 3:
+                case 4:
+                case 6:
+                case 11:
+                case 12:    tempP23VStartPoint = 0;
+                            break;
+                default:    tempP23VStartPoint = 0xFFFF;/* insert debug statement here */
+                            break;
+            }
 
-	    if (tempP23VStartPoint>2.5 + 2*ExtraFullLine)
-	    {
-		tempP23VStartPoint = 2.5 + 2*ExtraFullLine;
-	    }
+            if (tempP23VStartPoint>2.5 + 2*ExtraFullLine)
+            {
+                tempP23VStartPoint = 2.5 + 2*ExtraFullLine;
+            }
 
-	    val_OV0_P23_V_ACCUM_INIT = (int)(tempP23VStartPoint * (1<<0x5) + 0.5);
-	}
+            val_OV0_P23_V_ACCUM_INIT = (int)(tempP23VStartPoint * (1<<0x5) + 0.5);
+        }
     besr.p1_h_accum_init = ((val_OV0_P1_H_ACCUM_INIT&0x1f)<<15)  |((val_OV0_PRESHIFT_P1_TO&0xf)<<28);
     besr.p1_v_accum_init = (val_OV0_P1_MAX_LN_IN_PER_LN_OUT&0x3) |((val_OV0_P1_V_ACCUM_INIT&0x7ff)<<15);
     besr.p23_h_accum_init= ((val_OV0_P23_H_ACCUM_INIT&0x1f)<<15) |((val_OV0_PRESHIFT_P23_TO&0xf)<<28);
@@ -2459,82 +2459,82 @@ typedef struct RangeAndCoefSet {
 static void FilterSetup ( uint32_t val_OV0_P1_H_INC )
 {
     static const RANGEANDCOEFSET ArrayOfSets[] = {
-	{0.25, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13,   13,    3}, }},
-	{0.26, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.27, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.28, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.29, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.30, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.31, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.32, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.33, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.34, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.35, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.36, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.37, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.38, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.39, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.40, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.41, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.42, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.43, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.44, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.45, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.46, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.47, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.48, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.49, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.50, {{ 7,	16,  9,	 0}, { 7,   16,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 3,	13, 13,	 3}, }},
-	{0.51, {{ 7,	17,  8,	 0}, { 6,   17,	 9,  0}, { 5,	15, 11,	 1}, { 4,   15, 12,  1}, { 2,	14, 14,	 2}, }},
-	{0.52, {{ 7,	17,  8,	 0}, { 6,   17,	 9,  0}, { 5,	16, 11,	 0}, { 3,   15, 13,  1}, { 2,	14, 14,	 2}, }},
-	{0.53, {{ 7,	17,  8,	 0}, { 6,   17,	 9,  0}, { 5,	16, 11,	 0}, { 3,   15, 13,  1}, { 2,	14, 14,	 2}, }},
-	{0.54, {{ 7,	17,  8,	 0}, { 6,   17,	 9,  0}, { 4,	17, 11,	 0}, { 3,   15, 13,  1}, { 2,	14, 14,	 2}, }},
-	{0.55, {{ 7,	18,  7,	 0}, { 6,   17,	 9,  0}, { 4,	17, 11,	 0}, { 3,   15, 13,  1}, { 1,	15, 15,	 1}, }},
-	{0.56, {{ 7,	18,  7,	 0}, { 5,   18,	 9,  0}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.57, {{ 7,	18,  7,	 0}, { 5,   18,	 9,  0}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.58, {{ 7,	18,  7,	 0}, { 5,   18,	 9,  0}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.59, {{ 7,	18,  7,	 0}, { 5,   18,	 9,  0}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.60, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.61, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.62, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.63, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 11,	 0}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.64, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 12, -1}, { 2,   17, 13,  0}, { 1,	15, 15,	 1}, }},
-	{0.65, {{ 7,	18,  8, -1}, { 6,   17, 10, -1}, { 4,	17, 12, -1}, { 2,   17, 13,  0}, { 0,	16, 16,	 0}, }},
-	{0.66, {{ 7,	18,  8, -1}, { 6,   18, 10, -2}, { 4,	17, 12, -1}, { 2,   17, 13,  0}, { 0,	16, 16,	 0}, }},
-	{0.67, {{ 7,	20,  7, -2}, { 5,   19, 10, -2}, { 3,	18, 12, -1}, { 2,   17, 13,  0}, { 0,	16, 16,	 0}, }},
-	{0.68, {{ 7,	20,  7, -2}, { 5,   19, 10, -2}, { 3,	19, 12, -2}, { 1,   18, 14, -1}, { 0,	16, 16,	 0}, }},
-	{0.69, {{ 7,	20,  7, -2}, { 5,   19, 10, -2}, { 3,	19, 12, -2}, { 1,   18, 14, -1}, { 0,	16, 16,	 0}, }},
-	{0.70, {{ 7,	20,  7, -2}, { 5,   20,	 9, -2}, { 3,	19, 12, -2}, { 1,   18, 14, -1}, { 0,	16, 16,	 0}, }},
-	{0.71, {{ 7,	20,  7, -2}, { 5,   20,	 9, -2}, { 3,	19, 12, -2}, { 1,   18, 14, -1}, { 0,	16, 16,	 0}, }},
-	{0.72, {{ 7,	20,  7, -2}, { 5,   20,	 9, -2}, { 2,	20, 12, -2}, { 0,   19, 15, -2}, {-1,	17, 17, -1}, }},
-	{0.73, {{ 7,	20,  7, -2}, { 4,   21,	 9, -2}, { 2,	20, 12, -2}, { 0,   19, 15, -2}, {-1,	17, 17, -1}, }},
-	{0.74, {{ 6,	22,  6, -2}, { 4,   21,	 9, -2}, { 2,	20, 12, -2}, { 0,   19, 15, -2}, {-1,	17, 17, -1}, }},
-	{0.75, {{ 6,	22,  6, -2}, { 4,   21,	 9, -2}, { 1,	21, 12, -2}, { 0,   19, 15, -2}, {-1,	17, 17, -1}, }},
-	{0.76, {{ 6,	22,  6, -2}, { 4,   21,	 9, -2}, { 1,	21, 12, -2}, { 0,   19, 15, -2}, {-1,	17, 17, -1}, }},
-	{0.77, {{ 6,	22,  6, -2}, { 3,   22,	 9, -2}, { 1,	22, 12, -3}, { 0,   19, 15, -2}, {-2,	18, 18, -2}, }},
-	{0.78, {{ 6,	21,  6, -1}, { 3,   22,	 9, -2}, { 1,	22, 12, -3}, { 0,   19, 15, -2}, {-2,	18, 18, -2}, }},
-	{0.79, {{ 5,	23,  5, -1}, { 3,   22,	 9, -2}, { 0,	23, 12, -3}, {-1,   21, 15, -3}, {-2,	18, 18, -2}, }},
-	{0.80, {{ 5,	23,  5, -1}, { 3,   23,	 8, -2}, { 0,	23, 12, -3}, {-1,   21, 15, -3}, {-2,	18, 18, -2}, }},
-	{0.81, {{ 5,	23,  5, -1}, { 2,   24,	 8, -2}, { 0,	23, 12, -3}, {-1,   21, 15, -3}, {-2,	18, 18, -2}, }},
-	{0.82, {{ 5,	23,  5, -1}, { 2,   24,	 8, -2}, { 0,	23, 12, -3}, {-1,   21, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.83, {{ 5,	23,  5, -1}, { 2,   24,	 8, -2}, { 0,	23, 11, -2}, {-2,   22, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.84, {{ 4,	25,  4, -1}, { 1,   25,	 8, -2}, { 0,	23, 11, -2}, {-2,   22, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.85, {{ 4,	25,  4, -1}, { 1,   25,	 8, -2}, { 0,	23, 11, -2}, {-2,   22, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.86, {{ 4,	24,  4,	 0}, { 1,   25,	 7, -1}, {-1,	24, 11, -2}, {-2,   22, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.87, {{ 4,	24,  4,	 0}, { 1,   25,	 7, -1}, {-1,	24, 11, -2}, {-2,   22, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.88, {{ 3,	26,  3,	 0}, { 0,   26,	 7, -1}, {-1,	24, 11, -2}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.89, {{ 3,	26,  3,	 0}, { 0,   26,	 7, -1}, {-1,	24, 11, -2}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.90, {{ 3,	26,  3,	 0}, { 0,   26,	 7, -1}, {-2,	25, 11, -2}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.91, {{ 3,	26,  3,	 0}, { 0,   27,	 6, -1}, {-2,	25, 11, -2}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.92, {{ 2,	28,  2,	 0}, { 0,   27,	 6, -1}, {-2,	25, 11, -2}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.93, {{ 2,	28,  2,	 0}, { 0,   26,	 6,  0}, {-2,	25, 10, -1}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.94, {{ 2,	28,  2,	 0}, { 0,   26,	 6,  0}, {-2,	25, 10, -1}, {-3,   23, 15, -3}, {-3,	19, 19, -3}, }},
-	{0.95, {{ 1,	30,  1,	 0}, {-1,   28,	 5,  0}, {-3,	26, 10, -1}, {-3,   23, 14, -2}, {-3,	19, 19, -3}, }},
-	{0.96, {{ 1,	30,  1,	 0}, {-1,   28,	 5,  0}, {-3,	26, 10, -1}, {-3,   23, 14, -2}, {-3,	19, 19, -3}, }},
-	{0.97, {{ 1,	30,  1,	 0}, {-1,   28,	 5,  0}, {-3,	26, 10, -1}, {-3,   23, 14, -2}, {-3,	19, 19, -3}, }},
-	{0.98, {{ 1,	30,  1,	 0}, {-2,   29,	 5,  0}, {-3,	27,  9, -1}, {-3,   23, 14, -2}, {-3,	19, 19, -3}, }},
-	{0.99, {{ 0,	32,  0,	 0}, {-2,   29,	 5,  0}, {-3,	27,  9, -1}, {-4,   24, 14, -2}, {-3,	19, 19, -3}, }},
-	{1.00, {{ 0,	32,  0,	 0}, {-2,   29,	 5,  0}, {-3,	27,  9, -1}, {-4,   24, 14, -2}, {-3,	19, 19, -3}, }}
+        {0.25, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13,   13,    3}, }},
+        {0.26, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.27, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.28, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.29, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.30, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.31, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.32, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.33, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.34, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.35, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.36, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.37, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.38, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.39, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.40, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.41, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.42, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.43, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.44, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.45, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.46, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.47, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.48, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.49, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.50, {{ 7,    16,  9,  0}, { 7,   16,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 3,   13, 13,  3}, }},
+        {0.51, {{ 7,    17,  8,  0}, { 6,   17,  9,  0}, { 5,   15, 11,  1}, { 4,   15, 12,  1}, { 2,   14, 14,  2}, }},
+        {0.52, {{ 7,    17,  8,  0}, { 6,   17,  9,  0}, { 5,   16, 11,  0}, { 3,   15, 13,  1}, { 2,   14, 14,  2}, }},
+        {0.53, {{ 7,    17,  8,  0}, { 6,   17,  9,  0}, { 5,   16, 11,  0}, { 3,   15, 13,  1}, { 2,   14, 14,  2}, }},
+        {0.54, {{ 7,    17,  8,  0}, { 6,   17,  9,  0}, { 4,   17, 11,  0}, { 3,   15, 13,  1}, { 2,   14, 14,  2}, }},
+        {0.55, {{ 7,    18,  7,  0}, { 6,   17,  9,  0}, { 4,   17, 11,  0}, { 3,   15, 13,  1}, { 1,   15, 15,  1}, }},
+        {0.56, {{ 7,    18,  7,  0}, { 5,   18,  9,  0}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.57, {{ 7,    18,  7,  0}, { 5,   18,  9,  0}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.58, {{ 7,    18,  7,  0}, { 5,   18,  9,  0}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.59, {{ 7,    18,  7,  0}, { 5,   18,  9,  0}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.60, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.61, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.62, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.63, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 11,  0}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.64, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 12, -1}, { 2,   17, 13,  0}, { 1,   15, 15,  1}, }},
+        {0.65, {{ 7,    18,  8, -1}, { 6,   17, 10, -1}, { 4,   17, 12, -1}, { 2,   17, 13,  0}, { 0,   16, 16,  0}, }},
+        {0.66, {{ 7,    18,  8, -1}, { 6,   18, 10, -2}, { 4,   17, 12, -1}, { 2,   17, 13,  0}, { 0,   16, 16,  0}, }},
+        {0.67, {{ 7,    20,  7, -2}, { 5,   19, 10, -2}, { 3,   18, 12, -1}, { 2,   17, 13,  0}, { 0,   16, 16,  0}, }},
+        {0.68, {{ 7,    20,  7, -2}, { 5,   19, 10, -2}, { 3,   19, 12, -2}, { 1,   18, 14, -1}, { 0,   16, 16,  0}, }},
+        {0.69, {{ 7,    20,  7, -2}, { 5,   19, 10, -2}, { 3,   19, 12, -2}, { 1,   18, 14, -1}, { 0,   16, 16,  0}, }},
+        {0.70, {{ 7,    20,  7, -2}, { 5,   20,  9, -2}, { 3,   19, 12, -2}, { 1,   18, 14, -1}, { 0,   16, 16,  0}, }},
+        {0.71, {{ 7,    20,  7, -2}, { 5,   20,  9, -2}, { 3,   19, 12, -2}, { 1,   18, 14, -1}, { 0,   16, 16,  0}, }},
+        {0.72, {{ 7,    20,  7, -2}, { 5,   20,  9, -2}, { 2,   20, 12, -2}, { 0,   19, 15, -2}, {-1,   17, 17, -1}, }},
+        {0.73, {{ 7,    20,  7, -2}, { 4,   21,  9, -2}, { 2,   20, 12, -2}, { 0,   19, 15, -2}, {-1,   17, 17, -1}, }},
+        {0.74, {{ 6,    22,  6, -2}, { 4,   21,  9, -2}, { 2,   20, 12, -2}, { 0,   19, 15, -2}, {-1,   17, 17, -1}, }},
+        {0.75, {{ 6,    22,  6, -2}, { 4,   21,  9, -2}, { 1,   21, 12, -2}, { 0,   19, 15, -2}, {-1,   17, 17, -1}, }},
+        {0.76, {{ 6,    22,  6, -2}, { 4,   21,  9, -2}, { 1,   21, 12, -2}, { 0,   19, 15, -2}, {-1,   17, 17, -1}, }},
+        {0.77, {{ 6,    22,  6, -2}, { 3,   22,  9, -2}, { 1,   22, 12, -3}, { 0,   19, 15, -2}, {-2,   18, 18, -2}, }},
+        {0.78, {{ 6,    21,  6, -1}, { 3,   22,  9, -2}, { 1,   22, 12, -3}, { 0,   19, 15, -2}, {-2,   18, 18, -2}, }},
+        {0.79, {{ 5,    23,  5, -1}, { 3,   22,  9, -2}, { 0,   23, 12, -3}, {-1,   21, 15, -3}, {-2,   18, 18, -2}, }},
+        {0.80, {{ 5,    23,  5, -1}, { 3,   23,  8, -2}, { 0,   23, 12, -3}, {-1,   21, 15, -3}, {-2,   18, 18, -2}, }},
+        {0.81, {{ 5,    23,  5, -1}, { 2,   24,  8, -2}, { 0,   23, 12, -3}, {-1,   21, 15, -3}, {-2,   18, 18, -2}, }},
+        {0.82, {{ 5,    23,  5, -1}, { 2,   24,  8, -2}, { 0,   23, 12, -3}, {-1,   21, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.83, {{ 5,    23,  5, -1}, { 2,   24,  8, -2}, { 0,   23, 11, -2}, {-2,   22, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.84, {{ 4,    25,  4, -1}, { 1,   25,  8, -2}, { 0,   23, 11, -2}, {-2,   22, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.85, {{ 4,    25,  4, -1}, { 1,   25,  8, -2}, { 0,   23, 11, -2}, {-2,   22, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.86, {{ 4,    24,  4,  0}, { 1,   25,  7, -1}, {-1,   24, 11, -2}, {-2,   22, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.87, {{ 4,    24,  4,  0}, { 1,   25,  7, -1}, {-1,   24, 11, -2}, {-2,   22, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.88, {{ 3,    26,  3,  0}, { 0,   26,  7, -1}, {-1,   24, 11, -2}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.89, {{ 3,    26,  3,  0}, { 0,   26,  7, -1}, {-1,   24, 11, -2}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.90, {{ 3,    26,  3,  0}, { 0,   26,  7, -1}, {-2,   25, 11, -2}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.91, {{ 3,    26,  3,  0}, { 0,   27,  6, -1}, {-2,   25, 11, -2}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.92, {{ 2,    28,  2,  0}, { 0,   27,  6, -1}, {-2,   25, 11, -2}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.93, {{ 2,    28,  2,  0}, { 0,   26,  6,  0}, {-2,   25, 10, -1}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.94, {{ 2,    28,  2,  0}, { 0,   26,  6,  0}, {-2,   25, 10, -1}, {-3,   23, 15, -3}, {-3,   19, 19, -3}, }},
+        {0.95, {{ 1,    30,  1,  0}, {-1,   28,  5,  0}, {-3,   26, 10, -1}, {-3,   23, 14, -2}, {-3,   19, 19, -3}, }},
+        {0.96, {{ 1,    30,  1,  0}, {-1,   28,  5,  0}, {-3,   26, 10, -1}, {-3,   23, 14, -2}, {-3,   19, 19, -3}, }},
+        {0.97, {{ 1,    30,  1,  0}, {-1,   28,  5,  0}, {-3,   26, 10, -1}, {-3,   23, 14, -2}, {-3,   19, 19, -3}, }},
+        {0.98, {{ 1,    30,  1,  0}, {-2,   29,  5,  0}, {-3,   27,  9, -1}, {-3,   23, 14, -2}, {-3,   19, 19, -3}, }},
+        {0.99, {{ 0,    32,  0,  0}, {-2,   29,  5,  0}, {-3,   27,  9, -1}, {-4,   24, 14, -2}, {-3,   19, 19, -3}, }},
+        {1.00, {{ 0,    32,  0,  0}, {-2,   29,  5,  0}, {-3,   27,  9, -1}, {-4,   24, 14, -2}, {-3,   19, 19, -3}, }}
     };
 
     double DSR;
@@ -2546,26 +2546,26 @@ static void FilterSetup ( uint32_t val_OV0_P1_H_INC )
     if (DSR>1) DSR=1;
 
     ArrayElement = (int)((DSR-0.25) * 100);
-    besr.four_tap_coeff[0] =	 (ArrayOfSets[ArrayElement].CoefSet[0][0] & 0xf) |
-				((ArrayOfSets[ArrayElement].CoefSet[0][1] & 0x7f)<<8) |
-				((ArrayOfSets[ArrayElement].CoefSet[0][2] & 0x7f)<<16) |
-				((ArrayOfSets[ArrayElement].CoefSet[0][3] & 0xf)<<24);
-    besr.four_tap_coeff[1] =	 (ArrayOfSets[ArrayElement].CoefSet[1][0] & 0xf) |
-				((ArrayOfSets[ArrayElement].CoefSet[1][1] & 0x7f)<<8) |
-				((ArrayOfSets[ArrayElement].CoefSet[1][2] & 0x7f)<<16) |
-				((ArrayOfSets[ArrayElement].CoefSet[1][3] & 0xf)<<24);
-    besr.four_tap_coeff[2] =	 (ArrayOfSets[ArrayElement].CoefSet[2][0] & 0xf) |
-				((ArrayOfSets[ArrayElement].CoefSet[2][1] & 0x7f)<<8) |
-				((ArrayOfSets[ArrayElement].CoefSet[2][2] & 0x7f)<<16) |
-				((ArrayOfSets[ArrayElement].CoefSet[2][3] & 0xf)<<24);
-    besr.four_tap_coeff[3] =	 (ArrayOfSets[ArrayElement].CoefSet[3][0] & 0xf) |
-				((ArrayOfSets[ArrayElement].CoefSet[3][1] & 0x7f)<<8) |
-				((ArrayOfSets[ArrayElement].CoefSet[3][2] & 0x7f)<<16) |
-				((ArrayOfSets[ArrayElement].CoefSet[3][3] & 0xf)<<24);
-    besr.four_tap_coeff[4] =	 (ArrayOfSets[ArrayElement].CoefSet[4][0] & 0xf) |
-				((ArrayOfSets[ArrayElement].CoefSet[4][1] & 0x7f)<<8) |
-				((ArrayOfSets[ArrayElement].CoefSet[4][2] & 0x7f)<<16) |
-				((ArrayOfSets[ArrayElement].CoefSet[4][3] & 0xf)<<24);
+    besr.four_tap_coeff[0] =     (ArrayOfSets[ArrayElement].CoefSet[0][0] & 0xf) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[0][1] & 0x7f)<<8) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[0][2] & 0x7f)<<16) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[0][3] & 0xf)<<24);
+    besr.four_tap_coeff[1] =     (ArrayOfSets[ArrayElement].CoefSet[1][0] & 0xf) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[1][1] & 0x7f)<<8) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[1][2] & 0x7f)<<16) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[1][3] & 0xf)<<24);
+    besr.four_tap_coeff[2] =     (ArrayOfSets[ArrayElement].CoefSet[2][0] & 0xf) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[2][1] & 0x7f)<<8) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[2][2] & 0x7f)<<16) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[2][3] & 0xf)<<24);
+    besr.four_tap_coeff[3] =     (ArrayOfSets[ArrayElement].CoefSet[3][0] & 0xf) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[3][1] & 0x7f)<<8) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[3][2] & 0x7f)<<16) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[3][3] & 0xf)<<24);
+    besr.four_tap_coeff[4] =     (ArrayOfSets[ArrayElement].CoefSet[4][0] & 0xf) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[4][1] & 0x7f)<<8) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[4][2] & 0x7f)<<16) |
+                                ((ArrayOfSets[ArrayElement].CoefSet[4][3] & 0xf)<<24);
 /*
     For more details, refer to Microsoft's draft of PC99.
 */
@@ -2622,241 +2622,241 @@ static int radeon_vid_init_video( vidix_playback_t *config )
     h_inc = 1;
     switch(config->fourcc)
     {
-	/* 4:0:0*/
-	case IMGFMT_Y800:
-	/* 4:1:0*/
-	case IMGFMT_YVU9:
-	case IMGFMT_IF09:
-	/* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_YV12:
-	case IMGFMT_I420: pitch = (src_w + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  break;
-	/* RGB 4:4:4:4 */
-	case IMGFMT_RGB32:
-	case IMGFMT_BGR32: pitch = (src_w*4 + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  break;
-	/* 4:2:2 */
+        /* 4:0:0*/
+        case IMGFMT_Y800:
+        /* 4:1:0*/
+        case IMGFMT_YVU9:
+        case IMGFMT_IF09:
+        /* 4:2:0 */
+        case IMGFMT_IYUV:
+        case IMGFMT_YV12:
+        case IMGFMT_I420: pitch = (src_w + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          break;
+        /* RGB 4:4:4:4 */
+        case IMGFMT_RGB32:
+        case IMGFMT_BGR32: pitch = (src_w*4 + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          break;
+        /* 4:2:2 */
 
-	default: /* RGB15, RGB16, YVYU, UYVY, YUY2 */
-			  pitch = ((src_w*2) + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  break;
+        default: /* RGB15, RGB16, YVYU, UYVY, YUY2 */
+                          pitch = ((src_w*2) + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          break;
     }
     besr.load_prg_start=0;
     besr.swap_uv=0;
     switch(config->fourcc)
     {
-	case IMGFMT_RGB15:
-			   besr.swap_uv=1;
-	case IMGFMT_BGR15: besr.surf_id = SCALER_SOURCE_15BPP>>8;
-			   besr.load_prg_start = 1;
-			   break;
-	case IMGFMT_RGB16:
-			   besr.swap_uv=1;
-	case IMGFMT_BGR16: besr.surf_id = SCALER_SOURCE_16BPP>>8;
-			   besr.load_prg_start = 1;
-			   break;
-	case IMGFMT_RGB32:
-			   besr.swap_uv=1;
-	case IMGFMT_BGR32: besr.surf_id = SCALER_SOURCE_32BPP>>8;
-			   besr.load_prg_start = 1;
-			   break;
-	/* 4:1:0*/
-	case IMGFMT_IF09:
-	case IMGFMT_YVU9:  besr.surf_id = SCALER_SOURCE_YUV9>>8;
-			   break;
-	/* 4:0:0*/
-	case IMGFMT_Y800:
-	/* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_I420:
-	case IMGFMT_YV12:  besr.surf_id = SCALER_SOURCE_YUV12>>8;
-			   break;
-	/* 4:2:2 */
-	case IMGFMT_YVYU:
-	case IMGFMT_UYVY:  besr.surf_id = SCALER_SOURCE_YVYU422>>8;
-			   break;
-	case IMGFMT_YUY2:
-	default:	   besr.surf_id = SCALER_SOURCE_VYUY422>>8;
-			   break;
+        case IMGFMT_RGB15:
+                           besr.swap_uv=1;
+        case IMGFMT_BGR15: besr.surf_id = SCALER_SOURCE_15BPP>>8;
+                           besr.load_prg_start = 1;
+                           break;
+        case IMGFMT_RGB16:
+                           besr.swap_uv=1;
+        case IMGFMT_BGR16: besr.surf_id = SCALER_SOURCE_16BPP>>8;
+                           besr.load_prg_start = 1;
+                           break;
+        case IMGFMT_RGB32:
+                           besr.swap_uv=1;
+        case IMGFMT_BGR32: besr.surf_id = SCALER_SOURCE_32BPP>>8;
+                           besr.load_prg_start = 1;
+                           break;
+        /* 4:1:0*/
+        case IMGFMT_IF09:
+        case IMGFMT_YVU9:  besr.surf_id = SCALER_SOURCE_YUV9>>8;
+                           break;
+        /* 4:0:0*/
+        case IMGFMT_Y800:
+        /* 4:2:0 */
+        case IMGFMT_IYUV:
+        case IMGFMT_I420:
+        case IMGFMT_YV12:  besr.surf_id = SCALER_SOURCE_YUV12>>8;
+                           break;
+        /* 4:2:2 */
+        case IMGFMT_YVYU:
+        case IMGFMT_UYVY:  besr.surf_id = SCALER_SOURCE_YVYU422>>8;
+                           break;
+        case IMGFMT_YUY2:
+        default:           besr.surf_id = SCALER_SOURCE_VYUY422>>8;
+                           break;
     }
     switch (besr.surf_id)
     {
-	case 3:
-	case 4:
-	case 11:
-	case 12:    BytesPerPixel = 2;
-		    break;
-	case 6:	    BytesPerPixel = 4;
-		    break;
-	case 9:
-	case 10:
-	case 13:
-	case 14:    BytesPerPixel = 1;
-		    break;
-	default:    BytesPerPixel = 0;/*insert a debug statement here. */
-		    break;
+        case 3:
+        case 4:
+        case 11:
+        case 12:    BytesPerPixel = 2;
+                    break;
+        case 6:     BytesPerPixel = 4;
+                    break;
+        case 9:
+        case 10:
+        case 13:
+        case 14:    BytesPerPixel = 1;
+                    break;
+        default:    BytesPerPixel = 0;/*insert a debug statement here. */
+                    break;
     }
     switch (besr.surf_id)
     {
-	case 3:
-	case 4:	    BytesPerUVPixel = 0;
-		    break;/* In RGB modes, the BytesPerUVPixel is don't care */
-	case 11:
-	case 12:    BytesPerUVPixel = 2;
-		    break;
-	case 6:	    BytesPerUVPixel = 0;
-		    break;	/* In RGB modes, the BytesPerUVPixel is don't care */
-	case 9:
-	case 10:    BytesPerUVPixel = 1;
-		    break;
-	case 13:
-	case 14:    BytesPerUVPixel = 2;
-		    break;
-	default:    BytesPerUVPixel = 0;/* insert a debug statement here. */
-		    break;
+        case 3:
+        case 4:     BytesPerUVPixel = 0;
+                    break;/* In RGB modes, the BytesPerUVPixel is don't care */
+        case 11:
+        case 12:    BytesPerUVPixel = 2;
+                    break;
+        case 6:     BytesPerUVPixel = 0;
+                    break;      /* In RGB modes, the BytesPerUVPixel is don't care */
+        case 9:
+        case 10:    BytesPerUVPixel = 1;
+                    break;
+        case 13:
+        case 14:    BytesPerUVPixel = 2;
+                    break;
+        default:    BytesPerUVPixel = 0;/* insert a debug statement here. */
+                    break;
 
     }
     switch (besr.surf_id)
     {
-	case 3:
-	case 4:
-	case 6:	    HorzUVSubSample = 1;
-		    break;
-	case 9:	    HorzUVSubSample = 4;
-		    break;
-	case 10:
-	case 11:
-	case 12:
-	case 13:
-	case 14:    HorzUVSubSample = 2;
-		    break;
-	default:    HorzUVSubSample = 0;/* insert debug statement here. */
-		    break;
+        case 3:
+        case 4:
+        case 6:     HorzUVSubSample = 1;
+                    break;
+        case 9:     HorzUVSubSample = 4;
+                    break;
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:    HorzUVSubSample = 2;
+                    break;
+        default:    HorzUVSubSample = 0;/* insert debug statement here. */
+                    break;
     }
     switch (besr.surf_id)
     {
-	case 3:
-	case 4:
-	case 6:
-	case 11:
-	case 12:    VertUVSubSample = 1;
-		    break;
-	case 9:	    VertUVSubSample = 4;
-		    break;
-	case 10:
-	case 13:
-	case 14:    VertUVSubSample = 2;
-		    break;
-	default:    VertUVSubSample = 0;/* insert debug statment here. */
-		    break;
+        case 3:
+        case 4:
+        case 6:
+        case 11:
+        case 12:    VertUVSubSample = 1;
+                    break;
+        case 9:     VertUVSubSample = 4;
+                    break;
+        case 10:
+        case 13:
+        case 14:    VertUVSubSample = 2;
+                    break;
+        default:    VertUVSubSample = 0;/* insert debug statment here. */
+                    break;
     }
-    DisallowFourTapVertFiltering = 0;	    /* Allow it by default */
-    DisallowFourTapUVVertFiltering = 0;	    /* Allow it by default */
+    DisallowFourTapVertFiltering = 0;       /* Allow it by default */
+    DisallowFourTapUVVertFiltering = 0;     /* Allow it by default */
     LeftPixel = config->src.x;
     RightPixel = config->src.w-1;
-    if(floor(config->src.x/HorzUVSubSample)<0)	LeftUVPixel = 0;
-    else						LeftUVPixel = (int)floor(config->src.x/HorzUVSubSample);
+    if(floor(config->src.x/HorzUVSubSample)<0)  LeftUVPixel = 0;
+    else                                                LeftUVPixel = (int)floor(config->src.x/HorzUVSubSample);
     if(ceil((config->src.x+config->src.w)/HorzUVSubSample) > config->src.w/HorzUVSubSample)
-		RightUVPixel = config->src.w/HorzUVSubSample - 1;
-    else	RightUVPixel = (int)ceil((config->src.x+config->src.w)/HorzUVSubSample) - 1;
+                RightUVPixel = config->src.w/HorzUVSubSample - 1;
+    else        RightUVPixel = (int)ceil((config->src.x+config->src.w)/HorzUVSubSample) - 1;
     /* Top, Bottom and Right Crops can be out of range. The driver will program the hardware
     // to create a black border at the top and bottom. This is useful for DVD letterboxing. */
     SourceWidthInPixels = (int)(config->src.w + 1);
     SourceUVWidthInPixels = (int)(RightUVPixel - LeftUVPixel + 1);
 
     SourceWidthInMemWords = (int)(ceil(RightPixel*BytesPerPixel / MemWordsInBytes) -
-			    floor(LeftPixel*BytesPerPixel / MemWordsInBytes) + 1);
+                            floor(LeftPixel*BytesPerPixel / MemWordsInBytes) + 1);
     /* SourceUVWidthInMemWords means Source_U_or_V_or_UV_WidthInMemWords depending on whether the UV is packed together of not. */
     SourceUVWidthInMemWords = (int)(ceil(RightUVPixel*BytesPerUVPixel /
-			      MemWordsInBytes) - floor(LeftUVPixel*BytesPerUVPixel /
-			      MemWordsInBytes) + 1);
+                              MemWordsInBytes) - floor(LeftUVPixel*BytesPerUVPixel /
+                              MemWordsInBytes) + 1);
 
     switch (besr.surf_id)
     {
-	case 9:
-	case 10:    if ((ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1)
-		    {
-			RADEON_ASSERT("ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1\n");
-		    }
-		    else if ((SourceWidthInMemWords-1) * 2 > OV0LB_Rows-1)
-		    {
-			DisallowFourTapVertFiltering = 1;
-		    }
+        case 9:
+        case 10:    if ((ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1)
+                    {
+                        RADEON_ASSERT("ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1\n");
+                    }
+                    else if ((SourceWidthInMemWords-1) * 2 > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapVertFiltering = 1;
+                    }
 
-		    if ((ceil(SourceUVWidthInMemWords/2)-1) * 4 + 1 > OV0LB_Rows-1)
-		    {
-			/*CYCACC_ASSERT(0, "Image U plane width spans more octwords than supported by hardware.") */
-		    }
-		    else if ((SourceUVWidthInMemWords-1) * 4 + 1 > OV0LB_Rows-1)
-		    {
-			DisallowFourTapUVVertFiltering = 1;
-		    }
+                    if ((ceil(SourceUVWidthInMemWords/2)-1) * 4 + 1 > OV0LB_Rows-1)
+                    {
+                        /*CYCACC_ASSERT(0, "Image U plane width spans more octwords than supported by hardware.") */
+                    }
+                    else if ((SourceUVWidthInMemWords-1) * 4 + 1 > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapUVVertFiltering = 1;
+                    }
 
-		    if ((ceil(SourceUVWidthInMemWords/2)-1) * 4 + 3 > OV0LB_Rows-1)
-		    {
-			/*CYCACC_ASSERT(0, "Image V plane width spans more octwords than supported by hardware.") */
-		    }
-		    else if ((SourceUVWidthInMemWords-1) * 4 + 3 > OV0LB_Rows-1)
-		    {
-			DisallowFourTapUVVertFiltering = 1;
-		    }
-		    break;
-	case 13:
-	case 14:    if ((ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1)
-		    {
-			RADEON_ASSERT("ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1\n");
-		    }
-		    else if ((SourceWidthInMemWords-1) * 2 > OV0LB_Rows-1)
-		    {
-			DisallowFourTapVertFiltering = 1;
-		    }
+                    if ((ceil(SourceUVWidthInMemWords/2)-1) * 4 + 3 > OV0LB_Rows-1)
+                    {
+                        /*CYCACC_ASSERT(0, "Image V plane width spans more octwords than supported by hardware.") */
+                    }
+                    else if ((SourceUVWidthInMemWords-1) * 4 + 3 > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapUVVertFiltering = 1;
+                    }
+                    break;
+        case 13:
+        case 14:    if ((ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1)
+                    {
+                        RADEON_ASSERT("ceil(SourceWidthInMemWords/2)-1) * 2 > OV0LB_Rows-1\n");
+                    }
+                    else if ((SourceWidthInMemWords-1) * 2 > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapVertFiltering = 1;
+                    }
 
-		    if ((ceil(SourceUVWidthInMemWords/2)-1) * 2 + 1 > OV0LB_Rows-1)
-		    {
-			/*CYCACC_ASSERT(0, "Image UV plane width spans more octwords than supported by hardware.") */
-		    }
-		    else if ((SourceUVWidthInMemWords-1) * 2 + 1 > OV0LB_Rows-1)
-		    {
-			DisallowFourTapUVVertFiltering = 1;
-		    }
-		    break;
-	case 3:
-	case 4:
-	case 6:
-	case 11:
-	case 12:    if ((ceil(SourceWidthInMemWords/2)-1) > OV0LB_Rows-1)
-		    {
-			RADEON_ASSERT("(ceil(SourceWidthInMemWords/2)-1) > OV0LB_Rows-1\n")
-		    }
-		    else if ((SourceWidthInMemWords-1) > OV0LB_Rows-1)
-		    {
-			DisallowFourTapVertFiltering = 1;
-		    }
-		    break;
-	default:    /* insert debug statement here. */
-		    break;
+                    if ((ceil(SourceUVWidthInMemWords/2)-1) * 2 + 1 > OV0LB_Rows-1)
+                    {
+                        /*CYCACC_ASSERT(0, "Image UV plane width spans more octwords than supported by hardware.") */
+                    }
+                    else if ((SourceUVWidthInMemWords-1) * 2 + 1 > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapUVVertFiltering = 1;
+                    }
+                    break;
+        case 3:
+        case 4:
+        case 6:
+        case 11:
+        case 12:    if ((ceil(SourceWidthInMemWords/2)-1) > OV0LB_Rows-1)
+                    {
+                        RADEON_ASSERT("(ceil(SourceWidthInMemWords/2)-1) > OV0LB_Rows-1\n")
+                    }
+                    else if ((SourceWidthInMemWords-1) > OV0LB_Rows-1)
+                    {
+                        DisallowFourTapVertFiltering = 1;
+                    }
+                    break;
+        default:    /* insert debug statement here. */
+                    break;
     }
     dest_w = config->dest.w;
     dest_h = config->dest.h;
     if(radeon_is_dbl_scan()) dest_h *= 2;
     besr.dest_bpp = radeon_vid_get_dbpp();
     besr.fourcc = config->fourcc;
-    if(radeon_is_interlace())	interlace_factor = 2;
-    else			interlace_factor = 1;
+    if(radeon_is_interlace())   interlace_factor = 2;
+    else                        interlace_factor = 1;
     /* TODO: must be checked in doublescan mode!!! */
     if((besr.chip_flags&R_INTEGRATED)==R_INTEGRATED)
     {
-	/* Force the overlay clock on for integrated chips */
+        /* Force the overlay clock on for integrated chips */
         OUTPLL(VCLK_ECP_CNTL, (INPLL(VCLK_ECP_CNTL) | (1<<18)));
     }
     horz_repl_factor = 1 << (uint32_t)((INPLL(VCLK_ECP_CNTL) & 0x300) >> 8);
@@ -2864,195 +2864,195 @@ static int radeon_vid_init_video( vidix_playback_t *config )
     V_scale_ratio = (double)(dest_h+1)/src_h;
     if(H_scale_ratio < 0.5 && V_scale_ratio < 0.5)
     {
-	val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 3;
-	val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 2;
+        val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 3;
+        val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 2;
     }
     else
     if(H_scale_ratio < 1 && V_scale_ratio < 1)
     {
-	val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 2;
-	val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 1;
+        val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 2;
+        val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 1;
     }
     else
     {
-	val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 1;
-	val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 1;
+        val_OV0_P1_MAX_LN_IN_PER_LN_OUT = 1;
+        val_OV0_P23_MAX_LN_IN_PER_LN_OUT = 1;
     }
     /* N.B.: Indeed it has 6.12 format but shifted on 8 to the left!!! */
     besr.v_inc = (uint16_t)((1./V_scale_ratio)*(1<<12)*interlace_factor+0.5);
     CRT_V_INC = besr.v_inc/interlace_factor;
     besr.v_inc <<= 8;
     {
-	int ThereIsTwoTapVerticalFiltering,DoNotUseMostRecentlyFetchedLine;
-	int P1GroupSize = 0;
-	int P23GroupSize;
-	int P1StepSize = 0;
-	int P23StepSize = 0;
+        int ThereIsTwoTapVerticalFiltering,DoNotUseMostRecentlyFetchedLine;
+        int P1GroupSize = 0;
+        int P23GroupSize;
+        int P1StepSize = 0;
+        int P23StepSize = 0;
 
-	Calc_H_INC_STEP_BY(
-	    besr.surf_id,
-	    H_scale_ratio,
-	    DisallowFourTapVertFiltering,
-	    DisallowFourTapUVVertFiltering,
-	    &val_OV0_P1_H_INC,
-	    &val_OV0_P1_H_STEP_BY,
-	    &val_OV0_P23_H_INC,
-	    &val_OV0_P23_H_STEP_BY,
-	    &P1GroupSize,
-	    &P1StepSize,
-	    &P23StepSize);
+        Calc_H_INC_STEP_BY(
+            besr.surf_id,
+            H_scale_ratio,
+            DisallowFourTapVertFiltering,
+            DisallowFourTapUVVertFiltering,
+            &val_OV0_P1_H_INC,
+            &val_OV0_P1_H_STEP_BY,
+            &val_OV0_P23_H_INC,
+            &val_OV0_P23_H_STEP_BY,
+            &P1GroupSize,
+            &P1StepSize,
+            &P23StepSize);
 
-	if(H_scale_ratio > MinHScaleHard)
-	{
-	    h_inc = (src_w << 12) / dest_w;
-	    besr.step_by = 0x0101;
-	    switch (besr.surf_id)
-	    {
-		case 3:
-		case 4:
-		case 6:
-			besr.h_inc = (h_inc)|(h_inc<<16);
-			break;
-		case 9:
-			besr.h_inc = h_inc | ((h_inc >> 2) << 16);
-			break;
-		default:
-			besr.h_inc = h_inc | ((h_inc >> 1) << 16);
-			break;
-	    }
-	}
+        if(H_scale_ratio > MinHScaleHard)
+        {
+            h_inc = (src_w << 12) / dest_w;
+            besr.step_by = 0x0101;
+            switch (besr.surf_id)
+            {
+                case 3:
+                case 4:
+                case 6:
+                        besr.h_inc = (h_inc)|(h_inc<<16);
+                        break;
+                case 9:
+                        besr.h_inc = h_inc | ((h_inc >> 2) << 16);
+                        break;
+                default:
+                        besr.h_inc = h_inc | ((h_inc >> 1) << 16);
+                        break;
+            }
+        }
 
-	P23GroupSize = 2;	/* Current vaue for all modes */
+        P23GroupSize = 2;       /* Current vaue for all modes */
 
-	besr.horz_pick_nearest=0;
-	DoNotUseMostRecentlyFetchedLine=0;
-	ThereIsTwoTapVerticalFiltering = (val_OV0_P1_H_STEP_BY!=0) || (val_OV0_P23_H_STEP_BY!=0);
-	if (ThereIsTwoTapVerticalFiltering && DoNotUseMostRecentlyFetchedLine)
-				besr.vert_pick_nearest = 1;
-	else
-				besr.vert_pick_nearest = 0;
+        besr.horz_pick_nearest=0;
+        DoNotUseMostRecentlyFetchedLine=0;
+        ThereIsTwoTapVerticalFiltering = (val_OV0_P1_H_STEP_BY!=0) || (val_OV0_P23_H_STEP_BY!=0);
+        if (ThereIsTwoTapVerticalFiltering && DoNotUseMostRecentlyFetchedLine)
+                                besr.vert_pick_nearest = 1;
+        else
+                                besr.vert_pick_nearest = 0;
 
-	ComputeXStartEnd(is_400,LeftPixel,LeftUVPixel,MemWordsInBytes,BytesPerPixel,
-		     SourceWidthInPixels,P1StepSize,BytesPerUVPixel,
-		     SourceUVWidthInPixels,P23StepSize,&val_OV0_P1_X_START,&val_OV0_P2_X_START);
+        ComputeXStartEnd(is_400,LeftPixel,LeftUVPixel,MemWordsInBytes,BytesPerPixel,
+                     SourceWidthInPixels,P1StepSize,BytesPerUVPixel,
+                     SourceUVWidthInPixels,P23StepSize,&val_OV0_P1_X_START,&val_OV0_P2_X_START);
 
-	if(H_scale_ratio > MinHScaleHard)
-	{
-	    unsigned tmp;
-	    tmp = (left & 0x0003ffff) + 0x00028000 + (h_inc << 3);
-	    besr.p1_h_accum_init = ((tmp <<  4) & 0x000f8000) |
-				    ((tmp << 12) & 0xf0000000);
+        if(H_scale_ratio > MinHScaleHard)
+        {
+            unsigned tmp;
+            tmp = (left & 0x0003ffff) + 0x00028000 + (h_inc << 3);
+            besr.p1_h_accum_init = ((tmp <<  4) & 0x000f8000) |
+                                    ((tmp << 12) & 0xf0000000);
 
-	    tmp = (top & 0x0000ffff) + 0x00018000;
-	    besr.p1_v_accum_init = ((tmp << 4) & OV0_P1_V_ACCUM_INIT_MASK)
-				    |(OV0_P1_MAX_LN_IN_PER_LN_OUT & 1);
-	    tmp = ((left >> 1) & 0x0001ffff) + 0x00028000 + (h_inc << 2);
-	    besr.p23_h_accum_init = ((tmp << 4) & 0x000f8000) |
-				    ((tmp << 12) & 0x70000000);
+            tmp = (top & 0x0000ffff) + 0x00018000;
+            besr.p1_v_accum_init = ((tmp << 4) & OV0_P1_V_ACCUM_INIT_MASK)
+                                    |(OV0_P1_MAX_LN_IN_PER_LN_OUT & 1);
+            tmp = ((left >> 1) & 0x0001ffff) + 0x00028000 + (h_inc << 2);
+            besr.p23_h_accum_init = ((tmp << 4) & 0x000f8000) |
+                                    ((tmp << 12) & 0x70000000);
 
-	    tmp = ((top >> 1) & 0x0000ffff) + 0x00018000;
-	    besr.p23_v_accum_init = (is_420||is_410) ?
-				    ((tmp << 4) & OV0_P23_V_ACCUM_INIT_MASK)
-				    |(OV0_P23_MAX_LN_IN_PER_LN_OUT & 1) : 0;
-	}
-	else
-	    ComputeAccumInit(	val_OV0_P1_X_START,val_OV0_P2_X_START,
-				val_OV0_P1_H_INC,val_OV0_P23_H_INC,
-				val_OV0_P1_H_STEP_BY,val_OV0_P23_H_STEP_BY,
-				CRT_V_INC,P1GroupSize,P23GroupSize,
-				val_OV0_P1_MAX_LN_IN_PER_LN_OUT,
-				val_OV0_P23_MAX_LN_IN_PER_LN_OUT);
+            tmp = ((top >> 1) & 0x0000ffff) + 0x00018000;
+            besr.p23_v_accum_init = (is_420||is_410) ?
+                                    ((tmp << 4) & OV0_P23_V_ACCUM_INIT_MASK)
+                                    |(OV0_P23_MAX_LN_IN_PER_LN_OUT & 1) : 0;
+        }
+        else
+            ComputeAccumInit(   val_OV0_P1_X_START,val_OV0_P2_X_START,
+                                val_OV0_P1_H_INC,val_OV0_P23_H_INC,
+                                val_OV0_P1_H_STEP_BY,val_OV0_P23_H_STEP_BY,
+                                CRT_V_INC,P1GroupSize,P23GroupSize,
+                                val_OV0_P1_MAX_LN_IN_PER_LN_OUT,
+                                val_OV0_P23_MAX_LN_IN_PER_LN_OUT);
     }
 
     /* keep everything in 16.16 */
     besr.base_addr = INREG(DISPLAY_BASE_ADDR);
     config->offsets[0] = 0;
     for(i=1;i<besr.vid_nbufs;i++)
-	    config->offsets[i] = config->offsets[i-1]+config->frame_size;
+            config->offsets[i] = config->offsets[i-1]+config->frame_size;
     if(is_420 || is_410 || is_400)
     {
-	uint32_t d1line,d2line,d3line;
-	d1line = top*pitch;
-	if(is_420)
-	{
-	    d2line = src_h*pitch+(d1line>>2);
-	    d3line = d2line+((src_h*pitch)>>2);
-	}
-	else
-	if(is_410)
-	{
-	    d2line = src_h*pitch+(d1line>>4);
-	    d3line = d2line+((src_h*pitch)>>4);
-	}
-	else
-	{
-	    d2line = 0;
-	    d3line = 0;
-	}
-	d1line += (left >> 16) & ~15;
-	if(is_420)
-	{
-	    d2line += (left >> 17) & ~15;
-	    d3line += (left >> 17) & ~15;
-	}
-	else /* is_410 */
-	{
-	    d2line += (left >> 18) & ~15;
-	    d3line += (left >> 18) & ~15;
-	}
-	config->offset.y = d1line & VIF_BUF0_BASE_ADRS_MASK;
-	if(is_400)
-	{
-	    config->offset.v = 0;
-	    config->offset.u = 0;
-	}
-	else
-	{
-	    config->offset.v = d2line & VIF_BUF1_BASE_ADRS_MASK;
-	    config->offset.u = d3line & VIF_BUF2_BASE_ADRS_MASK;
-	}
-	for(i=0;i<besr.vid_nbufs;i++)
-	{
-	    besr.vid_buf_base_adrs_y[i]=((radeon_overlay_off+config->offsets[i]+config->offset.y)&VIF_BUF0_BASE_ADRS_MASK);
-	    if(is_400)
-	    {
-		besr.vid_buf_base_adrs_v[i]=0;
-		besr.vid_buf_base_adrs_u[i]=0;
-	    }
-	    else
-	    {
-              	if (besr.fourcc == IMGFMT_I420 || besr.fourcc == IMGFMT_IYUV)
-		{
-		    besr.vid_buf_base_adrs_u[i]=((radeon_overlay_off+config->offsets[i]+config->offset.v)&VIF_BUF1_BASE_ADRS_MASK)|VIF_BUF1_PITCH_SEL;
-		    besr.vid_buf_base_adrs_v[i]=((radeon_overlay_off+config->offsets[i]+config->offset.u)&VIF_BUF2_BASE_ADRS_MASK)|VIF_BUF2_PITCH_SEL;
-		}
-		else
-		{
-		    besr.vid_buf_base_adrs_v[i]=((radeon_overlay_off+config->offsets[i]+config->offset.v)&VIF_BUF1_BASE_ADRS_MASK)|VIF_BUF1_PITCH_SEL;
-		    besr.vid_buf_base_adrs_u[i]=((radeon_overlay_off+config->offsets[i]+config->offset.u)&VIF_BUF2_BASE_ADRS_MASK)|VIF_BUF2_PITCH_SEL;
-		}
-	    }
-	}
-	config->offset.y = ((besr.vid_buf_base_adrs_y[0])&VIF_BUF0_BASE_ADRS_MASK) - radeon_overlay_off;
-	if(is_400)
-	{
-	    config->offset.v = 0;
-	    config->offset.u = 0;
-	}
-	else
-	{
-	    config->offset.v = ((besr.vid_buf_base_adrs_v[0])&VIF_BUF1_BASE_ADRS_MASK) - radeon_overlay_off;
-	    config->offset.u = ((besr.vid_buf_base_adrs_u[0])&VIF_BUF2_BASE_ADRS_MASK) - radeon_overlay_off;
-	}
+        uint32_t d1line,d2line,d3line;
+        d1line = top*pitch;
+        if(is_420)
+        {
+            d2line = src_h*pitch+(d1line>>2);
+            d3line = d2line+((src_h*pitch)>>2);
+        }
+        else
+        if(is_410)
+        {
+            d2line = src_h*pitch+(d1line>>4);
+            d3line = d2line+((src_h*pitch)>>4);
+        }
+        else
+        {
+            d2line = 0;
+            d3line = 0;
+        }
+        d1line += (left >> 16) & ~15;
+        if(is_420)
+        {
+            d2line += (left >> 17) & ~15;
+            d3line += (left >> 17) & ~15;
+        }
+        else /* is_410 */
+        {
+            d2line += (left >> 18) & ~15;
+            d3line += (left >> 18) & ~15;
+        }
+        config->offset.y = d1line & VIF_BUF0_BASE_ADRS_MASK;
+        if(is_400)
+        {
+            config->offset.v = 0;
+            config->offset.u = 0;
+        }
+        else
+        {
+            config->offset.v = d2line & VIF_BUF1_BASE_ADRS_MASK;
+            config->offset.u = d3line & VIF_BUF2_BASE_ADRS_MASK;
+        }
+        for(i=0;i<besr.vid_nbufs;i++)
+        {
+            besr.vid_buf_base_adrs_y[i]=((radeon_overlay_off+config->offsets[i]+config->offset.y)&VIF_BUF0_BASE_ADRS_MASK);
+            if(is_400)
+            {
+                besr.vid_buf_base_adrs_v[i]=0;
+                besr.vid_buf_base_adrs_u[i]=0;
+            }
+            else
+            {
+                if (besr.fourcc == IMGFMT_I420 || besr.fourcc == IMGFMT_IYUV)
+                {
+                    besr.vid_buf_base_adrs_u[i]=((radeon_overlay_off+config->offsets[i]+config->offset.v)&VIF_BUF1_BASE_ADRS_MASK)|VIF_BUF1_PITCH_SEL;
+                    besr.vid_buf_base_adrs_v[i]=((radeon_overlay_off+config->offsets[i]+config->offset.u)&VIF_BUF2_BASE_ADRS_MASK)|VIF_BUF2_PITCH_SEL;
+                }
+                else
+                {
+                    besr.vid_buf_base_adrs_v[i]=((radeon_overlay_off+config->offsets[i]+config->offset.v)&VIF_BUF1_BASE_ADRS_MASK)|VIF_BUF1_PITCH_SEL;
+                    besr.vid_buf_base_adrs_u[i]=((radeon_overlay_off+config->offsets[i]+config->offset.u)&VIF_BUF2_BASE_ADRS_MASK)|VIF_BUF2_PITCH_SEL;
+                }
+            }
+        }
+        config->offset.y = ((besr.vid_buf_base_adrs_y[0])&VIF_BUF0_BASE_ADRS_MASK) - radeon_overlay_off;
+        if(is_400)
+        {
+            config->offset.v = 0;
+            config->offset.u = 0;
+        }
+        else
+        {
+            config->offset.v = ((besr.vid_buf_base_adrs_v[0])&VIF_BUF1_BASE_ADRS_MASK) - radeon_overlay_off;
+            config->offset.u = ((besr.vid_buf_base_adrs_u[0])&VIF_BUF2_BASE_ADRS_MASK) - radeon_overlay_off;
+        }
     }
     else
     {
       config->offset.y = config->offset.u = config->offset.v = ((left & ~7) << 1)&VIF_BUF0_BASE_ADRS_MASK;
       for(i=0;i<besr.vid_nbufs;i++)
       {
-	besr.vid_buf_base_adrs_y[i] =
-	besr.vid_buf_base_adrs_u[i] =
-	besr.vid_buf_base_adrs_v[i] = radeon_overlay_off + config->offsets[i] + config->offset.y;
+        besr.vid_buf_base_adrs_y[i] =
+        besr.vid_buf_base_adrs_u[i] =
+        besr.vid_buf_base_adrs_v[i] = radeon_overlay_off + config->offsets[i] + config->offset.y;
       }
     }
     leftUV = (left >> (is_410?18:17)) & 15;
@@ -3063,7 +3063,7 @@ static int radeon_vid_init_video( vidix_playback_t *config )
     besr.vid_buf_pitch0_value = pitch;
     besr.vid_buf_pitch1_value = is_410 ? pitch>>2 : is_420 ? pitch>>1 : pitch;
     /* ********************************************************* */
-    /* ** Calculate programmable coefficients as needed		 */
+    /* ** Calculate programmable coefficients as needed          */
     /* ********************************************************* */
 
     /* ToDo_Active: When in pick nearest mode, we need to program the filter tap zero */
@@ -3071,14 +3071,14 @@ static int radeon_vid_init_video( vidix_playback_t *config )
     if(H_scale_ratio > MinHScaleHard) besr.filter_cntl |= FILTER_HARDCODED_COEF;
     else
     {
-	FilterSetup (val_OV0_P1_H_INC);
-	/* ToDo_Active: Must add the smarts into the driver to decide what type of filtering it */
-	/* would like to do. For now, we let the test application decide. */
-	besr.filter_cntl = FILTER_PROGRAMMABLE_COEF;
-	if(DisallowFourTapVertFiltering)
-	    besr.filter_cntl |= FILTER_HARD_SCALE_VERT_Y;
-	if(DisallowFourTapUVVertFiltering)
-	    besr.filter_cntl |= FILTER_HARD_SCALE_VERT_UV;
+        FilterSetup (val_OV0_P1_H_INC);
+        /* ToDo_Active: Must add the smarts into the driver to decide what type of filtering it */
+        /* would like to do. For now, we let the test application decide. */
+        besr.filter_cntl = FILTER_PROGRAMMABLE_COEF;
+        if(DisallowFourTapVertFiltering)
+            besr.filter_cntl |= FILTER_HARD_SCALE_VERT_Y;
+        if(DisallowFourTapUVVertFiltering)
+            besr.filter_cntl |= FILTER_HARD_SCALE_VERT_UV;
     }
     return 0;
 }
@@ -3091,30 +3091,30 @@ static void radeon_compute_framesize(vidix_playback_t *info)
   switch(info->fourcc)
   {
     case IMGFMT_Y800:
-		awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*info->src.h;
-		break;
+                awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*info->src.h;
+                break;
     case IMGFMT_YVU9:
     case IMGFMT_IF09:
-		awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*(info->src.h+info->src.h/8);
-		break;
+                awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*(info->src.h+info->src.h/8);
+                break;
     case IMGFMT_I420:
     case IMGFMT_YV12:
     case IMGFMT_IYUV:
-		awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*(info->src.h+info->src.h/2);
-		break;
+                awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*(info->src.h+info->src.h/2);
+                break;
     case IMGFMT_RGB32:
     case IMGFMT_BGR32:
-		awidth = (info->src.w*4 + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*info->src.h;
-		break;
+                awidth = (info->src.w*4 + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*info->src.h;
+                break;
     /* YUY2 YVYU, RGB15, RGB16 */
     default:
-		awidth = (info->src.w*2 + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*info->src.h;
-		break;
+                awidth = (info->src.w*2 + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*info->src.h;
+                break;
   }
   info->frame_size = (info->frame_size+4095)&~4095;
 }
@@ -3126,7 +3126,7 @@ static int radeon_config_playback(vidix_playback_t *info)
   if(!is_supported_fourcc(info->fourcc)) return ENOSYS;
   if(info->num_frames>VID_PLAY_MAXFRAMES) info->num_frames=VID_PLAY_MAXFRAMES;
   if(info->num_frames==1) besr.double_buff=0;
-  else			  besr.double_buff=1;
+  else                    besr.double_buff=1;
   radeon_compute_framesize(info);
 
   rgb_size = radeon_get_xres()*radeon_get_yres()*((radeon_vid_get_dbpp()+7)/8);
@@ -3206,16 +3206,16 @@ static int radeon_frame_select(unsigned frame)
     off[4] = besr.vid_buf_base_adrs_v[prev_frame];
     off[5] = besr.vid_buf_base_adrs_u[prev_frame];
     radeon_fifo_wait(8);
-    OUTREG(OV0_REG_LOAD_CNTL,		REG_LD_CTL_LOCK);
+    OUTREG(OV0_REG_LOAD_CNTL,           REG_LD_CTL_LOCK);
     radeon_engine_idle();
     while(!(INREG(OV0_REG_LOAD_CNTL)&REG_LD_CTL_LOCK_READBACK));
-    OUTREG(OV0_VID_BUF0_BASE_ADRS,	off[0]);
-    OUTREG(OV0_VID_BUF1_BASE_ADRS,	off[1]);
-    OUTREG(OV0_VID_BUF2_BASE_ADRS,	off[2]);
-    OUTREG(OV0_VID_BUF3_BASE_ADRS,	off[3]);
-    OUTREG(OV0_VID_BUF4_BASE_ADRS,	off[4]);
-    OUTREG(OV0_VID_BUF5_BASE_ADRS,	off[5]);
-    OUTREG(OV0_REG_LOAD_CNTL,		0);
+    OUTREG(OV0_VID_BUF0_BASE_ADRS,      off[0]);
+    OUTREG(OV0_VID_BUF1_BASE_ADRS,      off[1]);
+    OUTREG(OV0_VID_BUF2_BASE_ADRS,      off[2]);
+    OUTREG(OV0_VID_BUF3_BASE_ADRS,      off[3]);
+    OUTREG(OV0_VID_BUF4_BASE_ADRS,      off[4]);
+    OUTREG(OV0_VID_BUF5_BASE_ADRS,      off[5]);
+    OUTREG(OV0_REG_LOAD_CNTL,           0);
     if(besr.vid_nbufs == 2) radeon_wait_vsync();
     if(verbosity > VERBOSE_LEVEL) radeon_vid_dump_regs();
     return 0;
@@ -3239,8 +3239,8 @@ static int radeon_get_eq(vidix_video_eq_t * eq)
 #ifndef RAGE128
 #define RTFSaturation(a)   (1.0 + ((a)*1.0)/1000.0)
 #define RTFBrightness(a)   (((a)*1.0)/2000.0)
-#define RTFIntensity(a)	   (((a)*1.0)/2000.0)
-#define RTFContrast(a)	 (1.0 + ((a)*1.0)/1000.0)
+#define RTFIntensity(a)    (((a)*1.0)/2000.0)
+#define RTFContrast(a)   (1.0 + ((a)*1.0)/1000.0)
 #define RTFHue(a)   (((a)*3.1416)/1000.0)
 #define RTFCheckParam(a) {if((a)<-1000) (a)=-1000; if((a)>1000) (a)=1000;}
 #endif
@@ -3255,7 +3255,7 @@ static int radeon_set_eq(const vidix_video_eq_t * eq)
     if(eq->cap & VEQ_CAP_BRIGHTNESS) equal.brightness = eq->brightness;
     if(eq->cap & VEQ_CAP_CONTRAST)   equal.contrast   = eq->contrast;
     if(eq->cap & VEQ_CAP_SATURATION) equal.saturation = eq->saturation;
-    if(eq->cap & VEQ_CAP_HUE)	     equal.hue	      = eq->hue;
+    if(eq->cap & VEQ_CAP_HUE)        equal.hue        = eq->hue;
     if(eq->cap & VEQ_CAP_RGB_INTENSITY)
     {
       equal.red_intensity   = eq->red_intensity;
@@ -3279,13 +3279,13 @@ static int radeon_set_eq(const vidix_video_eq_t * eq)
   RTFCheckParam(equal.green_intensity);
   RTFCheckParam(equal.blue_intensity);
   radeon_set_transform(RTFBrightness(equal.brightness),
-		       RTFContrast(equal.contrast),
-		       RTFSaturation(equal.saturation),
-		       RTFHue(equal.hue),
-		       RTFIntensity(equal.red_intensity),
-		       RTFIntensity(equal.green_intensity),
-		       RTFIntensity(equal.blue_intensity),
-		       itu_space);
+                       RTFContrast(equal.contrast),
+                       RTFSaturation(equal.saturation),
+                       RTFHue(equal.hue),
+                       RTFIntensity(equal.red_intensity),
+                       RTFIntensity(equal.green_intensity),
+                       RTFIntensity(equal.blue_intensity),
+                       itu_space);
 #endif
   return 0;
 }
@@ -3297,23 +3297,23 @@ static int radeon_playback_set_deint(const vidix_deinterlace_t * info)
   {
     default:
     case CFG_NON_INTERLACED:
-			    besr.deinterlace_on = 0;
-			    break;
+                            besr.deinterlace_on = 0;
+                            break;
     case CFG_EVEN_ODD_INTERLACING:
     case CFG_INTERLACED:
-			    besr.deinterlace_on = 1;
-			    besr.deinterlace_pattern = 0x900AAAAA;
-			    break;
+                            besr.deinterlace_on = 1;
+                            besr.deinterlace_pattern = 0x900AAAAA;
+                            break;
     case CFG_ODD_EVEN_INTERLACING:
-			    besr.deinterlace_on = 1;
-			    besr.deinterlace_pattern = 0x00055555;
-			    break;
+                            besr.deinterlace_on = 1;
+                            besr.deinterlace_pattern = 0x00055555;
+                            break;
     case CFG_UNIQUE_INTERLACING:
-			    besr.deinterlace_on = 1;
-			    besr.deinterlace_pattern = info->deinterlace_pattern;
-			    break;
+                            besr.deinterlace_on = 1;
+                            besr.deinterlace_pattern = info->deinterlace_pattern;
+                            break;
   }
-  OUTREG(OV0_REG_LOAD_CNTL,		REG_LD_CTL_LOCK);
+  OUTREG(OV0_REG_LOAD_CNTL,             REG_LD_CTL_LOCK);
   radeon_engine_idle();
   while(!(INREG(OV0_REG_LOAD_CNTL)&REG_LD_CTL_LOCK_READBACK));
   radeon_fifo_wait(15);
@@ -3324,7 +3324,7 @@ static int radeon_playback_set_deint(const vidix_deinterlace_t * info)
     OUTREG(OV0_DEINTERLACE_PATTERN,besr.deinterlace_pattern);
   }
   else OUTREG(OV0_SCALE_CNTL,sflg & (~SCALER_ADAPTIVE_DEINT));
-  OUTREG(OV0_REG_LOAD_CNTL,		0);
+  OUTREG(OV0_REG_LOAD_CNTL,             0);
   return 0;
 }
 
@@ -3348,92 +3348,92 @@ static int set_gr_key( void )
     int result = 0;
 
     besr.merge_cntl = 0xff000000 | /* overlay alpha */
-		      0x00ff0000;  /* graphic alpha */
+                      0x00ff0000;  /* graphic alpha */
     if(radeon_grkey.ckey.op == CKEY_TRUE)
     {
-	int dbpp=radeon_vid_get_dbpp();
-	besr.ckey_on=1;
+        int dbpp=radeon_vid_get_dbpp();
+        besr.ckey_on=1;
 
-	switch(dbpp)
-	{
-	case 15:
+        switch(dbpp)
+        {
+        case 15:
 #ifndef RAGE128
-		if((besr.chip_flags&R_100)!=R_100)
-			besr.graphics_key_clr=
-				  ((radeon_grkey.ckey.blue &0xF8))
-				| ((radeon_grkey.ckey.green&0xF8)<<8)
-				| ((radeon_grkey.ckey.red  &0xF8)<<16);
-		else
+                if((besr.chip_flags&R_100)!=R_100)
+                        besr.graphics_key_clr=
+                                  ((radeon_grkey.ckey.blue &0xF8))
+                                | ((radeon_grkey.ckey.green&0xF8)<<8)
+                                | ((radeon_grkey.ckey.red  &0xF8)<<16);
+                else
 #endif
-		besr.graphics_key_clr=
-			  ((radeon_grkey.ckey.blue &0xF8)>>3)
-			| ((radeon_grkey.ckey.green&0xF8)<<2)
-			| ((radeon_grkey.ckey.red  &0xF8)<<7);
-		break;
-	case 16:
+                besr.graphics_key_clr=
+                          ((radeon_grkey.ckey.blue &0xF8)>>3)
+                        | ((radeon_grkey.ckey.green&0xF8)<<2)
+                        | ((radeon_grkey.ckey.red  &0xF8)<<7);
+                break;
+        case 16:
 #ifndef RAGE128
-		/* This test may be too general/specific */
-		if((besr.chip_flags&R_100)!=R_100)
-			besr.graphics_key_clr=
-				  ((radeon_grkey.ckey.blue &0xF8))
-				| ((radeon_grkey.ckey.green&0xFC)<<8)
-				| ((radeon_grkey.ckey.red  &0xF8)<<16);
-		else
+                /* This test may be too general/specific */
+                if((besr.chip_flags&R_100)!=R_100)
+                        besr.graphics_key_clr=
+                                  ((radeon_grkey.ckey.blue &0xF8))
+                                | ((radeon_grkey.ckey.green&0xFC)<<8)
+                                | ((radeon_grkey.ckey.red  &0xF8)<<16);
+                else
 #endif
-		besr.graphics_key_clr=
-			  ((radeon_grkey.ckey.blue &0xF8)>>3)
-			| ((radeon_grkey.ckey.green&0xFC)<<3)
-			| ((radeon_grkey.ckey.red  &0xF8)<<8);
-		break;
-	case 24:
-	case 32:
-		besr.graphics_key_clr=
-			  ((radeon_grkey.ckey.blue &0xFF))
-			| ((radeon_grkey.ckey.green&0xFF)<<8)
-			| ((radeon_grkey.ckey.red  &0xFF)<<16);
-		break;
-	default:
-		besr.ckey_on=0;
-		besr.graphics_key_msk=0;
-		besr.graphics_key_clr=0;
-	}
+                besr.graphics_key_clr=
+                          ((radeon_grkey.ckey.blue &0xF8)>>3)
+                        | ((radeon_grkey.ckey.green&0xFC)<<3)
+                        | ((radeon_grkey.ckey.red  &0xF8)<<8);
+                break;
+        case 24:
+        case 32:
+                besr.graphics_key_clr=
+                          ((radeon_grkey.ckey.blue &0xFF))
+                        | ((radeon_grkey.ckey.green&0xFF)<<8)
+                        | ((radeon_grkey.ckey.red  &0xFF)<<16);
+                break;
+        default:
+                besr.ckey_on=0;
+                besr.graphics_key_msk=0;
+                besr.graphics_key_clr=0;
+        }
 #ifdef RAGE128
-	besr.graphics_key_msk=(1<<dbpp)-1;
-	besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_NE|CMP_MIX_AND;
+        besr.graphics_key_msk=(1<<dbpp)-1;
+        besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_NE|CMP_MIX_AND;
 #else
-	besr.graphics_key_msk=besr.graphics_key_clr;
-	besr.ckey_cntl = VIDEO_KEY_FN_TRUE|CMP_MIX_AND|GRAPHIC_KEY_FN_EQ;
+        besr.graphics_key_msk=besr.graphics_key_clr;
+        besr.ckey_cntl = VIDEO_KEY_FN_TRUE|CMP_MIX_AND|GRAPHIC_KEY_FN_EQ;
 #endif
     }
     else if(radeon_grkey.ckey.op == CKEY_ALPHA)
     {
-	int dbpp=radeon_vid_get_dbpp();
-	besr.ckey_on=1;
+        int dbpp=radeon_vid_get_dbpp();
+        besr.ckey_on=1;
 
-	switch(dbpp)
-	{
-	case 32:
-		besr.ckey_on=1;
-		besr.graphics_key_msk=0;
-		besr.graphics_key_clr=0;
-		besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
-		besr.merge_cntl |= 0x00000001; /* DISP_ALPHA_MODE_PER_PIXEL */
-		break;
-	default:
-		besr.ckey_on=0;
-		besr.graphics_key_msk=0;
-		besr.graphics_key_clr=0;
-		besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
-		result = 1;
-	}
+        switch(dbpp)
+        {
+        case 32:
+                besr.ckey_on=1;
+                besr.graphics_key_msk=0;
+                besr.graphics_key_clr=0;
+                besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
+                besr.merge_cntl |= 0x00000001; /* DISP_ALPHA_MODE_PER_PIXEL */
+                break;
+        default:
+                besr.ckey_on=0;
+                besr.graphics_key_msk=0;
+                besr.graphics_key_clr=0;
+                besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
+                result = 1;
+        }
     }
     else
     {
-	besr.ckey_on=0;
-	besr.graphics_key_msk=0;
-	besr.graphics_key_clr=0;
-	besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
-	besr.merge_cntl |= 0x00000100;  /* DISP_RGB_OFFSET_EN */
+        besr.ckey_on=0;
+        besr.graphics_key_msk=0;
+        besr.graphics_key_clr=0;
+        besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND;
+        besr.merge_cntl |= 0x00000100;  /* DISP_RGB_OFFSET_EN */
     }
     radeon_fifo_wait(3);
     OUTREG(OV0_GRAPHICS_KEY_MSK, besr.graphics_key_msk);

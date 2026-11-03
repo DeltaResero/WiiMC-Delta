@@ -33,16 +33,16 @@ static void print_last_error(char *s){
         LPTSTR lpMsgBuf;
 
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, GetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) & lpMsgBuf, 0, NULL);
-	if(strlen(lpMsgBuf) >= 2)
-		lpMsgBuf[strlen(lpMsgBuf)-2] = 0;
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, GetLastError(),
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR) & lpMsgBuf, 0, NULL);
+        if(strlen(lpMsgBuf) >= 2)
+                lpMsgBuf[strlen(lpMsgBuf)-2] = 0;
 
         printf("%s (%i -> %s)\n", s, GetLastError(), lpMsgBuf);
-		LocalFree(lpMsgBuf);
+                LocalFree(lpMsgBuf);
 }
 
 int main(int argc,char* argv[]){

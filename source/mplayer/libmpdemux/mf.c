@@ -55,7 +55,7 @@ mf_t* open_mf(char * filename){
  char        * fname;
  mf_t        * mf;
  int           error_count = 0;
- int	       count = 0;
+ int           count = 0;
 
  mf=calloc( 1,sizeof( mf_t ) );
 

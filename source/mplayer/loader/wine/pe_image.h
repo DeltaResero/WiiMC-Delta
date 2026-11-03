@@ -18,10 +18,10 @@
  * all section are calculated here, relocations etc.
  */
 typedef struct {
-	PIMAGE_IMPORT_DESCRIPTOR	pe_import;
-	PIMAGE_EXPORT_DIRECTORY	pe_export;
-	PIMAGE_RESOURCE_DIRECTORY	pe_resource;
-	int				tlsindex;
+    PIMAGE_IMPORT_DESCRIPTOR    pe_import;
+    PIMAGE_EXPORT_DIRECTORY pe_export;
+    PIMAGE_RESOURCE_DIRECTORY   pe_resource;
+    int             tlsindex;
 } PE_MODREF;
 
 struct wine_modref;
@@ -55,23 +55,23 @@ PIMAGE_RESOURCE_DIRECTORY GetResDirEntryW(PIMAGE_RESOURCE_DIRECTORY, LPCWSTR, DW
 typedef DWORD CALLBACK (*DLLENTRYPROC)(HMODULE,DWORD,LPVOID);
 
 typedef struct WINE_PACKED {
-	WORD	popl;		/* 0x8f 0x05 */
-	DWORD	addr_popped;	/* ...  */
-	BYTE	pushl1;		/* 0x68 */
-	DWORD	newret;		/* ...  */
-	BYTE	pushl2;		/* 0x68 */
-	DWORD	origfun;	/* original function */
-	BYTE	ret1;		/* 0xc3 */
-	WORD	addesp;		/* 0x83 0xc4 */
-	BYTE	nrofargs;	/* nr of arguments to add esp, */
-	BYTE	pushl3;		/* 0x68 */
-	DWORD	oldret;		/* Filled out from popl above  */
-	BYTE	ret2;		/* 0xc3 */
+    WORD    popl;       /* 0x8f 0x05 */
+    DWORD   addr_popped;    /* ...  */
+    BYTE    pushl1;     /* 0x68 */
+    DWORD   newret;     /* ...  */
+    BYTE    pushl2;     /* 0x68 */
+    DWORD   origfun;    /* original function */
+    BYTE    ret1;       /* 0xc3 */
+    WORD    addesp;     /* 0x83 0xc4 */
+    BYTE    nrofargs;   /* nr of arguments to add esp, */
+    BYTE    pushl3;     /* 0x68 */
+    DWORD   oldret;     /* Filled out from popl above  */
+    BYTE    ret2;       /* 0xc3 */
 } ELF_STDCALL_STUB;
 
 typedef struct {
-	void*			dlhandle;
-	ELF_STDCALL_STUB	*stubs;
+    void*           dlhandle;
+    ELF_STDCALL_STUB    *stubs;
 } ELF_MODREF;
 
 struct wine_modref *ELF_LoadLibraryExA( LPCSTR libname, DWORD flags);

@@ -31,11 +31,11 @@
 #include "vd_internal.h"
 
 static const vd_info_t info = {
-	"PNG Images decoder",
-	"mpng",
-	"A'rpi",
-	".so, based on mpng.c",
-	"uses libpng, 8bpp modes not supported yet"
+        "PNG Images decoder",
+        "mpng",
+        "A'rpi",
+        ".so, based on mpng.c",
+        "uses libpng, 8bpp modes not supported yet"
 };
 
 LIBVD_EXTERN(mpng)
@@ -50,9 +50,9 @@ static int last_c=-1;
 static int control(sh_video_t *sh,int cmd,void* arg,...){
     switch (cmd)
     {
-	case VDCTRL_QUERY_FORMAT:
-	    if (*((int *) arg) == out_fmt) return CONTROL_TRUE;
-	    return CONTROL_FALSE;
+        case VDCTRL_QUERY_FORMAT:
+            if (*((int *) arg) == out_fmt) return CONTROL_TRUE;
+            return CONTROL_FALSE;
     }
     return CONTROL_UNKNOWN;
 }
@@ -153,7 +153,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
 #endif
 
     mpi=mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
-	png_width,png_height);
+        png_width,png_height);
     if(!mpi) return NULL;
 
 // Let's DECODE!
@@ -168,10 +168,10 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
      mpi->planes[1] = realloc(mpi->planes[1], 4*cols);
      p = mpi->planes[1];
      for (i = 0; i < cols; i++) {
-	 *p++ = pal[i].blue;
-	 *p++ = pal[i].green;
-	 *p++ = pal[i].red;
-	 *p++ = 0;
+         *p++ = pal[i].blue;
+         *p++ = pal[i].green;
+         *p++ = pal[i].red;
+         *p++ = 0;
      }
  }
 

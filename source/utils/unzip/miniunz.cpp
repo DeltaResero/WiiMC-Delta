@@ -243,31 +243,31 @@ static uLong zipSize(unzFile uf)
 
     uLong total = 0;
 
-	unz_file_info file_info;
-	char filename_inzip[256];
+    unz_file_info file_info;
+    char filename_inzip[256];
 
     err = unzGetGlobalInfo (uf,&gi);
 
     for (i=0;i<gi.number_entry;i++)
     {
-		err = unzGetCurrentFileInfo(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
+        err = unzGetCurrentFileInfo(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
 
-		if (err!=UNZ_OK)
-			return err;
+        if (err!=UNZ_OK)
+            return err;
 
-		total += file_info.uncompressed_size;
+        total += file_info.uncompressed_size;
 
         if ((i+1)<gi.number_entry)
         {
             err = unzGoToNextFile(uf);
             if (err!=UNZ_OK)
-				return err;
+                return err;
         }
     }
 
     err = unzGoToFirstFile(uf);
-	if (err!=UNZ_OK)
-		return err;
+    if (err!=UNZ_OK)
+        return err;
 
     return total;
 }
@@ -278,9 +278,9 @@ int extractZip(unzFile uf,int opt_extract_without_path,int opt_overwrite,const c
     unz_global_info gi;
     int err;
 
-	total_size = zipSize(uf);
-	total_unzipped = 0;
-	ShowProgress("Unzipping...", total_unzipped, total_size);
+    total_size = zipSize(uf);
+    total_unzipped = 0;
+    ShowProgress("Unzipping...", total_unzipped, total_size);
 
     err = unzGetGlobalInfo (uf,&gi);
     //if (err!=UNZ_OK)
@@ -303,7 +303,7 @@ int extractZip(unzFile uf,int opt_extract_without_path,int opt_overwrite,const c
             }
         }
     }
-	CancelAction();
+    CancelAction();
     return 0;
 }
 

@@ -333,13 +333,13 @@ int y4m_write_frame_header(int fd, y4m_frame_info_t *i);
 /* read a complete frame (header + data)
    o yuv[3] points to three buffers, one each for Y, U, V planes */
 int y4m_read_frame(stream_t *s, y4m_stream_info_t *si,
-		   y4m_frame_info_t *fi, unsigned char *yuv[3]);
+                   y4m_frame_info_t *fi, unsigned char *yuv[3]);
 
 #if 0
 /* write a complete frame (header + data)
    o yuv[3] points to three buffers, one each for Y, U, V planes */
 int y4m_write_frame(int fd, y4m_stream_info_t *si,
-		    y4m_frame_info_t *fi, unsigned char *yuv[3]);
+                    y4m_frame_info_t *fi, unsigned char *yuv[3]);
 #endif
 
 #if 0
@@ -349,8 +349,8 @@ int y4m_write_frame(int fd, y4m_stream_info_t *si,
    o lower_field[3] same as yuv[3] above, but for lower field
 */
 int y4m_read_fields(int fd, y4m_stream_info_t *si, y4m_frame_info_t *fi,
-		    unsigned char *upper_field[3],
-		    unsigned char *lower_field[3]);
+                    unsigned char *upper_field[3],
+                    unsigned char *lower_field[3]);
 
 /* write a complete frame (header + data), but interleave fields
     from two separate buffers
@@ -358,8 +358,8 @@ int y4m_read_fields(int fd, y4m_stream_info_t *si, y4m_frame_info_t *fi,
    o lower_field[3] same as yuv[3] above, but for lower field
 */
 int y4m_write_fields(int fd, y4m_stream_info_t *si, y4m_frame_info_t *fi,
-		     unsigned char *upper_field[3],
-		     unsigned char *lower_field[3]);
+                     unsigned char *upper_field[3],
+                     unsigned char *lower_field[3]);
 
 #endif
 
@@ -438,7 +438,7 @@ int y4m_allow_unknown_tags(int yn);
      I - [char] interlacing:  p - progressive (none)
                             t - top-field-first
                             b - bottom-field-first
-		            ? - unknown
+                            ? - unknown
      F - [ratio] frame-rate, 0:0 == unknown
      A - [ratio] sample (pixel) aspect ratio, 0:0 == unknown
      X - [character string] 'metadata' (unparsed, but passed around)

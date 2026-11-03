@@ -55,21 +55,21 @@ virtual R3 * computeMerge(const R1 * r1, const R2 * r2, double ratio) const = 0;
 public:
 
 inline virtual R3 * operator()(const RenderItem * r1, const RenderItem * r2, double ratio) const {
-	if (supported(r1, r2))
-		return computeMerge(dynamic_cast<const R1*>(r1), dynamic_cast<const R2*>(r2), ratio);
-	else if (supported(r2,r1))
-		return computeMerge(dynamic_cast<const R1*>(r2), dynamic_cast<const R2*>(r1), ratio);
-	else
-		return 0;
+    if (supported(r1, r2))
+        return computeMerge(dynamic_cast<const R1*>(r1), dynamic_cast<const R2*>(r2), ratio);
+    else if (supported(r2,r1))
+        return computeMerge(dynamic_cast<const R1*>(r2), dynamic_cast<const R2*>(r1), ratio);
+    else
+        return 0;
 }
 
 /// Returns true if and only if r1 and r2 are of type R1 and R2 respectively.
 inline bool supported(const RenderItem * r1, const RenderItem * r2) const {
-	return typeid(r1) == typeid(const R1 *) && typeid(r2) == typeid(const R2 *);
+    return typeid(r1) == typeid(const R1 *) && typeid(r2) == typeid(const R2 *);
 }
 
 inline TypeIdPair typeIdPair() const {
-	return TypeIdPair(typeid(const R1*).name(), typeid(const R2*).name());
+    return TypeIdPair(typeid(const R1*).name(), typeid(const R2*).name());
 }
 
 };
@@ -79,19 +79,19 @@ class ShapeMerge : public RenderItemMerge<Shape> {
 
 public:
 
-	ShapeMerge() {}
-	virtual ~ShapeMerge() {}
+    ShapeMerge() {}
+    virtual ~ShapeMerge() {}
 
 protected:
 
-	virtual inline Shape * computeMerge(const Shape * lhs, const Shape * rhs, double ratio) const {
+    virtual inline Shape * computeMerge(const Shape * lhs, const Shape * rhs, double ratio) const {
 
-    	Shape * ret = new Shape();
-	Shape & target = *ret;
+        Shape * ret = new Shape();
+    Shape & target = *ret;
 
-	target.x = interpolate(lhs->x, rhs->x, ratio);
+    target.x = interpolate(lhs->x, rhs->x, ratio);
         target.y = interpolate(lhs->y, rhs->y, ratio);
-	target.a = interpolate(lhs->a, rhs->a, ratio);
+    target.a = interpolate(lhs->a, rhs->a, ratio);
         target.a2 = interpolate(lhs->a2, rhs->a2, ratio);
         target.r = interpolate(lhs->r, rhs->r, ratio);
         target.r2 = interpolate(lhs->r2, rhs->r2, ratio);
@@ -122,7 +122,7 @@ protected:
         target.imageUrl = (ratio > 0.5) ? lhs->imageUrl : rhs->imageUrl;
 
         return ret;
-	}
+    }
 };
 
 class BorderMerge : public RenderItemMerge<Border> {
@@ -138,7 +138,7 @@ class BorderMerge : public RenderItemMerge<Border> {
         {
             Border * ret = new Border();
 
-	    Border & target = *ret;
+        Border & target = *ret;
 
             target.inner_a = interpolate(lhs->inner_a, rhs->inner_a, ratio);
             target.inner_r = interpolate(lhs->inner_r, rhs->inner_r, ratio);
@@ -168,13 +168,13 @@ class WaveformMerge : public RenderItemMerge<Waveform> {
 
     protected:
 
-	/// @BUG unimplemented
+    /// @BUG unimplemented
         virtual inline Waveform * computeMerge(const Waveform * lhs, const Waveform * rhs, double ratio) const
         {
-		return 0;
+        return 0;
 /*
             Waveform * ret = new Waveform();
-	    Waveform & target = *ret;
+        Waveform & target = *ret;
 
             target.additive = interpolate(lhs->additive, rhs->additive, ratio);
             target.dots = interpolate(lhs->dots, rhs->dots, ratio);
@@ -200,37 +200,37 @@ class MasterRenderItemMerge : public RenderItemMerge<RenderItem> {
 typedef std::map<TypeIdPair, RenderItemMergeFunction*> MergeFunctionMap;
 public:
 
-	MasterRenderItemMerge() {}
-	virtual ~MasterRenderItemMerge() {}
+    MasterRenderItemMerge() {}
+    virtual ~MasterRenderItemMerge() {}
 
-	inline void add(RenderItemMergeFunction * fun) {
-		_mergeFunctionMap[fun->typeIdPair()] = fun;
-	}
+    inline void add(RenderItemMergeFunction * fun) {
+        _mergeFunctionMap[fun->typeIdPair()] = fun;
+    }
 
 protected:
-	virtual inline RenderItem * computeMerge(const RenderItem * lhs, const RenderItem * rhs,  double ratio) const {
+    virtual inline RenderItem * computeMerge(const RenderItem * lhs, const RenderItem * rhs,  double ratio) const {
 
-		RenderItemMergeFunction * mergeFunction;
+        RenderItemMergeFunction * mergeFunction;
 
-		TypeIdPair pair(typeid(lhs), typeid(rhs));
-		if (_mergeFunctionMap.count(pair)) {
-			mergeFunction = _mergeFunctionMap[pair];
-		} else if (_mergeFunctionMap.count(pair = TypeIdPair(typeid(rhs), typeid(lhs)))) {
-			mergeFunction = _mergeFunctionMap[pair];
-		} else {
-			mergeFunction  = 0;
-		}
+        TypeIdPair pair(typeid(lhs), typeid(rhs));
+        if (_mergeFunctionMap.count(pair)) {
+            mergeFunction = _mergeFunctionMap[pair];
+        } else if (_mergeFunctionMap.count(pair = TypeIdPair(typeid(rhs), typeid(lhs)))) {
+            mergeFunction = _mergeFunctionMap[pair];
+        } else {
+            mergeFunction  = 0;
+        }
 
-		// If specialized mergeFunction exists, use it to get higher granularity
-		// of correctness
-		if (mergeFunction)
-			return (*mergeFunction)(lhs, rhs, ratio);
-		else
-			return 0;
-	}
+        // If specialized mergeFunction exists, use it to get higher granularity
+        // of correctness
+        if (mergeFunction)
+            return (*mergeFunction)(lhs, rhs, ratio);
+        else
+            return 0;
+    }
 
 private:
-	mutable MergeFunctionMap _mergeFunctionMap;
+    mutable MergeFunctionMap _mergeFunctionMap;
 };
 
 #endif /* RenderItemMergeFunction_HPP_ */

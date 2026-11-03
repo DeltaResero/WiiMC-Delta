@@ -31,16 +31,16 @@ const char timer_name[] = "gekko";
 
 /*
 int usec_sleep(unsigned int usec_delay) {
-	return usleep(usec_delay);
+        return usleep(usec_delay);
 }*
 // Returns current time in microseconds
 u64 GetTimer(void) {
-	return ticks_to_microsecs(gettime());
+        return ticks_to_microsecs(gettime());
 }
 
 // Returns current time in milliseconds
 u64 GetTimerMS(void) {
-	return ticks_to_millisecs(gettime());
+        return ticks_to_millisecs(gettime());
 }
 */
 
@@ -65,18 +65,18 @@ u64 GetRelativeTime(void){
 }
 /*
 double GetRelativeTime(void) {
-	u64 t;
-	float res;
+        u64 t;
+        float res;
 
-	t = gettime();
-	res = (double) ticks_to_nanosecs(diff_ticks(t, RelativeTime)) /
-			(double) TB_NSPERSEC;
-	RelativeTime = t;
+        t = gettime();
+        res = (double) ticks_to_nanosecs(diff_ticks(t, RelativeTime)) /
+                        (double) TB_NSPERSEC;
+        RelativeTime = t;
 
-	return res;
+        return res;
 }
 */
 
 void InitTimer(void) {
-	GetRelativeTime();
+        GetRelativeTime();
 }

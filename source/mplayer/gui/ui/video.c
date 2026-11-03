@@ -96,7 +96,7 @@ void uiVideoMouseHandle( int Button,int X,int Y,int RX,int RY )
             case wsPMMouseButton:
                    uiMenuMouseHandle( RX,RY );
                    break;
-	    default: uiPlaybarShow( Y ); break;
+            default: uiPlaybarShow( Y ); break;
            }
           break;
    case wsRLMouseButton:
@@ -104,7 +104,7 @@ void uiVideoMouseHandle( int Button,int X,int Y,int RX,int RY )
            {
             if( videoVisible++%2 ) wsRaiseWindowTop( wsDisplay,guiApp.mainWindow.WindowID );
              else wsRaiseWindowTop( wsDisplay,guiApp.videoWindow.WindowID );
-	   }
+           }
           msButton=0;
           mplVideoMoved=0;
           break;

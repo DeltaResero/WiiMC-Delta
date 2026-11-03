@@ -5,39 +5,39 @@
 
 struct Point
 {
-	float x;
-	float y;
+    float x;
+    float y;
 
-	Point(float x, float y);
+    Point(float x, float y);
 };
 
 struct PerPixelContext
 {
-	float x;
-	float y;
-	float rad;
-	float theta;
+    float x;
+    float y;
+    float rad;
+    float theta;
 
-	int i;
-	int j;
+    int i;
+    int j;
 
-	PerPixelContext(float x, float y, float rad, float theta, int i, int j);
+    PerPixelContext(float x, float y, float rad, float theta, int i, int j);
 };
 
 class PerPixelMesh
 {
 public:
-	int width;
-	int height;
-	int size;
+    int width;
+    int height;
+    int size;
 
-	std::vector<Point> p;
-	std::vector<Point> p_original;
-	std::vector<PerPixelContext> identity;
+    std::vector<Point> p;
+    std::vector<Point> p_original;
+    std::vector<PerPixelContext> identity;
 
-	PerPixelMesh(int width, int height);
+    PerPixelMesh(int width, int height);
 
-	void Reset();
+    void Reset();
 };
 
 

@@ -1,7 +1,7 @@
 /********************************************************
 
          DirectShow audio decoder
-	 Copyright 2001 Eugene Kuznetsov  (divx@euro.ru)
+         Copyright 2001 Eugene Kuznetsov  (divx@euro.ru)
 
 *********************************************************/
 #include "config.h"
@@ -83,9 +83,9 @@ DS_AudioDecoder * DS_AudioDecoder_Open(char* dllname, GUID* guid, WAVEFORMATEX* 
     this->m_sDestType.bTemporalCompression=0;
     this->m_sDestType.lSampleSize=pWF->nBlockAlign;
     if (wf->wFormatTag == 0x130)
-	// ACEL hack to prevent memory corruption
+        // ACEL hack to prevent memory corruption
         // obviosly we are missing something here
-	this->m_sDestType.lSampleSize *= 288;
+        this->m_sDestType.lSampleSize *= 288;
     this->m_sDestType.pUnk=0;
     this->m_sDestType.cbFormat=18; //pWF->cbSize;
     this->m_sDestType.pbFormat=this->m_sVhdr2;
@@ -96,7 +96,7 @@ DS_AudioDecoder * DS_AudioDecoder_Open(char* dllname, GUID* guid, WAVEFORMATEX* 
     /*try*/
     {
         this->m_pDS_Filter = DS_FilterCreate(dllname, guid, &this->m_sOurType, &this->m_sDestType,&sampleProcData);
-	if( !this->m_pDS_Filter ) {
+        if( !this->m_pDS_Filter ) {
            free(this);
            return NULL;
         }
@@ -110,11 +110,11 @@ DS_AudioDecoder * DS_AudioDecoder_Open(char* dllname, GUID* guid, WAVEFORMATEX* 
     /*
     catch (FatalError& e)
     {
-	e.PrintAll();
-	delete[] m_sVhdr;
-	delete[] m_sVhdr2;
-	delete m_pDS_Filter;
-	throw;
+        e.PrintAll();
+        delete[] m_sVhdr;
+        delete[] m_sVhdr2;
+        delete m_pDS_Filter;
+        throw;
     }
     */
     return this;
@@ -129,14 +129,14 @@ void DS_AudioDecoder_Destroy(DS_AudioDecoder *this)
 }
 
 int DS_AudioDecoder_Convert(DS_AudioDecoder *this, const void* in_data, unsigned int in_size,
-			     void* out_data, unsigned int out_size,
-			     unsigned int* size_read, unsigned int* size_written)
+                             void* out_data, unsigned int out_size,
+                             unsigned int* size_read, unsigned int* size_written)
 {
     unsigned int written = 0;
     unsigned int read = 0;
 
     if (!in_data || !out_data)
-	return -1;
+        return -1;
 
 #ifdef WIN32_LOADER
     Setup_FS_Segment();
@@ -145,48 +145,48 @@ int DS_AudioDecoder_Convert(DS_AudioDecoder *this, const void* in_data, unsigned
     in_size -= in_size%this->in_fmt.nBlockAlign;
     while (in_size>0)
     {
-	IMediaSample* sample=0;
-	char* ptr;
-	int result;
-	this->m_pDS_Filter->m_pAll->vt->GetBuffer(this->m_pDS_Filter->m_pAll, &sample, 0, 0, 0);
-	if (!sample)
-	{
-	    Debug printf("DS_AudioDecoder::Convert() Error: null sample\n");
-	    break;
-	}
-	sample->vt->SetActualDataLength(sample, this->in_fmt.nBlockAlign);
-	sample->vt->GetPointer(sample, (BYTE **)&ptr);
-	memcpy(ptr, (const uint8_t*)in_data + read, this->in_fmt.nBlockAlign);
-	sample->vt->SetSyncPoint(sample, 1);
-	sample->vt->SetPreroll(sample, 0);
-	result = this->m_pDS_Filter->m_pImp->vt->Receive(this->m_pDS_Filter->m_pImp, sample);
+        IMediaSample* sample=0;
+        char* ptr;
+        int result;
+        this->m_pDS_Filter->m_pAll->vt->GetBuffer(this->m_pDS_Filter->m_pAll, &sample, 0, 0, 0);
+        if (!sample)
+        {
+            Debug printf("DS_AudioDecoder::Convert() Error: null sample\n");
+            break;
+        }
+        sample->vt->SetActualDataLength(sample, this->in_fmt.nBlockAlign);
+        sample->vt->GetPointer(sample, (BYTE **)&ptr);
+        memcpy(ptr, (const uint8_t*)in_data + read, this->in_fmt.nBlockAlign);
+        sample->vt->SetSyncPoint(sample, 1);
+        sample->vt->SetPreroll(sample, 0);
+        result = this->m_pDS_Filter->m_pImp->vt->Receive(this->m_pDS_Filter->m_pImp, sample);
         if (result)
-	    Debug printf("DS_AudioDecoder::Convert() Error: putting data into input pin %x\n", result);
-	if ((written + sampleProcData.frame_size) > out_size)
-	{
-	    sample->vt->Release((IUnknown*)sample);
-	    break;
-	}
-	memcpy((uint8_t*)out_data + written, sampleProcData.frame_pointer, sampleProcData.frame_size);
+            Debug printf("DS_AudioDecoder::Convert() Error: putting data into input pin %x\n", result);
+        if ((written + sampleProcData.frame_size) > out_size)
+        {
+            sample->vt->Release((IUnknown*)sample);
+            break;
+        }
+        memcpy((uint8_t*)out_data + written, sampleProcData.frame_pointer, sampleProcData.frame_size);
         sample->vt->Release((IUnknown*)sample);
-	read+=this->in_fmt.nBlockAlign;
-	written+=sampleProcData.frame_size;
-	break;
+        read+=this->in_fmt.nBlockAlign;
+        written+=sampleProcData.frame_size;
+        break;
     }
     if (size_read)
-	*size_read = read;
+        *size_read = read;
     if (size_written)
-	*size_written = written;
+        *size_written = written;
     return 0;
 }
 
 int DS_AudioDecoder_GetSrcSize(DS_AudioDecoder *this, int dest_size)
 {
     double efficiency =(double) this->in_fmt.nAvgBytesPerSec
-	/ (this->in_fmt.nSamplesPerSec*this->in_fmt.nBlockAlign);
+        / (this->in_fmt.nSamplesPerSec*this->in_fmt.nBlockAlign);
     int frames = (int)(dest_size*efficiency);
 
     if (frames < 1)
-	frames = 1;
+        frames = 1;
     return frames * this->in_fmt.nBlockAlign;
 }

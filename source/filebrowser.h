@@ -14,60 +14,60 @@
 #include <gccore.h>
 #include <sys/param.h>
 
-#define MAXJOLIET			255
+#define MAXJOLIET           255
 
 enum
 {
-	TYPE_FILE,
-	TYPE_FOLDER,
-	TYPE_PLAYLIST,
-	TYPE_SEARCH
+    TYPE_FILE,
+    TYPE_FOLDER,
+    TYPE_PLAYLIST,
+    TYPE_SEARCH
 };
 
 typedef struct _bentry
 {
-	u64 length; // file length
-	int type; // TYPE_FILE,	TYPE_FOLDER, TYPE_PLAYLIST, TYPE_SEARCH
-	char *file; // full filename
-	char *url; // address
-	char *display; // name for browser display
-	char *xml; // name for xml data
-	char *image;
-	char *tunein;
-	char *year;
-	char *desc;
-	int icon; // icon to display
-	int pos;
-	_bentry *next;
-	_bentry *prior;
+    u64 length; // file length
+    int type; // TYPE_FILE, TYPE_FOLDER, TYPE_PLAYLIST, TYPE_SEARCH
+    char *file; // full filename
+    char *url; // address
+    char *display; // name for browser display
+    char *xml; // name for xml data
+    char *image;
+    char *tunein;
+    char *year;
+    char *desc;
+    int icon; // icon to display
+    int pos;
+    _bentry *next;
+    _bentry *prior;
 } BROWSERENTRY;
 
 typedef struct
 {
-	char dir[MAXPATHLEN]; // directory path
-	int menu; // current menu area
-	char lastdir[MAXPATHLEN]; // last browsed directory
-	int numEntries; // number of entries in the browser
-	BROWSERENTRY * selIndex; // currently selected index
-	int pageIndex; // starting index of page display
-	BROWSERENTRY *first;
-	BROWSERENTRY *last;
+    char dir[MAXPATHLEN]; // directory path
+    int menu; // current menu area
+    char lastdir[MAXPATHLEN]; // last browsed directory
+    int numEntries; // number of entries in the browser
+    BROWSERENTRY * selIndex; // currently selected index
+    int pageIndex; // starting index of page display
+    BROWSERENTRY *first;
+    BROWSERENTRY *last;
 } BROWSER;
 
 enum
 {
-	ICON_NONE,
-	ICON_FOLDER,
-	ICON_FOLDER_CHECKED,
-	ICON_FILE,
-	ICON_FILE_CHECKED,
-	ICON_CHECK,
-	ICON_PLAY,
-	ICON_SD,
-	ICON_USB,
-	ICON_DVD,
-	ICON_SMB,
-	ICON_FTP
+    ICON_NONE,
+    ICON_FOLDER,
+    ICON_FOLDER_CHECKED,
+    ICON_FILE,
+    ICON_FILE_CHECKED,
+    ICON_CHECK,
+    ICON_PLAY,
+    ICON_SD,
+    ICON_USB,
+    ICON_DVD,
+    ICON_SMB,
+    ICON_FTP
 };
 
 extern BROWSER browser;

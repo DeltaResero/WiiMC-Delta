@@ -89,15 +89,15 @@ static void set_window(int force_update)
   if ( WinID )
     {
       XGetGeometry(mDisplay, vo_window, &mRoot, &drwX, &drwY, &drwWidth,
-		   &drwHeight, &drwBorderWidth, &drwDepth);
+                   &drwHeight, &drwBorderWidth, &drwDepth);
       drwX = drwY = 0;
 
       XTranslateCoordinates(mDisplay, vo_window, mRoot, 0, 0,
-			    &drwcX, &drwcY, &mRoot);
+                            &drwcX, &drwcY, &mRoot);
       aspect(&dwidth,&dheight,A_NOZOOM);
       if (!vo_fs)
-	mp_msg(MSGT_VO, MSGL_V, "[xvidix] dcx: %d dcy: %d dx: %d dy: %d dw: %d dh: %d\n",
-	       drwcX, drwcY, drwX, drwY, drwWidth, drwHeight);
+        mp_msg(MSGT_VO, MSGL_V, "[xvidix] dcx: %d dcy: %d dx: %d dy: %d dw: %d dh: %d\n",
+               drwcX, drwcY, drwX, drwY, drwWidth, drwHeight);
 
       /* following stuff copied from vo_xmga.c */
     }
@@ -117,7 +117,7 @@ static void set_window(int force_update)
       drwWidth = ((int)dwidth > vo_screenwidth ? vo_screenwidth : dwidth);
       drwHeight = ((int)dheight > vo_screenheight ? vo_screenheight : dheight);
       mp_msg(MSGT_VO, MSGL_V, "[xvidix-fs] dcx: %d dcy: %d dx: %d dy: %d dw: %d dh: %d\n",
-	     drwcX, drwcY, drwX, drwY, drwWidth, drwHeight);
+             drwcX, drwcY, drwX, drwY, drwWidth, drwHeight);
     }
 
   vo_dwidth=drwWidth; vo_dheight=drwHeight;
@@ -133,26 +133,26 @@ static void set_window(int force_update)
 
       /* find the screen we are on */
       while (i<num_screens &&
-	     ((screens[i].x_org < (int)drwcX) ||
-	      (screens[i].y_org < (int)drwcY) ||
-	      (screens[i].x_org + screens[i].width >= (int)drwcX) ||
-	      (screens[i].y_org + screens[i].height >= (int)drwcY)))
-	{
-	  i++;
-	}
+             ((screens[i].x_org < (int)drwcX) ||
+              (screens[i].y_org < (int)drwcY) ||
+              (screens[i].x_org + screens[i].width >= (int)drwcX) ||
+              (screens[i].y_org + screens[i].height >= (int)drwcY)))
+        {
+          i++;
+        }
 
       if(i<num_screens)
-	{
-	  /* save the screen we are on */
-	  xinerama_screen = i;
-	} else {
-	  /* oops.. couldnt find the screen we are on
-	   * because the upper left corner left the
-	   * visual range. assume we are still on the
-	   * same screen
-	   */
-	  i = xinerama_screen;
-	}
+        {
+          /* save the screen we are on */
+          xinerama_screen = i;
+        } else {
+          /* oops.. couldnt find the screen we are on
+           * because the upper left corner left the
+           * visual range. assume we are still on the
+           * same screen
+           */
+          i = xinerama_screen;
+        }
 
       /* set drwcX and drwcY to the right values */
       drwcX = drwcX - screens[i].x_org;
@@ -185,7 +185,7 @@ static void set_window(int force_update)
       w.h = window_height = drwHeight;
 
       if(sub_vo->control(VOCTRL_XOVERLAY_SET_WIN,&w) != VO_TRUE)
-	mp_msg(MSGT_VO, MSGL_ERR, "xvidx: set_overlay failed\n");
+        mp_msg(MSGT_VO, MSGL_ERR, "xvidx: set_overlay failed\n");
 
       mp_msg(MSGT_VO, MSGL_V, "[xvidix] window properties: pos: %dx%d, size: %dx%d\n", vo_dx, vo_dy, window_width, window_height);
     }
@@ -197,7 +197,7 @@ static void set_window(int force_update)
   XClearWindow( mDisplay,vo_window );
   XSetForeground(mDisplay, vo_gc, colorkey);
   XFillRectangle(mDisplay, vo_window, vo_gc, drwX, drwY, drwWidth,
-		 (vo_fs ? drwHeight - 1 : drwHeight));
+                 (vo_fs ? drwHeight - 1 : drwHeight));
 
   /* flush, update drawable */
   XFlush(mDisplay);
@@ -209,7 +209,7 @@ static void set_window(int force_update)
  * allocate colors and (shared) memory
  */
 static int config(uint32_t width, uint32_t height, uint32_t d_width,
-		       uint32_t d_height, uint32_t flags, char *title, uint32_t format)
+                       uint32_t d_height, uint32_t flags, char *title, uint32_t format)
 {
   XVisualInfo vinfo;
   //    XSizeHints hint;
@@ -255,7 +255,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
       break;
     default:
       mp_msg(MSGT_VO, MSGL_ERR, "Sorry, this (%d) color depth is not supported\n",
-	     vo_depthonscreen);
+             vo_depthonscreen);
     }
   mp_msg(MSGT_VO, MSGL_V, "Using colorkey: %x\n", colorkey);
 
@@ -281,20 +281,20 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
       /* from vo_x11 */
       window_depth = attribs.depth;
       if ((window_depth != 15) && (window_depth != 16) && (window_depth != 24)
-	  && (window_depth != 32))
+          && (window_depth != 32))
         window_depth = 24;
       XMatchVisualInfo(mDisplay, mScreen, window_depth, TrueColor, &vinfo);
 
       xswa.background_pixel = BlackPixel(mDisplay, mScreen);
       xswa.border_pixel     = 0;
       xswa.colormap         = XCreateColormap(mDisplay, RootWindow(mDisplay, mScreen),
-					      vinfo.visual, AllocNone);
+                                              vinfo.visual, AllocNone);
       xswamask = CWBackPixel | CWBorderPixel | CWColormap;
 
-	    vo_x11_create_vo_window(&vinfo, vo_dx, vo_dy,
+            vo_x11_create_vo_window(&vinfo, vo_dx, vo_dy,
                   window_width, window_height, flags,
-	          xswa.colormap, "xvidix", title);
-	    XChangeWindowAttributes(mDisplay, vo_window, xswamask, &xswa);
+                  xswa.colormap, "xvidix", title);
+            XChangeWindowAttributes(mDisplay, vo_window, xswamask, &xswa);
 
 #ifdef CONFIG_GUI
     }
@@ -303,7 +303,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
   if ( ( !WinID )&&( flags&VOFLAG_FULLSCREEN ) ) { vo_dx=0; vo_dy=0; vo_dwidth=vo_screenwidth; vo_dheight=vo_screenheight; vo_fs=1; }
 
   if(sub_vo->config(image_width,image_height,vo_dwidth,vo_dheight,
-		    flags | VOFLAG_XOVERLAY_SUB_VO,NULL,format)) {
+                    flags | VOFLAG_XOVERLAY_SUB_VO,NULL,format)) {
     mp_msg(MSGT_VO, MSGL_ERR, "xover: sub vo config failed\n");
     return 1;
   }
@@ -346,7 +346,7 @@ static void flip_page(void)
 }
 
 static int draw_slice(uint8_t *src[], int stride[],
-			   int w, int h, int x, int y)
+                           int w, int h, int x, int y)
 {
   mp_msg(MSGT_VO, MSGL_FATAL, "xover error: didn't used sub vo draw_slice!\n");
   return 1;
@@ -425,8 +425,8 @@ static int control(uint32_t request, void *data)
   case VOCTRL_SET_PANSCAN:
     if ( vo_fs && ( vo_panscan != vo_panscan_amount ) )
       {
-	panscan_calc();
-	set_window(0);
+        panscan_calc();
+        set_window(0);
       }
     return VO_TRUE;
   default:

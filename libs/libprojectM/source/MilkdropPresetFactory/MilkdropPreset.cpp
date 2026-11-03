@@ -35,9 +35,9 @@
 #include "PresetFrameIO.hpp"
 
 MilkdropPreset::MilkdropPreset(std::istream & in, const std::string & presetName,  PresetOutputs & presetOutputs):
-	Preset(presetName),
-    	builtinParams(_presetInputs, presetOutputs),
-    	_presetOutputs(presetOutputs)
+        Preset(presetName),
+        builtinParams(_presetInputs, presetOutputs),
+        _presetOutputs(presetOutputs)
 {
   initialize(in);
 
@@ -67,12 +67,12 @@ MilkdropPreset::~MilkdropPreset()
 
   for (PresetOutputs::cwave_container::iterator pos = customWaves.begin(); pos != customWaves.end(); ++pos)
   {
-    	delete(*pos);
+        delete(*pos);
   }
 
   for (PresetOutputs::cshape_container::iterator pos = customShapes.begin(); pos != customShapes.end(); ++pos)
   {
-    	delete(*pos);
+        delete(*pos);
   }
 
 }
@@ -256,10 +256,10 @@ void MilkdropPreset::postloadInitialize() {
 
 void MilkdropPreset::Render(const BeatDetect &music, const PipelineContext &context)
 {
-	_presetInputs.update(music, context);
+        _presetInputs.update(music, context);
 
-	evaluateFrame();
-	pipeline().Render(music, context);
+        evaluateFrame();
+        pipeline().Render(music, context);
 
 }
 
@@ -294,7 +294,7 @@ void MilkdropPreset::initialize(std::istream & in)
   if ((retval = readIn(in)) < 0)
   {
 
-	if (MILKDROP_PRESET_DEBUG)
+        if (MILKDROP_PRESET_DEBUG)
      std::cerr << "[Preset] failed to load from stream " << std::endl;
 
     /// @bug how should we handle this problem? a well define exception?
@@ -328,7 +328,7 @@ void MilkdropPreset::loadCustomShapeUnspecInitConds()
 {
 
   for (PresetOutputs::cshape_container::iterator pos = customShapes.begin();
-	pos != customShapes.end(); ++pos)
+        pos != customShapes.end(); ++pos)
   {
     assert(*pos);
     (*pos)->loadUnspecInitConds();
@@ -371,74 +371,74 @@ void MilkdropPreset::initialize_PerPixelMeshes()
 
   int x,y;
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.cx_mesh[x][y]=presetOutputs().cx;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.cx_mesh[x][y]=presetOutputs().cx;
+        }}
 
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.cy_mesh[x][y]=presetOutputs().cy;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.cy_mesh[x][y]=presetOutputs().cy;
+        }}
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.sx_mesh[x][y]=presetOutputs().sx;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.sx_mesh[x][y]=presetOutputs().sx;
+        }}
 
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.sy_mesh[x][y]=presetOutputs().sy;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.sy_mesh[x][y]=presetOutputs().sy;
+        }}
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.dx_mesh[x][y]=presetOutputs().dx;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.dx_mesh[x][y]=presetOutputs().dx;
+        }}
 
 //std::cout<<presetOutputs().cx<<","<<presetOutputs().cy<<" "<<presetOutputs().dx<<","<<presetOutputs().dy<<std::endl;
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.dy_mesh[x][y]=presetOutputs().dy;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.dy_mesh[x][y]=presetOutputs().dy;
+        }}
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.zoom_mesh[x][y]=presetOutputs().zoom;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.zoom_mesh[x][y]=presetOutputs().zoom;
+        }}
 
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.zoomexp_mesh[x][y]=presetOutputs().zoomexp;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.zoomexp_mesh[x][y]=presetOutputs().zoomexp;
+        }}
 
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.rot_mesh[x][y]=presetOutputs().rot;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.rot_mesh[x][y]=presetOutputs().rot;
+        }}
 
 
       for (x=0;x<presetInputs().gx;x++){
-	for(y=0;y<presetInputs().gy;y++){
-	  _presetOutputs.warp_mesh[x][y]=presetOutputs().warp;
-	}}
+        for(y=0;y<presetInputs().gy;y++){
+          _presetOutputs.warp_mesh[x][y]=presetOutputs().warp;
+        }}
 
 
 
@@ -449,7 +449,7 @@ void MilkdropPreset::evalPerPixelEqns()
 
   /* Evaluate all per pixel equations in the tree datastructure */
   for (int mesh_x = 0; mesh_x < presetInputs().gx; mesh_x++)
-	  for (int mesh_y = 0; mesh_y < presetInputs().gy; mesh_y++)
+          for (int mesh_y = 0; mesh_y < presetInputs().gy; mesh_y++)
   for (std::map<int, PerPixelEqn*>::iterator pos = per_pixel_eqn_tree.begin();
        pos != per_pixel_eqn_tree.end(); ++pos)
     pos->second->evaluate(mesh_x, mesh_y);
@@ -465,8 +465,8 @@ int MilkdropPreset::readIn(std::istream & fs) {
   /* Parse any comments */
   if (Parser::parse_top_comment(fs) < 0)
   {
-	if (MILKDROP_PRESET_DEBUG)
-    		std::cerr << "[Preset::readIn] no left bracket found..." << std::endl;
+        if (MILKDROP_PRESET_DEBUG)
+                std::cerr << "[Preset::readIn] no left bracket found..." << std::endl;
     return -1;
   }
 
@@ -512,7 +512,7 @@ int MilkdropPreset::loadPresetFile(const std::string & pathname)
   std::ifstream fs(pathname.c_str());
   if (!fs || fs.eof()) {
     if (MILKDROP_PRESET_DEBUG)
-    	std::cerr << "loadPresetFile: loading of file \"" << pathname << "\" failed!\n";
+        std::cerr << "loadPresetFile: loading of file \"" << pathname << "\" failed!\n";
     return -1;
   }
 

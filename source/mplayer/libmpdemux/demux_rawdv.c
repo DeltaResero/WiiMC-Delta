@@ -161,12 +161,12 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    dv_decoder->quality=DV_QUALITY_BEST;
 
    if (dv_parse_header(dv_decoder, dv_frame) == -1)
-	   return NULL;
+           return NULL;
 
    // create a new video stream header
    sh_video = new_sh_video(demuxer, 0);
    if (!sh_video)
-	   return NULL;
+           return NULL;
 
    // make sure the demuxer knows about the new video stream header
    // (even though new_sh_video() ought to take care of it)
@@ -209,20 +209,20 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
     if (dv_decoder->audio != NULL && demuxer->audio->id>=-1){
        sh_audio_t *sh_audio =  new_sh_audio(demuxer, 0, NULL);
        demuxer->audio->id = 0;
-	    demuxer->audio->sh = sh_audio;
-	    sh_audio->ds = demuxer->audio;
+            demuxer->audio->sh = sh_audio;
+            sh_audio->ds = demuxer->audio;
        mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() chan: %d samplerate: %d\n",dv_decoder->audio->num_channels,dv_decoder->audio->frequency );
        // custom fourcc for internal MPlayer use
        sh_audio->format = mmioFOURCC('R', 'A', 'D', 'V');
 
-	sh_audio->wf = calloc(1, sizeof(*sh_audio->wf));
-	sh_audio->wf->wFormatTag = sh_audio->format;
-	sh_audio->wf->nChannels = dv_decoder->audio->num_channels;
-	sh_audio->wf->wBitsPerSample = 16;
-	sh_audio->wf->nSamplesPerSec = dv_decoder->audio->frequency;
-	// info about the input stream:
-	sh_audio->wf->nAvgBytesPerSec = sh_video->fps*dv_decoder->frame_size;
-	sh_audio->wf->nBlockAlign = dv_decoder->frame_size;
+        sh_audio->wf = calloc(1, sizeof(*sh_audio->wf));
+        sh_audio->wf->wFormatTag = sh_audio->format;
+        sh_audio->wf->nChannels = dv_decoder->audio->num_channels;
+        sh_audio->wf->wBitsPerSample = 16;
+        sh_audio->wf->nSamplesPerSec = dv_decoder->audio->frequency;
+        // info about the input stream:
+        sh_audio->wf->nAvgBytesPerSec = sh_video->fps*dv_decoder->frame_size;
+        sh_audio->wf->nBlockAlign = dv_decoder->frame_size;
 
 //       sh_audio->context=(void*)dv_decoder;
     }

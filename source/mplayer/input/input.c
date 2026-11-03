@@ -852,16 +852,16 @@ mp_input_parse_cmd(char* str) {
       errno = 0;
       cmd->args[i].v.i = atoi(ptr);
       if(errno != 0) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrArgMustBeInt,cmd_def->name,i+1);
-	ptr = NULL;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrArgMustBeInt,cmd_def->name,i+1);
+        ptr = NULL;
       }
       break;
     case MP_CMD_ARG_FLOAT:
       errno = 0;
       cmd->args[i].v.f = atof(ptr);
       if(errno != 0) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrArgMustBeFloat,cmd_def->name,i+1);
-	ptr = NULL;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrArgMustBeFloat,cmd_def->name,i+1);
+        ptr = NULL;
       }
       break;
     case MP_CMD_ARG_STRING: {
@@ -869,28 +869,28 @@ mp_input_parse_cmd(char* str) {
       char* ptr2 = ptr, *start;
 
       if(ptr[0] == '\'' || ptr[0] == '"') {
-	term = ptr[0];
-	ptr2++;
+        term = ptr[0];
+        ptr2++;
       } else
-	term = ' ';
+        term = ' ';
       start = ptr2;
       while(1) {
-	e = strchr(ptr2,term);
-	if(!e) break;
-	if(e <= ptr2 || *(e - 1) != '\\') break;
-	ptr2 = e + 1;
+        e = strchr(ptr2,term);
+        if(!e) break;
+        if(e <= ptr2 || *(e - 1) != '\\') break;
+        ptr2 = e + 1;
       }
 
       if(term != ' ' && (!e || e[0] == '\0')) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnterminatedArg,cmd_def->name,i+1);
-	ptr = NULL;
-	break;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnterminatedArg,cmd_def->name,i+1);
+        ptr = NULL;
+        break;
       } else if(!e) e = ptr+strlen(ptr);
       l = e-start;
       ptr2 = start;
       for(e = strchr(ptr2,'\\') ; e && e<start+l ; e = strchr(ptr2,'\\')) {
-	memmove(e,e+1,strlen(e));
-	ptr2 = e + 1;
+        memmove(e,e+1,strlen(e));
+        ptr2 = e + 1;
         l--;
       }
       cmd->args[i].v.s = malloc(l+1);
@@ -948,11 +948,11 @@ mp_input_read_cmd(mp_input_fd_t* mp_fd, char** ret) {
       switch(r) {
       case MP_INPUT_ERROR:
       case MP_INPUT_DEAD:
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrReadingCmdFd,mp_fd->fd,strerror(errno));
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrReadingCmdFd,mp_fd->fd,strerror(errno));
       case MP_INPUT_NOTHING:
-	return r;
+        return r;
       case MP_INPUT_RETRY:
-	continue;
+        continue;
       }
       // EOF ?
     } else if(r == 0) {
@@ -976,9 +976,9 @@ mp_input_read_cmd(mp_input_fd_t* mp_fd, char** ret) {
     if(!end) {
       // If buffer is full we must drop all until the next \n
       if(mp_fd->size - mp_fd->pos <= 1) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrCmdBufferFullDroppingContent,mp_fd->fd);
-	mp_fd->pos = 0;
-	mp_fd->drop = 1;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrCmdBufferFullDroppingContent,mp_fd->fd);
+        mp_fd->pos = 0;
+        mp_fd->drop = 1;
       }
       break;
     }
@@ -1017,9 +1017,9 @@ mp_input_default_cmd_func(int fd,char* buf, int l) {
     // Error ?
     if(r < 0) {
       if(errno == EINTR)
-	continue;
+        continue;
       else if(errno == EAGAIN)
-	return MP_INPUT_NOTHING;
+        return MP_INPUT_NOTHING;
       return MP_INPUT_ERROR;
       // EOF ?
     }
@@ -1048,13 +1048,13 @@ mp_input_find_bind_for_key(const mp_cmd_bind_t* binds, int n,int* keys) {
   for(j = 0; binds[j].cmd != NULL; j++) {
       int found = 1,s;
       for(s = 0; s < n && binds[j].input[s] != 0; s++) {
-	if(binds[j].input[s] != keys[s]) {
-	  found = 0;
-	  break;
-	}
+        if(binds[j].input[s] != keys[s]) {
+          found = 0;
+          break;
+        }
       }
       if(found && binds[j].input[s] == 0 && s == n)
-	break;
+        break;
   }
   return binds[j].cmd;
 }
@@ -1112,7 +1112,7 @@ mp_input_get_cmd_from_keys(int n,int* keys, int paused) {
     if(  num_key_down > 1) {
       unsigned int s;
       for(s=1; s < num_key_down; s++)
-	mp_msg(MSGT_INPUT,MSGL_ERR,"-%s",mp_input_get_key_name(key_down[s]));
+        mp_msg(MSGT_INPUT,MSGL_ERR,"-%s",mp_input_get_key_name(key_down[s]));
     }
     mp_msg(MSGT_INPUT,MSGL_ERR," : %s             \n",cmd);
   }
@@ -1137,7 +1137,7 @@ interpret_key(int code, int paused)
 
   if(mp_input_key_cb) {
       if (code & MP_KEY_DOWN)
-	  return NULL;
+          return NULL;
       code &= ~(MP_KEY_DOWN|MP_NO_REPEAT_KEY);
       if (mp_input_key_cb(code))
     return NULL;
@@ -1145,17 +1145,17 @@ interpret_key(int code, int paused)
 
     if(code & MP_KEY_DOWN) {
       if(num_key_down > MP_MAX_KEY_DOWN) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_Err2ManyKeyDowns);
-	return NULL;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_Err2ManyKeyDowns);
+        return NULL;
       }
       code &= ~MP_KEY_DOWN;
       // Check if we don't already have this key as pushed
       for(j = 0; j < num_key_down; j++) {
-	if(key_down[j] == code)
-	  break;
+        if(key_down[j] == code)
+          break;
       }
       if(j != num_key_down)
-	return NULL;
+        return NULL;
       key_down[num_key_down] = code;
       num_key_down++;
       last_key_down = GetTimer();
@@ -1167,12 +1167,12 @@ interpret_key(int code, int paused)
     // send only release event
     for(j = 0; j < num_key_down; j++) {
       if(key_down[j] == code)
-	break;
+        break;
     }
     if(j == num_key_down) { // key was not in the down keys : add it
       if(num_key_down > MP_MAX_KEY_DOWN) {
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_Err2ManyKeyDowns);
-	return NULL;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_Err2ManyKeyDowns);
+        return NULL;
       }
       key_down[num_key_down] = code;
       num_key_down++;
@@ -1200,8 +1200,8 @@ static mp_cmd_t *check_autorepeat(int paused)
     if(ar_state == 0 && (t - last_key_down) >= ar_delay*1000) {
       ar_cmd = mp_input_get_cmd_from_keys(num_key_down,key_down,paused);
       if(!ar_cmd) {
-	ar_state = -1;
-	return NULL;
+        ar_state = -1;
+        return NULL;
       }
       ar_state = 1;
       last_ar = t;
@@ -1228,116 +1228,116 @@ static mp_cmd_t *read_events(int time, int paused)
     fd_set fds;
 #endif
     for (i = 0; i < num_key_fd; i++)
-	if (key_fds[i].dead) {
-	    mp_input_rm_key_fd(key_fds[i].fd);
-	    i--;
-	}
+        if (key_fds[i].dead) {
+            mp_input_rm_key_fd(key_fds[i].fd);
+            i--;
+        }
     for (i = 0; i < num_cmd_fd; i++)
-	if (cmd_fds[i].dead || cmd_fds[i].eof) {
-	    mp_input_rm_cmd_fd(cmd_fds[i].fd);
-	    i--;
-	}
-	else if (cmd_fds[i].got_cmd)
-	    got_cmd = 1;
+        if (cmd_fds[i].dead || cmd_fds[i].eof) {
+            mp_input_rm_cmd_fd(cmd_fds[i].fd);
+            i--;
+        }
+        else if (cmd_fds[i].got_cmd)
+            got_cmd = 1;
 #ifdef HAVE_POSIX_SELECT
     FD_ZERO(&fds);
     if (!got_cmd) {
-	int max_fd = 0, num_fd = 0;
-	for (i = 0; i < num_key_fd; i++) {
-	    if (key_fds[i].no_select)
-		continue;
-	    if (key_fds[i].fd > max_fd)
-		max_fd = key_fds[i].fd;
-	    FD_SET(key_fds[i].fd, &fds);
-	    num_fd++;
-	}
-	for (i = 0; i < num_cmd_fd; i++) {
-	    if (cmd_fds[i].no_select)
-		continue;
-	    if (cmd_fds[i].fd > max_fd)
-		max_fd = cmd_fds[i].fd;
-	    FD_SET(cmd_fds[i].fd, &fds);
-	    num_fd++;
-	}
-	if (num_fd > 0) {
-	    struct timeval tv, *time_val;
-	    if (time >= 0) {
-		tv.tv_sec = time / 1000;
-		tv.tv_usec = (time % 1000) * 1000;
-		time_val = &tv;
-	    }
-	    else
-		time_val = NULL;
-	    if (select(max_fd + 1, &fds, NULL, NULL, time_val) < 0) {
-		if (errno != EINTR)
-		    mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrSelect,
-			    strerror(errno));
-		FD_ZERO(&fds);
-	    }
-	} else if (time)
-	    usec_sleep(time * 1000);
+        int max_fd = 0, num_fd = 0;
+        for (i = 0; i < num_key_fd; i++) {
+            if (key_fds[i].no_select)
+                continue;
+            if (key_fds[i].fd > max_fd)
+                max_fd = key_fds[i].fd;
+            FD_SET(key_fds[i].fd, &fds);
+            num_fd++;
+        }
+        for (i = 0; i < num_cmd_fd; i++) {
+            if (cmd_fds[i].no_select)
+                continue;
+            if (cmd_fds[i].fd > max_fd)
+                max_fd = cmd_fds[i].fd;
+            FD_SET(cmd_fds[i].fd, &fds);
+            num_fd++;
+        }
+        if (num_fd > 0) {
+            struct timeval tv, *time_val;
+            if (time >= 0) {
+                tv.tv_sec = time / 1000;
+                tv.tv_usec = (time % 1000) * 1000;
+                time_val = &tv;
+            }
+            else
+                time_val = NULL;
+            if (select(max_fd + 1, &fds, NULL, NULL, time_val) < 0) {
+                if (errno != EINTR)
+                    mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrSelect,
+                            strerror(errno));
+                FD_ZERO(&fds);
+            }
+        } else if (time)
+            usec_sleep(time * 1000);
     }
 #else
     if (!got_cmd && time)
-	usec_sleep(time * 1000);
+        usec_sleep(time * 1000);
 #endif
 
 
     for (i = 0; i < num_key_fd; i++) {
-	int code;
+        int code;
 #ifdef HAVE_POSIX_SELECT
-	if (!key_fds[i].no_select && !FD_ISSET(key_fds[i].fd, &fds))
-	    continue;
+        if (!key_fds[i].no_select && !FD_ISSET(key_fds[i].fd, &fds))
+            continue;
 #endif
 
-	if (key_fds[i].no_readfunc_retval) {   // getch2 handler special-cased for now
-	    ((void (*)(void))key_fds[i].read_func)();
-	    if (cmd_queue_length)
-		return NULL;
-	    code = mplayer_get_key(0);
-	    if (code < 0)
-		code = MP_INPUT_NOTHING;
-	}
-	else
-	    code = ((mp_key_func_t)key_fds[i].read_func)(key_fds[i].fd);
-	if (code >= 0) {
-	    mp_cmd_t *ret = interpret_key(code, paused);
-	    if (ret)
-		return ret;
-	}
-	else if (code == MP_INPUT_ERROR)
-	    mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrOnKeyInFd,
-		   key_fds[i].fd);
-	else if (code == MP_INPUT_DEAD) {
-	    mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrDeadKeyOnFd,
-		   key_fds[i].fd);
-	    key_fds[i].dead = 1;
-	}
+        if (key_fds[i].no_readfunc_retval) {   // getch2 handler special-cased for now
+            ((void (*)(void))key_fds[i].read_func)();
+            if (cmd_queue_length)
+                return NULL;
+            code = mplayer_get_key(0);
+            if (code < 0)
+                code = MP_INPUT_NOTHING;
+        }
+        else
+            code = ((mp_key_func_t)key_fds[i].read_func)(key_fds[i].fd);
+        if (code >= 0) {
+            mp_cmd_t *ret = interpret_key(code, paused);
+            if (ret)
+                return ret;
+        }
+        else if (code == MP_INPUT_ERROR)
+            mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrOnKeyInFd,
+                   key_fds[i].fd);
+        else if (code == MP_INPUT_DEAD) {
+            mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrDeadKeyOnFd,
+                   key_fds[i].fd);
+            key_fds[i].dead = 1;
+        }
     }
     autorepeat_cmd = check_autorepeat(paused);
     if (autorepeat_cmd)
-	return autorepeat_cmd;
+        return autorepeat_cmd;
 
     for (i = 0; i < num_cmd_fd; i++) {
-	char *cmd;
-	int r;
+        char *cmd;
+        int r;
 #ifdef HAVE_POSIX_SELECT
-	if (!cmd_fds[i].no_select && !FD_ISSET(cmd_fds[i].fd, &fds) &&
-	    !cmd_fds[i].got_cmd)
-	    continue;
+        if (!cmd_fds[i].no_select && !FD_ISSET(cmd_fds[i].fd, &fds) &&
+            !cmd_fds[i].got_cmd)
+            continue;
 #endif
-	r = mp_input_read_cmd(&cmd_fds[i], &cmd);
-	if (r >= 0) {
-	    mp_cmd_t *ret = mp_input_parse_cmd(cmd);
-	    free(cmd);
-	    if (ret)
-		return ret;
-	}
-	else if (r == MP_INPUT_ERROR)
-	    mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrOnCmdFd,
-		   cmd_fds[i].fd);
-	else if (r == MP_INPUT_DEAD)
-	    cmd_fds[i].dead = 1;
+        r = mp_input_read_cmd(&cmd_fds[i], &cmd);
+        if (r >= 0) {
+            mp_cmd_t *ret = mp_input_parse_cmd(cmd);
+            free(cmd);
+            if (ret)
+                return ret;
+        }
+        else if (r == MP_INPUT_ERROR)
+            mp_msg(MSGT_INPUT, MSGL_ERR, MSGTR_INPUT_INPUT_ErrOnCmdFd,
+                   cmd_fds[i].fd);
+        else if (r == MP_INPUT_DEAD)
+            cmd_fds[i].dead = 1;
     }
 
     return NULL;
@@ -1390,8 +1390,8 @@ mp_input_get_cmd(int time, int paused, int peek_only) {
     from_queue = 0;
     ret = read_events(time, paused);
     if (!ret) {
-	from_queue = 1;
-	ret = mp_input_get_queued_cmd(peek_only);
+        from_queue = 1;
+        ret = mp_input_get_queued_cmd(peek_only);
     }
     break;
   }
@@ -1499,7 +1499,7 @@ mp_input_get_input_from_name(char* name,int* keys) {
   for(end = strchr(ptr,'-') ; ptr != NULL ; end = strchr(ptr,'-')) {
     if(end && end[1] != '\0') {
       if(end[1] == '-')
-	end = &end[1];
+        end = &end[1];
       end[0] = '\0';
     }
     keys[n] = mp_input_get_key_from_name(ptr);
@@ -1544,10 +1544,10 @@ mp_input_bind_keys(const int keys[MP_MAX_KEY_DOWN+1], char* cmd) {
   if(bind_section->cmd_binds) {
     for(i = 0; bind_section->cmd_binds[i].cmd != NULL ; i++) {
       for(j = 0 ; bind_section->cmd_binds[i].input[j] == keys[j]  && keys[j] != 0 ; j++)
-	/* NOTHING */;
+        /* NOTHING */;
       if(keys[j] == 0 && bind_section->cmd_binds[i].input[j] == 0 ) {
-	bind = &bind_section->cmd_binds[i];
-	break;
+        bind = &bind_section->cmd_binds[i];
+        break;
       }
     }
   }
@@ -1599,16 +1599,16 @@ mp_input_parse_config(char *file) {
       if(bs > 0) bs--;
       r = read(fd,buffer+bs,BS_MAX-1-bs);
       if(r < 0) {
-	if(errno == EINTR)
-	  continue;
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrReadingInputConfig,file,strerror(errno));
-	close(fd);
-	return 0;
+        if(errno == EINTR)
+          continue;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrReadingInputConfig,file,strerror(errno));
+        close(fd);
+        return 0;
       } else if(r == 0) {
-	eof = 1;
+        eof = 1;
       } else {
-	bs += r+1;
-	buffer[bs-1] = '\0';
+        bs += r+1;
+        buffer[bs-1] = '\0';
       }
     }
     // Empty buffer : return
@@ -1622,10 +1622,10 @@ mp_input_parse_config(char *file) {
 
     if(comments) {
       for( ; iter[0] != '\0' && iter[0] != '\n' ; iter++)
-	/* NOTHING */;
+        /* NOTHING */;
       if(iter[0] == '\0') { // Buffer was full of comment
-	bs = 0;
-	continue;
+        bs = 0;
+        continue;
       }
       iter++;
       r = strlen(iter);
@@ -1639,84 +1639,84 @@ mp_input_parse_config(char *file) {
     if(keys[0] == 0) {
       // Jump beginning space
       for(  ; iter[0] != '\0' && strchr(SPACE_CHAR,iter[0]) != NULL ; iter++)
-	/* NOTHING */;
+        /* NOTHING */;
       if(iter[0] == '\0') { // Buffer was full of space char
-	bs = 0;
-	continue;
+        bs = 0;
+        continue;
       }
       if(iter[0] == '#') { // Comments
-	comments = 1;
-	continue;
+        comments = 1;
+        continue;
       }
       // Find the end of the key code name
       for(end = iter; end[0] != '\0' && strchr(SPACE_CHAR,end[0]) == NULL ; end++)
-	/*NOTHING */;
+        /*NOTHING */;
       if(end[0] == '\0') { // Key name doesn't fit in the buffer
-	if(buffer == iter) {
-	  if(eof && (buffer-iter) == bs)
-	    mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnfinishedBinding,iter);
-	  else
-	    mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName,iter);
-	  return 0;
-	}
-	memmove(buffer,iter,end-iter);
-	bs = end-iter;
-	continue;
+        if(buffer == iter) {
+          if(eof && (buffer-iter) == bs)
+            mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnfinishedBinding,iter);
+          else
+            mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName,iter);
+          return 0;
+        }
+        memmove(buffer,iter,end-iter);
+        bs = end-iter;
+        continue;
       }
       {
-	char name[end-iter+1];
-	strncpy(name,iter,end-iter);
-	name[end-iter] = '\0';
-	if(! mp_input_get_input_from_name(name,keys)) {
-	  mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnknownKey,name);
-	  close(fd);
-	  return 0;
-	}
+        char name[end-iter+1];
+        strncpy(name,iter,end-iter);
+        name[end-iter] = '\0';
+        if(! mp_input_get_input_from_name(name,keys)) {
+          mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnknownKey,name);
+          close(fd);
+          return 0;
+        }
       }
       if( bs > (end-buffer))
-	memmove(buffer,end,bs - (end-buffer));
+        memmove(buffer,end,bs - (end-buffer));
       bs -= end-buffer;
       continue;
     } else { // Get the command
       while(iter[0] == ' ' || iter[0] == '\t') iter++;
       // Found new line
       if(iter[0] == '\n' || iter[0] == '\r') {
-	int i;
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrNoCmdForKey,mp_input_get_key_name(keys[0]));
-	for(i = 1; keys[i] != 0 ; i++)
-	  mp_msg(MSGT_INPUT,MSGL_ERR,"-%s",mp_input_get_key_name(keys[i]));
-	mp_msg(MSGT_INPUT,MSGL_ERR,"\n");
-	keys[0] = 0;
-	if(iter > buffer) {
-	  memmove(buffer,iter,bs- (iter-buffer));
-	  bs -= (iter-buffer);
-	}
-	continue;
+        int i;
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrNoCmdForKey,mp_input_get_key_name(keys[0]));
+        for(i = 1; keys[i] != 0 ; i++)
+          mp_msg(MSGT_INPUT,MSGL_ERR,"-%s",mp_input_get_key_name(keys[i]));
+        mp_msg(MSGT_INPUT,MSGL_ERR,"\n");
+        keys[0] = 0;
+        if(iter > buffer) {
+          memmove(buffer,iter,bs- (iter-buffer));
+          bs -= (iter-buffer);
+        }
+        continue;
       }
       for(end = iter ; end[0] != '\n' && end[0] != '\r' && end[0] != '\0' ; end++)
-	/* NOTHING */;
+        /* NOTHING */;
       if(end[0] == '\0' && ! (eof && ((end+1) - buffer) == bs)) {
-	if(iter == buffer) {
-	  mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd,buffer);
-	  close(fd);
-	  return 0;
-	}
-	memmove(buffer,iter,end - iter);
-	bs = end - iter;
-	continue;
+        if(iter == buffer) {
+          mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd,buffer);
+          close(fd);
+          return 0;
+        }
+        memmove(buffer,iter,end - iter);
+        bs = end - iter;
+        continue;
       }
       {
-	char cmd[end-iter+1];
-	strncpy(cmd,iter,end-iter);
-	cmd[end-iter] = '\0';
-	//printf("Set bind %d => %s\n",keys[0],cmd);
-	mp_input_bind_keys(keys,cmd);
-	n_binds++;
+        char cmd[end-iter+1];
+        strncpy(cmd,iter,end-iter);
+        cmd[end-iter] = '\0';
+        //printf("Set bind %d => %s\n",keys[0],cmd);
+        mp_input_bind_keys(keys,cmd);
+        n_binds++;
       }
       keys[0] = 0;
       end++;
       if(bs > (end-buffer))
-	memmove(buffer,end,bs-(end-buffer));
+        memmove(buffer,end,bs-(end-buffer));
       bs -= (end-buffer);
       buffer[bs-1] = '\0';
       continue;
@@ -1885,21 +1885,21 @@ static int mp_input_print_cmd_list(m_option_t* cfg) {
     for(j= 0 ; j < MP_CMD_MAX_ARGS && cmd->args[j].type != -1 ; j++) {
       switch(cmd->args[j].type) {
       case MP_CMD_ARG_INT:
-	type = "Integer";
-	break;
+        type = "Integer";
+        break;
       case MP_CMD_ARG_FLOAT:
-	type = "Float";
-	break;
+        type = "Float";
+        break;
       case MP_CMD_ARG_STRING:
-	type = "String";
-	break;
+        type = "String";
+        break;
       default:
-	type = "??";
+        type = "??";
       }
       if(j+1 > cmd->nargs)
-	printf(" [%s]",type);
+        printf(" [%s]",type);
       else
-	printf(" %s",type);
+        printf(" %s",type);
     }
     printf("\n");
   }

@@ -155,9 +155,9 @@ static int open_txt(menu_t* menu, char* args) {
     r = fread(buf+pos,1,BUF_SIZE-pos-1,fd);
     if(r <= 0) {
       if(pos > 0) {
-	mpriv->lines = realloc(mpriv->lines,(mpriv->num_lines + 1)*sizeof(char*));
-	mpriv->lines[mpriv->num_lines] = strdup(buf);
-	mpriv->num_lines++;
+        mpriv->lines = realloc(mpriv->lines,(mpriv->num_lines + 1)*sizeof(char*));
+        mpriv->lines[mpriv->num_lines] = strdup(buf);
+        mpriv->num_lines++;
       }
       fclose(fd);
       break;
@@ -173,7 +173,7 @@ static int open_txt(menu_t* menu, char* args) {
       mpriv->lines[mpriv->num_lines][s] = '\0';
       pos -= s + 1;
       if(pos > 0)
-	memmove(buf,l+1,pos);
+        memmove(buf,l+1,pos);
       buf[pos] = '\0';
       mpriv->num_lines++;
     }

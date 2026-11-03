@@ -37,25 +37,25 @@
 
 #include <fribidi-char-sets-cp1255.h>
 
-#define ISO_ALEF		0xE0
-#define ISO_TAV			0xFA
-#define CP1255_SHEVA		0xC0
-#define CP1255_SOF_PASUQ	0xD3
-#define CP1255_DOUBLE_VAV	0xD4
-#define CP1255_GERSHAYIM	0xD8
-#define CP1255_LRM		0xFD
-#define CP1255_RLM		0xFE
+#define ISO_ALEF                0xE0
+#define ISO_TAV                 0xFA
+#define CP1255_SHEVA            0xC0
+#define CP1255_SOF_PASUQ        0xD3
+#define CP1255_DOUBLE_VAV       0xD4
+#define CP1255_GERSHAYIM        0xD8
+#define CP1255_LRM              0xFD
+#define CP1255_RLM              0xFE
 
-#define UNI_ALEF		0x05D0
-#define UNI_TAV			0x05EA
-#define UNI_SHEVA		0x05B0
-#define UNI_SOF_PASUQ		0x05C3
-#define UNI_DOUBLE_VAV		0x05F0
-#define UNI_GERSHAYIM		0x05F4
-#define UNI_LRM			0x200E
-#define UNI_RLM			0x200F
+#define UNI_ALEF                0x05D0
+#define UNI_TAV                 0x05EA
+#define UNI_SHEVA               0x05B0
+#define UNI_SOF_PASUQ           0x05C3
+#define UNI_DOUBLE_VAV          0x05F0
+#define UNI_GERSHAYIM           0x05F4
+#define UNI_LRM                 0x200E
+#define UNI_RLM                 0x200F
 
-static FriBidiChar fribidi_cp1255_to_unicode_tab[] = {	/* 0x80-0xBF */
+static FriBidiChar fribidi_cp1255_to_unicode_tab[] = {  /* 0x80-0xBF */
   0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
   0x02C6, 0x2030, 0x008a, 0x2039, 0x008c, 0x008d, 0x008e, 0x008f,
   0x0090, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,

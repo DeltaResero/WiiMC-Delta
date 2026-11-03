@@ -170,7 +170,7 @@ static void blank(mp_image_t *mpi, int y1, int y2)
 static int prepare_image(struct vf_instance *vf, mp_image_t *mpi)
 {
     if (mpi->flags & MP_IMGFLAG_DIRECT ||
-	mpi->flags & MP_IMGFLAG_DRAW_CALLBACK) {
+    mpi->flags & MP_IMGFLAG_DRAW_CALLBACK) {
         vf->dmpi = mpi->priv;
         if (!vf->dmpi) {
             mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_MPCODECS_FunWhydowegetNULL);
@@ -194,30 +194,30 @@ static int prepare_image(struct vf_instance *vf, mp_image_t *mpi)
     // copy mpi->dmpi...
     if (mpi->flags & MP_IMGFLAG_PLANAR) {
         memcpy_pic(vf->dmpi->planes[0] +  ass_top_margin * vf->dmpi->stride[0],
-		   mpi->planes[0],
-		   mpi->w,
-		   mpi->h,
-		   vf->dmpi->stride[0],
-		   mpi->stride[0]);
+           mpi->planes[0],
+           mpi->w,
+           mpi->h,
+           vf->dmpi->stride[0],
+           mpi->stride[0]);
         memcpy_pic(vf->dmpi->planes[1] + (ass_top_margin >> mpi->chroma_y_shift) * vf->dmpi->stride[1],
-		   mpi->planes[1],
-		   mpi->w >> mpi->chroma_x_shift,
+           mpi->planes[1],
+           mpi->w >> mpi->chroma_x_shift,
                    mpi->h >> mpi->chroma_y_shift,
-		   vf->dmpi->stride[1],
+           vf->dmpi->stride[1],
                    mpi->stride[1]);
         memcpy_pic(vf->dmpi->planes[2] + (ass_top_margin >> mpi->chroma_y_shift) * vf->dmpi->stride[2],
-		   mpi->planes[2],
+           mpi->planes[2],
                    mpi->w >> mpi->chroma_x_shift,
                    mpi->h >> mpi->chroma_y_shift,
-		   vf->dmpi->stride[2],
+           vf->dmpi->stride[2],
                    mpi->stride[2]);
     } else {
         memcpy_pic(vf->dmpi->planes[0] + ass_top_margin * vf->dmpi->stride[0],
-		   mpi->planes[0],
+           mpi->planes[0],
                    mpi->w * (vf->dmpi->bpp / 8),
-		   mpi->h,
+           mpi->h,
                    vf->dmpi->stride[0],
-		   mpi->stride[0]);
+           mpi->stride[0]);
         vf->dmpi->planes[1] = mpi->planes[1];   // passthrough rgb8 palette
     }
     if (ass_top_margin)

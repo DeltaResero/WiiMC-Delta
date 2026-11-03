@@ -42,37 +42,37 @@ extern "C" {
 #define CTR_STICK_DOWN     0x80000000
 
 typedef struct {
-	struct {
-		int sd;
-		int nb;
-		struct sockaddr_in sin;
-		socklen_t sinlen;
-	} sv;
+    struct {
+        int sd;
+        int nb;
+        struct sockaddr_in sin;
+        socklen_t sinlen;
+    } sv;
 
-	struct timespec tv;
+    struct timespec tv;
 
-	struct {
-		uint32_t held, last, down, up;
-		struct { uint16_t x, y; } touch;
-		struct { int16_t x, y; } stick;
-		struct { int16_t x, y; } substick;
-		struct { float x, y, z; } gyro;
-		struct { float x, y, z; } gforce;
-		struct { float roll, pitch; } orient;
-	} data;
+    struct {
+        uint32_t held, last, down, up;
+        struct { uint16_t x, y; } touch;
+        struct { int16_t x, y; } stick;
+        struct { int16_t x, y; } substick;
+        struct { float x, y, z; } gyro;
+        struct { float x, y, z; } gforce;
+        struct { float roll, pitch; } orient;
+    } data;
 } ctr_state_t;
 
 extern ctr_state_t ctr;
 
 typedef struct {
-	uint16_t magic;
-	uint16_t version;
-	uint32_t up, down, held;
-	struct { uint16_t x, y; } touch;
-	struct { int16_t x, y; } stick;
-	struct { int16_t x, y; } substick;
-	struct { int16_t x, y, z; } gyro;
-	struct { int16_t x, y, z; } accel;
+    uint16_t magic;
+    uint16_t version;
+    uint32_t up, down, held;
+    struct { uint16_t x, y; } touch;
+    struct { int16_t x, y; } stick;
+    struct { int16_t x, y; } substick;
+    struct { int16_t x, y, z; } gyro;
+    struct { int16_t x, y, z; } accel;
 } ATTRIBUTE_PACKED ctr_packet_t;
 
 void CTRScanPads(void);

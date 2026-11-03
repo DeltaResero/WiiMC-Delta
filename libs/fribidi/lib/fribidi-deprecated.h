@@ -68,7 +68,7 @@
  * Returns: the new mirroring status.
  */
      FRIBIDI_ENTRY fribidi_boolean fribidi_set_mirroring (
-  fribidi_boolean state		/* new state to set */
+  fribidi_boolean state         /* new state to set */
 ) FRIBIDI_GNUC_DEPRECATED;
 
 
@@ -99,7 +99,7 @@
  * Returns: the new marks reordering status.
  */
      FRIBIDI_ENTRY fribidi_boolean fribidi_set_reorder_nsm (
-  fribidi_boolean state		/* new state to set */
+  fribidi_boolean state         /* new state to set */
 ) FRIBIDI_GNUC_DEPRECATED;
 
 
@@ -112,12 +112,12 @@
 #define fribidi_log2vis_get_embedding_levels FRIBIDI_NAMESPACE(log2vis_get_embedding_levels)
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_log2vis_get_embedding_levels (
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len,	/* input string length of the paragraph */
-  FriBidiParType *pbase_dir,	/* requested and resolved paragraph
-				 * base direction */
-  FriBidiLevel *embedding_levels	/* output list of embedding levels */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len,    /* input string length of the paragraph */
+  FriBidiParType *pbase_dir,    /* requested and resolved paragraph
+                                 * base direction */
+  FriBidiLevel *embedding_levels        /* output list of embedding levels */
 ) FRIBIDI_GNUC_DEPRECATED;
 
 /* fribidi_get_type - get character bidi type
@@ -127,7 +127,7 @@ fribidi_log2vis_get_embedding_levels (
 #define fribidi_get_type FRIBIDI_NAMESPACE(get_type)
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type (
-  FriBidiChar ch		/* input character */
+  FriBidiChar ch                /* input character */
 ) FRIBIDI_GNUC_DEPRECATED;
 
 /* fribidi_get_type_internal - get character bidi type
@@ -137,7 +137,7 @@ fribidi_get_type (
 #define fribidi_get_type_internal FRIBIDI_NAMESPACE(get_type_internal)
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type_internal (
-  FriBidiChar ch		/* input character */
+  FriBidiChar ch                /* input character */
 ) FRIBIDI_GNUC_DEPRECATED;
 
 #define fribidi_remove_bidi_marks FRIBIDI_NAMESPACE(remove_bidi_marks)
@@ -167,13 +167,13 @@ fribidi_get_type_internal (
  */
 FRIBIDI_ENTRY FriBidiStrIndex
 fribidi_remove_bidi_marks (
-  FriBidiChar *str,		/* input string to clean */
-  const FriBidiStrIndex len,	/* input string length */
-  FriBidiStrIndex *positions_to_this,	/* list mapping positions to the
-					   order used in str */
-  FriBidiStrIndex *position_from_this_list,	/* list mapping positions from the
-						   order used in str */
-  FriBidiLevel *embedding_levels	/* list of embedding levels */
+  FriBidiChar *str,             /* input string to clean */
+  const FriBidiStrIndex len,    /* input string length */
+  FriBidiStrIndex *positions_to_this,   /* list mapping positions to the
+                                           order used in str */
+  FriBidiStrIndex *position_from_this_list,     /* list mapping positions from the
+                                                   order used in str */
+  FriBidiLevel *embedding_levels        /* list of embedding levels */
 )
      FRIBIDI_GNUC_WARN_UNUSED FRIBIDI_GNUC_DEPRECATED;
 
@@ -196,44 +196,44 @@ fribidi_remove_bidi_marks (
  * (memory allocation failure most probably).
  */
      FRIBIDI_ENTRY FriBidiLevel fribidi_log2vis (
-  const FriBidiChar *str,	/* input logical string */
-  const FriBidiStrIndex len,	/* input string length */
-  FriBidiParType *pbase_dir,	/* requested and resolved paragraph
-				 * base direction */
-  FriBidiChar *visual_str,	/* output visual string */
-  FriBidiStrIndex *positions_L_to_V,	/* output mapping from logical to
-					 * visual string positions */
-  FriBidiStrIndex *positions_V_to_L,	/* output mapping from visual string
-					 * back to the logical string
-					 * positions */
-  FriBidiLevel *embedding_levels	/* output list of embedding levels */
+  const FriBidiChar *str,       /* input logical string */
+  const FriBidiStrIndex len,    /* input string length */
+  FriBidiParType *pbase_dir,    /* requested and resolved paragraph
+                                 * base direction */
+  FriBidiChar *visual_str,      /* output visual string */
+  FriBidiStrIndex *positions_L_to_V,    /* output mapping from logical to
+                                         * visual string positions */
+  FriBidiStrIndex *positions_V_to_L,    /* output mapping from visual string
+                                         * back to the logical string
+                                         * positions */
+  FriBidiLevel *embedding_levels        /* output list of embedding levels */
 )
      FRIBIDI_GNUC_WARN_UNUSED FRIBIDI_GNUC_DEPRECATED;
 
 
-#define UNI_MAX_BIDI_LEVEL	FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL
-#define UNI_LRM			FRIBIDI_CHAR_LRM
-#define UNI_RLM			FRIBIDI_CHAR_RLM
-#define UNI_LRE			FRIBIDI_CHAR_LRE
-#define UNI_RLE			FRIBIDI_CHAR_RLE
-#define UNI_LRO			FRIBIDI_CHAR_LRO
-#define UNI_RLO			FRIBIDI_CHAR_RLO
-#define UNI_LS			FRIBIDI_CHAR_LS
-#define UNI_PS			FRIBIDI_CHAR_PS
-#define UNI_ZWNJ		FRIBIDI_CHAR_ZWNJ
-#define UNI_ZWJ			FRIBIDI_CHAR_ZWJ
-#define UNI_HEBREW_ALEF		FRIBIDI_CHAR_HEBREW_ALEF
-#define UNI_ARABIC_ALEF		FRIBIDI_CHAR_ARABIC_ALEF
-#define UNI_ARABIC_ZERO		FRIBIDI_CHAR_ARABIC_ZERO
-#define UNI_FARSI_ZERO		FRIBIDI_CHAR_PERSIAN_ZERO
+#define UNI_MAX_BIDI_LEVEL      FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL
+#define UNI_LRM                 FRIBIDI_CHAR_LRM
+#define UNI_RLM                 FRIBIDI_CHAR_RLM
+#define UNI_LRE                 FRIBIDI_CHAR_LRE
+#define UNI_RLE                 FRIBIDI_CHAR_RLE
+#define UNI_LRO                 FRIBIDI_CHAR_LRO
+#define UNI_RLO                 FRIBIDI_CHAR_RLO
+#define UNI_LS                  FRIBIDI_CHAR_LS
+#define UNI_PS                  FRIBIDI_CHAR_PS
+#define UNI_ZWNJ                FRIBIDI_CHAR_ZWNJ
+#define UNI_ZWJ                 FRIBIDI_CHAR_ZWJ
+#define UNI_HEBREW_ALEF         FRIBIDI_CHAR_HEBREW_ALEF
+#define UNI_ARABIC_ALEF         FRIBIDI_CHAR_ARABIC_ALEF
+#define UNI_ARABIC_ZERO         FRIBIDI_CHAR_ARABIC_ZERO
+#define UNI_FARSI_ZERO          FRIBIDI_CHAR_PERSIAN_ZERO
 
-#define FRIBIDI_TYPE_WL		FRIBIDI_PAR_WLTR
-#define FRIBIDI_TYPE_WR		FRIBIDI_PAR_WRTL
-#define FRIBIDI_TYPE_L		FRIBIDI_PAR_LTR
-#define FRIBIDI_TYPE_R		FRIBIDI_PAR_RTL
-#define FRIBIDI_TYPE_N		FRIBIDI_PAR_ON
-#define FRIBIDI_TYPE_B		FRIBIDI_TYPE_BS
-#define FRIBIDI_TYPE_S		FRIBIDI_TYPE_SS
+#define FRIBIDI_TYPE_WL         FRIBIDI_PAR_WLTR
+#define FRIBIDI_TYPE_WR         FRIBIDI_PAR_WRTL
+#define FRIBIDI_TYPE_L          FRIBIDI_PAR_LTR
+#define FRIBIDI_TYPE_R          FRIBIDI_PAR_RTL
+#define FRIBIDI_TYPE_N          FRIBIDI_PAR_ON
+#define FRIBIDI_TYPE_B          FRIBIDI_TYPE_BS
+#define FRIBIDI_TYPE_S          FRIBIDI_TYPE_SS
 
 #include "fribidi-enddecls.h"
 

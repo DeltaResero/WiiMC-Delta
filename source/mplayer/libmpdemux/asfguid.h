@@ -26,24 +26,24 @@
 #include "mpbswap.h"
 
 
-#define	ASF_LOAD_GUID_PREFIX(guid)	AV_RL32(guid)
+#define ASF_LOAD_GUID_PREFIX(guid)      AV_RL32(guid)
 
-#define ASF_GUID_PREFIX_audio_stream	0xF8699E40
-#define ASF_GUID_PREFIX_video_stream	0xBC19EFC0
+#define ASF_GUID_PREFIX_audio_stream    0xF8699E40
+#define ASF_GUID_PREFIX_video_stream    0xBC19EFC0
 #define ASF_GUID_PREFIX_audio_conceal_none 0x49f1a440
 #define ASF_GUID_PREFIX_audio_conceal_interleave 0xbfc3cd50
-#define ASF_GUID_PREFIX_header		0x75B22630
-#define ASF_GUID_PREFIX_data_chunk	0x75b22636
-#define ASF_GUID_PREFIX_index_chunk	0x33000890
-#define ASF_GUID_PREFIX_stream_header	0xB7DC0791
-#define ASF_GUID_PREFIX_header_2_0	0xD6E229D1
-#define ASF_GUID_PREFIX_file_header	0x8CABDCA1
-#define	ASF_GUID_PREFIX_content_desc	0x75b22633
-#define	ASF_GUID_PREFIX_stream_group	0x7bf875ce
-#define ASF_GUID_PREFIX_ext_audio_stream	0x31178C9D
-#define ASF_GUID_PREFIX_ext_stream_embed_stream_header	0x3AFB65E2
-#define ASF_GUID_PREFIX_dvr_ms_timing_rep_data	0xFD3CC02A
-#define ASF_GUID_PREFIX_dvr_ms_vid_frame_rep_data	0xDD6432CC
+#define ASF_GUID_PREFIX_header          0x75B22630
+#define ASF_GUID_PREFIX_data_chunk      0x75b22636
+#define ASF_GUID_PREFIX_index_chunk     0x33000890
+#define ASF_GUID_PREFIX_stream_header   0xB7DC0791
+#define ASF_GUID_PREFIX_header_2_0      0xD6E229D1
+#define ASF_GUID_PREFIX_file_header     0x8CABDCA1
+#define ASF_GUID_PREFIX_content_desc    0x75b22633
+#define ASF_GUID_PREFIX_stream_group    0x7bf875ce
+#define ASF_GUID_PREFIX_ext_audio_stream        0x31178C9D
+#define ASF_GUID_PREFIX_ext_stream_embed_stream_header  0x3AFB65E2
+#define ASF_GUID_PREFIX_dvr_ms_timing_rep_data  0xFD3CC02A
+#define ASF_GUID_PREFIX_dvr_ms_vid_frame_rep_data       0xDD6432CC
 
 /*
 const char asf_audio_stream_guid[16] = {0x40, 0x9e, 0x69, 0xf8,

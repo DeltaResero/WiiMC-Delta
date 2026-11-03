@@ -91,55 +91,55 @@ init_cap_rtl (
 
   caprtl_to_unicode =
     (FriBidiChar *) fribidi_malloc (CAPRTL_CHARS *
-				    sizeof caprtl_to_unicode[0]);
+                                    sizeof caprtl_to_unicode[0]);
   for (i = 0; i < CAPRTL_CHARS; i++)
     if (CapRTLCharTypes[i] == fribidi_get_bidi_type (i))
       {
-	caprtl_to_unicode[i] = i;
-	mark[i] = 1;
+        caprtl_to_unicode[i] = i;
+        mark[i] = 1;
       }
     else
       {
-	int j;
+        int j;
 
-	caprtl_to_unicode[i] = FRIBIDI_UNICODE_CHARS;
-	mark[i] = 0;
-	if (fribidi_get_mirror_char (i, NULL))
-	  {
-	    DBG ("warning: I could not map mirroring character map to itself in CapRTL");
-	  }
+        caprtl_to_unicode[i] = FRIBIDI_UNICODE_CHARS;
+        mark[i] = 0;
+        if (fribidi_get_mirror_char (i, NULL))
+          {
+            DBG ("warning: I could not map mirroring character map to itself in CapRTL");
+          }
 
-	for (j = 0; j < num_types; j++)
-	  if (to_type[j] == CapRTLCharTypes[i])
-	    break;
-	if (j == num_types)
-	  {
-	    num_types++;
-	    to_type[j] = CapRTLCharTypes[i];
-	    request[j] = 0;
-	  }
-	request[j]++;
-	count++;
+        for (j = 0; j < num_types; j++)
+          if (to_type[j] == CapRTLCharTypes[i])
+            break;
+        if (j == num_types)
+          {
+            num_types++;
+            to_type[j] = CapRTLCharTypes[i];
+            request[j] = 0;
+          }
+        request[j]++;
+        count++;
       }
-  for (i = 0; i < 0x10000 && count; i++)	/* Assign BMP chars to CapRTL entries */
+  for (i = 0; i < 0x10000 && count; i++)        /* Assign BMP chars to CapRTL entries */
     if (!fribidi_get_mirror_char (i, NULL) && !(i < CAPRTL_CHARS && mark[i]))
       {
-	int j, k;
-	FriBidiCharType t = fribidi_get_bidi_type (i);
-	for (j = 0; j < num_types; j++)
-	  if (to_type[j] == t)
-	    break;
-	if (!request[j])	/* Do not need this type */
-	  continue;
-	for (k = 0; k < CAPRTL_CHARS; k++)
-	  if (caprtl_to_unicode[k] == FRIBIDI_UNICODE_CHARS
-	      && to_type[j] == CapRTLCharTypes[k])
-	    {
-	      request[j]--;
-	      count--;
-	      caprtl_to_unicode[k] = i;
-	      break;
-	    }
+        int j, k;
+        FriBidiCharType t = fribidi_get_bidi_type (i);
+        for (j = 0; j < num_types; j++)
+          if (to_type[j] == t)
+            break;
+        if (!request[j])        /* Do not need this type */
+          continue;
+        for (k = 0; k < CAPRTL_CHARS; k++)
+          if (caprtl_to_unicode[k] == FRIBIDI_UNICODE_CHARS
+              && to_type[j] == CapRTLCharTypes[k])
+            {
+              request[j]--;
+              count--;
+              caprtl_to_unicode[k] = i;
+              break;
+            }
       }
   if (count)
     {
@@ -147,10 +147,10 @@ init_cap_rtl (
 
       DBG ("warning: could not find a mapping for CapRTL to Unicode:");
       for (j = 0; j < num_types; j++)
-	if (request[j])
-	  {
-	    DBG2 ("  need this type: %s", fribidi_get_bidi_type_name (to_type[j]));
-	  }
+        if (request[j])
+          {
+            DBG2 ("  need this type: %s", fribidi_get_bidi_type_name (to_type[j]));
+          }
     }
 }
 
@@ -192,41 +192,41 @@ fribidi_cap_rtl_to_unicode (
 
       ch = s[i];
       if (ch == '_')
-	{
-	  switch (ch = s[++i])
-	    {
-	    case '>':
-	      us[j++] = FRIBIDI_CHAR_LRM;
-	      break;
-	    case '<':
-	      us[j++] = FRIBIDI_CHAR_RLM;
-	      break;
-	    case 'l':
-	      us[j++] = FRIBIDI_CHAR_LRE;
-	      break;
-	    case 'r':
-	      us[j++] = FRIBIDI_CHAR_RLE;
-	      break;
-	    case 'o':
-	      us[j++] = FRIBIDI_CHAR_PDF;
-	      break;
-	    case 'L':
-	      us[j++] = FRIBIDI_CHAR_LRO;
-	      break;
-	    case 'R':
-	      us[j++] = FRIBIDI_CHAR_RLO;
-	      break;
-	    case '_':
-	      us[j++] = '_';
-	      break;
-	    default:
-	      us[j++] = '_';
-	      i--;
-	      break;
-	    }
-	}
+        {
+          switch (ch = s[++i])
+            {
+            case '>':
+              us[j++] = FRIBIDI_CHAR_LRM;
+              break;
+            case '<':
+              us[j++] = FRIBIDI_CHAR_RLM;
+              break;
+            case 'l':
+              us[j++] = FRIBIDI_CHAR_LRE;
+              break;
+            case 'r':
+              us[j++] = FRIBIDI_CHAR_RLE;
+              break;
+            case 'o':
+              us[j++] = FRIBIDI_CHAR_PDF;
+              break;
+            case 'L':
+              us[j++] = FRIBIDI_CHAR_LRO;
+              break;
+            case 'R':
+              us[j++] = FRIBIDI_CHAR_RLO;
+              break;
+            case '_':
+              us[j++] = '_';
+              break;
+            default:
+              us[j++] = '_';
+              i--;
+              break;
+            }
+        }
       else
-	us[j++] = caprtl_to_unicode[(int) s[i]];
+        us[j++] = caprtl_to_unicode[(int) s[i]];
     }
 
   return j;
@@ -249,46 +249,46 @@ fribidi_unicode_to_cap_rtl (
     {
       FriBidiChar ch = us[i];
       if (!FRIBIDI_IS_EXPLICIT (fribidi_get_bidi_type (ch)) && ch != '_'
-	  && ch != FRIBIDI_CHAR_LRM && ch != FRIBIDI_CHAR_RLM)
-	s[j++] = fribidi_unicode_to_cap_rtl_c (ch);
+          && ch != FRIBIDI_CHAR_LRM && ch != FRIBIDI_CHAR_RLM)
+        s[j++] = fribidi_unicode_to_cap_rtl_c (ch);
       else
-	{
-	  s[j++] = '_';
-	  switch (ch)
-	    {
-	    case FRIBIDI_CHAR_LRM:
-	      s[j++] = '>';
-	      break;
-	    case FRIBIDI_CHAR_RLM:
-	      s[j++] = '<';
-	      break;
-	    case FRIBIDI_CHAR_LRE:
-	      s[j++] = 'l';
-	      break;
-	    case FRIBIDI_CHAR_RLE:
-	      s[j++] = 'r';
-	      break;
-	    case FRIBIDI_CHAR_PDF:
-	      s[j++] = 'o';
-	      break;
-	    case FRIBIDI_CHAR_LRO:
-	      s[j++] = 'L';
-	      break;
-	    case FRIBIDI_CHAR_RLO:
-	      s[j++] = 'R';
-	      break;
-	    case '_':
-	      s[j++] = '_';
-	      break;
-	    default:
-	      j--;
-	      if (ch < 256)
-		s[j++] = fribidi_unicode_to_cap_rtl_c (ch);
-	      else
-		s[j++] = '?';
-	      break;
-	    }
-	}
+        {
+          s[j++] = '_';
+          switch (ch)
+            {
+            case FRIBIDI_CHAR_LRM:
+              s[j++] = '>';
+              break;
+            case FRIBIDI_CHAR_RLM:
+              s[j++] = '<';
+              break;
+            case FRIBIDI_CHAR_LRE:
+              s[j++] = 'l';
+              break;
+            case FRIBIDI_CHAR_RLE:
+              s[j++] = 'r';
+              break;
+            case FRIBIDI_CHAR_PDF:
+              s[j++] = 'o';
+              break;
+            case FRIBIDI_CHAR_LRO:
+              s[j++] = 'L';
+              break;
+            case FRIBIDI_CHAR_RLO:
+              s[j++] = 'R';
+              break;
+            case '_':
+              s[j++] = '_';
+              break;
+            default:
+              j--;
+              if (ch < 256)
+                s[j++] = fribidi_unicode_to_cap_rtl_c (ch);
+              else
+                s[j++] = '?';
+              break;
+            }
+        }
     }
   s[j] = 0;
 
@@ -309,31 +309,31 @@ fribidi_char_set_desc_cap_rtl (
   l = 10000;
   s = (char *) fribidi_malloc (l);
   i = 0;
-  i += sprintf (s + i,		/*l - i, */
-		"CapRTL is a character set for testing with the reference\n"
-		"implementation, with explicit marks escape strings, and\n"
-		"the property that contains all unicode character types in\n"
-		"ASCII range 1-127.\n"
-		"\n"
-		"Warning: CapRTL character types are subject to change.\n"
-		"\n" "CapRTL's character types:\n");
+  i += sprintf (s + i,          /*l - i, */
+                "CapRTL is a character set for testing with the reference\n"
+                "implementation, with explicit marks escape strings, and\n"
+                "the property that contains all unicode character types in\n"
+                "ASCII range 1-127.\n"
+                "\n"
+                "Warning: CapRTL character types are subject to change.\n"
+                "\n" "CapRTL's character types:\n");
   for (j = 0; j < CAPRTL_CHARS; j++)
     {
       if (j % 4 == 0)
-	s[i++] = '\n';
+        s[i++] = '\n';
       i += sprintf (s + i, /*l - i, */ "  * 0x%02x %c%c %-3s ", j,
-		    j < 0x20 ? '^' : ' ',
-		    j < 0x20 ? j + '@' : j < 0x7f ? j : ' ',
-		    fribidi_get_bidi_type_name (CapRTLCharTypes[j]));
+                    j < 0x20 ? '^' : ' ',
+                    j < 0x20 ? j + '@' : j < 0x7f ? j : ' ',
+                    fribidi_get_bidi_type_name (CapRTLCharTypes[j]));
     }
-  i += sprintf (s + i,		/*l - i, */
-		"\n\n"
-		"Escape sequences:\n"
-		"  Character `_' is used to escape explicit marks. The list is:\n"
-		"    * _>  LRM\n" "    * _<  RLM\n"
-		"    * _l  LRE\n" "    * _r  RLE\n"
-		"    * _L  LRO\n" "    * _R  RLO\n"
-		"    * _o  PDF\n" "    * __  `_' itself\n" "\n");
+  i += sprintf (s + i,          /*l - i, */
+                "\n\n"
+                "Escape sequences:\n"
+                "  Character `_' is used to escape explicit marks. The list is:\n"
+                "    * _>  LRM\n" "    * _<  RLM\n"
+                "    * _l  LRE\n" "    * _r  RLE\n"
+                "    * _L  LRO\n" "    * _R  RLO\n"
+                "    * _o  PDF\n" "    * __  `_' itself\n" "\n");
   return s;
 }
 

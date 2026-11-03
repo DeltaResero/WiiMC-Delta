@@ -174,7 +174,7 @@ inline double operator()(const double cost[N][N], int logicalSize)
 /// \param i the index of the ith element in the first set (passed in operator())
 /// \returns an index j, denoting the matched jth element of the 2nd set
 inline int matching(int i) const {
-	return xy[i];
+    return xy[i];
 }
 
 
@@ -183,7 +183,7 @@ inline int matching(int i) const {
 /// \returns an index i, denoting the matched ith element of the 1st set
 /// \note inverseMatching(matching(i)) == i
 inline int inverseMatching(int j) const {
-	return yx[j];
+    return yx[j];
 }
 
 };

@@ -41,38 +41,38 @@
 
 @interface MPlayerOpenGLView : NSOpenGLView
 {
-	//Cocoa
-	NSWindow *window;
+    //Cocoa
+    NSWindow *window;
 
-	//CoreVideo
-	CVPixelBufferRef frameBuffers[2];
-	CVOpenGLTextureCacheRef textureCache;
-	CVOpenGLTextureRef texture;
-	NSRect textureFrame;
+    //CoreVideo
+    CVPixelBufferRef frameBuffers[2];
+    CVOpenGLTextureCacheRef textureCache;
+    CVOpenGLTextureRef texture;
+    NSRect textureFrame;
 
-	GLfloat lowerLeft[2];
-	GLfloat lowerRight[2];
-	GLfloat upperRight[2];
-	GLfloat upperLeft[2];
+    GLfloat lowerLeft[2];
+    GLfloat lowerRight[2];
+    GLfloat upperRight[2];
+    GLfloat upperLeft[2];
 
-	BOOL mouseHide;
+    BOOL mouseHide;
 
-	//menu command id
-	NSMenuItem *kHalfScreenCmd;
-	NSMenuItem *kNormalScreenCmd;
-	NSMenuItem *kDoubleScreenCmd;
-	NSMenuItem *kFullScreenCmd;
-	NSMenuItem *kKeepAspectCmd;
-	NSMenuItem *kAspectOrgCmd;
-	NSMenuItem *kAspectFullCmd;
-	NSMenuItem *kAspectWideCmd;
-	NSMenuItem *kPanScanCmd;
+    //menu command id
+    NSMenuItem *kHalfScreenCmd;
+    NSMenuItem *kNormalScreenCmd;
+    NSMenuItem *kDoubleScreenCmd;
+    NSMenuItem *kFullScreenCmd;
+    NSMenuItem *kKeepAspectCmd;
+    NSMenuItem *kAspectOrgCmd;
+    NSMenuItem *kAspectFullCmd;
+    NSMenuItem *kAspectWideCmd;
+    NSMenuItem *kPanScanCmd;
 
-	//timestamps for disabling screensaver and mouse hiding
-	int lastMouseHide;
-	int lastScreensaverUpdate;
+    //timestamps for disabling screensaver and mouse hiding
+    int lastMouseHide;
+    int lastScreensaverUpdate;
 @public
-	float winSizeMult;
+    float winSizeMult;
 }
 
 - (BOOL) acceptsFirstResponder;

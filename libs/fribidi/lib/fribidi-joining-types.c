@@ -100,11 +100,11 @@ fribidi_char_from_joining_type (
 {
   /* switch left and right if on visual run */
   if (visual & ((FRIBIDI_JOINS_RIGHT (j) && !FRIBIDI_JOINS_LEFT (j)) |
-		(!FRIBIDI_JOINS_RIGHT (j) && FRIBIDI_JOINS_LEFT (j))))
+                (!FRIBIDI_JOINS_RIGHT (j) && FRIBIDI_JOINS_LEFT (j))))
     j ^= FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT;
 
-#   define _FRIBIDI_ADD_TYPE(TYPE,SYMBOL)	\
-	if (FRIBIDI_IS_JOINING_TYPE_##TYPE(j)) return SYMBOL;
+#   define _FRIBIDI_ADD_TYPE(TYPE,SYMBOL)       \
+        if (FRIBIDI_IS_JOINING_TYPE_##TYPE(j)) return SYMBOL;
 #   include "fribidi-joining-types-list.h"
 #   undef _FRIBIDI_ADD_TYPE
 

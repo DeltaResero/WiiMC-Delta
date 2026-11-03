@@ -64,18 +64,18 @@ typedef struct font_desc {
 
     struct
     {
-	int g_r;
-	int o_r;
-	int g_w;
-	int o_w;
-	int o_size;
-	unsigned volume;
+        int g_r;
+        int o_r;
+        int g_w;
+        int o_w;
+        int o_size;
+        unsigned volume;
 
-	unsigned *g;
-	unsigned *gt2;
-	unsigned *om;
-	unsigned char *omt;
-	unsigned short *tmp;
+        unsigned *g;
+        unsigned *gt2;
+        unsigned *om;
+        unsigned char *omt;
+        unsigned short *tmp;
     } tables;
 #endif
 

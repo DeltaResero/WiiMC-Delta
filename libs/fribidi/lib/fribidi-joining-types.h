@@ -44,52 +44,52 @@
  * only one bit set.
  */
 
-#define FRIBIDI_MASK_JOINS_RIGHT	0x01	/* May join to right */
-#define FRIBIDI_MASK_JOINS_LEFT		0x02	/* May join to right */
-#define FRIBIDI_MASK_ARAB_SHAPES	0x04	/* May Arabic shape */
-#define FRIBIDI_MASK_TRANSPARENT	0x08	/* Is transparent */
-#define FRIBIDI_MASK_IGNORED		0x10	/* Is ignored */
-#define FRIBIDI_MASK_LIGATURED		0x20	/* Is ligatured */
+#define FRIBIDI_MASK_JOINS_RIGHT    0x01    /* May join to right */
+#define FRIBIDI_MASK_JOINS_LEFT     0x02    /* May join to right */
+#define FRIBIDI_MASK_ARAB_SHAPES    0x04    /* May Arabic shape */
+#define FRIBIDI_MASK_TRANSPARENT    0x08    /* Is transparent */
+#define FRIBIDI_MASK_IGNORED        0x10    /* Is ignored */
+#define FRIBIDI_MASK_LIGATURED      0x20    /* Is ligatured */
 
 /*
  * Define values for FriBidiJoiningType
  */
 
 /* nUn-joining */
-#define FRIBIDI_JOINING_TYPE_U_VAL	( 0 )
+#define FRIBIDI_JOINING_TYPE_U_VAL  ( 0 )
 
 /* Right-joining */
-#define FRIBIDI_JOINING_TYPE_R_VAL	\
-	( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_ARAB_SHAPES )
+#define FRIBIDI_JOINING_TYPE_R_VAL  \
+    ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_ARAB_SHAPES )
 
 /* Dual-joining */
-#define FRIBIDI_JOINING_TYPE_D_VAL	\
-	( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT \
-	| FRIBIDI_MASK_ARAB_SHAPES )
+#define FRIBIDI_JOINING_TYPE_D_VAL  \
+    ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT \
+    | FRIBIDI_MASK_ARAB_SHAPES )
 
 /* join-Causing */
-#define FRIBIDI_JOINING_TYPE_C_VAL	\
-	( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT )
+#define FRIBIDI_JOINING_TYPE_C_VAL  \
+    ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT )
 
 /* Left-joining */
-#define FRIBIDI_JOINING_TYPE_L_VAL	\
-	( FRIBIDI_MASK_JOINS_LEFT | FRIBIDI_MASK_ARAB_SHAPES )
+#define FRIBIDI_JOINING_TYPE_L_VAL  \
+    ( FRIBIDI_MASK_JOINS_LEFT | FRIBIDI_MASK_ARAB_SHAPES )
 
 /* Transparent */
-#define FRIBIDI_JOINING_TYPE_T_VAL	\
-	( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_ARAB_SHAPES )
+#define FRIBIDI_JOINING_TYPE_T_VAL  \
+    ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_ARAB_SHAPES )
 
 /* iGnored */
-#define FRIBIDI_JOINING_TYPE_G_VAL	( FRIBIDI_MASK_IGNORED )
+#define FRIBIDI_JOINING_TYPE_G_VAL  ( FRIBIDI_MASK_IGNORED )
 
 
 enum _FriBidiJoiningTypeEnum
 {
 # define _FRIBIDI_ADD_TYPE(TYPE,SYMBOL) \
-	FRIBIDI_JOINING_TYPE_##TYPE = FRIBIDI_JOINING_TYPE_##TYPE##_VAL,
+    FRIBIDI_JOINING_TYPE_##TYPE = FRIBIDI_JOINING_TYPE_##TYPE##_VAL,
 # include "fribidi-joining-types-list.h"
 # undef _FRIBIDI_ADD_TYPE
-  _FRIBIDI_JOINING_TYPE_JUNK	/* Don't use this */
+  _FRIBIDI_JOINING_TYPE_JUNK    /* Don't use this */
 };
 
 #ifdef __FRIBIDI_DOC
@@ -109,61 +109,61 @@ typedef fribidi_uint8 FriBidiArabicProp;
 /* Primary Arabic Joining Classes (Table 8-2) */
 
 /* nUn-joining */
-#define FRIBIDI_IS_JOINING_TYPE_U(p)	\
-	( 0 == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_U(p)    \
+    ( 0 == ( (p) &  \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
 
 /* Right-joining */
-#define FRIBIDI_IS_JOINING_TYPE_R(p)	\
-	( FRIBIDI_MASK_JOINS_RIGHT == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_R(p)    \
+    ( FRIBIDI_MASK_JOINS_RIGHT == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
 
 /* Dual-joining */
-#define FRIBIDI_IS_JOINING_TYPE_D(p)	\
-	( ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT	\
-	  | FRIBIDI_MASK_ARAB_SHAPES ) == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT	\
-		| FRIBIDI_MASK_ARAB_SHAPES ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_D(p)    \
+    ( ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT  \
+      | FRIBIDI_MASK_ARAB_SHAPES ) == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT    \
+        | FRIBIDI_MASK_ARAB_SHAPES ) ) )
 
 /* join-Causing */
-#define FRIBIDI_IS_JOINING_TYPE_C(p)	\
-	( ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) == ( (p) & \
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT	\
-		| FRIBIDI_MASK_ARAB_SHAPES ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_C(p)    \
+    ( ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) == ( (p) & \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT    \
+        | FRIBIDI_MASK_ARAB_SHAPES ) ) )
 
 /* Left-joining */
-#define FRIBIDI_IS_JOINING_TYPE_L(p)	\
-	( FRIBIDI_MASK_JOINS_LEFT == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_L(p)    \
+    ( FRIBIDI_MASK_JOINS_LEFT == ( (p) &    \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ) ) )
 
 /* Transparent */
-#define FRIBIDI_IS_JOINING_TYPE_T(p)	\
-	( FRIBIDI_MASK_TRANSPARENT == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_T(p)    \
+    ( FRIBIDI_MASK_TRANSPARENT == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED ) ) )
 
 /* iGnored */
-#define FRIBIDI_IS_JOINING_TYPE_G(p)	\
-	( FRIBIDI_MASK_IGNORED == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_G(p)    \
+    ( FRIBIDI_MASK_IGNORED == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED ) ) )
 
 /* and for Derived Arabic Joining Classes (Table 8-3) */
 
 /* Right join-Causing */
-#define FRIBIDI_IS_JOINING_TYPE_RC(p)	\
-	( FRIBIDI_MASK_JOINS_RIGHT == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_RIGHT ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_RC(p)   \
+    ( FRIBIDI_MASK_JOINS_RIGHT == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_RIGHT ) ) )
 
 /* Left join-Causing */
-#define FRIBIDI_IS_JOINING_TYPE_LC(p)	\
-	( FRIBIDI_MASK_JOINS_LEFT == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_JOINS_LEFT ) ) )
+#define FRIBIDI_IS_JOINING_TYPE_LC(p)   \
+    ( FRIBIDI_MASK_JOINS_LEFT == ( (p) &    \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_JOINS_LEFT ) ) )
 
 
 /*
@@ -172,34 +172,34 @@ typedef fribidi_uint8 FriBidiArabicProp;
  */
 
 /* Joins to right: R, D, C? */
-#define FRIBIDI_JOINS_RIGHT(p)	((p) & FRIBIDI_MASK_JOINS_RIGHT)
+#define FRIBIDI_JOINS_RIGHT(p)  ((p) & FRIBIDI_MASK_JOINS_RIGHT)
 
 /* Joins to left: L, D, C? */
-#define FRIBIDI_JOINS_LEFT(p)	((p) & FRIBIDI_MASK_JOINS_LEFT)
+#define FRIBIDI_JOINS_LEFT(p)   ((p) & FRIBIDI_MASK_JOINS_LEFT)
 
 /* May shape: R, D, L, T? */
-#define FRIBIDI_ARAB_SHAPES(p)	((p) & FRIBIDI_MASK_ARAB_SHAPES)
+#define FRIBIDI_ARAB_SHAPES(p)  ((p) & FRIBIDI_MASK_ARAB_SHAPES)
 
 /* Is skipped in joining: T, G? */
-#define FRIBIDI_IS_JOIN_SKIPPED(p)	\
-	((p) & (FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED))
+#define FRIBIDI_IS_JOIN_SKIPPED(p)  \
+    ((p) & (FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED))
 
 /* Is base that will be shaped: R, D, L? */
-#define FRIBIDI_IS_JOIN_BASE_SHAPES(p)	\
-	( FRIBIDI_MASK_ARAB_SHAPES == ( (p) &	\
-		( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED	\
-		| FRIBIDI_MASK_ARAB_SHAPES ) ) )
+#define FRIBIDI_IS_JOIN_BASE_SHAPES(p)  \
+    ( FRIBIDI_MASK_ARAB_SHAPES == ( (p) &   \
+        ( FRIBIDI_MASK_TRANSPARENT | FRIBIDI_MASK_IGNORED   \
+        | FRIBIDI_MASK_ARAB_SHAPES ) ) )
 
-#define FRIBIDI_JOINS_PRECEDING_MASK(level)	\
-	(FRIBIDI_LEVEL_IS_RTL (level) ? FRIBIDI_MASK_JOINS_RIGHT	\
-				      : FRIBIDI_MASK_JOINS_LEFT)
+#define FRIBIDI_JOINS_PRECEDING_MASK(level) \
+    (FRIBIDI_LEVEL_IS_RTL (level) ? FRIBIDI_MASK_JOINS_RIGHT    \
+                      : FRIBIDI_MASK_JOINS_LEFT)
 
-#define FRIBIDI_JOINS_FOLLOWING_MASK(level)	\
-	(FRIBIDI_LEVEL_IS_RTL (level) ? FRIBIDI_MASK_JOINS_LEFT	\
-				      : FRIBIDI_MASK_JOINS_RIGHT)
+#define FRIBIDI_JOINS_FOLLOWING_MASK(level) \
+    (FRIBIDI_LEVEL_IS_RTL (level) ? FRIBIDI_MASK_JOINS_LEFT \
+                      : FRIBIDI_MASK_JOINS_RIGHT)
 
-#define FRIBIDI_JOIN_SHAPE(p)	\
-	((p) & ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ))
+#define FRIBIDI_JOIN_SHAPE(p)   \
+    ((p) & ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ))
 
 /* Functions finally */
 
@@ -220,7 +220,7 @@ typedef fribidi_uint8 FriBidiArabicProp;
  */
 FRIBIDI_ENTRY FriBidiJoiningType
 fribidi_get_joining_type (
-  FriBidiChar ch		/* input character */
+  FriBidiChar ch        /* input character */
 ) FRIBIDI_GNUC_CONST;
 
 #define fribidi_get_joining_types FRIBIDI_NAMESPACE(get_joining_types)
@@ -231,9 +231,9 @@ fribidi_get_joining_type (
  * returned by this function.
  */
      FRIBIDI_ENTRY void fribidi_get_joining_types (
-  const FriBidiChar *str,	/* input string */
-  const FriBidiStrIndex len,	/* input string length */
-  FriBidiJoiningType *jtypes	/* output joining types */
+  const FriBidiChar *str,   /* input string */
+  const FriBidiStrIndex len,    /* input string length */
+  FriBidiJoiningType *jtypes    /* output joining types */
 );
 
 #define fribidi_get_joining_type_name FRIBIDI_NAMESPACE(get_joining_type_name)
@@ -247,7 +247,7 @@ fribidi_get_joining_type (
  * http://www.unicode.org/versions/Unicode4.0.0/ch08.pdf#G7462.
  */
      FRIBIDI_ENTRY const char *fribidi_get_joining_type_name (
-  FriBidiJoiningType j		/* input joining type */
+  FriBidiJoiningType j      /* input joining type */
 ) FRIBIDI_GNUC_CONST;
 
 #include "fribidi-enddecls.h"

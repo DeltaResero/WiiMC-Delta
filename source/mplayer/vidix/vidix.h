@@ -40,23 +40,23 @@
 #define PROBE_FORCE     1 /* ignore device_id but recognize device if it's known */
 
 typedef enum vidix_dev_type {
-  TYPE_OUTPUT  =        0x00000000,	/* Is a video playback device */
-  TYPE_CAPTURE =	0x00000001,	/* Is a capture device */
-  TYPE_CODEC   =        0x00000002,	/* Device supports hw (de)coding */
-  TYPE_FX      =	0x00000004,	/* Is a video effects device */
+  TYPE_OUTPUT  =        0x00000000,     /* Is a video playback device */
+  TYPE_CAPTURE =        0x00000001,     /* Is a capture device */
+  TYPE_CODEC   =        0x00000002,     /* Device supports hw (de)coding */
+  TYPE_FX      =        0x00000004,     /* Is a video effects device */
 } vidix_dev_type_t;
 
 typedef enum vidix_dev_flag {
-  FLAG_NONE       =	0x00000000, /* No flags defined */
-  FLAG_DMA        =	0x00000001, /* Card can use DMA */
+  FLAG_NONE       =     0x00000000, /* No flags defined */
+  FLAG_DMA        =     0x00000001, /* Card can use DMA */
   /* Card can use DMA only if src pitch == dest pitch */
-  FLAG_EQ_DMA     =	0x00000002,
+  FLAG_EQ_DMA     =     0x00000002,
   /* Possible to wait for DMA to finish. See BM_DMA_SYNC and BM_DMA_BLOCK */
   FLAG_SYNC_DMA   =     0x00000004,
-  FLAG_UPSCALER   =	0x00000010, /* Card supports hw upscaling */
-  FLAG_DOWNSCALER =	0x00000020, /* Card supports hw downscaling */
-  FLAG_SUBPIC	  =	0x00001000, /* Card supports DVD subpictures */
-  FLAG_EQUALIZER  =	0x00002000, /* Card supports equalizer */
+  FLAG_UPSCALER   =     0x00000010, /* Card supports hw upscaling */
+  FLAG_DOWNSCALER =     0x00000020, /* Card supports hw downscaling */
+  FLAG_SUBPIC     =     0x00001000, /* Card supports DVD subpictures */
+  FLAG_EQUALIZER  =     0x00002000, /* Card supports equalizer */
 } vidix_dev_flag_t;
 
 typedef struct vidix_capability_s
@@ -77,45 +77,45 @@ typedef struct vidix_capability_s
 } vidix_capability_t;
 
 typedef enum vidix_depth {
-  VID_DEPTH_NONE  =		0x0000,
-  VID_DEPTH_1BPP  =		0x0001,
-  VID_DEPTH_2BPP  =		0x0002,
-  VID_DEPTH_4BPP  =		0x0004,
-  VID_DEPTH_8BPP  =		0x0008,
-  VID_DEPTH_12BPP =		0x0010,
-  VID_DEPTH_15BPP =		0x0020,
-  VID_DEPTH_16BPP =		0x0040,
-  VID_DEPTH_24BPP =		0x0080,
-  VID_DEPTH_32BPP =		0x0100,
+  VID_DEPTH_NONE  =             0x0000,
+  VID_DEPTH_1BPP  =             0x0001,
+  VID_DEPTH_2BPP  =             0x0002,
+  VID_DEPTH_4BPP  =             0x0004,
+  VID_DEPTH_8BPP  =             0x0008,
+  VID_DEPTH_12BPP =             0x0010,
+  VID_DEPTH_15BPP =             0x0020,
+  VID_DEPTH_16BPP =             0x0040,
+  VID_DEPTH_24BPP =             0x0080,
+  VID_DEPTH_32BPP =             0x0100,
   VID_DEPTH_ALL   =             VID_DEPTH_1BPP  | VID_DEPTH_2BPP  | \
                                 VID_DEPTH_4BPP  | VID_DEPTH_8BPP  | \
-		                VID_DEPTH_12BPP | VID_DEPTH_15BPP | \
-		                VID_DEPTH_16BPP | VID_DEPTH_24BPP | \
+                                VID_DEPTH_12BPP | VID_DEPTH_15BPP | \
+                                VID_DEPTH_16BPP | VID_DEPTH_24BPP | \
                                 VID_DEPTH_32BPP,
 } vidix_depth_t;
 
 typedef enum vidix_cap {
-  VID_CAP_NONE               =	0x0000,
+  VID_CAP_NONE               =  0x0000,
   /* if overlay can be bigger than source */
-  VID_CAP_EXPAND             =	0x0001,
+  VID_CAP_EXPAND             =  0x0001,
   /* if overlay can be smaller than source */
-  VID_CAP_SHRINK             =	0x0002,
+  VID_CAP_SHRINK             =  0x0002,
   /* if overlay can be blended with framebuffer */
-  VID_CAP_BLEND              =	0x0004,
+  VID_CAP_BLEND              =  0x0004,
   /* if overlay can be restricted to a colorkey */
-  VID_CAP_COLORKEY           =	0x0008,
+  VID_CAP_COLORKEY           =  0x0008,
   /* if overlay can be restricted to an alpha channel */
-  VID_CAP_ALPHAKEY           =	0x0010,
+  VID_CAP_ALPHAKEY           =  0x0010,
   /* if the colorkey can be a range */
-  VID_CAP_COLORKEY_ISRANGE   =	0x0020,
+  VID_CAP_COLORKEY_ISRANGE   =  0x0020,
   /* if the alphakey can be a range */
-  VID_CAP_ALPHAKEY_ISRANGE   =	0x0040,
+  VID_CAP_ALPHAKEY_ISRANGE   =  0x0040,
   /* colorkey is checked against framebuffer */
-  VID_CAP_COLORKEY_ISMAIN    =	0x0080,
+  VID_CAP_COLORKEY_ISMAIN    =  0x0080,
   /* colorkey is checked against overlay */
-  VID_CAP_COLORKEY_ISOVERLAY =	0x0100,
+  VID_CAP_COLORKEY_ISOVERLAY =  0x0100,
   /* alphakey is checked against framebuffer */
-  VID_CAP_ALPHAKEY_ISMAIN    =	0x0200,
+  VID_CAP_ALPHAKEY_ISMAIN    =  0x0200,
   /* alphakey is checked against overlay */
   VID_CAP_ALPHAKEY_ISOVERLAY =  0x0400,
 } vidix_cap_t;
@@ -123,8 +123,8 @@ typedef enum vidix_cap {
 typedef struct vidix_fourcc_s
 {
   unsigned fourcc;      /* input: requested fourcc */
-  vidix_depth_t depth;	/* output: screen depth for given fourcc */
-  vidix_cap_t flags;	/* output: capability */
+  vidix_depth_t depth;  /* output: screen depth for given fourcc */
+  vidix_cap_t flags;    /* output: capability */
 } vidix_fourcc_t;
 
 typedef struct vidix_yuv_s
@@ -134,37 +134,37 @@ typedef struct vidix_yuv_s
 
 typedef struct vidix_rect_s
 {
-  unsigned x,y,w,h;	/* in pixels */
-  vidix_yuv_t pitch;	/* line-align in bytes */
+  unsigned x,y,w,h;     /* in pixels */
+  vidix_yuv_t pitch;    /* line-align in bytes */
 } vidix_rect_t;
 
 typedef enum vidix_color_key_op {
-  CKEY_FALSE =	0,
-  CKEY_TRUE  =	1,
-  CKEY_EQ    =	2,
-  CKEY_NEQ   =	3,
-  CKEY_ALPHA =	4,
+  CKEY_FALSE =  0,
+  CKEY_TRUE  =  1,
+  CKEY_EQ    =  2,
+  CKEY_NEQ   =  3,
+  CKEY_ALPHA =  4,
 } vidix_color_key_op_t;
 
 typedef struct vidix_color_key_s
 {
-  vidix_color_key_op_t op;	/* defines logical operation */
-  unsigned char	red;
-  unsigned char	green;
-  unsigned char	blue;
-  unsigned char	reserved;
+  vidix_color_key_op_t op;      /* defines logical operation */
+  unsigned char red;
+  unsigned char green;
+  unsigned char blue;
+  unsigned char reserved;
 }vidix_ckey_t;
 
 typedef enum vidix_video_key_op {
-  VKEY_FALSE =	0,
-  VKEY_TRUE  =	1,
-  VKEY_EQ    =	2,
-  VKEY_NEQ   =	3,
+  VKEY_FALSE =  0,
+  VKEY_TRUE  =  1,
+  VKEY_EQ    =  2,
+  VKEY_NEQ   =  3,
 } vidix_video_key_op_t;
 
 typedef struct vidix_video_key_s {
-  vidix_video_key_op_t op;	/* defines logical operation */
-  unsigned char	key[8];
+  vidix_video_key_op_t op;      /* defines logical operation */
+  unsigned char key[8];
 } vidix_vkey_t;
 
 typedef enum vidix_interleave {
@@ -172,50 +172,50 @@ typedef enum vidix_interleave {
   /* UVUVUVUVUV used by Matrox G200 */
   INTERLEAVING_UV         =             0x00001000,
   /* VUVUVUVUVU */
-  INTERLEAVING_VU         =		0x00001001,
+  INTERLEAVING_VU         =             0x00001001,
 } vidix_interleave_t;
 
-#define VID_PLAY_MAXFRAMES 64	/* unreal limitation */
+#define VID_PLAY_MAXFRAMES 64   /* unreal limitation */
 
 typedef struct vidix_playback_s
 {
-  unsigned fourcc;		/* app -> driver: movies's fourcc */
-  unsigned capability;	        /* app -> driver: what capability to use */
-  unsigned blend_factor;	/* app -> driver: blending factor */
+  unsigned fourcc;              /* app -> driver: movies's fourcc */
+  unsigned capability;          /* app -> driver: what capability to use */
+  unsigned blend_factor;        /* app -> driver: blending factor */
   vidix_rect_t src;             /* app -> driver: original movie size */
   vidix_rect_t dest;            /* app -> driver: destinition movie size.
                                    driver->app dest_pitch */
   vidix_interleave_t flags;     /* driver -> app: interleaved UV planes */
   /* memory model */
-  unsigned frame_size;		/* driver -> app: destinition frame size */
-  unsigned num_frames;		/* app -> driver: after call: driver -> app */
-  unsigned offsets[VID_PLAY_MAXFRAMES];	/* driver -> app */
-  vidix_yuv_t offset;		/* driver -> app: relative offsets
+  unsigned frame_size;          /* driver -> app: destinition frame size */
+  unsigned num_frames;          /* app -> driver: after call: driver -> app */
+  unsigned offsets[VID_PLAY_MAXFRAMES]; /* driver -> app */
+  vidix_yuv_t offset;           /* driver -> app: relative offsets
                                    within frame for yuv planes */
-  void *dga_addr;		/* driver -> app: linear address */
+  void *dga_addr;               /* driver -> app: linear address */
 } vidix_playback_t;
 
 typedef enum vidix_key_op {
-  KEYS_PUT =	0,
-  KEYS_AND =	1,
-  KEYS_OR  =	2,
-  KEYS_XOR =	3,
+  KEYS_PUT =    0,
+  KEYS_AND =    1,
+  KEYS_OR  =    2,
+  KEYS_XOR =    3,
 } vidix_key_op_t;
 
 typedef struct vidix_grkey_s
 {
-  vidix_ckey_t ckey;		/* app -> driver: color key */
-  vidix_vkey_t vkey;		/* app -> driver: video key */
-  vidix_key_op_t key_op;	/* app -> driver: keys operations */
+  vidix_ckey_t ckey;            /* app -> driver: color key */
+  vidix_vkey_t vkey;            /* app -> driver: video key */
+  vidix_key_op_t key_op;        /* app -> driver: keys operations */
 } vidix_grkey_t;
 
 typedef enum vidix_veq_cap {
-  VEQ_CAP_NONE		=	0x00000000UL,
-  VEQ_CAP_BRIGHTNESS	=	0x00000001UL,
-  VEQ_CAP_CONTRAST	=	0x00000002UL,
-  VEQ_CAP_SATURATION	=	0x00000004UL,
-  VEQ_CAP_HUE		=	0x00000008UL,
-  VEQ_CAP_RGB_INTENSITY =	0x00000010UL,
+  VEQ_CAP_NONE          =       0x00000000UL,
+  VEQ_CAP_BRIGHTNESS    =       0x00000001UL,
+  VEQ_CAP_CONTRAST      =       0x00000002UL,
+  VEQ_CAP_SATURATION    =       0x00000004UL,
+  VEQ_CAP_HUE           =       0x00000008UL,
+  VEQ_CAP_RGB_INTENSITY =       0x00000010UL,
 } vidix_veq_cap_t;
 
 typedef enum vidix_veq_flag {
@@ -225,63 +225,63 @@ typedef enum vidix_veq_flag {
 } vidix_veq_flag_t;
 
 typedef struct vidix_video_eq_s {
-  vidix_veq_cap_t cap;	 /* on get_eq should contain capability of
+  vidix_veq_cap_t cap;   /* on get_eq should contain capability of
                             equalizer on set_eq should contain using fields */
   /* end-user app can have presets like: cold-normal-hot picture and so on */
-  int brightness;	        /* -1000 : +1000 */
-  int contrast;	                /* -1000 : +1000 */
-  int saturation;	        /* -1000 : +1000 */
-  int hue;		        /* -1000 : +1000 */
-  int red_intensity;	        /* -1000 : +1000 */
+  int brightness;               /* -1000 : +1000 */
+  int contrast;                 /* -1000 : +1000 */
+  int saturation;               /* -1000 : +1000 */
+  int hue;                      /* -1000 : +1000 */
+  int red_intensity;            /* -1000 : +1000 */
   int green_intensity;          /* -1000 : +1000 */
   int blue_intensity;           /* -1000 : +1000 */
-  vidix_veq_flag_t flags;	/* currently specifies ITU YCrCb color
+  vidix_veq_flag_t flags;       /* currently specifies ITU YCrCb color
                                    space to use */
 } vidix_video_eq_t;
 
 typedef enum vidix_interlace_flag {
   /* stream is not interlaced */
-  CFG_NON_INTERLACED       =	0x00000000,
+  CFG_NON_INTERLACED       =    0x00000000,
   /* stream is interlaced */
-  CFG_INTERLACED           =	0x00000001,
+  CFG_INTERLACED           =    0x00000001,
   /* first frame contains even fields but second - odd */
-  CFG_EVEN_ODD_INTERLACING =	0x00000002,
+  CFG_EVEN_ODD_INTERLACING =    0x00000002,
   /* first frame contains odd fields but second - even */
-  CFG_ODD_EVEN_INTERLACING =	0x00000004,
+  CFG_ODD_EVEN_INTERLACING =    0x00000004,
   /* field deinterlace_pattern is valid */
-  CFG_UNIQUE_INTERLACING   =	0x00000008,
+  CFG_UNIQUE_INTERLACING   =    0x00000008,
   /* unknown deinterlacing - use adaptive if it's possible */
-  CFG_UNKNOWN_INTERLACING  =	0x0000000f,
+  CFG_UNKNOWN_INTERLACING  =    0x0000000f,
 } vidix_interlace_flag_t;
 
 typedef struct vidix_deinterlace_s {
   vidix_interlace_flag_t flags;
-  unsigned deinterlace_pattern;	/* app -> driver: deinterlace pattern if
+  unsigned deinterlace_pattern; /* app -> driver: deinterlace pattern if
                                    flag CFG_UNIQUE_INTERLACING is set */
 } vidix_deinterlace_t;
 
 typedef struct vidix_slice_s {
-  void *address;		/* app -> driver */
-  unsigned size;		/* app -> driver */
-  vidix_rect_t slice;		/* app -> driver */
+  void *address;                /* app -> driver */
+  unsigned size;                /* app -> driver */
+  vidix_rect_t slice;           /* app -> driver */
 } vidix_slice_t;
 
 typedef enum vidix_bm_flag {
-  LVO_DMA_NOSYNC	     = 0,
+  LVO_DMA_NOSYNC             = 0,
   /* waits for vsync or hsync */
   LVO_DMA_SYNC               = 1,
 } vidix_dma_flag_t;
 
 typedef struct vidix_dma_s
 {
-  vidix_slice_t	src;                    /* app -> driver */
-  vidix_slice_t	dest;			/* app -> driver */
-  vidix_dma_flag_t flags;		/* app -> driver */
+  vidix_slice_t src;                    /* app -> driver */
+  vidix_slice_t dest;                   /* app -> driver */
+  vidix_dma_flag_t flags;               /* app -> driver */
 } vidix_dma_t;
 
 typedef enum vidix_fx_type {
-  FX_TYPE_BOOLEAN =		0x00000000,
-  FX_TYPE_INTEGER =		0x00000001,
+  FX_TYPE_BOOLEAN =             0x00000000,
+  FX_TYPE_INTEGER =             0x00000001,
 } vidix_fx_type_t;
 
 /*
@@ -296,13 +296,13 @@ typedef enum vidix_fx_type {
 */
 typedef struct vidix_oem_fx_s
 {
-  vidix_fx_type_t type;	/* type of effects */
-  int num;		/* app -> driver: effect number.
+  vidix_fx_type_t type; /* type of effects */
+  int num;              /* app -> driver: effect number.
                            From 0 to max number of effects */
-  int minvalue;		/* min value of effect. 0 - for boolean */
-  int maxvalue;		/* max value of effect. 1 - for boolean */
-  int value;   	        /* current value of effect on get; required on set */
-  char *name[80];	/* effect name to display */
+  int minvalue;         /* min value of effect. 0 - for boolean */
+  int maxvalue;         /* max value of effect. 1 - for boolean */
+  int value;            /* current value of effect on get; required on set */
+  char *name[80];       /* effect name to display */
 } vidix_oem_fx_t;
 
 typedef struct VDXDriver {

@@ -55,12 +55,12 @@
 #define MESSAGE_SIZE 512
 #define MESSAGE_DEKO " +++ %s +++ "
 
-	static const vo_info_t info = {
-	    "AAlib",
-	    "aa",
-	    "Alban Bedel <albeu@free.fr> and Folke Ashberg <folke@ashberg.de>",
-	    ""
-	};
+        static const vo_info_t info = {
+            "AAlib",
+            "aa",
+            "Alban Bedel <albeu@free.fr> and Folke Ashberg <folke@ashberg.de>",
+            ""
+        };
 
 const LIBVO_EXTERN(aa)
 
@@ -122,7 +122,7 @@ resize(void){
 
     if(sws) sws_freeContext(sws);
     sws = sws_getContextFromCmdLine(src_width,src_height,image_format,
-				   image_width,image_height,IMGFMT_Y8);
+                                   image_width,image_height,IMGFMT_Y8);
 
     memset(image, 0, sizeof(image));
     image[0] = aa_image(c) + image_y * aa_imgwidth(c) + image_x;
@@ -178,8 +178,8 @@ osdpercent(int duration, int deko, int min, int max, int val, const char * desc,
     posbar[0]='|';
     posbar[aa_scrwidth(c)-1]='|';
     for (i=0;i<aa_scrwidth(c);i++){
-	if (i==where) posbar[i]='#';
-	else posbar[i]='-';
+        if (i==where) posbar[i]='#';
+        else posbar[i]='-';
     }
     if (where!=0) posbar[0]='|';
     if (where!=(aa_scrwidth(c)-1) ) posbar[aa_scrwidth(c)-1]='|';
@@ -227,8 +227,8 @@ printosdprogbar(void){
 }
 static int
 config(uint32_t width, uint32_t height, uint32_t d_width,
-	    uint32_t d_height, uint32_t flags, char *title,
-	    uint32_t format) {
+            uint32_t d_height, uint32_t flags, char *title,
+            uint32_t format) {
     /*
      * main init
      * called by mplayer
@@ -270,11 +270,11 @@ config(uint32_t width, uint32_t height, uint32_t d_width,
       vo_font->pic_a[0]->w=1;
       vo_font->pic_a[0]->h=1;
       for (i=0; i<255; i++){
-	vo_font->width[i]=1;
-	vo_font->font[i]=0;
-	vo_font->start[i]=i;
-	vo_font->pic_a[0]->bmp[i]=i;
-	vo_font->pic_b[0]->bmp[i]=i;
+        vo_font->width[i]=1;
+        vo_font->font[i]=0;
+        vo_font->start[i]=i;
+        vo_font->pic_a[0]->bmp[i]=i;
+        vo_font->pic_b[0]->bmp[i]=i;
       }
     }
 
@@ -285,28 +285,28 @@ config(uint32_t width, uint32_t height, uint32_t d_width,
     mp_msg(MSGT_VO,MSGL_V,"VO: [aa] keyboarddriver: %s\n", c->kbddriver->name);
 
     mp_msg(MSGT_VO,MSGL_INFO,
-		"\n"
-		"Important suboptions\n"
-		"\textended  use use all 256 characters\n"
-		"\teight     use eight bit ascii\n"
-		"\tdriver    set recommended aalib driver (X11,curses,linux)\n"
-		"\thelp      to see all options provided by aalib\n"
-		"\n"
-		"AA-MPlayer Keys\n"
-		"\t1 : contrast -\n"
-		"\t2 : contrast +\n"
-		"\t3 : brightness -\n"
-		"\t4 : brightness +\n"
-		"\t5 : fast rendering\n"
-		"\t6 : dithering\n"
-		"\t7 : invert image\n"
-	        "\ta : toggles between aa and mplayer control\n"
+                "\n"
+                "Important suboptions\n"
+                "\textended  use use all 256 characters\n"
+                "\teight     use eight bit ascii\n"
+                "\tdriver    set recommended aalib driver (X11,curses,linux)\n"
+                "\thelp      to see all options provided by aalib\n"
+                "\n"
+                "AA-MPlayer Keys\n"
+                "\t1 : contrast -\n"
+                "\t2 : contrast +\n"
+                "\t3 : brightness -\n"
+                "\t4 : brightness +\n"
+                "\t5 : fast rendering\n"
+                "\t6 : dithering\n"
+                "\t7 : invert image\n"
+                "\ta : toggles between aa and mplayer control\n"
 
-		"\n"
-		"All other keys are MPlayer defaults.\n"
+                "\n"
+                "All other keys are MPlayer defaults.\n"
 
 
-	  );
+          );
 
     return 0;
 }
@@ -319,19 +319,19 @@ query_format(uint32_t format) {
      * All input format supported by the sws
      */
     switch(format){
-	case IMGFMT_YV12:
-	case IMGFMT_I420:
-	case IMGFMT_IYUV:
-	case IMGFMT_IYU2:
-	case IMGFMT_BGR32:
-	case IMGFMT_BGR24:
-	case IMGFMT_BGR16:
-	case IMGFMT_BGR15:
-	case IMGFMT_RGB32:
-	case IMGFMT_RGB24:
-	case IMGFMT_Y8:
-	case IMGFMT_Y800:
-	    return VFCAP_CSP_SUPPORTED | VFCAP_SWSCALE | VFCAP_OSD;
+        case IMGFMT_YV12:
+        case IMGFMT_I420:
+        case IMGFMT_IYUV:
+        case IMGFMT_IYU2:
+        case IMGFMT_BGR32:
+        case IMGFMT_BGR24:
+        case IMGFMT_BGR16:
+        case IMGFMT_BGR15:
+        case IMGFMT_RGB32:
+        case IMGFMT_RGB24:
+        case IMGFMT_Y8:
+        case IMGFMT_Y800:
+            return VFCAP_CSP_SUPPORTED | VFCAP_SWSCALE | VFCAP_OSD;
     }
     return 0;
 }
@@ -367,7 +367,7 @@ draw_frame(uint8_t *src[]) {
 
 static int
 draw_slice(uint8_t *src[], int stride[],
-	    int w, int h, int x, int y) {
+            int w, int h, int x, int y) {
 
   int dx1 = screen_x + (x * screen_w / src_width);
   int dy1 = screen_y + (y * screen_h / src_height);
@@ -392,24 +392,24 @@ flip_page(void) {
    /* do we have to put *our* (messages, progbar) osd to aa's txtbuf ? */
     if (showosdmessage)
       {
-	if (time(NULL)>=stoposd ) {
-	  showosdmessage=0;
-	  if(*osdmessagetext) {
-	    memset(c->textbuffer + osdy * aa_scrwidth(c) + osdx,' ',strlen(osdmessagetext));
-	    memset(c->attrbuffer + osdy * aa_scrwidth(c) + osdx ,0,strlen(osdmessagetext));
-	    osdmessagetext[0] = '\0';
-	  }
-	  if(*posbar) {
-	    memset(c->textbuffer + (osdy+1) * aa_scrwidth(c),' ',strlen(posbar));
-	    memset(c->attrbuffer + (osdy+1) * aa_scrwidth(c),0,strlen(posbar));
-	  }
-	} else {
-	  /* update osd */
-	  aa_puts(c, osdx, osdy, AA_SPECIAL, osdmessagetext);
-	  /* posbar? */
-	  if (posbar[0]!='\0')
-	    aa_puts(c, 0, osdy + 1, AA_SPECIAL, posbar);
-	}
+        if (time(NULL)>=stoposd ) {
+          showosdmessage=0;
+          if(*osdmessagetext) {
+            memset(c->textbuffer + osdy * aa_scrwidth(c) + osdx,' ',strlen(osdmessagetext));
+            memset(c->attrbuffer + osdy * aa_scrwidth(c) + osdx ,0,strlen(osdmessagetext));
+            osdmessagetext[0] = '\0';
+          }
+          if(*posbar) {
+            memset(c->textbuffer + (osdy+1) * aa_scrwidth(c),' ',strlen(posbar));
+            memset(c->attrbuffer + (osdy+1) * aa_scrwidth(c),0,strlen(posbar));
+          }
+        } else {
+          /* update osd */
+          aa_puts(c, osdx, osdy, AA_SPECIAL, osdmessagetext);
+          /* posbar? */
+          if (posbar[0]!='\0')
+            aa_puts(c, 0, osdy + 1, AA_SPECIAL, posbar);
+        }
       }
     /* OSD time & playmode , subtitles */
     printosdtext();
@@ -427,74 +427,74 @@ check_events(void) {
      */
     int key;
     while ((key=aa_getevent(c,0))!=AA_NONE ){
-	if (key>255){
-	    /* some conversations */
-	    switch (key) {
-		case AA_UP:
-		    mplayer_put_key(KEY_UP);
-		    break;
-		case AA_DOWN:
-		    mplayer_put_key(KEY_DOWN);
-		    break;
-		case AA_LEFT:
-		    mplayer_put_key(KEY_LEFT);
-		    break;
-		case AA_RIGHT:
-		    mplayer_put_key(KEY_RIGHT);
-		    break;
-		case AA_ESC:
-		    mplayer_put_key(KEY_ESC);
-		    break;
-		case 65765:
-		    mplayer_put_key(KEY_PAGE_UP);
-		    break;
-		case 65766:
-		    mplayer_put_key(KEY_PAGE_DOWN);
-		    break;
-		default:
-		    continue; /* aa lib special key */
-		    break;
-	    }
-	}
-	if (key=='a' || key=='A'){
-	    aaconfigmode=!aaconfigmode;
-	    osdmessage(MESSAGE_DURATION, 1, "aa config mode is now %s",
-		    aaconfigmode==1 ? "on. use keys 5-7" : "off");
-	}
-	if (aaconfigmode==1) {
-	    switch (key) {
-		/* AA image controls */
-		case '5':
-		    fast=!fast;
-		    osdmessage(MESSAGE_DURATION, 1, "Fast mode is now %s", fast==1 ? "on" : "off");
-		    break;
-		case '6':
-		    if (p->dither==AA_FLOYD_S){
-			p->dither=AA_NONE;
-			osdmessage(MESSAGE_DURATION, 1, "Dithering: Off");
-		    }else if (p->dither==AA_NONE){
-			p->dither=AA_ERRORDISTRIB;
-			osdmessage(MESSAGE_DURATION, 1, "Dithering: Error Distribution");
-		    }else if (p->dither==AA_ERRORDISTRIB){
-			p->dither=AA_FLOYD_S;
-			osdmessage(MESSAGE_DURATION, 1, "Dithering: Floyd Steinberg");
-		    }
-		    break;
-		case '7':
-		    p->inversion=!p->inversion;
-		    osdmessage(MESSAGE_DURATION, 1, "Invert mode is now %s",
-				p->inversion==1 ? "on" : "off");
-		    break;
+        if (key>255){
+            /* some conversations */
+            switch (key) {
+                case AA_UP:
+                    mplayer_put_key(KEY_UP);
+                    break;
+                case AA_DOWN:
+                    mplayer_put_key(KEY_DOWN);
+                    break;
+                case AA_LEFT:
+                    mplayer_put_key(KEY_LEFT);
+                    break;
+                case AA_RIGHT:
+                    mplayer_put_key(KEY_RIGHT);
+                    break;
+                case AA_ESC:
+                    mplayer_put_key(KEY_ESC);
+                    break;
+                case 65765:
+                    mplayer_put_key(KEY_PAGE_UP);
+                    break;
+                case 65766:
+                    mplayer_put_key(KEY_PAGE_DOWN);
+                    break;
+                default:
+                    continue; /* aa lib special key */
+                    break;
+            }
+        }
+        if (key=='a' || key=='A'){
+            aaconfigmode=!aaconfigmode;
+            osdmessage(MESSAGE_DURATION, 1, "aa config mode is now %s",
+                    aaconfigmode==1 ? "on. use keys 5-7" : "off");
+        }
+        if (aaconfigmode==1) {
+            switch (key) {
+                /* AA image controls */
+                case '5':
+                    fast=!fast;
+                    osdmessage(MESSAGE_DURATION, 1, "Fast mode is now %s", fast==1 ? "on" : "off");
+                    break;
+                case '6':
+                    if (p->dither==AA_FLOYD_S){
+                        p->dither=AA_NONE;
+                        osdmessage(MESSAGE_DURATION, 1, "Dithering: Off");
+                    }else if (p->dither==AA_NONE){
+                        p->dither=AA_ERRORDISTRIB;
+                        osdmessage(MESSAGE_DURATION, 1, "Dithering: Error Distribution");
+                    }else if (p->dither==AA_ERRORDISTRIB){
+                        p->dither=AA_FLOYD_S;
+                        osdmessage(MESSAGE_DURATION, 1, "Dithering: Floyd Steinberg");
+                    }
+                    break;
+                case '7':
+                    p->inversion=!p->inversion;
+                    osdmessage(MESSAGE_DURATION, 1, "Invert mode is now %s",
+                                p->inversion==1 ? "on" : "off");
+                    break;
 
-		default :
-		    /* nothing if we're interested in?
-		     * the mplayer should handle it!
-		     */
-		    mplayer_put_key(key);
-		    break;
-	    }
-	}// aaconfigmode
-	else mplayer_put_key(key);
+                default :
+                    /* nothing if we're interested in?
+                     * the mplayer should handle it!
+                     */
+                    mplayer_put_key(key);
+                    break;
+            }
+        }// aaconfigmode
+        else mplayer_put_key(key);
     }
 }
 
@@ -505,7 +505,7 @@ uninit(void) {
      */
 
     if (strstr(c->driver->name,"Curses") || strstr(c->driver->name,"Linux")){
-	freopen("/dev/tty", "w", stderr);
+        freopen("/dev/tty", "w", stderr);
     }
     if(vo_font_save) {
       free(vo_font->pic_a[0]->bmp);
@@ -522,12 +522,12 @@ uninit(void) {
 static void draw_alpha(int x,int y, int w,int h, unsigned char* src, unsigned char *srca, int stride){
     int i,j;
     for (i = 0; i < h; i++) {
-	for (j = 0; j < w; j++) {
-	    if (src[i*stride+j] > 0) {
-		c->textbuffer[x + j + (y+i)*aa_scrwidth(c)] = src[i*stride+j];
-		c->attrbuffer[x + j + (y+i)*aa_scrwidth(c)] = aaopt_subcolor;
-	    }
-	}
+        for (j = 0; j < w; j++) {
+            if (src[i*stride+j] > 0) {
+                c->textbuffer[x + j + (y+i)*aa_scrwidth(c)] = src[i*stride+j];
+                c->attrbuffer[x + j + (y+i)*aa_scrwidth(c)] = aaopt_subcolor;
+            }
+        }
     }
 }
 
@@ -673,40 +673,40 @@ static int preinit(const char *arg)
     if(arg)
     {
         if (parse_suboptions(arg) != 0)
-	return ENOSYS;
+        return ENOSYS;
     }
 
         /* initializing of aalib */
 
     hidis=aa_getfirst(&aa_displayrecommended);
     if ( hidis==NULL ){
-	/* check /dev/vcsa<vt> */
-	/* check only, if no driver is explicit set */
-	fd = dup (fileno (stderr));
-	fstat (fd, &sbuf);
-	major = sbuf.st_rdev >> 8;
-	vt = minor = sbuf.st_rdev & 0xff;
-	close (fd);
-	sprintf (fname, "/dev/vcsa%2.2i", vt);
-	fp = fopen (fname, "w+");
-	if (fp==NULL){
-	    fprintf(stderr,"VO: [aa] cannot open %s for writing,"
-			"so we'll not use linux driver\n", fname);
-    	    aa_recommendlowdisplay("linux");
-    	    aa_recommendhidisplay("curses");
-    	    aa_recommendhidisplay("X11");
-	}else fclose(fp);
+        /* check /dev/vcsa<vt> */
+        /* check only, if no driver is explicit set */
+        fd = dup (fileno (stderr));
+        fstat (fd, &sbuf);
+        major = sbuf.st_rdev >> 8;
+        vt = minor = sbuf.st_rdev & 0xff;
+        close (fd);
+        sprintf (fname, "/dev/vcsa%2.2i", vt);
+        fp = fopen (fname, "w+");
+        if (fp==NULL){
+            fprintf(stderr,"VO: [aa] cannot open %s for writing,"
+                        "so we'll not use linux driver\n", fname);
+            aa_recommendlowdisplay("linux");
+            aa_recommendhidisplay("curses");
+            aa_recommendhidisplay("X11");
+        }else fclose(fp);
     } else aa_recommendhidisplay(hidis);
     c = aa_autoinit(&aa_defparams);
 
     if (c == NULL) {
-	mp_msg(MSGT_VO,MSGL_ERR,"Cannot initialize aalib\n");
-	return VO_ERROR;
+        mp_msg(MSGT_VO,MSGL_ERR,"Cannot initialize aalib\n");
+        return VO_ERROR;
     }
     if (!aa_autoinitkbd(c,0)) {
-	mp_msg(MSGT_VO,MSGL_ERR,"Cannot initialize keyboard\n");
-	aa_close(c);
-	return VO_ERROR;
+        mp_msg(MSGT_VO,MSGL_ERR,"Cannot initialize keyboard\n");
+        aa_close(c);
+        return VO_ERROR;
     }
 
     aa_resizehandler(c, (void *)resize);
@@ -714,9 +714,9 @@ static int preinit(const char *arg)
     p = aa_getrenderparams();
 
     if ((strstr(c->driver->name,"Curses")) || (strstr(c->driver->name,"Linux"))){
-	freopen("/dev/null", "w", stderr);
-	/* disable console blanking */
-	printf("\033[9;0]");
+        freopen("/dev/null", "w", stderr);
+        /* disable console blanking */
+        printf("\033[9;0]");
     }
 
     memset(image,0,3*sizeof(uint8_t));

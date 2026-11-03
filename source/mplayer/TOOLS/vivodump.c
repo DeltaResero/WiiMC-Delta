@@ -57,14 +57,14 @@ unsigned char buf=0;
 static unsigned int x_get_bits(int n){
     unsigned int x=0;
     while(n-->0){
-	if(!bitcnt){
-	    // fill buff
-	    buf=buffer[bufptr++];
-	    bitcnt=8;
-	}
-	//x=(x<<1)|(buf&1);buf>>=1;
-	x=(x<<1)|(buf>>7);buf<<=1;
-	--bitcnt;
+        if(!bitcnt){
+            // fill buff
+            buf=buffer[bufptr++];
+            bitcnt=8;
+        }
+        //x=(x<<1)|(buf&1);buf>>=1;
+        x=(x<<1)|(buf>>7);buf<<=1;
+        --bitcnt;
     }
     return x;
 }
@@ -90,22 +90,22 @@ static int h263_decode_picture_header(unsigned char *b_ptr)
 
     /* picture header */
     if (get_bits(&s->gb, 22) != 0x20){
-	printf("bad picture header\n");
+        printf("bad picture header\n");
         return -1;
     }
     skip_bits(&s->gb, 8); /* picture timestamp */
 
     if (get_bits1(&s->gb) != 1){
-	printf("bad marker\n");
-        return -1;	/* marker */
+        printf("bad marker\n");
+        return -1;      /* marker */
     }
     if (get_bits1(&s->gb) != 0){
-	printf("bad h263 id\n");
-        return -1;	/* h263 id */
+        printf("bad h263 id\n");
+        return -1;      /* h263 id */
     }
-    skip_bits1(&s->gb);	/* split screen off */
-    skip_bits1(&s->gb);	/* camera  off */
-    skip_bits1(&s->gb);	/* freeze picture release off */
+    skip_bits1(&s->gb); /* split screen off */
+    skip_bits1(&s->gb); /* camera  off */
+    skip_bits1(&s->gb); /* freeze picture release off */
 
     format = get_bits(&s->gb, 3);
 
@@ -114,39 +114,39 @@ static int h263_decode_picture_header(unsigned char *b_ptr)
         /* H.263v1 */
         width = h263_format[format][0];
         height = h263_format[format][1];
-	printf("%d x %d\n",width,height);
+        printf("%d x %d\n",width,height);
 //        if (!width) return -1;
 
-	printf("pict_type=%d\n",get_bits1(&s->gb));
-	printf("unrestricted_mv=%d\n",get_bits1(&s->gb));
+        printf("pict_type=%d\n",get_bits1(&s->gb));
+        printf("unrestricted_mv=%d\n",get_bits1(&s->gb));
 #if 1
-	printf("SAC: %d\n",get_bits1(&s->gb));
-	printf("advanced prediction mode: %d\n",get_bits1(&s->gb));
-	printf("PB frame: %d\n",get_bits1(&s->gb));
+        printf("SAC: %d\n",get_bits1(&s->gb));
+        printf("advanced prediction mode: %d\n",get_bits1(&s->gb));
+        printf("PB frame: %d\n",get_bits1(&s->gb));
 #else
         if (get_bits1(&s->gb) != 0)
-            return -1;	/* SAC: off */
+            return -1;  /* SAC: off */
         if (get_bits1(&s->gb) != 0)
-            return -1;	/* advanced prediction mode: off */
+            return -1;  /* advanced prediction mode: off */
         if (get_bits1(&s->gb) != 0)
-            return -1;	/* not PB frame */
+            return -1;  /* not PB frame */
 #endif
-	printf("qscale=%d\n",get_bits(&s->gb, 5));
-        skip_bits1(&s->gb);	/* Continuous Presence Multipoint mode: off */
+        printf("qscale=%d\n",get_bits(&s->gb, 5));
+        skip_bits1(&s->gb);     /* Continuous Presence Multipoint mode: off */
     } else {
         printf("h263_plus = 1\n");
         /* H.263v2 */
         if (get_bits(&s->gb, 3) != 1){
-	    printf("H.263v2 A error\n");
+            printf("H.263v2 A error\n");
             return -1;
-	}
+        }
         if (get_bits(&s->gb, 3) != 6){ /* custom source format */
-	    printf("custom source format\n");
+            printf("custom source format\n");
             return -1;
-	}
+        }
         skip_bits(&s->gb, 12);
         skip_bits(&s->gb, 3);
-	printf("pict_type=%d\n",get_bits(&s->gb, 3) + 1);
+        printf("pict_type=%d\n",get_bits(&s->gb, 3) + 1);
 //        if (s->pict_type != I_TYPE &&
 //            s->pict_type != P_TYPE)
 //            return -1;
@@ -155,10 +155,10 @@ static int h263_decode_picture_header(unsigned char *b_ptr)
         width = (get_bits(&s->gb, 9) + 1) * 4;
         skip_bits1(&s->gb);
         height = get_bits(&s->gb, 9) * 4;
-	printf("%d x %d\n",width,height);
+        printf("%d x %d\n",width,height);
         //if (height == 0)
         //    return -1;
-	printf("qscale=%d\n",get_bits(&s->gb, 5));
+        printf("qscale=%d\n",get_bits(&s->gb, 5));
     }
 
     /* PEI */
@@ -234,66 +234,66 @@ while((c=fgetc(f))>=0){
 
     prefix=0;
     if(c==0x82){
-	prefix=1;
-	//continue;
-	c=fgetc(f);
-	printf("%08lX  %02X\n",ftell(f),c);
+        prefix=1;
+        //continue;
+        c=fgetc(f);
+        printf("%08lX  %02X\n",ftell(f),c);
     }
 
     if(c==0x00){
-	// header
-	int len=0;
-	while((c=fgetc(f))>=0x80) len+=0x80*(c&0x0F);
-	len+=c;
-	printf("header: 00 (%d)\n",len);
-	for(i=0;i<len;i++) fgetc(f);
-	continue;
+        // header
+        int len=0;
+        while((c=fgetc(f))>=0x80) len+=0x80*(c&0x0F);
+        len+=c;
+        printf("header: 00 (%d)\n",len);
+        for(i=0;i<len;i++) fgetc(f);
+        continue;
     }
 
     if((c&0xF0)==0x40){
-	// audio
-	len=24;
-	if(prefix) len=fgetc(f);
-	printf("audio: %02X (%d)\n",c,len);
-	for(i=0;i<len;i++) fgetc(f);
-	continue;
+        // audio
+        len=24;
+        if(prefix) len=fgetc(f);
+        printf("audio: %02X (%d)\n",c,len);
+        for(i=0;i<len;i++) fgetc(f);
+        continue;
     }
     if((c&0xF0)==0x30){
-	// audio
-	len=40;
-	if(prefix) len=fgetc(f);
-	printf("audio: %02X (%d)\n",c,len);
-	for(i=0;i<len;i++) fgetc(f);
-	continue;
+        // audio
+        len=40;
+        if(prefix) len=fgetc(f);
+        printf("audio: %02X (%d)\n",c,len);
+        for(i=0;i<len;i++) fgetc(f);
+        continue;
     }
     if(flag2 || (((c&0xF0)==0x10 || (c&0xF0)==0x20) && (c&0x0F)!=(v_id&0xF))){
-	// end of frame:
-	printf("Frame size: %d\n",mux->buffer_len);
-	h263_decode_picture_header(mux->buffer);
-	muxer_write_chunk(mux,mux->buffer_len,0x10, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
-	mux->buffer_len=0;
+        // end of frame:
+        printf("Frame size: %d\n",mux->buffer_len);
+        h263_decode_picture_header(mux->buffer);
+        muxer_write_chunk(mux,mux->buffer_len,0x10, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
+        mux->buffer_len=0;
 
-	if((v_id&0xF0)==0x10) fprintf(stderr,"hmm. last video packet %02X\n",v_id);
+        if((v_id&0xF0)==0x10) fprintf(stderr,"hmm. last video packet %02X\n",v_id);
     }
     flag2=0;
     if((c&0xF0)==0x10){
-	// 128 byte
-	len=128;
-	if(prefix) len=fgetc(f);
-	printf("video: %02X (%d)\n",c,len);
-	fread(mux->buffer+mux->buffer_len,len,1,f);
-	mux->buffer_len+=len;
+        // 128 byte
+        len=128;
+        if(prefix) len=fgetc(f);
+        printf("video: %02X (%d)\n",c,len);
+        fread(mux->buffer+mux->buffer_len,len,1,f);
+        mux->buffer_len+=len;
     v_id=c;
-	continue;
+        continue;
     }
     if((c&0xF0)==0x20){
-	int len=fgetc(f);
-	printf("video: %02X (%d)\n",c,len);
-	fread(mux->buffer+mux->buffer_len,len,1,f);
-	mux->buffer_len+=len;
-	flag2=1;
+        int len=fgetc(f);
+        printf("video: %02X (%d)\n",c,len);
+        fread(mux->buffer+mux->buffer_len,len,1,f);
+        mux->buffer_len+=len;
+        flag2=1;
     v_id=c;
-	continue;
+        continue;
     }
     printf("error: %02X!\n",c);
     exit(1);

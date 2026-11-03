@@ -173,7 +173,7 @@ fribidi_charset_to_unicode (
     {
       register FriBidiStrIndex l;
       for (l = len; l; l--)
-	*us++ = (*char_sets[char_set].charset_to_unicode_c) (*s++);
+        *us++ = (*char_sets[char_set].charset_to_unicode_c) (*s++);
       return len;
     }
   else
@@ -196,7 +196,7 @@ fribidi_unicode_to_charset (
     {
       register FriBidiStrIndex l;
       for (l = len; l; l--)
-	*s++ = (*char_sets[char_set].unicode_to_charset_c) (*us++);
+        *s++ = (*char_sets[char_set].unicode_to_charset_c) (*us++);
       *s = '\0';
       return len;
     }

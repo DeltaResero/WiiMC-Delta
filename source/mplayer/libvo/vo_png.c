@@ -44,10 +44,10 @@
 
 static const vo_info_t info =
 {
-	"PNG file",
-	"png",
-	"Felix Buenemann <atmosfear@users.sourceforge.net>",
-	""
+        "PNG file",
+        "png",
+        "Felix Buenemann <atmosfear@users.sourceforge.net>",
+        ""
 };
 
 const LIBVO_EXTERN (png)
@@ -113,11 +113,11 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 {
     char buf[BUFLENGTH];
 
-	    if(z_compression == 0) {
- 		    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning1);
- 		    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning2);
- 		    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning3);
-	    }
+            if(z_compression == 0) {
+                    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning1);
+                    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning2);
+                    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_PNG_Warning3);
+            }
 
     snprintf(buf, BUFLENGTH, "%s", png_outdir);
     png_mkdir(buf, 1);
@@ -173,9 +173,9 @@ static uint32_t draw_image(mp_image_t* mpi){
     res = avcodec_encode_video(avctx, outbuffer, outbuffer_size, &pic);
 
     if(res < 0){
- 	    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);
+            mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);
             fclose(outfile);
-	    return 1;
+            return 1;
     }
 
     fwrite(outbuffer, res, 1, outfile);

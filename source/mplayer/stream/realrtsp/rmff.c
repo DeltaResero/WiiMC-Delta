@@ -395,17 +395,17 @@ static rmff_data_t *rmff_scan_dataheader(const char *data) {
 
 rmff_header_t *rmff_scan_header(const char *data) {
 
-	rmff_header_t *header=malloc(sizeof(rmff_header_t));
-	rmff_mdpr_t   *mdpr=NULL;
-	int           chunk_size;
-	uint32_t      chunk_type;
+        rmff_header_t *header=malloc(sizeof(rmff_header_t));
+        rmff_mdpr_t   *mdpr=NULL;
+        int           chunk_size;
+        uint32_t      chunk_type;
   const char    *ptr=data;
   int           i;
 
   header->fileheader=NULL;
-	header->prop=NULL;
-	header->cont=NULL;
-	header->data=NULL;
+        header->prop=NULL;
+        header->cont=NULL;
+        header->data=NULL;
 
   chunk_type = AV_RB32(ptr);
   if (chunk_type != RMF_TAG)
@@ -417,7 +417,7 @@ rmff_header_t *rmff_scan_header(const char *data) {
   header->fileheader=rmff_scan_fileheader(ptr);
   ptr += header->fileheader->size;
 
-	header->streams=malloc(sizeof(rmff_mdpr_t*)*(header->fileheader->num_headers));
+        header->streams=malloc(sizeof(rmff_mdpr_t*)*(header->fileheader->num_headers));
   for (i=0; i<header->fileheader->num_headers; i++) {
     header->streams[i]=NULL;
   }
@@ -459,7 +459,7 @@ rmff_header_t *rmff_scan_header(const char *data) {
     ptr+=chunk_size;
   }
 
-	return header;
+        return header;
 }
 
 rmff_header_t *rmff_scan_header_stream(int fd) {
@@ -485,7 +485,7 @@ rmff_header_t *rmff_scan_header_stream(int fd) {
       case PROP_TAG:
         buf = xbuffer_ensure_size(buf, index+chunk_size-8);
         recv(fd, buf+index, (chunk_size-8), 0);
-	index+=(chunk_size-8);
+        index+=(chunk_size-8);
         break;
       default:
         mp_msg(MSGT_STREAM, MSGL_WARN, "rmff_scan_header_stream: unknown chunk");

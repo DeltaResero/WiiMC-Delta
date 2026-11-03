@@ -81,10 +81,10 @@ static void
 needVideoFrameRate(demuxer_t* demuxer, MediaSubsession* subsession); // forward
 static Boolean
 parseQTState_video(QuickTimeGenericRTPSource::QTState const& qtState,
-		   unsigned& fourcc); // forward
+                   unsigned& fourcc); // forward
 static Boolean
 parseQTState_audio(QuickTimeGenericRTPSource::QTState const& qtState,
-		   unsigned& fourcc, unsigned& numChannels); // forward
+                   unsigned& fourcc, unsigned& numChannels); // forward
 
 static BITMAPINFOHEADER * insertVideoExtradata(BITMAPINFOHEADER *bih,
                                                unsigned char * extraData,
@@ -102,8 +102,8 @@ static BITMAPINFOHEADER * insertVideoExtradata(BITMAPINFOHEADER *bih,
 }
 
 void rtpCodecInitialize_video(demuxer_t* demuxer,
-			      MediaSubsession* subsession,
-			      unsigned& flags) {
+                              MediaSubsession* subsession,
+                              unsigned& flags) {
   flags = 0;
   // Create a dummy video stream header
   // to make the main MPlayer code happy:
@@ -121,11 +121,11 @@ void rtpCodecInitialize_video(demuxer_t* demuxer,
   if (strcmp(subsession->codecName(), "MPV") == 0) {
     flags |= RTPSTATE_IS_MPEG12_VIDEO;
   } else if (strcmp(subsession->codecName(), "MP1S") == 0 ||
-	     strcmp(subsession->codecName(), "MP2T") == 0) {
+             strcmp(subsession->codecName(), "MP2T") == 0) {
     flags |= RTPSTATE_IS_MPEG12_VIDEO|RTPSTATE_IS_MULTIPLEXED;
   } else if (strcmp(subsession->codecName(), "H263") == 0 ||
-	     strcmp(subsession->codecName(), "H263-2000") == 0 ||
-	     strcmp(subsession->codecName(), "H263-1998") == 0) {
+             strcmp(subsession->codecName(), "H263-2000") == 0 ||
+             strcmp(subsession->codecName(), "H263-1998") == 0) {
     bih->biCompression = sh_video->format
       = mmioFOURCC('H','2','6','3');
     needVideoFrameRate(demuxer, subsession);
@@ -169,7 +169,7 @@ void rtpCodecInitialize_video(demuxer_t* demuxer,
     sh_video->bih = bih = insertVideoExtradata(bih, configData, configLen);
     needVideoFrameRate(demuxer, subsession);
   } else if (strcmp(subsession->codecName(), "X-QT") == 0 ||
-	     strcmp(subsession->codecName(), "X-QUICKTIME") == 0) {
+             strcmp(subsession->codecName(), "X-QUICKTIME") == 0) {
     // QuickTime generic RTP format, as described in
     // http://developer.apple.com/quicktime/icefloe/dispatch026.html
 
@@ -182,8 +182,8 @@ void rtpCodecInitialize_video(demuxer_t* demuxer,
     unsigned fourcc;
     do {
       if (!awaitRTPPacket(demuxer, demuxer->video,
-			  packetData, packetDataLen, pts)) {
-	return;
+                          packetData, packetDataLen, pts)) {
+        return;
       }
     } while (!parseQTState_video(qtRTPSource->qtState, fourcc));
 
@@ -211,14 +211,14 @@ void rtpCodecInitialize_video(demuxer_t* demuxer,
     needVideoFrameRate(demuxer, subsession);
   } else {
     fprintf(stderr,
-	    "Unknown MPlayer format code for MIME type \"video/%s\"\n",
-	    subsession->codecName());
+            "Unknown MPlayer format code for MIME type \"video/%s\"\n",
+            subsession->codecName());
   }
 }
 
 void rtpCodecInitialize_audio(demuxer_t* demuxer,
-			      MediaSubsession* subsession,
-			      unsigned& flags) {
+                              MediaSubsession* subsession,
+                              unsigned& flags) {
   flags = 0;
   // Create a dummy audio stream header
   // to make the main MPlayer code happy:
@@ -291,7 +291,7 @@ void rtpCodecInitialize_audio(demuxer_t* demuxer,
     unsigned codecdata_len;
     sh_audio->codecdata
       = parseStreamMuxConfigStr(subsession->fmtp_config(),
-				codecdata_len);
+                                codecdata_len);
     sh_audio->codecdata_len = codecdata_len;
     //faad doesn't understand LATM's data length field, so omit it
     ((MPEG4LATMAudioRTPSource*)subsession->rtpSource())->omitLATMDataLengthField();
@@ -302,10 +302,10 @@ void rtpCodecInitialize_audio(demuxer_t* demuxer,
     unsigned codecdata_len;
     sh_audio->codecdata
       = parseGeneralConfigStr(subsession->fmtp_config(),
-			      codecdata_len);
+                              codecdata_len);
     sh_audio->codecdata_len = codecdata_len;
   } else if (strcmp(subsession->codecName(), "X-QT") == 0 ||
-	     strcmp(subsession->codecName(), "X-QUICKTIME") == 0) {
+             strcmp(subsession->codecName(), "X-QUICKTIME") == 0) {
     // QuickTime generic RTP format, as described in
     // http://developer.apple.com/quicktime/icefloe/dispatch026.html
 
@@ -318,8 +318,8 @@ void rtpCodecInitialize_audio(demuxer_t* demuxer,
     unsigned fourcc, numChannels;
     do {
       if (!awaitRTPPacket(demuxer, demuxer->audio,
-			  packetData, packetDataLen, pts)) {
-	return;
+                          packetData, packetDataLen, pts)) {
+        return;
       }
     } while (!parseQTState_audio(qtRTPSource->qtState, fourcc, numChannels));
 
@@ -350,13 +350,13 @@ void rtpCodecInitialize_audio(demuxer_t* demuxer,
     }
   } else {
     fprintf(stderr,
-	    "Unknown MPlayer format code for MIME type \"audio/%s\"\n",
-	    subsession->codecName());
+            "Unknown MPlayer format code for MIME type \"audio/%s\"\n",
+            subsession->codecName());
   }
 }
 
 static void needVideoFrameRate(demuxer_t* demuxer,
-			       MediaSubsession* subsession) {
+                               MediaSubsession* subsession) {
   // For some codecs, MPlayer's decoding software can't (or refuses to :-)
   // figure out the frame rate by itself, so (unless the user specifies
   // it manually, using "-fps") we figure it out ourselves here, using the
@@ -405,7 +405,7 @@ static void needVideoFrameRate(demuxer_t* demuxer,
 
 static Boolean
 parseQTState_video(QuickTimeGenericRTPSource::QTState const& qtState,
-		   unsigned& fourcc) {
+                   unsigned& fourcc) {
   // qtState's "sdAtom" field is supposed to contain a QuickTime video
   // 'sample description' atom.  This atom's name is the 'fourcc' that we want:
   char const* sdAtom = qtState.sdAtom;
@@ -417,7 +417,7 @@ parseQTState_video(QuickTimeGenericRTPSource::QTState const& qtState,
 
 static Boolean
 parseQTState_audio(QuickTimeGenericRTPSource::QTState const& qtState,
-		   unsigned& fourcc, unsigned& numChannels) {
+                   unsigned& fourcc, unsigned& numChannels) {
   // qtState's "sdAtom" field is supposed to contain a QuickTime audio
   // 'sample description' atom.  This atom's name is the 'fourcc' that we want.
   // Also, the top half of the 5th word following the atom name should

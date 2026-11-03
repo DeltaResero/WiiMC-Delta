@@ -123,7 +123,7 @@ void silk_NSQ_del_dec(
 {
     opus_int            i, k, lag, start_idx, LSF_interpolation_flag, Winner_ind, subfr;
     opus_int            last_smple_idx, smpl_buf_idx, decisionDelay;
-    const opus_int16 	*A_Q12, *B_Q14, *AR_shp_Q13;
+    const opus_int16    *A_Q12, *B_Q14, *AR_shp_Q13;
     opus_int16          *pxq;
     opus_int32          sLTP_Q15[ 2 * MAX_FRAME_LENGTH ];
     opus_int16          sLTP[     2 * MAX_FRAME_LENGTH ];

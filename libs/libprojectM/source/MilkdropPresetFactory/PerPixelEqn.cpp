@@ -45,8 +45,8 @@ void PerPixelEqn::evaluate(int mesh_i, int mesh_j) {
  float ** param_matrix = (float**)this->param->matrix;
 
  if (param_matrix == 0) {
-	 assert(param->engine_val);
-	 (*(float*)param->engine_val) = eqn_ptr->eval_gen_expr(mesh_i, mesh_j);
+         assert(param->engine_val);
+         (*(float*)param->engine_val) = eqn_ptr->eval_gen_expr(mesh_i, mesh_j);
 
   } else {
 
@@ -65,9 +65,9 @@ void PerPixelEqn::evaluate(int mesh_i, int mesh_j) {
 
 PerPixelEqn::PerPixelEqn(int _index, Param * _param, GenExpr * _gen_expr):index(_index), param(_param), gen_expr(_gen_expr) {
 
-	assert(index >= 0);
-	assert(param != 0);
-	assert(gen_expr != 0);
+        assert(index >= 0);
+        assert(param != 0);
+        assert(gen_expr != 0);
 
 }
 

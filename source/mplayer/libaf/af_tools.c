@@ -102,9 +102,9 @@ int af_test_output(struct af_instance_s* af, af_data_t* out)
 float af_softclip(float a)
 {
     if (a >= M_PI/2)
-	return 1.0;
+        return 1.0;
     else if (a <= -M_PI/2)
-	return -1.0;
+        return -1.0;
     else
-	return sin(a);
+        return sin(a);
 }

@@ -221,8 +221,8 @@ static void draw(menu_t* menu, mp_image_t* mpi) {
     sprintf(input,"%s%s",mpriv->prompt,mpriv->cur_history->buffer);
     menu_text_size(input,w,mpriv->vspace,1,&lw,&lh);
     menu_draw_text_full(mpi,input,x,y,w,h,mpriv->vspace,1,
-			MENU_TEXT_BOT|MENU_TEXT_LEFT,
-			MENU_TEXT_BOT|MENU_TEXT_LEFT);
+                        MENU_TEXT_BOT|MENU_TEXT_LEFT,
+                        MENU_TEXT_BOT|MENU_TEXT_LEFT);
     y -= lh + mpriv->vspace;
   }
 
@@ -231,8 +231,8 @@ static void draw(menu_t* menu, mp_image_t* mpi) {
     int c = (ll - i) >= 0 ? ll - i : mpriv->buf_lines + ll - i;
     menu_text_size(mpriv->lines[c],w,mpriv->vspace,1,&lw,&lh);
     menu_draw_text_full(mpi,mpriv->lines[c],x,y,w,h,mpriv->vspace,1,
-			MENU_TEXT_BOT|MENU_TEXT_LEFT,
-			MENU_TEXT_BOT|MENU_TEXT_LEFT);
+                        MENU_TEXT_BOT|MENU_TEXT_LEFT,
+                        MENU_TEXT_BOT|MENU_TEXT_LEFT);
     y -= lh + mpriv->vspace;
   }
   return;
@@ -278,10 +278,10 @@ static void check_child(menu_t* menu) {
       if(w) mpriv->add_line = 1;
       r = read(mpriv->child_fd[i],buffer,255);
       if(r < 0)
-	mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_ReadErrorOnChildFD, i == 1 ? "stdout":"stderr");
+        mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_ReadErrorOnChildFD, i == 1 ? "stdout":"stderr");
       else if(r>0) {
-	buffer[r] = '\0';
-	add_string(mpriv,buffer);
+        buffer[r] = '\0';
+        add_string(mpriv,buffer);
       }
       w = 1;
     }
@@ -346,7 +346,7 @@ static void enter_cmd(menu_t* menu) {
     if(mpriv->history_size >= mpriv->history_max) {
       history_t* i;
       for(i = mpriv->history ; i->prev ; i = i->prev)
-	/**/;
+        /**/;
       i->next->prev = NULL;
       free(i->buffer);
       free(i);
@@ -380,16 +380,16 @@ static void read_cmd(menu_t* menu,int cmd) {
       char *str = mpriv->cur_history->buffer;
       int l = strlen(str);
       while(l > 0) {
-	int w = write(mpriv->child_fd[0],str,l);
-	if(w < 0) {
-	  mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_WriteError);
-	  break;
-	}
-	l -= w;
-	str += w;
+        int w = write(mpriv->child_fd[0],str,l);
+        if(w < 0) {
+          mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_WriteError);
+          break;
+        }
+        l -= w;
+        str += w;
       }
       if(write(mpriv->child_fd[0],"\n",1) < 0)
-	mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_WriteError);
+        mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_WriteError);
       enter_cmd(menu);
       return;
     }
@@ -400,27 +400,27 @@ static void read_cmd(menu_t* menu,int cmd) {
     else {
       switch(c->id) {
       case MP_CMD_CHELP:
-	add_line(mpriv,"MPlayer console 0.01");
-	add_line(mpriv,"TODO: meaningful help message ;)");
-	add_line(mpriv,"Enter any slave command");
-	add_line(mpriv,"exit close this console");
-	break;
+        add_line(mpriv,"MPlayer console 0.01");
+        add_line(mpriv,"TODO: meaningful help message ;)");
+        add_line(mpriv,"Enter any slave command");
+        add_line(mpriv,"exit close this console");
+        break;
       case MP_CMD_CEXIT:
-	menu->show = 0;
-	menu->cl = 1;
-	break;
+        menu->show = 0;
+        menu->cl = 1;
+        break;
       case MP_CMD_CHIDE:
-	if(mpriv->hide_time)
-	  mpriv->hide_ts = GetTimerMS();
-	else
-	  menu->show = 0;
-	mpriv->show_ts = 0;
-	break;
+        if(mpriv->hide_time)
+          mpriv->hide_ts = GetTimerMS();
+        else
+          menu->show = 0;
+        mpriv->show_ts = 0;
+        break;
       case MP_CMD_RUN:
-	run_shell_cmd(menu,c->args[0].v.s);
-	break;
+        run_shell_cmd(menu,c->args[0].v.s);
+        break;
       default: // Send the other commands to mplayer
-	mp_input_queue_cmd(c);
+        mp_input_queue_cmd(c);
       }
     }
     return;

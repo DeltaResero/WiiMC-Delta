@@ -72,12 +72,12 @@ struct IClassFactory
 
 #ifdef WIN32_LOADER
 long CoCreateInstance(GUID* rclsid, struct IUnknown* pUnkOuter,
- 		      long dwClsContext, const GUID* riid, void** ppv);
+               long dwClsContext, const GUID* riid, void** ppv);
 void* CoTaskMemAlloc(unsigned long cb);
 void CoTaskMemFree(void* cb);
 #else
 long STDCALL CoCreateInstance(GUID* rclsid, struct IUnknown* pUnkOuter,
-		      long dwClsContext, const GUID* riid, void** ppv);
+              long dwClsContext, const GUID* riid, void** ppv);
 void* STDCALL  CoTaskMemAlloc(unsigned long);
 void  STDCALL  CoTaskMemFree(void*);
 #endif

@@ -35,10 +35,10 @@
 // Data for specific instances of this filter
 typedef struct af_delay_s
 {
-  void* q[AF_NCH];   	// Circular queues used for delaying audio signal
-  int 	wi[AF_NCH];  	// Write index
-  int 	ri;		// Read index
-  float	d[AF_NCH];   	// Delay [ms]
+  void* q[AF_NCH];      // Circular queues used for delaying audio signal
+  int   wi[AF_NCH];     // Write index
+  int   ri;             // Read index
+  float d[AF_NCH];      // Delay [ms]
 }af_delay_t;
 
 // Initialization and runtime control
@@ -62,7 +62,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     for(i=0;i<af->data->nch;i++){
       s->q[i] = calloc(L,af->data->bps);
       if(NULL == s->q[i])
-	mp_msg(MSGT_AFILTER, MSGL_FATAL, "[delay] Out of memory\n");
+        mp_msg(MSGT_AFILTER, MSGL_FATAL, "[delay] Out of memory\n");
     }
 
     return control(af,AF_CONTROL_DELAY_LEN | AF_CONTROL_SET,s->d);
@@ -74,7 +74,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     while(n && i < AF_NCH ){
       sscanf(cl,"%f:%n",&s->d[i],&n);
       if(n==0 || cl[n-1] == '\0')
-	break;
+        break;
       cl=&cl[n];
       i++;
     }
@@ -87,9 +87,9 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     s->ri = 0;
     for(i=0;i<AF_NCH;i++){
       mp_msg(MSGT_AFILTER, MSGL_DBG2, "[delay] Channel %i delayed by %0.3fms\n",
-	     i,clamp(s->d[i],0.0,1000.0));
+             i,clamp(s->d[i],0.0,1000.0));
       mp_msg(MSGT_AFILTER, MSGL_DBG3, "[delay] Channel %i delayed by %i samples\n",
-	     i,s->wi[i]);
+             i,s->wi[i]);
     }
     return AF_OK;
   }
@@ -97,9 +97,9 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     int i;
     for(i=0;i<AF_NCH;i++){
       if(s->ri > s->wi[i])
-	s->wi[i] = L - (s->ri - s->wi[i]);
+        s->wi[i] = L - (s->ri - s->wi[i]);
       else
-	s->wi[i] = s->wi[i] - s->ri;
+        s->wi[i] = s->wi[i] - s->ri;
     }
     return af_to_ms(AF_NCH, s->wi, arg, af->data->rate);
   }
@@ -121,12 +121,12 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   	c   = data;	 // Current working data
-  af_delay_t*  	s   = af->setup; // Setup for this instance
-  int 		nch = c->nch;	 // Number of channels
-  int		len = c->len/c->bps; // Number of sample in data chunk
-  int		ri  = 0;
-  int 		ch,i;
+  af_data_t*    c   = data;      // Current working data
+  af_delay_t*   s   = af->setup; // Setup for this instance
+  int           nch = c->nch;    // Number of channels
+  int           len = c->len/c->bps; // Number of sample in data chunk
+  int           ri  = 0;
+  int           ch,i;
   for(ch=0;ch<nch;ch++){
     switch(c->bps){
     case 1:{
@@ -135,10 +135,10 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
       int wi = s->wi[ch];
       ri = s->ri;
       for(i=ch;i<len;i+=nch){
-	q[wi] = a[i];
-	a[i]  = q[ri];
-	UPDATEQI(wi);
-	UPDATEQI(ri);
+        q[wi] = a[i];
+        a[i]  = q[ri];
+        UPDATEQI(wi);
+        UPDATEQI(ri);
       }
       s->wi[ch] = wi;
       break;
@@ -149,10 +149,10 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
       int wi = s->wi[ch];
       ri = s->ri;
       for(i=ch;i<len;i+=nch){
-	q[wi] = a[i];
-	a[i]  = q[ri];
-	UPDATEQI(wi);
-	UPDATEQI(ri);
+        q[wi] = a[i];
+        a[i]  = q[ri];
+        UPDATEQI(wi);
+        UPDATEQI(ri);
       }
       s->wi[ch] = wi;
       break;
@@ -163,10 +163,10 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
       int wi = s->wi[ch];
       ri = s->ri;
       for(i=ch;i<len;i+=nch){
-	q[wi] = a[i];
-	a[i]  = q[ri];
-	UPDATEQI(wi);
-	UPDATEQI(ri);
+        q[wi] = a[i];
+        a[i]  = q[ri];
+        UPDATEQI(wi);
+        UPDATEQI(ri);
       }
       s->wi[ch] = wi;
       break;

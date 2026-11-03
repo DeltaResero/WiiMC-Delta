@@ -140,25 +140,25 @@ static uint32_t SAVED_OVERLAY_GRAPHICS_KEY_CLR;
 /* VIDIX exports */
 
 /* MMIO space*/
-#define GETREG(TYPE,PTR,OFFZ)		(*((volatile TYPE*)((PTR)+(OFFZ))))
-#define SETREG(TYPE,PTR,OFFZ,VAL)	(*((volatile TYPE*)((PTR)+(OFFZ))))=VAL
+#define GETREG(TYPE,PTR,OFFZ)           (*((volatile TYPE*)((PTR)+(OFFZ))))
+#define SETREG(TYPE,PTR,OFFZ,VAL)       (*((volatile TYPE*)((PTR)+(OFFZ))))=VAL
 
-#define INREG8(addr)		GETREG(uint8_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2)
-#define OUTREG8(addr,val)	SETREG(uint8_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2,val)
+#define INREG8(addr)            GETREG(uint8_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2)
+#define OUTREG8(addr,val)       SETREG(uint8_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2,val)
 
 static inline uint32_t INREG (uint32_t addr) {
-	uint32_t tmp = GETREG(uint32_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2);
-	return le2me_32(tmp);
+        uint32_t tmp = GETREG(uint32_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2);
+        return le2me_32(tmp);
 }
-#define OUTREG(addr,val)	SETREG(uint32_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2,le2me_32(val))
+#define OUTREG(addr,val)        SETREG(uint32_t,(uint8_t *)mach64_mmio_base,((addr)^0x100)<<2,le2me_32(val))
 
-#define OUTREGP(addr,val,mask)  					\
-	do {								\
-		unsigned int _tmp = INREG(addr);			\
-		_tmp &= (mask);						\
-		_tmp |= (val);						\
-		OUTREG(addr, _tmp);					\
-	} while (0)
+#define OUTREGP(addr,val,mask)                                          \
+        do {                                                            \
+                unsigned int _tmp = INREG(addr);                        \
+                _tmp &= (mask);                                         \
+                _tmp |= (val);                                          \
+                OUTREG(addr, _tmp);                                     \
+        } while (0)
 
 static inline int ATIGetMach64LCDReg(int _Index)
 {
@@ -190,13 +190,13 @@ static inline void OUTPLL(uint32_t addr, uint32_t val)
     OUTREG8(CLOCK_CNTL + 1, (addr << 2) & ~PLL_WR_EN);
 }
 
-#define OUTPLLP(addr,val,mask)  					\
-	do {								\
-		unsigned int _tmp = INPLL(addr);			\
-		_tmp &= (mask);						\
-		_tmp |= (val);						\
-		OUTPLL(addr, _tmp);					\
-	} while (0)
+#define OUTPLLP(addr,val,mask)                                          \
+        do {                                                            \
+                unsigned int _tmp = INPLL(addr);                        \
+                _tmp &= (mask);                                         \
+                _tmp |= (val);                                          \
+                OUTPLL(addr, _tmp);                                     \
+        } while (0)
 
 static void mach64_fifo_wait(unsigned n)
 {
@@ -214,9 +214,9 @@ static void mach64_wait_vsync( void )
     int i;
 
     for(i=0; i<2000000; i++)
-	if( (INREG(CRTC_INT_CNTL)&CRTC_VBLANK)==0 ) break;
+        if( (INREG(CRTC_INT_CNTL)&CRTC_VBLANK)==0 ) break;
     for(i=0; i<2000000; i++)
-	if( (INREG(CRTC_INT_CNTL)&CRTC_VBLANK) ) break;
+        if( (INREG(CRTC_INT_CNTL)&CRTC_VBLANK) ) break;
 
 }
 
@@ -301,13 +301,13 @@ static int mach64_get_vert_stretch(void)
     if(!(vert_stretching&VERT_STRETCH_EN)) ret= 1<<16;
     else
     {
-    	int panel_size;
+        int panel_size;
 
-	ext_vert_stretch= ATIGetMach64LCDReg(LCD_EXT_VERT_STRETCH);
-	panel_size= (ext_vert_stretch&VERT_PANEL_SIZE)>>11;
-	panel_size++;
+        ext_vert_stretch= ATIGetMach64LCDReg(LCD_EXT_VERT_STRETCH);
+        panel_size= (ext_vert_stretch&VERT_PANEL_SIZE)>>11;
+        panel_size++;
 
-	ret= ((yres<<16) + (panel_size>>1))/panel_size;
+        ret= ((yres<<16) + (panel_size>>1))/panel_size;
     }
 
 //    lcd_gen_ctrl = ATIGetMach64LCDReg(LCD_GEN_CNTL);
@@ -346,8 +346,8 @@ static void mach64_vid_dump_regs( void )
   printf("[mach64] *** Begin of OV0 registers dump ***\n");
   for(i=0;i<sizeof(vregs)/sizeof(video_registers_t);i++)
   {
-	mach64_wait_for_idle();
-	printf("[mach64] %s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
+        mach64_wait_for_idle();
+        printf("[mach64] %s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
   }
   printf("[mach64] *** End of OV0 registers dump ***\n");
 }
@@ -425,30 +425,30 @@ static int mach64_probe(int verbose,int force)
       if(lst[i].vendor == VENDOR_ATI)
       {
         int idx;
-	const char *dname;
-	idx = find_chip(lst[i].device);
-	if(idx == -1 && force == PROBE_NORMAL) continue;
-	dname = pci_device_name(VENDOR_ATI,lst[i].device);
-	dname = dname ? dname : "Unknown chip";
-	printf("[mach64] Found chip: %s\n",dname);
+        const char *dname;
+        idx = find_chip(lst[i].device);
+        if(idx == -1 && force == PROBE_NORMAL) continue;
+        dname = pci_device_name(VENDOR_ATI,lst[i].device);
+        dname = dname ? dname : "Unknown chip";
+        printf("[mach64] Found chip: %s\n",dname);
 #if 0
-	if ((lst[i].command & PCI_COMMAND_IO) == 0)
-	{
-		printf("[mach64] Device is disabled, ignoring\n");
-		continue;
-	}
+        if ((lst[i].command & PCI_COMMAND_IO) == 0)
+        {
+                printf("[mach64] Device is disabled, ignoring\n");
+                continue;
+        }
 #endif
-	if(force > PROBE_NORMAL)
-	{
-	    printf("[mach64] Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
-	    if(idx == -1)
-		printf("[mach64] Assuming it as Mach64\n");
-	}
-	mach64_cap.device_id = lst[i].device;
-	err = 0;
-	memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
-	probed=1;
-	break;
+        if(force > PROBE_NORMAL)
+        {
+            printf("[mach64] Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
+            if(idx == -1)
+                printf("[mach64] Assuming it as Mach64\n");
+        }
+        mach64_cap.device_id = lst[i].device;
+        err = 0;
+        memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
+        probed=1;
+        break;
       }
     }
   }
@@ -461,8 +461,8 @@ static void reset_regs( void )
   size_t i;
   for(i=0;i<sizeof(vregs)/sizeof(video_registers_t);i++)
   {
-	mach64_fifo_wait(2);
-	OUTREG(vregs[i].name,0);
+        mach64_fifo_wait(2);
+        OUTREG(vregs[i].name,0);
   }
 }
 
@@ -500,16 +500,16 @@ static int mach64_init(void)
   if(INREG(SCALER_BUF0_OFFSET_U)) supports_planar=1;
   else
   {
-	OUTREG(SCALER_BUF0_OFFSET_U,	-1);
+        OUTREG(SCALER_BUF0_OFFSET_U,    -1);
 
-	mach64_wait_vsync();
-	mach64_wait_for_idle();
-	mach64_fifo_wait(2);
+        mach64_wait_vsync();
+        mach64_wait_for_idle();
+        mach64_fifo_wait(2);
 
-	if(INREG(SCALER_BUF0_OFFSET_U)) 	supports_planar=1;
+        if(INREG(SCALER_BUF0_OFFSET_U))         supports_planar=1;
   }
-  if(supports_planar)	printf("[mach64] Planar YUV formats are supported :)\n");
-  else			printf("[mach64] Planar YUV formats are not supported :(\n");
+  if(supports_planar)   printf("[mach64] Planar YUV formats are supported :)\n");
+  else                  printf("[mach64] Planar YUV formats are not supported :(\n");
 
   if(   mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M
      || mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M2
@@ -575,21 +575,21 @@ static unsigned mach64_query_pitch(unsigned fourcc,const vidix_yuv_t *spitch)
   }
   switch(fourcc)
   {
-	/* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_YV12:
-	case IMGFMT_I420:
-		if(spy > 16 && spu == spy/2 && spv == spy/2)	pitch = spy;
-		else						pitch = 32;
-		break;
-	case IMGFMT_YVU9:
-		if(spy > 32 && spu == spy/4 && spv == spy/4)	pitch = spy;
-		else						pitch = 64;
-		break;
-	default:
-		if(spy >= 16)	pitch = spy;
-		else		pitch = 16;
-		break;
+        /* 4:2:0 */
+        case IMGFMT_IYUV:
+        case IMGFMT_YV12:
+        case IMGFMT_I420:
+                if(spy > 16 && spu == spy/2 && spv == spy/2)    pitch = spy;
+                else                                            pitch = 32;
+                break;
+        case IMGFMT_YVU9:
+                if(spy > 32 && spu == spy/4 && spv == spy/4)    pitch = spy;
+                else                                            pitch = 64;
+                break;
+        default:
+                if(spy >= 16)   pitch = spy;
+                else            pitch = 16;
+                break;
   }
   return pitch;
 }
@@ -603,23 +603,23 @@ static void mach64_compute_framesize(vidix_playback_t *info)
     case IMGFMT_I420:
     case IMGFMT_YV12:
     case IMGFMT_IYUV:
-		awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*(info->src.h+info->src.h/2);
-		break;
+                awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*(info->src.h+info->src.h/2);
+                break;
     case IMGFMT_YVU9:
-		awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
-		info->frame_size = awidth*(info->src.h+info->src.h/8);
-		break;
+                awidth = (info->src.w + (pitch-1)) & ~(pitch-1);
+                info->frame_size = awidth*(info->src.h+info->src.h/8);
+                break;
 //    case IMGFMT_RGB32:
     case IMGFMT_BGR32:
-		awidth = (info->src.w*4 + (pitch-1)) & ~(pitch-1);
-		info->frame_size = (awidth*info->src.h);
-		break;
+                awidth = (info->src.w*4 + (pitch-1)) & ~(pitch-1);
+                info->frame_size = (awidth*info->src.h);
+                break;
     /* YUY2 YVYU, RGB15, RGB16 */
     default:
-		awidth = (info->src.w*2 + (pitch-1)) & ~(pitch-1);
-		info->frame_size = (awidth*info->src.h);
-		break;
+                awidth = (info->src.w*2 + (pitch-1)) & ~(pitch-1);
+                info->frame_size = (awidth*info->src.h);
+                break;
   }
   info->frame_size+=256; // so we have some space for alignment & such
   info->frame_size&=~16;
@@ -644,17 +644,17 @@ static void mach64_vid_display_video( void )
 {
     mach64_fifo_wait(14);
 
-    OUTREG(OVERLAY_Y_X_START,			besr.y_x_start);
-    OUTREG(OVERLAY_Y_X_END,			besr.y_x_end);
-    OUTREG(OVERLAY_SCALE_INC,			besr.scale_inc);
-    OUTREG(SCALER_BUF_PITCH,			besr.vid_buf_pitch);
-    OUTREG(SCALER_HEIGHT_WIDTH,			besr.height_width);
-    OUTREG(SCALER_BUF0_OFFSET,			mach64_buffer_base[0][0]);
-    OUTREG(SCALER_BUF0_OFFSET_U,		mach64_buffer_base[0][1]);
-    OUTREG(SCALER_BUF0_OFFSET_V,		mach64_buffer_base[0][2]);
-    OUTREG(SCALER_BUF1_OFFSET,			mach64_buffer_base[0][0]);
-    OUTREG(SCALER_BUF1_OFFSET_U,		mach64_buffer_base[0][1]);
-    OUTREG(SCALER_BUF1_OFFSET_V,		mach64_buffer_base[0][2]);
+    OUTREG(OVERLAY_Y_X_START,                   besr.y_x_start);
+    OUTREG(OVERLAY_Y_X_END,                     besr.y_x_end);
+    OUTREG(OVERLAY_SCALE_INC,                   besr.scale_inc);
+    OUTREG(SCALER_BUF_PITCH,                    besr.vid_buf_pitch);
+    OUTREG(SCALER_HEIGHT_WIDTH,                 besr.height_width);
+    OUTREG(SCALER_BUF0_OFFSET,                  mach64_buffer_base[0][0]);
+    OUTREG(SCALER_BUF0_OFFSET_U,                mach64_buffer_base[0][1]);
+    OUTREG(SCALER_BUF0_OFFSET_V,                mach64_buffer_base[0][2]);
+    OUTREG(SCALER_BUF1_OFFSET,                  mach64_buffer_base[0][0]);
+    OUTREG(SCALER_BUF1_OFFSET_U,                mach64_buffer_base[0][1]);
+    OUTREG(SCALER_BUF1_OFFSET_V,                mach64_buffer_base[0][2]);
     mach64_wait_vsync();
 
     mach64_fifo_wait(4);
@@ -682,11 +682,11 @@ static void mach64_vid_display_video( void )
 // 0x5  BGR16 (hmm, that need investigation, 2 BGR16 formats, i guess 1 will have only 5bits for green)
 // 0x6  BGR32
 // 0x7  BGR32 with somehow mixed even / odd pixels ?
-// 0x8	YYYYUVUV
-// 0x9	YVU9
-// 0xA	YV12
-// 0xB	YUY2
-// 0xC	UYVY
+// 0x8  YYYYUVUV
+// 0x9  YVU9
+// 0xA  YV12
+// 0xB  YUY2
+// 0xC  UYVY
 // 0xD  UYVY (no difference is visible if i switch between C/D for every even/odd frame)
 // 0xE  dunno behaves strange
 // 0xF  dunno behaves strange
@@ -696,21 +696,21 @@ static void mach64_vid_display_video( void )
 
     switch(besr.fourcc)
     {
-	/* BGR formats */
-	case IMGFMT_BGR15: OUTREG(VIDEO_FORMAT, 0x00030000);  break;
-	case IMGFMT_BGR16: OUTREG(VIDEO_FORMAT, 0x00040000);  break;
-	case IMGFMT_BGR32: OUTREG(VIDEO_FORMAT, 0x00060000);  break;
+        /* BGR formats */
+        case IMGFMT_BGR15: OUTREG(VIDEO_FORMAT, 0x00030000);  break;
+        case IMGFMT_BGR16: OUTREG(VIDEO_FORMAT, 0x00040000);  break;
+        case IMGFMT_BGR32: OUTREG(VIDEO_FORMAT, 0x00060000);  break;
         /* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_I420:
-	case IMGFMT_YV12:  OUTREG(VIDEO_FORMAT, 0x000A0000);  break;
+        case IMGFMT_IYUV:
+        case IMGFMT_I420:
+        case IMGFMT_YV12:  OUTREG(VIDEO_FORMAT, 0x000A0000);  break;
 
-	case IMGFMT_YVU9:  OUTREG(VIDEO_FORMAT, 0x00090000);  break;
+        case IMGFMT_YVU9:  OUTREG(VIDEO_FORMAT, 0x00090000);  break;
         /* 4:2:2 */
         case IMGFMT_YVYU:
-	case IMGFMT_UYVY:  OUTREG(VIDEO_FORMAT, 0x000C0000); break;
-	case IMGFMT_YUY2:
-	default:           OUTREG(VIDEO_FORMAT, 0x000B0000); break;
+        case IMGFMT_UYVY:  OUTREG(VIDEO_FORMAT, 0x000C0000); break;
+        case IMGFMT_YUY2:
+        default:           OUTREG(VIDEO_FORMAT, 0x000B0000); break;
     }
     if(verbosity > VERBOSE_LEVEL) mach64_vid_dump_regs();
 }
@@ -736,32 +736,32 @@ static int mach64_vid_init_video( vidix_playback_t *config )
     mpitch = best_pitch-1;
     switch(config->fourcc)
     {
-	case IMGFMT_YVU9:
-	/* 4:2:0 */
-	case IMGFMT_IYUV:
-	case IMGFMT_YV12:
-	case IMGFMT_I420: pitch = (src_w + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  besr.vid_buf_pitch= pitch;
-			  break;
-	/* RGB 4:4:4:4 */
-	case IMGFMT_RGB32:
-	case IMGFMT_BGR32: pitch = (src_w*4 + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  besr.vid_buf_pitch= pitch>>2;
-			  break;
-	/* 4:2:2 */
+        case IMGFMT_YVU9:
+        /* 4:2:0 */
+        case IMGFMT_IYUV:
+        case IMGFMT_YV12:
+        case IMGFMT_I420: pitch = (src_w + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          besr.vid_buf_pitch= pitch;
+                          break;
+        /* RGB 4:4:4:4 */
+        case IMGFMT_RGB32:
+        case IMGFMT_BGR32: pitch = (src_w*4 + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          besr.vid_buf_pitch= pitch>>2;
+                          break;
+        /* 4:2:2 */
         default: /* RGB15, RGB16, YVYU, UYVY, YUY2 */
-			  pitch = ((src_w*2) + mpitch) & ~mpitch;
-			  config->dest.pitch.y =
-			  config->dest.pitch.u =
-			  config->dest.pitch.v = best_pitch;
-			  besr.vid_buf_pitch= pitch>>1;
-			  break;
+                          pitch = ((src_w*2) + mpitch) & ~mpitch;
+                          config->dest.pitch.y =
+                          config->dest.pitch.u =
+                          config->dest.pitch.v = best_pitch;
+                          besr.vid_buf_pitch= pitch>>1;
+                          break;
     }
     dest_w = config->dest.w;
     dest_h = config->dest.h;
@@ -782,40 +782,40 @@ static int mach64_vid_init_video( vidix_playback_t *config )
     for(i=1; i<config->num_frames; i++)
         config->offsets[i] = config->offsets[i-1] + config->frame_size;
 
-	/*FIXME the left / top stuff is broken (= zoom a src rectangle from a larger one)
-		1. the framesize isn't known as the outer src rectangle dimensions aren't known
-		2. the mach64 needs aligned addresses so it can't work anyway
-		   -> so we could shift the outer buffer to compensate that but that would mean
-		      alignment problems for the code which writes into it
-	*/
+        /*FIXME the left / top stuff is broken (= zoom a src rectangle from a larger one)
+                1. the framesize isn't known as the outer src rectangle dimensions aren't known
+                2. the mach64 needs aligned addresses so it can't work anyway
+                   -> so we could shift the outer buffer to compensate that but that would mean
+                      alignment problems for the code which writes into it
+        */
 
     if(is_420)
     {
-	config->offset.y= 0;
-	config->offset.u= (pitch*src_h + 15)&~15;
-	config->offset.v= (config->offset.u + (pitch*src_h>>2) + 15)&~15;
+        config->offset.y= 0;
+        config->offset.u= (pitch*src_h + 15)&~15;
+        config->offset.v= (config->offset.u + (pitch*src_h>>2) + 15)&~15;
 
-	if(besr.fourcc == IMGFMT_I420 || besr.fourcc == IMGFMT_IYUV)
-	{
-	  uint32_t tmp;
-	  tmp = config->offset.u;
-	  config->offset.u = config->offset.v;
-	  config->offset.v = tmp;
-	}
+        if(besr.fourcc == IMGFMT_I420 || besr.fourcc == IMGFMT_IYUV)
+        {
+          uint32_t tmp;
+          tmp = config->offset.u;
+          config->offset.u = config->offset.v;
+          config->offset.v = tmp;
+        }
 
-	src_offset_y= config->offset.y + top*pitch + left;
-	src_offset_u= config->offset.u + (top*pitch>>2) + (left>>1);
-	src_offset_v= config->offset.v + (top*pitch>>2) + (left>>1);
+        src_offset_y= config->offset.y + top*pitch + left;
+        src_offset_u= config->offset.u + (top*pitch>>2) + (left>>1);
+        src_offset_v= config->offset.v + (top*pitch>>2) + (left>>1);
     }
     else if(besr.fourcc == IMGFMT_YVU9)
     {
-	config->offset.y= 0;
-	config->offset.u= (pitch*src_h + 15)&~15;
-	config->offset.v= (config->offset.u + (pitch*src_h>>4) + 15)&~15;
+        config->offset.y= 0;
+        config->offset.u= (pitch*src_h + 15)&~15;
+        config->offset.v= (config->offset.u + (pitch*src_h>>4) + 15)&~15;
 
-	src_offset_y= config->offset.y + top*pitch + left;
-	src_offset_u= config->offset.u + (top*pitch>>4) + (left>>1);
-	src_offset_v= config->offset.v + (top*pitch>>4) + (left>>1);
+        src_offset_y= config->offset.y + top*pitch + left;
+        src_offset_u= config->offset.u + (top*pitch>>4) + (left>>1);
+        src_offset_v= config->offset.v + (top*pitch>>4) + (left>>1);
     }
     else if(besr.fourcc == IMGFMT_BGR32)
     {
@@ -831,9 +831,9 @@ static int mach64_vid_init_video( vidix_playback_t *config )
     num_mach64_buffers= config->num_frames;
     for(i=0; i<config->num_frames; i++)
     {
-	mach64_buffer_base[i][0]= (mach64_overlay_offset + config->offsets[i] + src_offset_y)&~15;
-	mach64_buffer_base[i][1]= (mach64_overlay_offset + config->offsets[i] + src_offset_u)&~15;
-	mach64_buffer_base[i][2]= (mach64_overlay_offset + config->offsets[i] + src_offset_v)&~15;
+        mach64_buffer_base[i][0]= (mach64_overlay_offset + config->offsets[i] + src_offset_y)&~15;
+        mach64_buffer_base[i][1]= (mach64_overlay_offset + config->offsets[i] + src_offset_u)&~15;
+        mach64_buffer_base[i][2]= (mach64_overlay_offset + config->offsets[i] + src_offset_v)&~15;
     }
 
     left = (left >> 16) & 15;
@@ -861,15 +861,15 @@ static int is_supported_fourcc(uint32_t fourcc)
     case IMGFMT_I420:
     case IMGFMT_YVU9:
     case IMGFMT_IYUV:
-	return supports_planar;
+        return supports_planar;
     case IMGFMT_YUY2:
     case IMGFMT_UYVY:
     case IMGFMT_BGR15:
     case IMGFMT_BGR16:
     case IMGFMT_BGR32:
-	return 1;
+        return 1;
     default:
-	return 0;
+        return 0;
     }
 }
 
@@ -877,9 +877,9 @@ static int mach64_query_fourcc(vidix_fourcc_t *to)
 {
     if(is_supported_fourcc(to->fourcc))
     {
-	to->depth = VID_DEPTH_ALL;
-	to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
-	return 0;
+        to->depth = VID_DEPTH_ALL;
+        to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
+        return 0;
     }
     else  to->depth = to->flags = 0;
     return ENOSYS;
@@ -931,19 +931,19 @@ static int mach64_frame_sel(unsigned int frame)
 
     for(i=0; i<3; i++)
     {
-    	off[i]  = mach64_buffer_base[frame][i];
-    	off[i+3]= mach64_buffer_base[last_frame][i];
+        off[i]  = mach64_buffer_base[frame][i];
+        off[i+3]= mach64_buffer_base[last_frame][i];
     }
 
     mach64_wait_for_idle();
     mach64_fifo_wait(7);
 
-    OUTREG(SCALER_BUF0_OFFSET,		off[0]);
-    OUTREG(SCALER_BUF0_OFFSET_U,	off[1]);
-    OUTREG(SCALER_BUF0_OFFSET_V,	off[2]);
-    OUTREG(SCALER_BUF1_OFFSET,		off[3]);
-    OUTREG(SCALER_BUF1_OFFSET_U,	off[4]);
-    OUTREG(SCALER_BUF1_OFFSET_V,	off[5]);
+    OUTREG(SCALER_BUF0_OFFSET,          off[0]);
+    OUTREG(SCALER_BUF0_OFFSET_U,        off[1]);
+    OUTREG(SCALER_BUF0_OFFSET_V,        off[2]);
+    OUTREG(SCALER_BUF1_OFFSET,          off[3]);
+    OUTREG(SCALER_BUF1_OFFSET_U,        off[4]);
+    OUTREG(SCALER_BUF1_OFFSET_V,        off[5]);
     if(num_mach64_buffers==2) mach64_wait_vsync(); //only wait for vsync if we do double buffering
 
     if(verbosity > VERBOSE_LEVEL) mach64_vid_dump_regs();
@@ -996,50 +996,50 @@ static int mach64_set_gkeys(const vidix_grkey_t *grkey)
 
     if(mach64_grkey.ckey.op == CKEY_TRUE)
     {
-	besr.ckey_on=1;
+        besr.ckey_on=1;
 
-	switch(mach64_vid_get_dbpp())
-	{
-	case 15:
-		besr.graphics_key_msk=0x7FFF;
-		besr.graphics_key_clr=
-			  ((mach64_grkey.ckey.blue &0xF8)>>3)
-			| ((mach64_grkey.ckey.green&0xF8)<<2)
-			| ((mach64_grkey.ckey.red  &0xF8)<<7);
-		break;
-	case 16:
-		besr.graphics_key_msk=0xFFFF;
-		besr.graphics_key_clr=
-			  ((mach64_grkey.ckey.blue &0xF8)>>3)
-			| ((mach64_grkey.ckey.green&0xFC)<<3)
-			| ((mach64_grkey.ckey.red  &0xF8)<<8);
-		//besr.graphics_key_clr=le2me_32(besr.graphics_key_clr);
-		break;
-	case 24:
-		besr.graphics_key_msk=0xFFFFFF;
-		besr.graphics_key_clr=
-			  ((mach64_grkey.ckey.blue &0xFF))
-			| ((mach64_grkey.ckey.green&0xFF)<<8)
-			| ((mach64_grkey.ckey.red  &0xFF)<<16);
-		break;
-	case 32:
-		besr.graphics_key_msk=0xFFFFFF;
-		besr.graphics_key_clr=
-			  ((mach64_grkey.ckey.blue &0xFF))
-			| ((mach64_grkey.ckey.green&0xFF)<<8)
-			| ((mach64_grkey.ckey.red  &0xFF)<<16);
-		break;
-	default:
-		besr.ckey_on=0;
-		besr.graphics_key_msk=0;
-		besr.graphics_key_clr=0;
-	}
+        switch(mach64_vid_get_dbpp())
+        {
+        case 15:
+                besr.graphics_key_msk=0x7FFF;
+                besr.graphics_key_clr=
+                          ((mach64_grkey.ckey.blue &0xF8)>>3)
+                        | ((mach64_grkey.ckey.green&0xF8)<<2)
+                        | ((mach64_grkey.ckey.red  &0xF8)<<7);
+                break;
+        case 16:
+                besr.graphics_key_msk=0xFFFF;
+                besr.graphics_key_clr=
+                          ((mach64_grkey.ckey.blue &0xF8)>>3)
+                        | ((mach64_grkey.ckey.green&0xFC)<<3)
+                        | ((mach64_grkey.ckey.red  &0xF8)<<8);
+                //besr.graphics_key_clr=le2me_32(besr.graphics_key_clr);
+                break;
+        case 24:
+                besr.graphics_key_msk=0xFFFFFF;
+                besr.graphics_key_clr=
+                          ((mach64_grkey.ckey.blue &0xFF))
+                        | ((mach64_grkey.ckey.green&0xFF)<<8)
+                        | ((mach64_grkey.ckey.red  &0xFF)<<16);
+                break;
+        case 32:
+                besr.graphics_key_msk=0xFFFFFF;
+                besr.graphics_key_clr=
+                          ((mach64_grkey.ckey.blue &0xFF))
+                        | ((mach64_grkey.ckey.green&0xFF)<<8)
+                        | ((mach64_grkey.ckey.red  &0xFF)<<16);
+                break;
+        default:
+                besr.ckey_on=0;
+                besr.graphics_key_msk=0;
+                besr.graphics_key_clr=0;
+        }
     }
     else
     {
-	besr.ckey_on=0;
-	besr.graphics_key_msk=0;
-	besr.graphics_key_clr=0;
+        besr.ckey_on=0;
+        besr.graphics_key_msk=0;
+        besr.graphics_key_clr=0;
     }
 
     mach64_fifo_wait(4);
@@ -1048,9 +1048,9 @@ static int mach64_set_gkeys(const vidix_grkey_t *grkey)
 //    OUTREG(OVERLAY_VIDEO_KEY_MSK, 0);
 //    OUTREG(OVERLAY_VIDEO_KEY_CLR, 0);
     if(besr.ckey_on)
-    	OUTREG(OVERLAY_KEY_CNTL,VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_EQ|CMP_MIX_AND);
+        OUTREG(OVERLAY_KEY_CNTL,VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_EQ|CMP_MIX_AND);
     else
-    	OUTREG(OVERLAY_KEY_CNTL,VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND);
+        OUTREG(OVERLAY_KEY_CNTL,VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_TRUE|CMP_MIX_AND);
 
     return 0;
 }

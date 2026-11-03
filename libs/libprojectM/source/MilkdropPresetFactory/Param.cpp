@@ -41,7 +41,7 @@
 /** Constructor */
 Param::Param( std::string _name, short int _type, short int _flags, void * _engine_val, void * _matrix,
               CValue _default_init_val, CValue _upper_bound, CValue _lower_bound):
-	name(_name),
+    name(_name),
         type(_type),
         flags (_flags),
         matrix_flag (0),
@@ -57,16 +57,16 @@ Param::Param( std::string _name, short int _type, short int _flags, void * _engi
 
 /* Creates a user defined parameter */
 Param::Param(std::string _name) :
-	name(_name),
+    name(_name),
         type(P_TYPE_DOUBLE),
-	flags(P_FLAG_USERDEF),
+    flags(P_FLAG_USERDEF),
         matrix_flag(0),
         matrix(0)
         {
 
-	engine_val = new float();
+    engine_val = new float();
 
-	default_init_val.float_val = DEFAULT_DOUBLE_IV;
+    default_init_val.float_val = DEFAULT_DOUBLE_IV;
         upper_bound.float_val = DEFAULT_DOUBLE_UB;
         lower_bound.float_val = DEFAULT_DOUBLE_LB;
 

@@ -32,11 +32,11 @@
 
 static const ad_info_t info =
 {
-	"FFmpeg/libavcodec audio decoders",
-	"ffmpeg",
-	"Nick Kurshev",
-	"ffmpeg.sf.net",
-	""
+        "FFmpeg/libavcodec audio decoders",
+        "ffmpeg",
+        "Nick Kurshev",
+        "ffmpeg.sf.net",
+        ""
 };
 
 LIBAD_EXTERN(ffmpeg)
@@ -99,8 +99,8 @@ static int init(sh_audio_t *sh_audio)
 
     lavc_codec = avcodec_find_decoder_by_name(sh_audio->codec->dll);
     if(!lavc_codec){
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,sh_audio->codec->dll);
-	return 0;
+        mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,sh_audio->codec->dll);
+        return 0;
     }
 
     lavc_context = avcodec_alloc_context3(lavc_codec);
@@ -111,11 +111,11 @@ static int init(sh_audio_t *sh_audio)
     lavc_context->sample_rate = sh_audio->samplerate;
     lavc_context->bit_rate = sh_audio->i_bps * 8;
     if(sh_audio->wf){
-	lavc_context->channels = sh_audio->wf->nChannels;
-	lavc_context->sample_rate = sh_audio->wf->nSamplesPerSec;
-	lavc_context->bit_rate = sh_audio->wf->nAvgBytesPerSec * 8;
-	lavc_context->block_align = sh_audio->wf->nBlockAlign;
-	lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
+        lavc_context->channels = sh_audio->wf->nChannels;
+        lavc_context->sample_rate = sh_audio->wf->nSamplesPerSec;
+        lavc_context->bit_rate = sh_audio->wf->nAvgBytesPerSec * 8;
+        lavc_context->block_align = sh_audio->wf->nBlockAlign;
+        lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
     }
     lavc_context->request_channels = audio_output_channels;
     lavc_context->codec_tag = sh_audio->format; //FOURCC
@@ -185,7 +185,7 @@ static void uninit(sh_audio_t *sh)
     AVCodecContext *lavc_context = sh->context;
 
     if (avcodec_close(lavc_context) < 0)
-	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
     av_freep(&lavc_context->extradata);
     av_freep(&lavc_context);
 }
@@ -207,52 +207,52 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
     unsigned char *start=NULL;
     int y,len=-1;
     while(len<minlen){
-	AVPacket pkt;
-	int len2=maxlen;
-	double pts;
-	int x=ds_get_packet_pts(sh_audio->ds,&start, &pts);
-	if(x<=0) {
-	    start = NULL;
-	    x = 0;
-	    ds_parse(sh_audio->ds, &start, &x, MP_NOPTS_VALUE, 0);
-	    if (x <= 0)
-	        break; // error
-	} else {
-	    int in_size = x;
-	    int consumed = ds_parse(sh_audio->ds, &start, &x, pts, 0);
-	    sh_audio->ds->buffer_pos -= in_size - consumed;
-	}
+        AVPacket pkt;
+        int len2=maxlen;
+        double pts;
+        int x=ds_get_packet_pts(sh_audio->ds,&start, &pts);
+        if(x<=0) {
+            start = NULL;
+            x = 0;
+            ds_parse(sh_audio->ds, &start, &x, MP_NOPTS_VALUE, 0);
+            if (x <= 0)
+                break; // error
+        } else {
+            int in_size = x;
+            int consumed = ds_parse(sh_audio->ds, &start, &x, pts, 0);
+            sh_audio->ds->buffer_pos -= in_size - consumed;
+        }
 
-	av_init_packet(&pkt);
-	pkt.data = start;
-	pkt.size = x;
-	if (pts != MP_NOPTS_VALUE) {
-	    sh_audio->pts = pts;
-	    sh_audio->pts_bytes = 0;
-	}
-	y=avcodec_decode_audio3(sh_audio->context,(int16_t*)buf,&len2,&pkt);
+        av_init_packet(&pkt);
+        pkt.data = start;
+        pkt.size = x;
+        if (pts != MP_NOPTS_VALUE) {
+            sh_audio->pts = pts;
+            sh_audio->pts_bytes = 0;
+        }
+        y=avcodec_decode_audio3(sh_audio->context,(int16_t*)buf,&len2,&pkt);
 //printf("return:%d samples_out:%d bitstream_in:%d sample_sum:%d\n", y, len2, x, len); fflush(stdout);
-	// LATM may need many packets to find mux info
-	if (y == AVERROR(EAGAIN))
-	    continue;
-	if(y<0){ mp_msg(MSGT_DECAUDIO,MSGL_V,"lavc_audio: error\n");break; }
-	if(!sh_audio->parser && y<x)
-	    sh_audio->ds->buffer_pos+=y-x;  // put back data (HACK!)
-	if(len2>0){
-	  if (((AVCodecContext *)sh_audio->context)->channels >= 5) {
+        // LATM may need many packets to find mux info
+        if (y == AVERROR(EAGAIN))
+            continue;
+        if(y<0){ mp_msg(MSGT_DECAUDIO,MSGL_V,"lavc_audio: error\n");break; }
+        if(!sh_audio->parser && y<x)
+            sh_audio->ds->buffer_pos+=y-x;  // put back data (HACK!)
+        if(len2>0){
+          if (((AVCodecContext *)sh_audio->context)->channels >= 5) {
             int samplesize = av_get_bytes_per_sample(((AVCodecContext *)
                                     sh_audio->context)->sample_fmt);
             reorder_channel_nch(buf, AF_CHANNEL_LAYOUT_LAVC_DEFAULT,
                                 AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
                                 ((AVCodecContext *)sh_audio->context)->channels,
                                 len2 / samplesize, samplesize);
-	  }
-	  //len=len2;break;
-	  if(len<0) len=len2; else len+=len2;
-	  buf+=len2;
-	  maxlen -= len2;
-	  sh_audio->pts_bytes += len2;
-	}
+          }
+          //len=len2;break;
+          if(len<0) len=len2; else len+=len2;
+          buf+=len2;
+          maxlen -= len2;
+          sh_audio->pts_bytes += len2;
+        }
         mp_dbg(MSGT_DECAUDIO,MSGL_DBG2,"Decoded %d -> %d  \n",y,len2);
 
         if (setup_format(sh_audio, sh_audio->context))

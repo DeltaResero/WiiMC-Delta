@@ -197,7 +197,7 @@ static const FriBidiChar ArShap[179][4] = {
 
 #ifndef FRIBIDI_ACCESS_SHAPE_TABLE
 # define FRIBIDI_ACCESS_SHAPE_TABLE(table,min,max,x,shape) \
-	(((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
+        (((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
 #endif
 
 #define FRIBIDI_GET_ARABIC_SHAPE_PRES(x,shape) FRIBIDI_ACCESS_SHAPE_TABLE(ArShap, 0x0621, 0x06d3, (x), (shape))

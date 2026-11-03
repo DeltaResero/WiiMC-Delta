@@ -106,9 +106,9 @@ static const char* asf_chunk_type(unsigned char* guid) {
       strcpy(tmp, "unknown guid ");
       p = tmp + strlen(tmp);
       for (i = 0; i < 16; i++) {
-	if ((1 << i) & ((1<<4) | (1<<6) | (1<<8))) *p++ = '-';
-	sprintf(p, "%02x", guid[i]);
-	p += 2;
+        if ((1 << i) & ((1<<4) | (1<<6) | (1<<8))) *p++ = '-';
+        sprintf(p, "%02x", guid[i]);
+        p += 2;
       }
       return tmp;
   }
@@ -119,7 +119,7 @@ int asf_check_header(demuxer_t *demuxer){
   struct asf_priv* asf = calloc(1,sizeof(*asf));
   asf->scrambling_h=asf->scrambling_w=asf->scrambling_b=1;
   stream_read(demuxer->stream,(char*) &asf->header,sizeof(asf->header)); // header obj
-  le2me_ASF_header_t(&asf->header);			// swap to machine endian
+  le2me_ASF_header_t(&asf->header);                     // swap to machine endian
 //  for(i=0;i<16;i++) printf(" %02X",temp[i]);printf("\n");
 //  for(i=0;i<16;i++) printf(" %02X",asfhdrguid[i]);printf("\n");
   if(memcmp(asfhdrguid,asf->header.objh.guid,16)){
@@ -401,7 +401,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
 
   if (hdr_len > 1024 * 1024) {
     mp_msg(MSGT_HEADER, MSGL_ERR, MSGTR_MPDEMUX_ASFHDR_HeaderSizeOver1MB,
-			hdr_len);
+                        hdr_len);
     hdr_skip = hdr_len - 1024 * 1024;
     hdr_len = 1024 * 1024;
   }
@@ -484,7 +484,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
         ++audio_streams;
         if (!asf_init_audio_stream(demuxer, asf, sh_audio, streamh, &pos, &buffer, hdr, hdr_len))
           goto len_err_out;
-	//if(demuxer->audio->id==-1) demuxer->audio->id=streamh.stream_no & 0x7F;
+        //if(demuxer->audio->id==-1) demuxer->audio->id=streamh.stream_no & 0x7F;
         break;
         }
       case ASF_GUID_PREFIX_video_stream: {
@@ -493,13 +493,13 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
         sh_video_t* sh_video=new_sh_video(demuxer,streamh->stream_no & 0x7F);
         mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_VideoID, "asfheader", streamh->stream_no & 0x7F);
         len=streamh->type_size-(4+4+1+2);
-	++video_streams;
+        ++video_streams;
 //        sh_video->bih=malloc(chunksize); memset(sh_video->bih,0,chunksize);
         sh_video->bih=calloc((len<sizeof(*sh_video->bih))?sizeof(*sh_video->bih):len,1);
         memcpy(sh_video->bih,&buffer[4+4+1+2],len);
-	le2me_BITMAPINFOHEADER(sh_video->bih);
-	if (sh_video->bih->biSize > len && sh_video->bih->biSize > sizeof(*sh_video->bih))
-		sh_video->bih->biSize = len;
+        le2me_BITMAPINFOHEADER(sh_video->bih);
+        if (sh_video->bih->biSize > len && sh_video->bih->biSize > sizeof(*sh_video->bih))
+                sh_video->bih->biSize = len;
         if (sh_video->bih->biCompression == mmioFOURCC('D', 'V', 'R', ' ')) {
           //mp_msg(MSGT_DEMUXER, MSGL_WARN, MSGTR_MPDEMUX_ASFHDR_DVRWantsLibavformat);
           //sh_video->fps=(float)sh_video->video.dwRate/(float)sh_video->video.dwScale;
@@ -519,7 +519,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
 
         if( mp_msg_test(MSGT_DEMUX,MSGL_V) ) print_video_header(sh_video->bih, MSGL_V);
         //asf_video_id=streamh.stream_no & 0x7F;
-	//if(demuxer->video->id==-1) demuxer->video->id=streamh.stream_no & 0x7F;
+        //if(demuxer->video->id==-1) demuxer->video->id=streamh.stream_no & 0x7F;
         break;
         }
       }
@@ -555,8 +555,8 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
         uint16_t len;
         pos += sizeof(ASF_content_description_t);
         if (pos > hdr_len) goto len_err_out;
-	le2me_ASF_content_description_t(contenth);
-	mp_msg(MSGT_HEADER,MSGL_V,"\n");
+        le2me_ASF_content_description_t(contenth);
+        mp_msg(MSGT_HEADER,MSGL_V,"\n");
         // extract the title
         if((len = contenth->title_size) != 0) {
           wstring = (uint16_t*)&hdr[pos];
@@ -611,7 +611,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
             free(string);
           }
         }
-	mp_msg(MSGT_HEADER,MSGL_V,"\n");
+        mp_msg(MSGT_HEADER,MSGL_V,"\n");
   }
 
   // find content header
@@ -665,10 +665,10 @@ if(streams) {
   uint32_t vr = 0, ar = 0,i;
 #ifdef CONFIG_NETWORKING
   if( demuxer->stream->streaming_ctrl!=NULL ) {
-	  if( demuxer->stream->streaming_ctrl->bandwidth!=0 && demuxer->stream->streaming_ctrl->data!=NULL ) {
-		  best_audio = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->audio_id;
-		  best_video = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->video_id;
-	  }
+          if( demuxer->stream->streaming_ctrl->bandwidth!=0 && demuxer->stream->streaming_ctrl->data!=NULL ) {
+                  best_audio = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->audio_id;
+                  best_video = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->video_id;
+          }
   } else
 #endif
   for(i = 0; i < stream_count; i++) {
@@ -692,8 +692,8 @@ if(!audio_streams) demuxer->audio->id=-2;  // nosound
 else if(best_audio > 0 && demuxer->audio->id == -1) demuxer->audio->id=best_audio;
 if(!video_streams){
     if(!audio_streams){
-	mp_msg(MSGT_HEADER,MSGL_ERR,MSGTR_MPDEMUX_ASFHDR_AudioVideoHeaderNotFound);
-	return 0;
+        mp_msg(MSGT_HEADER,MSGL_ERR,MSGTR_MPDEMUX_ASFHDR_AudioVideoHeaderNotFound);
+        return 0;
     }
     demuxer->video->id=-2; // audio-only
 } else if (best_video > 0 && demuxer->video->id == -1) demuxer->video->id = best_video;

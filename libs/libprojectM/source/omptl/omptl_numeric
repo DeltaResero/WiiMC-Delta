@@ -26,12 +26,12 @@ namespace omptl
 
 template <class InputIterator, class T>
 T accumulate(InputIterator first, InputIterator last, T init,
-		const unsigned P = _Pfunc::Pfunc());
+        const unsigned P = _Pfunc::Pfunc());
 
 template <class InputIterator, class T, class BinaryFunction>
 T accumulate(InputIterator first, InputIterator last, T init,
-	     BinaryFunction binary_op,
-	     const unsigned P = _Pfunc::Pfunc());
+         BinaryFunction binary_op,
+         const unsigned P = _Pfunc::Pfunc());
 
 /*
  * Not (yet) paralellized due to data dependance.
@@ -39,36 +39,36 @@ T accumulate(InputIterator first, InputIterator last, T init,
 template <class InputIterator, class OutputIterator, class BinaryFunction>
 OutputIterator
 adjacent_difference(InputIterator first, InputIterator last,
-		    OutputIterator result, BinaryFunction binary_op,
-		    const unsigned P = _Pfunc::Pfunc());
+            OutputIterator result, BinaryFunction binary_op,
+            const unsigned P = _Pfunc::Pfunc());
 
 template <class InputIterator, class OutputIterator>
 OutputIterator adjacent_difference(InputIterator first, InputIterator last,
-				   OutputIterator result,
-				   const unsigned P = _Pfunc::Pfunc());
+                   OutputIterator result,
+                   const unsigned P = _Pfunc::Pfunc());
 
 template <class InputIterator1, class InputIterator2, class T,
           class BinaryFunction1, class BinaryFunction2>
 T inner_product(InputIterator1 first1, InputIterator1 last1,
-		InputIterator2 first2, T init,
-		BinaryFunction1 binary_op1, BinaryFunction2 binary_op2,
-		const unsigned P = _Pfunc::Pfunc());
+        InputIterator2 first2, T init,
+        BinaryFunction1 binary_op1, BinaryFunction2 binary_op2,
+        const unsigned P = _Pfunc::Pfunc());
 
 template <class InputIterator1, class InputIterator2, class T>
 T inner_product(InputIterator1 first1, InputIterator1 last1,
-		InputIterator2 first2, T init,
-		const unsigned P = _Pfunc::Pfunc());
+        InputIterator2 first2, T init,
+        const unsigned P = _Pfunc::Pfunc());
 
 // Not paralellized due to dependencies and complications with OutputIterators.
 template <class InputIterator, class OutputIterator,
-	  class BinaryOperation>
+      class BinaryOperation>
 OutputIterator partial_sum(InputIterator first, InputIterator last,
-			   OutputIterator result, BinaryOperation binary_op,
-			   const unsigned P = _Pfunc::Pfunc());
+               OutputIterator result, BinaryOperation binary_op,
+               const unsigned P = _Pfunc::Pfunc());
 
 template <class InputIterator, class OutputIterator>
 OutputIterator partial_sum(InputIterator first, InputIterator last,
-		OutputIterator result, const unsigned P = _Pfunc::Pfunc());
+        OutputIterator result, const unsigned P = _Pfunc::Pfunc());
 
 } // namespace omptl
 

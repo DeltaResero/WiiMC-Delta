@@ -162,7 +162,7 @@ static char *ucodesearchpath[] = {
   NULL,
 };
 
-#define BUF_SIZE	2048
+#define BUF_SIZE        2048
 
 static unsigned char dxr2buf[BUF_SIZE];
 static unsigned int  dxr2bufpos = 0;
@@ -326,7 +326,7 @@ static int dxr2_set_vga_params(dxr2_vgaParams_t* vga,int detect) {
     memset(img,255,vo_screenwidth*vo_screenheight*3);
     vo_config_count = sub_config_count;
     if(sub_vo->config(vo_screenwidth,vo_screenheight,vo_screenwidth,vo_screenheight,
-		    VOFLAG_FULLSCREEN ,"DXR2 sub vo",IMGFMT_BGR24) != 0) {
+                    VOFLAG_FULLSCREEN ,"DXR2 sub vo",IMGFMT_BGR24) != 0) {
       mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] sub vo config failed => No overlay\n");
       sub_vo->uninit();
       sub_vo = NULL;
@@ -384,21 +384,21 @@ static int dxr2_save_vga_params(dxr2_vgaParams_t* vga,char* name) {
   }
 
   ret = fprintf(fd,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-		vga->hOffWinKey,
-		vga->vOffWinKey,
-		vga->xScreen,
-		vga->yScreen,
-		vga->hsyncPol,
-		vga->vsyncPol,
-		vga->blankStart,
-		vga->blankWidth,
-		vga->hOffset,
-		vga->vOffset,
-		vga->ratio,
-		olx_cor,
-		oly_cor,
-		olw_cor,
-		olh_cor);
+                vga->hOffWinKey,
+                vga->vOffWinKey,
+                vga->xScreen,
+                vga->yScreen,
+                vga->hsyncPol,
+                vga->vsyncPol,
+                vga->blankStart,
+                vga->blankWidth,
+                vga->hOffset,
+                vga->vOffset,
+                vga->ratio,
+                olx_cor,
+                oly_cor,
+                olw_cor,
+                olh_cor);
 
   fclose(fd);
   return ret >= 11 ? 1 : 0;
@@ -421,21 +421,21 @@ static int dxr2_load_vga_params(dxr2_vgaParams_t* vga,char* name) {
     return 0;
   }
   ret = fscanf(fd, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-	       &vga->hOffWinKey,
-	       &vga->vOffWinKey,
-	       &vga->xScreen,
-	       &vga->yScreen,
-	       &vga->hsyncPol,
-	       &vga->vsyncPol,
-	       &vga->blankStart,
-	       &vga->blankWidth,
-	       &vga->hOffset,
-	       &vga->vOffset,
-	       &vga->ratio,
-	       &xc,
-	       &yc,
-	       &wc,
-	       &hc);
+               &vga->hOffWinKey,
+               &vga->vOffWinKey,
+               &vga->xScreen,
+               &vga->yScreen,
+               &vga->hsyncPol,
+               &vga->vsyncPol,
+               &vga->blankStart,
+               &vga->blankWidth,
+               &vga->hOffset,
+               &vga->vOffset,
+               &vga->ratio,
+               &xc,
+               &yc,
+               &wc,
+               &hc);
 
   fclose(fd);
   if(ret > 11 && !olx_cor) olx_cor = xc;
@@ -468,7 +468,7 @@ static void dxr2_set_overlay_window(void) {
   vo_config_count = cc;
 
 
-  mp_msg(MSGT_VO,MSGL_V,"VO: [dxr2] setting overlay with correction x=%d y=%d w=%d h=%d\n",olx_cor,oly_cor,	olw_cor,olh_cor);
+  mp_msg(MSGT_VO,MSGL_V,"VO: [dxr2] setting overlay with correction x=%d y=%d w=%d h=%d\n",olx_cor,oly_cor,     olw_cor,olh_cor);
 
   // Sub vo isn't a windowed one, fill in the needed stuff
   if(!sub_vo_win) {
@@ -582,17 +582,17 @@ static int config(uint32_t s_width, uint32_t s_height, uint32_t width, uint32_t 
       arg = DXR2_OUTPUTFORMAT_NTSC;
     else if (strcmp(norm, "pal")==0) {
       if (vo_fps > 28) {
-	mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] you want pal, but we play at 30 fps, selecting pal60 instead\n");
-	arg = DXR2_OUTPUTFORMAT_PAL_60;
-	norm="pal60";
+        mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] you want pal, but we play at 30 fps, selecting pal60 instead\n");
+        arg = DXR2_OUTPUTFORMAT_PAL_60;
+        norm="pal60";
       } else arg = DXR2_OUTPUTFORMAT_PAL_BDGHI;
     } else if (strcmp(norm, "pal60")==0) {
       if (vo_fps > 28)
-	arg = DXR2_OUTPUTFORMAT_PAL_60;
+        arg = DXR2_OUTPUTFORMAT_PAL_60;
       else {
-	mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] you want pal60, but we play at 25 fps, selecting pal instead\n");
-	arg = DXR2_OUTPUTFORMAT_PAL_BDGHI;
-	norm="pal";
+        mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] you want pal60, but we play at 25 fps, selecting pal instead\n");
+        arg = DXR2_OUTPUTFORMAT_PAL_BDGHI;
+        norm="pal";
       }
     } else if (strcmp(norm, "palm")==0)
       arg = DXR2_OUTPUTFORMAT_PAL_M;
@@ -674,11 +674,11 @@ static int config(uint32_t s_width, uint32_t s_height, uint32_t width, uint32_t 
       dxr2_sixArg_t oc;
       int i,sub_flags = VOFLAG_SWSCALE | (flags & VOFLAG_FULLSCREEN);
       if(sub_vo->config(width,height,width,height,sub_flags,
-			"MPlayer DXR2 render",IMGFMT_BGR24) != 0) {
-	mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] sub vo config failed => No X11 window\n");
-	sub_vo->uninit();
-	sub_vo = NULL;
-	break;
+                        "MPlayer DXR2 render",IMGFMT_BGR24) != 0) {
+        mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] sub vo config failed => No X11 window\n");
+        sub_vo->uninit();
+        sub_vo = NULL;
+        break;
       }
       sub_config_count++;
 
@@ -695,9 +695,9 @@ static int config(uint32_t s_width, uint32_t s_height, uint32_t width, uint32_t 
       ioctl(dxr2_fd, DXR2_IOC_SET_OVERLAY_MODE,&om);
       sub_img = malloc(width*height*3);
       for(i = 0 ; i < width*height*3 ; i += 3) {
-	sub_img[i] = ck_b;
-	sub_img[i+1] = ck_g;
-	sub_img[i+2] = ck_r;
+        sub_img[i] = ck_b;
+        sub_img[i+1] = ck_g;
+        sub_img[i+2] = ck_r;
       }
       dxr2_aspect = ((1<<16)*width + height/2)/height;
       sub_w = sub_h = 0;
@@ -826,11 +826,11 @@ static int preinit(const char *arg) {
   if(use_ol) {
     if (arg) {
       for(n = 0 ; video_out_drivers[n] != NULL ; n++) {
-	const vo_info_t* vi = video_out_drivers[n]->info;
-	if(!vi)
-	  continue;
-	if(strcasecmp(arg,vi->short_name) == 0)
-	  break;
+        const vo_info_t* vi = video_out_drivers[n]->info;
+        if(!vi)
+          continue;
+        if(strcasecmp(arg,vi->short_name) == 0)
+          break;
       }
       sub_vo = video_out_drivers[n];
     } else {
@@ -852,10 +852,10 @@ static int preinit(const char *arg) {
       uint32_t fmt = IMGFMT_BGR24;
       mp_msg(MSGT_VO,MSGL_V,"VO: [dxr2] Sub vo %s initialized\n",arg);
       if(sub_vo->control(VOCTRL_QUERY_FORMAT,&fmt) <= 0) {
-	mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] Sub vo %s doesn't support BGR24 => no overlay\n",arg);
-	sub_vo->uninit();
-	sub_vo = NULL;
-	use_ol = 0;
+        mp_msg(MSGT_VO,MSGL_WARN,"VO: [dxr2] Sub vo %s doesn't support BGR24 => no overlay\n",arg);
+        sub_vo->uninit();
+        sub_vo = NULL;
+        use_ol = 0;
       }
     }
   }
@@ -870,7 +870,7 @@ static int preinit(const char *arg) {
     uCodeFD = open(ucode, O_RDONLY);
   else for (n=0; ucodesearchpath[n] != NULL; n++) {
     mp_msg(MSGT_VO,MSGL_V,"VO: [dxr2] Looking for microcode in %s... ",
-	   ucodesearchpath[n]);
+           ucodesearchpath[n]);
     if ((uCodeFD = open(ucodesearchpath[n], O_RDONLY))>0) {
       mp_msg(MSGT_VO,MSGL_V,"ok\n");
       break;
@@ -942,7 +942,7 @@ static int control(uint32_t request, void *data)
     else if(sub_vo) {
       int r = sub_vo->control(VOCTRL_FULLSCREEN,0);
       if(r == VO_TRUE && !sub_vo_win)
-	dxr2_set_overlay_window();
+        dxr2_set_overlay_window();
       return r;
     } else {
       dxr2_twoArg_t win;

@@ -61,9 +61,9 @@ static OSErr        (*FindCodec)(CodecType              cType,
 static OSErr        (*InitializeQTML)(long flags);
 static PixMapHandle (*GetGWorldPixMap)(GWorldPtr offscreenGWorld);
 static OSErr        (*QTNewGWorldFromPtr)(GWorldPtr *gw,
-			            OSType pixelFormat,
-			            const Rect *boundsRect,
-			            CTabHandle cTable,
+                                    OSType pixelFormat,
+                                    const Rect *boundsRect,
+                                    CTabHandle cTable,
                         /*GDHandle*/void* aGDevice, /*unused anyway*/
                         GWorldFlags flags,
                         void *baseAddr,
@@ -140,7 +140,7 @@ struct vf_priv_s {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
 //    OSErr cres;
     ComponentDescription cdesc;
     mux_v->bih->biWidth=width;
@@ -152,9 +152,9 @@ static int config(struct vf_instance *vf,
 
     memset(&cdesc,0,sizeof(cdesc));
     cdesc.componentType= (((unsigned char)'i')<<24)|
-			(((unsigned char)'m')<<16)|
-			(((unsigned char)'c')<<8)|
-			(((unsigned char)'o'));
+                        (((unsigned char)'m')<<16)|
+                        (((unsigned char)'c')<<8)|
+                        (((unsigned char)'o'));
 
     cdesc.componentSubType=bswap_32(format);
     cdesc.componentManufacturer=0;
@@ -165,13 +165,13 @@ static int config(struct vf_instance *vf,
     mp_msg(MSGT_MENCODER,MSGL_DBG2,"Count = %ld\n",CountComponents(&cdesc));
     compressor=FindNextComponent(NULL,&cdesc);
     if(!compressor){
-	mp_msg(MSGT_MENCODER,MSGL_ERR,"Cannot find requested component\n");
-	return 0;
+        mp_msg(MSGT_MENCODER,MSGL_ERR,"Cannot find requested component\n");
+        return 0;
     }
     mp_msg(MSGT_MENCODER,MSGL_DBG2,"Found it! ID = %p\n",compressor);
 
-//	cres= FindCodec (fourcc,anyCodec,&compressor,&decompressor );
-//	printf("FindCodec returned:%i compressor: 0x%X decompressor: 0x%X\n",cres&0xFFFF,compressor,decompressor);
+//      cres= FindCodec (fourcc,anyCodec,&compressor,&decompressor );
+//      printf("FindCodec returned:%i compressor: 0x%X decompressor: 0x%X\n",cres&0xFFFF,compressor,decompressor);
 
     return 1;
 }
@@ -263,7 +263,7 @@ if(!codec_initialized){
     codec_initialized++;
 }
     cres = CompressSequenceFrame (
-    	seq,
+        seq,
         GetGWorldPixMap(frame_GWorld_in),
         &FrameRect,
         0,
@@ -280,11 +280,11 @@ if(!codec_initialized){
     muxer_write_chunk(mux_v, compressedsize , similarity?0:0x10, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 
     if(((*desc)->idSize)>MAX_IDSIZE){
-	mp_msg(MSGT_MENCODER,MSGL_ERR,"FATAL! idSize=%d too big, increase MAX_IDSIZE in ve_qtvideo.c!\n",((*desc)->idSize));
+        mp_msg(MSGT_MENCODER,MSGL_ERR,"FATAL! idSize=%d too big, increase MAX_IDSIZE in ve_qtvideo.c!\n",((*desc)->idSize));
     } else {
-	// according to QT docs, imagedescription may be changed while encoding
-	// a frame (even its size may (and does!) change!)
-	memcpy(mux_v->bih+1,*desc,(*desc)->idSize);
+        // according to QT docs, imagedescription may be changed while encoding
+        // a frame (even its size may (and does!) change!)
+        memcpy(mux_v->bih+1,*desc,(*desc)->idSize);
     }
 
     return 1;

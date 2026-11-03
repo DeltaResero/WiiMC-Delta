@@ -58,7 +58,7 @@ typedef struct sh_audio {
   int o_bps; // == samplerate*samplesize*channels   (uncompr. bytes/sec)
   int i_bps; // == bitrate  (compressed bytes/sec)
   // in buffers:
-  int audio_in_minsize;	// max. compressed packet size (== min. in buffer size)
+  int audio_in_minsize; // max. compressed packet size (== min. in buffer size)
   char* a_in_buffer;
   int a_in_buffer_len;
   int a_in_buffer_size;
@@ -89,7 +89,7 @@ typedef struct sh_audio {
 typedef struct sh_video {
   SH_COMMON
   int vid;
-  float timer;		  // absolute time in video stream, since last start/seek
+  float timer;            // absolute time in video stream, since last start/seek
   // frame counters:
   float num_frames;       // number of frames played
   int num_frames_decoded; // number of frames decoded

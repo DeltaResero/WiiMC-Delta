@@ -33,16 +33,16 @@ static void audio_resume(void);
 
 #define LIBAO_EXTERN(x) const ao_functions_t audio_out_##x =\
 {\
-	&info,\
-	control,\
-	init,\
+    &info,\
+    control,\
+    init,\
         uninit,\
-	reset,\
-	get_space,\
-	play,\
-	get_delay,\
-	audio_pause,\
-	audio_resume\
+    reset,\
+    get_space,\
+    play,\
+    get_delay,\
+    audio_pause,\
+    audio_resume\
 };
 
 #endif /* MPLAYER_AUDIO_OUT_INTERNAL_H */

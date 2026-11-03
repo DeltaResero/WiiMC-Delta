@@ -78,10 +78,10 @@ fribidi_shape_mirroring (
   for (i = len - 1; i >= 0; i--)
     if (FRIBIDI_LEVEL_IS_RTL (embedding_levels[i]))
       {
-	FriBidiChar mirrored_ch;
+        FriBidiChar mirrored_ch;
 
-	if (fribidi_get_mirror_char (str[i], &mirrored_ch))
-	  str[i] = mirrored_ch;
+        if (fribidi_get_mirror_char (str[i], &mirrored_ch))
+          str[i] = mirrored_ch;
       }
 }
 

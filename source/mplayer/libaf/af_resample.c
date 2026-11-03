@@ -47,15 +47,15 @@
 #include "af_resample_template.c"
 
 // Filtering types
-#define RSMP_LIN   	(0<<0)	// Linear interpolation
-#define RSMP_INT   	(1<<0)  // 16 bit integer
-#define RSMP_FLOAT	(2<<0)	// 32 bit floating point
-#define RSMP_MASK	(3<<0)
+#define RSMP_LIN        (0<<0)  // Linear interpolation
+#define RSMP_INT        (1<<0)  // 16 bit integer
+#define RSMP_FLOAT      (2<<0)  // 32 bit floating point
+#define RSMP_MASK       (3<<0)
 
 // Defines for sloppy or exact resampling
-#define FREQ_SLOPPY 	(0<<2)
-#define FREQ_EXACT  	(1<<2)
-#define FREQ_MASK	(1<<2)
+#define FREQ_SLOPPY     (0<<2)
+#define FREQ_EXACT      (1<<2)
+#define FREQ_MASK       (1<<2)
 
 // Accuracy for linear interpolation
 #define STEPACCURACY 32
@@ -63,31 +63,31 @@
 // local data
 typedef struct af_resample_s
 {
-  void*  	w;	// Current filter weights
-  void** 	xq; 	// Circular buffers
-  uint32_t	xi; 	// Index for circular buffers
-  uint32_t	wi;	// Index for w
-  uint32_t	i; 	// Number of new samples to put in x queue
-  uint32_t  	dn;     // Down sampling factor
-  uint32_t	up;	// Up sampling factor
-  uint64_t	step;	// Step size for linear interpolation
-  uint64_t	pt;	// Pointer remainder for linear interpolation
-  int		setup;	// Setup parameters cmdline or through postcreate
+  void*         w;      // Current filter weights
+  void**        xq;     // Circular buffers
+  uint32_t      xi;     // Index for circular buffers
+  uint32_t      wi;     // Index for w
+  uint32_t      i;      // Number of new samples to put in x queue
+  uint32_t      dn;     // Down sampling factor
+  uint32_t      up;     // Up sampling factor
+  uint64_t      step;   // Step size for linear interpolation
+  uint64_t      pt;     // Pointer remainder for linear interpolation
+  int           setup;  // Setup parameters cmdline or through postcreate
 } af_resample_t;
 
 // Fast linear interpolation resample with modest audio quality
 static int linint(af_data_t* c,af_data_t* l, af_resample_t* s)
 {
-  uint32_t	len   = 0; 		// Number of input samples
-  uint32_t	nch   = l->nch;   	// Words pre transfer
-  uint64_t	step  = s->step;
-  int16_t*	in16  = ((int16_t*)c->audio);
-  int16_t*	out16 = ((int16_t*)l->audio);
-  int32_t*	in32  = ((int32_t*)c->audio);
-  int32_t*	out32 = ((int32_t*)l->audio);
-  uint64_t 	end   = ((((uint64_t)c->len)/2LL)<<STEPACCURACY);
-  uint64_t	pt    = s->pt;
-  uint16_t 	tmp;
+  uint32_t      len   = 0;              // Number of input samples
+  uint32_t      nch   = l->nch;         // Words pre transfer
+  uint64_t      step  = s->step;
+  int16_t*      in16  = ((int16_t*)c->audio);
+  int16_t*      out16 = ((int16_t*)l->audio);
+  int32_t*      in32  = ((int32_t*)c->audio);
+  int32_t*      out32 = ((int32_t*)l->audio);
+  uint64_t      end   = ((((uint64_t)c->len)/2LL)<<STEPACCURACY);
+  uint64_t      pt    = s->pt;
+  uint16_t      tmp;
 
   switch (nch){
   case 1:
@@ -111,8 +111,8 @@ static int linint(af_data_t* c,af_data_t* l, af_resample_t* s)
     while(pt < end){
       tmp=nch;
       do {
-	tmp--;
-	out16[len+tmp]=in16[tmp+(pt>>STEPACCURACY)*nch];
+        tmp--;
+        out16[len+tmp]=in16[tmp+(pt>>STEPACCURACY)*nch];
       } while (tmp);
       len+=nch;
       pt+=step;
@@ -157,9 +157,9 @@ static int set_types(struct af_instance_s* af, af_data_t* data)
       af->data->bps    = 2;
     }
     mp_msg(MSGT_AFILTER, MSGL_V, "[resample] Using %s processing and %s frequecy"
-	   " conversion.\n",
-	   ((s->setup & RSMP_MASK) == RSMP_FLOAT)?"floating point":"integer",
-	   ((s->setup & FREQ_MASK) == FREQ_SLOPPY)?"inexact":"exact");
+           " conversion.\n",
+           ((s->setup & RSMP_MASK) == RSMP_FLOAT)?"floating point":"integer",
+           ((s->setup & FREQ_MASK) == FREQ_SLOPPY)?"inexact":"exact");
   }
 
   if(af->data->format != data->format || af->data->bps != data->bps)
@@ -176,9 +176,9 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   switch(cmd){
   case AF_CONTROL_REINIT:{
     af_resample_t* s   = af->setup;
-    af_data_t* 	   n   = arg; // New configuration
+    af_data_t*     n   = arg; // New configuration
     int            i,d = 0;
-    int 	   rv  = AF_OK;
+    int            rv  = AF_OK;
 
     // Free space for circular buffers
     if(s->xq){
@@ -195,7 +195,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       s->pt=0LL;
       s->step=((uint64_t)n->rate<<STEPACCURACY)/(uint64_t)af->data->rate+1LL;
       mp_msg(MSGT_AFILTER, MSGL_DBG2, "[resample] Linear interpolation step: 0x%016"PRIX64".\n",
-	     s->step);
+             s->step);
       af->mul = (double)af->data->rate / n->rate;
       return rv;
     }
@@ -209,8 +209,8 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       int dn=n->rate/2;
       int m=2;
       while(af->data->rate/(d*m) > 5000){
-	d=av_gcd(up,dn);
-	up/=2; dn/=2; m*=2;
+        d=av_gcd(up,dn);
+        up/=2; dn/=2; m*=2;
       }
       d*=m;
     }
@@ -242,26 +242,26 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 
       // Design prototype filter type using Kaiser window with beta = 10
       if(NULL == w || NULL == s->w ||
-	 -1 == af_filter_design_fir(s->up*L, w, &fc, LP|KAISER , 10.0)){
-	mp_msg(MSGT_AFILTER, MSGL_ERR, "[resample] Unable to design prototype filter.\n");
-	return AF_ERROR;
+         -1 == af_filter_design_fir(s->up*L, w, &fc, LP|KAISER , 10.0)){
+        mp_msg(MSGT_AFILTER, MSGL_ERR, "[resample] Unable to design prototype filter.\n");
+        return AF_ERROR;
       }
       // Copy data from prototype to polyphase filter
       wt=w;
       for(j=0;j<L;j++){//Columns
-	for(i=0;i<s->up;i++){//Rows
-	  if((s->setup & RSMP_MASK) == RSMP_INT){
-	    float t=(float)s->up*32767.0*(*wt);
-	    ((int16_t*)s->w)[i*L+j] = (int16_t)((t>=0.0)?(t+0.5):(t-0.5));
-	  }
-	  else
-	    ((float*)s->w)[i*L+j] = (float)s->up*(*wt);
-	  wt++;
-	}
+        for(i=0;i<s->up;i++){//Rows
+          if((s->setup & RSMP_MASK) == RSMP_INT){
+            float t=(float)s->up*32767.0*(*wt);
+            ((int16_t*)s->w)[i*L+j] = (int16_t)((t>=0.0)?(t+0.5):(t-0.5));
+          }
+          else
+            ((float*)s->w)[i*L+j] = (float)s->up*(*wt);
+          wt++;
+        }
       }
       free(w);
       mp_msg(MSGT_AFILTER, MSGL_V, "[resample] New filter designed up: %i "
-	     "down: %i\n", s->up, s->dn);
+             "down: %i\n", s->up, s->dn);
     }
 
     // Set multiplier and delay
@@ -289,14 +289,14 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     // Sanity check
     if(((int*)arg)[0] < 8000 || ((int*)arg)[0] > 192000){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[resample] The output sample frequency "
-	     "must be between 8kHz and 192kHz. Current value is %i \n",
-	     ((int*)arg)[0]);
+             "must be between 8kHz and 192kHz. Current value is %i \n",
+             ((int*)arg)[0]);
       return AF_ERROR;
     }
 
     af->data->rate=((int*)arg)[0];
     mp_msg(MSGT_AFILTER, MSGL_V, "[resample] Changing sample rate "
-	   "to %iHz\n",af->data->rate);
+           "to %iHz\n",af->data->rate);
     return AF_OK;
   }
   return AF_UNKNOWN;
@@ -320,8 +320,8 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  int 		 len = 0; 	 // Length of output data
-  af_data_t*     c   = data;	 // Current working data
+  int            len = 0;        // Length of output data
+  af_data_t*     c   = data;     // Current working data
   af_data_t*     l   = af->data; // Local data
   af_resample_t* s   = af->setup;
 

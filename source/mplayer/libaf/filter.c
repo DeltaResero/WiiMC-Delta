@@ -103,7 +103,7 @@ int af_filter_updatepq(unsigned int n, unsigned int d, unsigned int xi,
          0 < fc < 1 where 1 <=> Fs/2
    flags window and filter type as defined in filter.h
          variables are ored together: i.e. LP|HAMMING will give a
-	 low pass filter designed using a hamming window
+         low pass filter designed using a hamming window
    opt   beta constant used only when designing using kaiser windows
 
    returns 0 if OK, -1 if fail
@@ -111,16 +111,16 @@ int af_filter_updatepq(unsigned int n, unsigned int d, unsigned int xi,
 int af_filter_design_fir(unsigned int n, FLOAT_TYPE* w, const FLOAT_TYPE* fc,
                          unsigned int flags, FLOAT_TYPE opt)
 {
-  unsigned int	o   = n & 1;          	// Indicator for odd filter length
-  unsigned int	end = ((n + 1) >> 1) - o;       // Loop end
-  unsigned int	i;			// Loop index
+  unsigned int  o   = n & 1;            // Indicator for odd filter length
+  unsigned int  end = ((n + 1) >> 1) - o;       // Loop end
+  unsigned int  i;                      // Loop index
 
-  FLOAT_TYPE k1 = 2 * M_PI;		// 2*pi*fc1
+  FLOAT_TYPE k1 = 2 * M_PI;             // 2*pi*fc1
   FLOAT_TYPE k2 = 0.5 * (FLOAT_TYPE)(1 - o);// Constant used if the filter has even length
-  FLOAT_TYPE k3;		        // 2*pi*fc2 Constant used in BP and BS design
-  FLOAT_TYPE g  = 0.0;     		// Gain
-  FLOAT_TYPE t1,t2,t3;     		// Temporary variables
-  FLOAT_TYPE fc1,fc2;			// Cutoff frequencies
+  FLOAT_TYPE k3;                        // 2*pi*fc2 Constant used in BP and BS design
+  FLOAT_TYPE g  = 0.0;                  // Gain
+  FLOAT_TYPE t1,t2,t3;                  // Temporary variables
+  FLOAT_TYPE fc1,fc2;                   // Cutoff frequencies
 
   // Sanity check
   if(!w || (n == 0)) return -1;
@@ -158,28 +158,28 @@ int af_filter_design_fir(unsigned int n, FLOAT_TYPE* w, const FLOAT_TYPE* fc,
       // where x is zero. To make sure nothing strange happens, we set this
       // value separately.
       if (o){
-	w[end] = fc1 * w[end] * 2.0;
-	g=w[end];
+        w[end] = fc1 * w[end] * 2.0;
+        g=w[end];
       }
 
       // Create filter
       for (i=0 ; i<end ; i++){
-	t1 = (FLOAT_TYPE)(i+1) - k2;
-	w[end-i-1] = w[n-end+i] = w[end-i-1] * sin(k1 * t1)/(M_PI * t1); // Sinc
-	g += 2*w[end-i-1]; // Total gain in filter
+        t1 = (FLOAT_TYPE)(i+1) - k2;
+        w[end-i-1] = w[n-end+i] = w[end-i-1] * sin(k1 * t1)/(M_PI * t1); // Sinc
+        g += 2*w[end-i-1]; // Total gain in filter
       }
     }
     else{ // High pass filter
       if (!o) // High pass filters must have odd length
-	return -1;
+        return -1;
       w[end] = 1.0 - (fc1 * w[end] * 2.0);
       g= w[end];
 
       // Create filter
       for (i=0 ; i<end ; i++){
-	t1 = (FLOAT_TYPE)(i+1);
-	w[end-i-1] = w[n-end+i] = -1 * w[end-i-1] * sin(k1 * t1)/(M_PI * t1); // Sinc
-	g += ((i&1) ? (2*w[end-i-1]) : (-2*w[end-i-1])); // Total gain in filter
+        t1 = (FLOAT_TYPE)(i+1);
+        w[end-i-1] = w[n-end+i] = -1 * w[end-i-1] * sin(k1 * t1)/(M_PI * t1); // Sinc
+        g += ((i&1) ? (2*w[end-i-1]) : (-2*w[end-i-1])); // Total gain in filter
       }
     }
   }
@@ -196,32 +196,32 @@ int af_filter_design_fir(unsigned int n, FLOAT_TYPE* w, const FLOAT_TYPE* fc,
     if(flags & BP){ // Band pass
       // Calculate center tap
       if (o){
-	g=w[end]*(fc1+fc2);
-	w[end] = (fc2 - fc1) * w[end] * 2.0;
+        g=w[end]*(fc1+fc2);
+        w[end] = (fc2 - fc1) * w[end] * 2.0;
       }
 
       // Create filter
       for (i=0 ; i<end ; i++){
-	t1 = (FLOAT_TYPE)(i+1) - k2;
-	t2 = sin(k3 * t1)/(M_PI * t1); // Sinc fc2
-	t3 = sin(k1 * t1)/(M_PI * t1); // Sinc fc1
-	g += w[end-i-1] * (t3 + t2);   // Total gain in filter
-	w[end-i-1] = w[n-end+i] = w[end-i-1] * (t2 - t3);
+        t1 = (FLOAT_TYPE)(i+1) - k2;
+        t2 = sin(k3 * t1)/(M_PI * t1); // Sinc fc2
+        t3 = sin(k1 * t1)/(M_PI * t1); // Sinc fc1
+        g += w[end-i-1] * (t3 + t2);   // Total gain in filter
+        w[end-i-1] = w[n-end+i] = w[end-i-1] * (t2 - t3);
       }
     }
     else{ // Band stop
       if (!o) // Band stop filters must have odd length
-	return -1;
+        return -1;
       w[end] = 1.0 - (fc2 - fc1) * w[end] * 2.0;
       g= w[end];
 
       // Create filter
       for (i=0 ; i<end ; i++){
-	t1 = (FLOAT_TYPE)(i+1);
-	t2 = sin(k1 * t1)/(M_PI * t1); // Sinc fc1
-	t3 = sin(k3 * t1)/(M_PI * t1); // Sinc fc2
-	w[end-i-1] = w[n-end+i] = w[end-i-1] * (t2 - t3);
-	g += 2*w[end-i-1]; // Total gain in filter
+        t1 = (FLOAT_TYPE)(i+1);
+        t2 = sin(k1 * t1)/(M_PI * t1); // Sinc fc1
+        t3 = sin(k3 * t1)/(M_PI * t1); // Sinc fc2
+        w[end-i-1] = w[n-end+i] = w[end-i-1] * (t2 - t3);
+        g += 2*w[end-i-1]; // Total gain in filter
       }
     }
   }
@@ -243,17 +243,17 @@ int af_filter_design_fir(unsigned int n, FLOAT_TYPE* w, const FLOAT_TYPE* fc,
    g     Filter gain
    flags FWD forward indexing
          REW reverse indexing
-	 ODD multiply every 2nd filter tap by -1 => HP filter
+         ODD multiply every 2nd filter tap by -1 => HP filter
 
    returns 0 if OK, -1 if fail
 */
 int af_filter_design_pfir(unsigned int n, unsigned int k, const FLOAT_TYPE* w,
                           FLOAT_TYPE** pw, FLOAT_TYPE g, unsigned int flags)
 {
-  int l = (int)n/k;	// Length of individual FIR filters
-  int i;     	// Counters
+  int l = (int)n/k;     // Length of individual FIR filters
+  int i;        // Counters
   int j;
-  FLOAT_TYPE t;	// g * w[i]
+  FLOAT_TYPE t; // g * w[i]
 
   // Sanity check
   if(l<1 || k<1 || !w || !pw)
@@ -263,16 +263,16 @@ int af_filter_design_pfir(unsigned int n, unsigned int k, const FLOAT_TYPE* w,
   if(flags&REW){
     for(j=l-1;j>-1;j--){//Columns
       for(i=0;i<(int)k;i++){//Rows
-	t=g *  *w++;
-	pw[i][j]=t * ((flags & ODD) ? ((j & 1) ? -1 : 1) : 1);
+        t=g *  *w++;
+        pw[i][j]=t * ((flags & ODD) ? ((j & 1) ? -1 : 1) : 1);
       }
     }
   }
   else{
     for(j=0;j<l;j++){//Columns
       for(i=0;i<(int)k;i++){//Rows
-	t=g *  *w++;
-	pw[i][j]=t * ((flags & ODD) ? ((j & 1) ? 1 : -1) : 1);
+        t=g *  *w++;
+        pw[i][j]=t * ((flags & ODD) ? ((j & 1) ? 1 : -1) : 1);
       }
     }
   }
@@ -314,12 +314,12 @@ static void af_filter_prewarp(FLOAT_TYPE* a, FLOAT_TYPE fc, FLOAT_TYPE fs)
    Arguments:
    a       - s-domain numerator coefficients
    b       - s-domain denominator coefficients
-   k 	   - filter gain factor. Initially set to 1 and modified by each
+   k       - filter gain factor. Initially set to 1 and modified by each
              biquad section in such a way, as to make it the
              coefficient by which to multiply the overall filter gain
              in order to achieve a desired overall filter gain,
              specified in initial value of k.
-   fs 	   - sampling rate (Hz)
+   fs      - sampling rate (Hz)
    coef    - array of z-domain coefficients to be filled in.
 
    Return: On return, set coef z-domain coefficients and k to the gain
@@ -409,13 +409,13 @@ static void af_filter_bilinear(const FLOAT_TYPE* a, const FLOAT_TYPE* b, FLOAT_T
    Arguments:
    a       - s-domain numerator coefficients, a[1] is always assumed to be 1.0
    b       - s-domain denominator coefficients
-   Q	   - Q value for the filter
-   k 	   - filter gain factor. Initially set to 1 and modified by each
+   Q       - Q value for the filter
+   k       - filter gain factor. Initially set to 1 and modified by each
              biquad section in such a way, as to make it the
              coefficient by which to multiply the overall filter gain
              in order to achieve a desired overall filter gain,
              specified in initial value of k.
-   fs 	   - sampling rate (Hz)
+   fs      - sampling rate (Hz)
    coef    - array of z-domain coefficients to be filled in.
 
    Note: Upon return from each call, the k argument will be set to a

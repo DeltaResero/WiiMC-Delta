@@ -46,16 +46,16 @@
 
 typedef struct {
 #ifndef CONFIG_LIBCDIO
-	cdrom_drive* cd;
-	cdrom_paranoia* cdp;
+        cdrom_drive* cd;
+        cdrom_paranoia* cdp;
 #else
-	cdrom_drive_t* cd;
-	cdrom_paranoia_t* cdp;
+        cdrom_drive_t* cd;
+        cdrom_paranoia_t* cdp;
 #endif
-	int sector;
-	int start_sector;
-	int end_sector;
-	cd_info_t *cd_info;
+        int sector;
+        int start_sector;
+        int end_sector;
+        cd_info_t *cd_info;
 } cdda_priv;
 
 static struct cdda_params {
@@ -155,15 +155,15 @@ static int fill_buffer(stream_t* s, char* buffer, int max_len) {
   memcpy(buffer,buf,CD_FRAMESIZE_RAW);
 
   for(i=0;i<p->cd->tracks;i++){
-	  if(p->cd->disc_toc[i].dwStartSector==p->sector-1) {
-		  cd_track = cd_info_get_track(p->cd_info, i+1);
+          if(p->cd->disc_toc[i].dwStartSector==p->sector-1) {
+                  cd_track = cd_info_get_track(p->cd_info, i+1);
 //printf("Track %d, sector=%d\n", i, p->sector-1);
-		  if( cd_track!=NULL ) {
-			mp_msg(MSGT_SEEK, MSGL_INFO, "\n%s\n", cd_track->name);
-			mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CDDA_TRACK=%d\n", cd_track->track_nb);
-		  }
-		  break;
-	  }
+                  if( cd_track!=NULL ) {
+                        mp_msg(MSGT_SEEK, MSGL_INFO, "\n%s\n", cd_track->name);
+                        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CDDA_TRACK=%d\n", cd_track->track_nb);
+                  }
+                  break;
+          }
   }
 
 
@@ -191,24 +191,24 @@ static int seek(stream_t* s,off_t newpos) {
 
   for(i=0;i<p->cd->tracks;i++){
 //        printf("trk #%d: %d .. %d\n",i,p->cd->disc_toc[i].dwStartSector,p->cd->disc_toc[i+1].dwStartSector);
-	if( p->sector>=p->cd->disc_toc[i].dwStartSector && p->sector<p->cd->disc_toc[i+1].dwStartSector ) {
-		current_track = i;
-	}
-	if( sec>=p->cd->disc_toc[i].dwStartSector && sec<p->cd->disc_toc[i+1].dwStartSector ) {
-		seeked_track = i;
-		seek_to_track = sec == p->cd->disc_toc[i].dwStartSector;
-	}
+        if( p->sector>=p->cd->disc_toc[i].dwStartSector && p->sector<p->cd->disc_toc[i+1].dwStartSector ) {
+                current_track = i;
+        }
+        if( sec>=p->cd->disc_toc[i].dwStartSector && sec<p->cd->disc_toc[i+1].dwStartSector ) {
+                seeked_track = i;
+                seek_to_track = sec == p->cd->disc_toc[i].dwStartSector;
+        }
   }
 //printf("current: %d, seeked: %d\n", current_track, seeked_track);
-	if (current_track != seeked_track && !seek_to_track) {
+        if (current_track != seeked_track && !seek_to_track) {
 //printf("Track %d, sector=%d\n", seeked_track, sec);
-		  cd_track = cd_info_get_track(p->cd_info, seeked_track+1);
-		  if( cd_track!=NULL ) {
-			  mp_msg(MSGT_SEEK, MSGL_INFO, "\n%s\n", cd_track->name);
-			  mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CDDA_TRACK=%d\n", cd_track->track_nb);
-		  }
+                  cd_track = cd_info_get_track(p->cd_info, seeked_track+1);
+                  if( cd_track!=NULL ) {
+                          mp_msg(MSGT_SEEK, MSGL_INFO, "\n%s\n", cd_track->name);
+                          mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CDDA_TRACK=%d\n", cd_track->track_nb);
+                  }
 
-	}
+        }
 #if 0
   if(sec < p->start_sector)
     sec = p->start_sector;
@@ -369,13 +369,13 @@ static int open_cdda(stream_t *st,int m, void* opts, int* file_format) {
   cd_info = cd_info_new();
   mp_msg(MSGT_OPEN,MSGL_INFO,MSGTR_MPDEMUX_CDDA_AudioCDFoundWithNTracks,cdda_tracks(cdd));
   for(i=0;i<cdd->tracks;i++) {
-	  char track_name[80];
-	  long sec=cdda_track_firstsector(cdd,i+1);
-	  long off=cdda_track_lastsector(cdd,i+1)-sec+1;
+          char track_name[80];
+          long sec=cdda_track_firstsector(cdd,i+1);
+          long off=cdda_track_lastsector(cdd,i+1)-sec+1;
 
-	  sprintf(track_name, "Track %d", i+1);
-	  cd_info_add_track(cd_info, track_name, i+1, (unsigned int)(off/(60*75)), (unsigned int)((off/75)%60), (unsigned int)(off%75), sec, off );
-	  audiolen += off;
+          sprintf(track_name, "Track %d", i+1);
+          cd_info_add_track(cd_info, track_name, i+1, (unsigned int)(off/(60*75)), (unsigned int)((off/75)%60), (unsigned int)(off%75), sec, off );
+          audiolen += off;
   }
   cd_info->min  = (unsigned int)(audiolen/(60*75));
   cd_info->sec  = (unsigned int)((audiolen/75)%60);

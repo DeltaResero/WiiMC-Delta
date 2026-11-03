@@ -48,8 +48,8 @@ int mp_header_process_sequence_header (mp_mpeg_header_t * picture, const unsigne
     int height;
 
     if ((buffer[6] & 0x20) != 0x20){
-	fprintf(stderr, "missing marker bit!\n");
-	return 1;	/* missing marker_bit */
+        fprintf(stderr, "missing marker bit!\n");
+        return 1;       /* missing marker_bit */
     }
 
     height = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
@@ -70,14 +70,14 @@ int mp_header_process_sequence_header (mp_mpeg_header_t * picture, const unsigne
 }
 
 static int header_process_sequence_extension (mp_mpeg_header_t * picture,
-					      const unsigned char * buffer)
+                                              const unsigned char * buffer)
 {
     /* check chroma format, size extensions, marker bit */
 
     if ( ((buffer[1] & 0x06) == 0x00) ||
          ((buffer[1] & 0x01) != 0x00) || (buffer[2] & 0xe0) ||
          ((buffer[3] & 0x01) != 0x01) )
-	return 1;
+        return 1;
 
     picture->progressive_sequence = (buffer[1] >> 3) & 1;
     picture->frame_rate_extension_n = ((buffer[5] >> 5) & 3) + 1;
@@ -116,10 +116,10 @@ static int header_process_picture_coding_extension (mp_mpeg_header_t * picture, 
 int mp_header_process_extension (mp_mpeg_header_t * picture, const unsigned char * buffer)
 {
     switch (buffer[0] & 0xf0) {
-    case 0x10:	/* sequence extension */
-	return header_process_sequence_extension (picture, buffer);
-    case 0x80:	/* picture coding extension */
-	return header_process_picture_coding_extension (picture, buffer);
+    case 0x10:  /* sequence extension */
+        return header_process_sequence_extension (picture, buffer);
+    case 0x80:  /* picture coding extension */
+        return header_process_picture_coding_extension (picture, buffer);
     }
     return 0;
 }
@@ -169,12 +169,12 @@ unsigned char mp_getbits(const unsigned char *buffer, unsigned int from, unsigne
 
     y = (buffer[n] << m);
     if(8 > len)
-    	y  >>= (8-len);
+        y  >>= (8-len);
     if(l)
-    	y |= (buffer[n+1] >> (8-l));
+        y |= (buffer[n+1] >> (8-l));
 
     //fprintf(stderr, "GETBITS(%d -> %d): bytes=0x%x 0x%x, n=%d, m=%d, l=%d, u=%d, Y=%d\n",
-    //	from, (int) len, (int) buffer[n],(int) buffer[n+1], n, (int) m, (int) l, (int) u, (int) y);
+    //  from, (int) len, (int) buffer[n],(int) buffer[n+1], n, (int) m, (int) l, (int) u, (int) y);
     return  y;
 }
 
@@ -261,7 +261,7 @@ int mp4_header_process_vol(mp_mpeg_header_t * picture, const unsigned char * buf
     n += 13;
 
     //fprintf(stderr, "ASPECT: %d, PARW=%d, PARH=%d, TIMEINCRESOLUTION: %d, FIXED_TIMEINC: %d (number of bits: %d), FPS: %u\n",
-    //	aspect, aspectw, aspecth, picture->timeinc_resolution, picture->timeinc_unit, picture->timeinc_bits, picture->fps);
+    //  aspect, aspectw, aspecth, picture->timeinc_resolution, picture->timeinc_unit, picture->timeinc_bits, picture->fps);
 
     return 0;
 }
@@ -361,7 +361,7 @@ static int h264_parse_vui(mp_mpeg_header_t * picture, unsigned char * buf, unsig
   }
 
   //fprintf(stderr, "H264_PARSE_VUI, OVESCAN=%u, VSP_COLOR=%u, CHROMA=%u, TIMING=%u, DISPW=%u, DISPH=%u, TIMERES=%u, TIMEINC=%u, FIXED_FPS=%u\n", overscan, vsp_color, chroma, timing, picture->display_picture_width, picture->display_picture_height,
-  //	picture->timeinc_resolution, picture->timeinc_unit, picture->timeinc_unit, fixed_fps);
+  //    picture->timeinc_resolution, picture->timeinc_unit, picture->timeinc_unit, fixed_fps);
 
   return n;
 }

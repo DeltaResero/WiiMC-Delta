@@ -1028,10 +1028,10 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_
 }
 
 //function to set color controls
-//  brightness	[0, 10000]
-//  contrast	[0, 20000]
-//  hue		[-180, 180]
-//  saturation	[0, 20000]
+//  brightness  [0, 10000]
+//  contrast    [0, 20000]
+//  hue     [-180, 180]
+//  saturation  [0, 20000]
 static uint32_t color_ctrl_set(const char *what, int value)
 {
     uint32_t r = VO_NOTIMPL;
@@ -1093,7 +1093,7 @@ static uint32_t color_ctrl_get(const char *what, int *value)
         *value = dcc.lSaturation * 200 / 20000 - 100;
         r      = VO_TRUE;
     }
-//	printf("\n*** %s = %d\n", what, *value);
+//  printf("\n*** %s = %d\n", what, *value);
 
     return r;
 }

@@ -26,11 +26,11 @@
 #include "ad_internal.h"
 
 static const ad_info_t info = {
-	"Sample audio decoder",  // name of the driver
-	"sample",    // driver name. should be the same as filename without ad_
-	"A'rpi",     // writer/maintainer of _this_ file
-	"",          // writer/maintainer/site of the _codec_
-	""           // comments
+        "Sample audio decoder",  // name of the driver
+        "sample",    // driver name. should be the same as filename without ad_
+        "A'rpi",     // writer/maintainer of _this_ file
+        "",          // writer/maintainer/site of the _codec_
+        ""           // comments
 };
 
 LIBAD_EXTERN(sample)
@@ -47,7 +47,7 @@ static int preinit(sh_audio_t *sh){
   // minimum output buffer size (should be the uncompressed max. frame size)
   sh->audio_out_minsize=4*2*1024; // in this sample, we assume max 4 channels,
                                   // 2 bytes/sample and 1024 samples/frame
-				  // Default: 8192
+                                  // Default: 8192
 
   // minimum input buffer size (set only if you need input buffering)
   // (should be the max compressed frame size)
@@ -130,16 +130,16 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...){
     switch(cmd){
       case ADCTRL_RESYNC_STREAM:
         // it is called once after seeking, to resync.
-	// Note: sh_audio->a_in_buffer_len=0; is done _before_ this call!
-	...
-	return CONTROL_TRUE;
+        // Note: sh_audio->a_in_buffer_len=0; is done _before_ this call!
+        ...
+        return CONTROL_TRUE;
       case ADCTRL_SKIP_FRAME:
         // it is called to skip (jump over) small amount (1/10 sec or 1 frame)
-	// of audio data - used to sync audio to video after seeking
-	// if you don't return CONTROL_TRUE, it will defaults to:
-	//      ds_fill_buffer(sh_audio->ds);  // skip 1 demux packet
-	...
-	return CONTROL_TRUE;
+        // of audio data - used to sync audio to video after seeking
+        // if you don't return CONTROL_TRUE, it will defaults to:
+        //      ds_fill_buffer(sh_audio->ds);  // skip 1 demux packet
+        ...
+        return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }

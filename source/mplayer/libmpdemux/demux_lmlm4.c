@@ -152,7 +152,7 @@ static int getFrame(demuxer_t *demuxer, FrameInfo *frameInfo)
 
     if(stream_eof(demuxer->stream)){
         frameInfo->frameSize = 0;
-	return 0;
+        return 0;
     }
 
     frameInfo->frameSize = packetSize - 8; //sizeof(IME6400Header);
@@ -165,10 +165,10 @@ static int getFrame(demuxer_t *demuxer, FrameInfo *frameInfo)
             frameInfo->paddingSize);
 
     if(!imeHeaderValid(frameInfo)){
-	// skip this packet
-	stream_skip(demuxer->stream,PACKET_BLOCK_SIZE-8);
+        // skip this packet
+        stream_skip(demuxer->stream,PACKET_BLOCK_SIZE-8);
         frameInfo->frameSize = 0;
-	return -1;
+        return -1;
     }
 
     return 1;
@@ -192,20 +192,20 @@ static int lmlm4_check_file(demuxer_t* demuxer)
 
     switch(frameInfo.frameType){
     case FRAMETYPE_AUDIO_MPEG1L2:
-	if( (first & 0xffe00000) != 0xffe00000 ){
-    	    mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: not mpeg audio\n");
-    	    return 0;
-	}
-	if((4-((first>>17)&3))!=2){
-    	    mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: not layer-2\n");
-    	    return 0;
-	}
-	if(((first>>10)&0x3)==3){
-    	    mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: invalid audio sampelrate\n");
-    	    return 0;
-	}
-	mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: first packet is audio, header checks OK!\n");
-	break;
+        if( (first & 0xffe00000) != 0xffe00000 ){
+            mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: not mpeg audio\n");
+            return 0;
+        }
+        if((4-((first>>17)&3))!=2){
+            mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: not layer-2\n");
+            return 0;
+        }
+        if(((first>>10)&0x3)==3){
+            mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: invalid audio sampelrate\n");
+            return 0;
+        }
+        mp_msg(MSGT_DEMUXER,MSGL_V,"LMLM4: first packet is audio, header checks OK!\n");
+        break;
     // TODO: add checks for video header too, for case of disabled audio
     }
 
@@ -247,25 +247,25 @@ static int demux_lmlm4_fill_buffer(demuxer_t *demux, demux_stream_t *ds)
             mp_msg(MSGT_DEMUX, MSGL_V, "Skip Audio Packet\n");
             return -1; //goto hdr;
         }
-	if(demux->audio->id==-1){
-	    if(!demux->a_streams[id]) new_sh_audio(demux,id, NULL);
-	    demux->audio->id=id;
-	    demux->audio->sh=demux->a_streams[id];
-	    ((sh_audio_t*)(demux->audio->sh))->format=0x50; // mpeg audio layer 1/2
-	}
-	if(demux->audio->id==id)
-	    ds_read_packet(demux->audio, demux->stream, frameInfo.frameSize,
-		pts, demux->filepos, 0);
-	else
-	    stream_skip(demux->stream,frameInfo.frameSize);
-	break;
+        if(demux->audio->id==-1){
+            if(!demux->a_streams[id]) new_sh_audio(demux,id, NULL);
+            demux->audio->id=id;
+            demux->audio->sh=demux->a_streams[id];
+            ((sh_audio_t*)(demux->audio->sh))->format=0x50; // mpeg audio layer 1/2
+        }
+        if(demux->audio->id==id)
+            ds_read_packet(demux->audio, demux->stream, frameInfo.frameSize,
+                pts, demux->filepos, 0);
+        else
+            stream_skip(demux->stream,frameInfo.frameSize);
+        break;
     case FRAMETYPE_I:
         if (!video) {
             video = 1;
             mp_dbg(MSGT_DEMUX, MSGL_DBG2, "First Video Packet\n");
         }
     case FRAMETYPE_P:
-	frames=(frames+1)&(1024*1024-1); // wrap around at 4 hrs to avoid inaccurate float calculations
+        frames=(frames+1)&(1024*1024-1); // wrap around at 4 hrs to avoid inaccurate float calculations
         if (!video)
         {
             stream_skip(demux->stream, frameInfo.frameSize + frameInfo.paddingSize);
@@ -273,18 +273,18 @@ static int demux_lmlm4_fill_buffer(demuxer_t *demux, demux_stream_t *ds)
             return -1; //goto hdr;
         }
         mp_dbg(MSGT_DEMUX, MSGL_DBG2, "Video Packet\n");
-	if(demux->video->id==-1){
-	    if(!demux->v_streams[id]) new_sh_video(demux,id);
-	    demux->video->id=id;
-	    demux->video->sh=demux->v_streams[id];
-	    ((sh_video_t*)(demux->video->sh))->format=0x10000004; // mpeg4-ES
-	}
-	if(demux->video->id==id)
-	    ds_read_packet(demux->video, demux->stream, frameInfo.frameSize,
-		pts, demux->filepos, 0);
-	break;
+        if(demux->video->id==-1){
+            if(!demux->v_streams[id]) new_sh_video(demux,id);
+            demux->video->id=id;
+            demux->video->sh=demux->v_streams[id];
+            ((sh_video_t*)(demux->video->sh))->format=0x10000004; // mpeg4-ES
+        }
+        if(demux->video->id==id)
+            ds_read_packet(demux->video, demux->stream, frameInfo.frameSize,
+                pts, demux->filepos, 0);
+        break;
     default:
-	stream_skip(demux->stream,frameInfo.frameSize);
+        stream_skip(demux->stream,frameInfo.frameSize);
     }
 
     stream_skip(demux->stream, frameInfo.paddingSize);

@@ -89,7 +89,7 @@ typedef struct ADPCMDecodeContext {
     AVFrame frame;
     ADPCMChannelStatus status[6];
     int vqa_version;                /**< VQA version. Used for ADPCM_IMA_WS */
-	int has_status;
+        int has_status;
 } ADPCMDecodeContext;
 
 static av_cold int adpcm_decode_init(AVCodecContext * avctx)
@@ -1228,10 +1228,10 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
     case CODEC_ID_ADPCM_THP_LE:
     {
 #if 1
-	if(useMono) {
-		//yet another, this latest, only 1 channel is working...
-		int table[14][16];
-		int channels = avctx->channels;
+        if(useMono) {
+                //yet another, this latest, only 1 channel is working...
+                int table[14][16];
+                int channels = avctx->channels;
 
 #define THP_GET16(g) \
     sign_extend( \
@@ -1294,16 +1294,16 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                     *samples = av_clip_int16(sampledat);
                     c->status[ch].sample2 = c->status[ch].sample1;
                     c->status[ch].sample1 = *samples++;
-				}
-			}
-		}
-	}//special case
-	else {
+                                }
+                        }
+                }
+        }//special case
+        else {
 #endif
 
 #if 0
-		//allows 1 channel streams to work, breaks everything else.
-		int table[14][16];
+                //allows 1 channel streams to work, breaks everything else.
+                int table[14][16];
         int ch;
 
 #define THP_GET16(g) \
@@ -1368,7 +1368,7 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                     c->status[ch].sample2 = c->status[ch].sample1;
                     c->status[ch].sample1 = *samples++;
 #endif
-		//og
+                //og
 #if 1
         int table[2][16];
         int prev[2][2];
@@ -1424,7 +1424,7 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                 }
             }
         }
-				}//special mono case
+                                }//special mono case
         break;
     }
 
