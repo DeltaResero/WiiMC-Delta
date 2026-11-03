@@ -37,7 +37,7 @@
 #define MAX_SIZE (1024*1024*15)
 
 extern "C" {
-#include "mplayer/stream/url.h"
+#include "stream/url.h"
 }
 
 #define TCP_CONNECT_TIMEOUT     13  // 13 secs to make a connection

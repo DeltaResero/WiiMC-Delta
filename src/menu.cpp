@@ -37,7 +37,7 @@
 #include "filelist.h"
 
 extern "C" {
-#include "mplayer/stream/url.h"
+#include "stream/url.h"
 }
 
 u32 getipbyname(char *domain)

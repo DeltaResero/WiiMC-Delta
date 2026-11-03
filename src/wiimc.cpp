@@ -39,8 +39,8 @@ char MPLAYER_CONFDIR[512];
 char MPLAYER_LIBDIR[512];
 char MPLAYER_CSSDIR[512];
 
-#include "mplayer/input/input.h"
-#include "mplayer/osdep/gx_supp.h"
+#include "input/input.h"
+#include "osdep/gx_supp.h"
 
 bool want3DS = false;
 bool isReload = false;

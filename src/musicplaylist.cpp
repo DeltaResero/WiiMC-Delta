@@ -20,7 +20,7 @@
 #include "utils/gettext.h"
 
 extern "C" {
-#include "mplayer/playtree.h"
+#include "playtree.h"
 }
 
 static int *shuffleList = NULL;

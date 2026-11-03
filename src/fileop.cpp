@@ -32,9 +32,9 @@
 #include <ogc/machine/processor.h>
 
 extern "C" {
-#include "mplayer/playtree.h"
-#include "mplayer/stream/url.h"
-#include "mplayer/libdvdcss/libdvdcss.h"
+#include "playtree.h"
+#include "stream/url.h"
+#include "libdvdcss/libdvdcss.h"
 }
 
 #include "wiimc.h"

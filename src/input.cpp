@@ -22,8 +22,8 @@
 #include "input.h"
 #include "settings.h"
 #include "libwiigui/gui.h"
-#include "mplayer/input/input.h"
-#include "mplayer/osdep/gx_supp.h"
+#include "input/input.h"
+#include "osdep/gx_supp.h"
 #include "utils/3ds.h"
 
 #define RUMBLE_MAX              60000
