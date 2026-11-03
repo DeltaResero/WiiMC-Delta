@@ -86,7 +86,7 @@ int avpriv_adx_decode_header(AVCodecContext *avctx, const uint8_t *buf,
 		if(buf[0x17] == 1 && buf[0x1B] == 1) { //loop enabled, latter is correct
 			loop_st_point = AV_RB32(buf + 0x1C);
 			loop_st_point /= avctx->sample_rate;
-			
+
 			loop_ed_point = AV_RB32(buf + 0x24);
 			loop_ed_point /= avctx->sample_rate;
 		}
@@ -94,7 +94,7 @@ int avpriv_adx_decode_header(AVCodecContext *avctx, const uint8_t *buf,
 		if(buf[0x23] == 1 && buf[0x27] == 1) { //loop enabled
 			loop_st_point = AV_RB32(buf + 0x28);
 			loop_st_point /= avctx->sample_rate;
-			
+
 			loop_ed_point = AV_RB32(buf + 0x30);
 			loop_ed_point /= avctx->sample_rate;
 		}

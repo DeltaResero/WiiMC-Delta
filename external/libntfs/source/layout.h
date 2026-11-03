@@ -251,7 +251,7 @@ typedef enum {
  *
  * These are the so far known MFT_RECORD_* flags (16-bit) which contain
  * information about the mft record in which they are present.
- * 
+ *
  * MFT_RECORD_IS_4 exists on all $Extend sub-files.
  * It seems that it marks it is a metadata file with MFT record >24, however,
  * it is unknown if it is limited to metadata files only.
@@ -490,7 +490,7 @@ typedef struct {
  * Each attribute type has a corresponding attribute name (Unicode string of
  * maximum 64 character length) as described by the attribute definitions
  * present in the data attribute of the $AttrDef system file.
- * 
+ *
  * On NTFS 3.0 volumes the names are just as the types are named in the below
  * enum exchanging AT_ for the dollar sign ($). If that isn't a revealing
  * choice of symbol... (-;
@@ -870,15 +870,15 @@ typedef enum {
 	 * This is a copy of the MFT_RECORD_IS_DIRECTORY bit from the mft
 	 * record, telling us whether this is a directory or not, i.e. whether
 	 * it has an index root attribute named "$I30" or not.
-	 * 
-	 * This flag is only present in the FILE_NAME attribute (in the 
+	 *
+	 * This flag is only present in the FILE_NAME attribute (in the
 	 * file_attributes field).
 	 */
 	FILE_ATTR_I30_INDEX_PRESENT	= const_cpu_to_le32(0x10000000),
-	
+
 	/**
 	 * FILE_ATTR_VIEW_INDEX_PRESENT - Does have a non-directory index?
-	 * 
+	 *
 	 * This is a copy of the MFT_RECORD_IS_VIEW_INDEX bit from the mft
 	 * record, telling us whether this file has a view index present (eg.
 	 * object id index, quota index, one of the security indexes and the
@@ -2088,13 +2088,13 @@ typedef struct {
 				   including the INDEX_HEADER, aligned to 8. */
 /*  8*/	le32 allocated_size;	/* Allocated byte size of this index (block),
 				   multiple of 8 bytes. See more below.      */
-	/* 
+	/*
 	   For the index root attribute, the above two numbers are always
 	   equal, as the attribute is resident and it is resized as needed.
-	   
-	   For the index allocation attribute, the attribute is not resident 
-	   and the allocated_size is equal to the index_block_size specified 
-	   by the corresponding INDEX_ROOT attribute minus the INDEX_BLOCK 
+
+	   For the index allocation attribute, the attribute is not resident
+	   and the allocated_size is equal to the index_block_size specified
+	   by the corresponding INDEX_ROOT attribute minus the INDEX_BLOCK
 	   size not counting the INDEX_HEADER part (i.e. minus -24).
 	 */
 /* 12*/	INDEX_HEADER_FLAGS ih_flags;	/* Bit field of INDEX_HEADER_FLAGS.  */
@@ -2293,7 +2293,7 @@ typedef enum {
 
 /**
  * struct INDEX_ENTRY_HEADER - This the index entry header (see below).
- * 
+ *
  *         ==========================================================
  *         !!!!!  SEE DESCRIPTION OF THE FIELDS AT INDEX_ENTRY  !!!!!
  *         ==========================================================
@@ -2371,12 +2371,12 @@ typedef struct {
 	leVCN vcn;	   If INDEX_ENTRY_NODE bit in ie_flags is set, the last
 			   eight bytes of this index entry contain the virtual
 			   cluster number of the index block that holds the
-			   entries immediately preceding the current entry. 
-	
+			   entries immediately preceding the current entry.
+
 			   If the key_length is zero, then the vcn immediately
-			   follows the INDEX_ENTRY_HEADER. 
-	
-			   The address of the vcn of "ie" INDEX_ENTRY is given by 
+			   follows the INDEX_ENTRY_HEADER.
+
+			   The address of the vcn of "ie" INDEX_ENTRY is given by
 			   (char*)ie + le16_to_cpu(ie->length) - sizeof(VCN)
 	*/
 } __attribute__((__packed__)) INDEX_ENTRY;

@@ -2341,7 +2341,7 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 
     if (mpctx->sh_audio) {
         double a_pts, v_pts;
-		
+
 		//test pts auto, on a seek it should also reset to 0
 		//default_max_pts_correction = 0;
 	/*	if (debug_30fps && !dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
@@ -2353,7 +2353,7 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 			}
 		} else
 			default_max_pts_correction = -1; */
-		
+
 		//if (!dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31 && halve_fps) {
 		if (mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31 && halve_fps) {
 			//after checking if it's 30fps switch fps
@@ -2401,12 +2401,12 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 			//Let's talk about this here, it solves an issue regarding broken files.
 			//Take that in and also the fact that it stops video randomly in files with subtitles
 			//oh this has to go. -nocorrect-pts is too buggy.
-			
+
 			mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
 			cmd->id=MP_CMD_PAUSE;
 			cmd->name=strdup("pause");
 			mp_input_queue_cmd(cmd);
-			
+
 				// This case means that we are supposed to stop video for a long
 				// time, even though audio is already ahead.
 				// This happens e.g. when initial audio pts is 10000, video
@@ -2716,7 +2716,7 @@ int reinit_video_chain(void)
 if (sh_video->disp_w > 1024)
 {
 	codecs_t *c = find_video_codec(sh_video->format, sh_video->bih ? ((unsigned int *)&sh_video->bih->biCompression) : NULL, sh_video->codec, 0);
-	
+
 	if (strncmp(c->name, "ffmpeg", 6) == 0 || strncmp(c->name, "ffodivx", 7) == 0)
 	{
 		m_config_set_option(mconfig, "lavdopts", "fast=0:lowres=1:skipframe=default:skiploopfilter=default");
@@ -2847,10 +2847,10 @@ static double update_video(int *blit_frame)
 
 			if (flush && !decoded_frame)
 				return -1;
-			
+
 			if (full_frame) {
                 sh_video->timer += frame_time;
-                
+
                 if (mpctx->sh_audio)
                     mpctx->delay -= frame_time;
                 // video_read_frame can change fps (e.g. for ASF video)
@@ -2941,14 +2941,14 @@ static void pause_loop(void)
     if(controlledbygui == 2) // mplayer shutdown requested!
       break;
   }  //end while
-  
+
   if (cmd && cmd->id == MP_CMD_QUIT)  // exit or home button pressed, go to GUI now
   {
 		cmd = mp_input_get_cmd(0,1,0); //execute the command
 		run_command(mpctx, cmd);
 		mp_cmd_free(cmd);
 		DrawMPlayer(); //copy screen
-		pause_gui=0; 
+		pause_gui=0;
 		PauseAndGotoGUI();
   }
 
@@ -3600,7 +3600,7 @@ if(end_film_error==0)
 else //end film by error
 	controlledbygui = 1; // send control back to GUI
 
-do 
+do
 {
   usleep(50000);
 
@@ -3730,7 +3730,7 @@ audio_delay=0;
             filename = play_tree_iter_get_file(mpctx->playtree_iter, 1);
         }
     }
-#ifndef GEKKO    
+#ifndef GEKKO
     if (!profile_config_loaded) load_profile_config(mconfig, filename);
 #endif
 //---------------------------------------------------------------------------
@@ -3808,7 +3808,7 @@ audio_delay=0;
 
 #ifdef GEKKO
   strcpy(fileplaying, filename);
-  strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying)); 
+  strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying));
   partitionlabel[sizeof(partitionlabelplaying)-1] = '\0';
 #endif
 
@@ -4348,7 +4348,7 @@ if (mpctx->sh_video)
 /*
 	if (!vo_font || !sub_font || prev_dxs != mpctx->sh_video->disp_w || prev_dys != mpctx->sh_video->disp_h)
 	{
-	
+
 	    force_load_font = 0;
 		load_font_ft(mpctx->sh_video->disp_w, mpctx->sh_video->disp_h, &vo_font, font_name, osd_font_scale_factor);
 		prev_dxs = mpctx->sh_video->disp_w; prev_dys = mpctx->sh_video->disp_h;
@@ -4515,7 +4515,7 @@ total_time_usage_start=GetTimer();
 #endif
                 if (!skip_timing)
                     frame_time_remaining = sleep_until_update(&mpctx->time_frame, &aq_sleep_time);
-                
+
 
 //====================== FLIP PAGE (VIDEO BLT): =========================
                 if (!edl_needs_reset) {
@@ -4613,7 +4613,7 @@ total_time_usage_start=GetTimer();
 		mpctx->osd_function = OSD_PAUSE;
 	}
 	else if (mpctx->osd_function == OSD_PAUSE)
-	{ 
+	{
 	  if(pause_low_cache)
 	  {
 			pause_low_cache=0;
@@ -4689,7 +4689,7 @@ total_time_usage_start=GetTimer();
 				//mpctx->eof = 0;
 				//This workaround allows videos to reconnect after idling for too long.
 				//But it also might cause the video to skip forward by some 20 secs.
-				
+
 				if(http_hack) {
 					seek_2_sec = demuxer_get_time_length(mpctx->demuxer);
 					http_hack = 0;
@@ -4697,7 +4697,7 @@ total_time_usage_start=GetTimer();
 				if((demuxer_get_current_time(mpctx->demuxer)+5) < seek_2_sec && !http_block) {
 					wiiSeek(demuxer_get_current_time(mpctx->demuxer)+5, 2);
 				//	wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
-					
+
 					mpctx->eof = 0;
 				}
 			}
@@ -4706,7 +4706,7 @@ total_time_usage_start=GetTimer();
 			if(mpctx->eof == 1)
 				//usleep(465000);
 				usleep(550000);
-			
+
 			int loop_mode = 0; //1=end point supported
 			if(loop_ed_point != 0) {
 				double pts = playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
@@ -4716,15 +4716,15 @@ total_time_usage_start=GetTimer();
 					mpctx->eof = 1;
 				loop_mode = 1;
 			}
-			
+
             /* Looping. */
             if ((mpctx->eof == 1 && mpctx->loop_times >= 0) || (mpctx->eof == 1 && loop_tm > 0 &&
 														(loop_st_point != 0 || loop_ed_point != 0))) {
                 mp_msg(MSGT_CPLAYER, MSGL_V, "loop_times = %d, eof = %d\n", mpctx->loop_times, mpctx->eof);
-				
+
 				if(loop_tm > 0)
 					--loop_tm;
-				
+
 				if(loop_mode == 1 && loop_ed_point != 0) {
 					seek_to_sec = loop_st_point;
 					if(loop_tm == 0) //don't end on the endpoint
@@ -4738,7 +4738,7 @@ total_time_usage_start=GetTimer();
 						loop_st_point = 0;
 					loop_mode = 0;
 				}
-				
+
                 if (mpctx->loop_times > 1)
                     mpctx->loop_times--;
                 else if (mpctx->loop_times == 1)
@@ -4987,7 +4987,7 @@ static bool match_restore_point(int i, char *_filename, char *_partitionlabel)
 {
     if (i >= MAX_RESTORE_POINTS)
         return false;
-    
+
     if (strcmp(_filename,restore_points[i].filename)==0 &&
         (!restore_points[i].hasPartitionlabel || strcmp(_partitionlabel,restore_points[i].partitionlabel)==0) )
         return true;
@@ -5026,8 +5026,8 @@ static void save_restore_point(char *_filename, char *_partitionlabel)
 	if(!mpctx->demuxer || !mpctx->sh_video)
 		return;
 
-	if(	strncmp(_filename,"dvd:",4) == 0 || 
-		strncmp(_filename,"dvdnav:",7) == 0 || 
+	if(	strncmp(_filename,"dvd:",4) == 0 ||
+		strncmp(_filename,"dvdnav:",7) == 0 ||
 		strncmp(_filename,"http:",5) == 0 ||
 		strncmp(_filename,"mms:",4) == 0)
 		return;
@@ -5083,7 +5083,7 @@ static int load_restore_point(char *_filename, char *_partitionlabel)
 	return 0;
 }
 
-int mpctx_get_set_of_sub_size() 
+int mpctx_get_set_of_sub_size()
 {
     return mpctx->set_of_sub_size;
 }
@@ -5141,9 +5141,9 @@ static void reload_subtitles()
 	{
 		select_subtitle(mpctx);
 		//force_load_font = 1;
-#ifdef CONFIG_ASS		
+#ifdef CONFIG_ASS
 		ass_force_reload = 1;
-#endif		
+#endif
 	}
 }
 
@@ -5162,7 +5162,7 @@ static float timing_sleep(float time_frame)
 		frame = frame - GetRelativeTime();
 	}
 	time_frame=(float)(frame * 0.000001F);
-	
+
 	return time_frame;
 }
 
@@ -5187,13 +5187,13 @@ void PauseAndGotoGUI()
 	//if content is identified as interlaced, consult setting and figure out what to reset to
 	if(sync_interlace > 0)
 		SetInterlaceOff();
-	
+
 	// Reset video loop mode, which is now ON during video or OFF if in GUI
 	mpctx->loop_times = -1;
-	
+
 	//HTTP hack needs to be off in GUI mode
 	http_block = true;
-	
+
 	//avoid issues with tiled rendering
 	guiDelay = 1;
 
@@ -5213,7 +5213,7 @@ void PauseAndGotoGUI()
 	printf("sent control to gui\n");
 	if (controlledbygui == 0)
 		controlledbygui = 1; // send control to gui
-	
+
 	while (controlledbygui == 1)
 		usec_sleep(20000);
 
@@ -5326,7 +5326,7 @@ static void low_cache_loop(void)
 		mpctx->video_out->control(VOCTRL_RESUME, NULL); // resume video
 
 	GetRelativeTime(); // ignore time that passed during pause
-	
+
 }
 
 void fast_pause()
@@ -5368,7 +5368,7 @@ void wiiLoadFile(char *_filename, char *_partitionlabel)
 	if(filename)
 		free(filename);
 	filename = strdup(_filename);
-	
+
 }
 
 void wiiSetTiledVar()
@@ -5851,7 +5851,7 @@ void wiiSetVolume(int vol)
 		return;
 
 	mixer_setvolume(&mpctx->mixer, vol, vol);
-	
+
 #if 1
 //	printf("howMany: %d,,", vol);
 
@@ -5886,7 +5886,7 @@ void wiiSetVolume(int vol)
 		volAF = 8;
 	else if(vol == 100)
 		volAF = 16;
-	
+
 	sprintf(wiiu, "volume=%d", volAF); //control is not as accurate but works well
 	cmd->args[0].v.s = strdup(wiiu);
 	}
@@ -5896,7 +5896,7 @@ void wiiSetVolume(int vol)
 void wiiSetProperty(int command, float value)
 {
 	static float current_audio_delay = 0;
-	
+
 	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
 	cmd->id=command;
 	cmd->nargs = 1;
@@ -6055,7 +6055,7 @@ void wiiSetSubtitleSize(float size)
 	text_font_scale_factor = size;
 	osd_font_scale_factor = size;
 	//force_load_font = 1;
-#endif	
+#endif
 	vo_osd_changed(OSDTYPE_SUBTITLE);
 }
 
@@ -6064,10 +6064,10 @@ bool wiiFindRestorePoint(char *filename, char *partitionlabel)
 	int i;
 	char *aux_partitionlabel;
 	static char szEmptyStr[] = "";
-	
+
 	if(!filename)
 		return false;
-	
+
 	aux_partitionlabel = (partitionlabel) ? partitionlabel : szEmptyStr;
 
 	for(i=0; i<MAX_RESTORE_POINTS; i++)
@@ -6106,9 +6106,9 @@ void wiiLoadRestorePoints(char *buffer, int size)
 			{
 				if(c == 0)
 					break;
-				
+
 				line = strndup(&buffer[lineptr], c);
-				
+
 				if(!line)
 					break;
 
@@ -6119,10 +6119,10 @@ void wiiLoadRestorePoints(char *buffer, int size)
 		}
 
 		lineptr += c+1;
-		
+
 		if(!line)
 			continue;
-		
+
 		pc = line;
 		fields = 1;
 		while (*pc) {
@@ -6173,12 +6173,12 @@ char * wiiSaveRestorePoints(char * path)
 	{
 		if(restore_points[i].filename[0]=='\0')
 			continue;
-        
+
         if (restore_points[i].hasPartitionlabel)
 		    sprintf(tmppath,"%s\t%i\t%s\n", restore_points[i].filename, restore_points[i].position, restore_points[i].partitionlabel);
 		else
 		    sprintf(tmppath,"%s\t%i\n", restore_points[i].filename, restore_points[i].position);
-		    
+
 		strcat(buff,tmppath);
 	}
 	return buff;

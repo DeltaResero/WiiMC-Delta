@@ -316,7 +316,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
 			kbText->SetText(kbtextstr);
 		}
 		keySpace->SetState(STATE_SELECTED, t->chan);
-		
+
 		//don't reset pos
 		if(focus)
 		{
@@ -332,7 +332,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
 			kbText->SetText(GetDisplayText(kbtextstr));
 		}
 		keyBack->SetState(STATE_SELECTED, t->chan);
-		
+
 		//don't reset pos
 		if(focus)
 		{

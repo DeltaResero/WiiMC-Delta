@@ -43,7 +43,7 @@ GuiKeypad::GuiKeypad(char * t, u32 max)
 	kptextmaxlen = max;
 
 	char thekeys[4][3] = {
-		{ '1', '2', '3' },	
+		{ '1', '2', '3' },
 		{ '4', '5', '6' },
 		{ '7', '8',	'9'	},
 		{ '-', '0', '.' }
@@ -68,7 +68,7 @@ GuiKeypad::GuiKeypad(char * t, u32 max)
 
 	trigA = new GuiTrigger;
 	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
-	
+
 	keyBackImg = new GuiImage(keyMedium);
 	keyBackOverImg = new GuiImage(keyMediumOver);
 	keyBackText = new GuiText("Back", 20, (GXColor){255, 255, 255, 0xff});
@@ -106,7 +106,7 @@ GuiKeypad::GuiKeypad(char * t, u32 max)
 			}
 		}
 	}
-	
+
 	// disable '-' by default
 	keyBtn[3][0]->SetState(STATE_DISABLED);
 	keyBtn[3][0]->SetVisible(false);
@@ -199,7 +199,7 @@ void GuiKeypad::Update(GuiTrigger * t)
 		try	{ _elements.at(i)->Update(t); }
 		catch (const std::exception& e) { }
 	}
-	
+
 	if(keyBack->GetState() == STATE_CLICKED)
 	{
 		if(strlen(kptextstr) > 0)
@@ -208,7 +208,7 @@ void GuiKeypad::Update(GuiTrigger * t)
 			kpText->SetText(GetDisplayText(kptextstr));
 		}
 		keyBack->SetState(STATE_SELECTED, t->chan);
-		
+
 		//don't reset pos
 		//if(focus)
 		//{
@@ -230,7 +230,7 @@ void GuiKeypad::Update(GuiTrigger * t)
 
 					kpText->SetText(GetDisplayText(kptextstr));
 					keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
-					
+
 					//don't reset pos
 					//if(focus)
 					//{
@@ -241,7 +241,7 @@ void GuiKeypad::Update(GuiTrigger * t)
 			}
 		}
 	}
-	
+
 	//dpad/stick movement
 	if(t->Right())
 		this->MoveSelectionHor(1);

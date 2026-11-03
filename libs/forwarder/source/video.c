@@ -125,7 +125,7 @@ InitVideo ()
 {
 	VIDEO_Init();
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
-	
+
 	bool pal = false;
 
 	if (vmode == &TVPal528IntDf)

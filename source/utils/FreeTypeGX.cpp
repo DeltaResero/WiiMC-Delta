@@ -498,7 +498,7 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
 	GXTexObj glyphTexture;
 	FT_Vector pairDelta;
 	ftgxDataOffset offset;
-	
+
 	if(!text)
 		return 0;
 

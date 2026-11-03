@@ -17,7 +17,7 @@
 class Preset {
 public:
 
-	
+
 	Preset(const std::string & name=std::string(), const std::string & author = std::string());
 	virtual ~Preset();
 

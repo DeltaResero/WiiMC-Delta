@@ -38,7 +38,7 @@ MAINTAINERCLEANFILES = \
 		`find "$(srcdir)" -type f -name "*~" -print` \
 		`$(srcdir)/bootstrap --write-configure`
 # The last line above is a horrible hack.
-# GNU Coding Standards recommends that `make maintainer-clean' should not 
+# GNU Coding Standards recommends that `make maintainer-clean' should not
 # remove the configure script.
 # We instead make configure call bootstrap.
 

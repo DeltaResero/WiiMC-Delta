@@ -106,7 +106,7 @@ float ValExpr::eval_val_expr ( int mesh_i, int mesh_j )
 				return ( float ) ( * ( ( int* ) ( term.param->engine_val ) ) );
 			case P_TYPE_DOUBLE:
 
-				
+
 				if ( term.param->matrix_flag | ( term.param->flags & P_FLAG_ALWAYS_MATRIX ) )
 				{
 
@@ -128,7 +128,7 @@ float ValExpr::eval_val_expr ( int mesh_i, int mesh_j )
 					//assert(mesh_i >=0);
 				}
 				//std::cout << term.param->name << ": " << (*((float*)term.param->engine_val)) << std::endl;
-				return * ( ( float* ) ( term.param->engine_val ) );			
+				return * ( ( float* ) ( term.param->engine_val ) );
 			default:
 				return EVAL_ERROR;
 		}

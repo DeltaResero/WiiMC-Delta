@@ -25,11 +25,11 @@
 static void int32_to_float_fmul_scalar_paired(float *dst, const int *src, float mul, int len)
 {
 	vector float pair;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		float src0 = *src++;
 		float src1 = *src++;
-		
+
 		pair = ps_merge00(src0, src1);
 		pair = ps_muls0(pair, mul);
 		paired_stx(pair, i, dst);
@@ -40,7 +40,7 @@ static void float_to_int16_paired(int16_t *dst, const float *src, long len)
 {
 	src -= 2;
 	dst -= 2;
-	
+
 	for (int i = 0; i < (len>>1); i++) {
 		vec_f32_t pair = psq_lu(8,src,0,0);
 		psq_stu(pair,4,dst,0,7);
@@ -51,17 +51,17 @@ static void float_to_int16_interleave_paired(int16_t *dst, const float **src, lo
 {
 	vector float pair[2];
 	vector float result;
-	
+
 	if (channels > 2) {
 		dst -= 2;
 		for (int i = 0; i < len*4; i += 8, dst += channels) {
 			for (int c = 0; c < channels - 1; c += 2) {
 				pair[0] = paired_lx(i, src[c]);
 				pair[1] = paired_lx(i, src[c+1]);
-				
+
 				result = paired_merge00(pair[0], pair[1]);
 				psq_stu(result,4,dst,0,7);
-				
+
 				result = paired_merge11(pair[0], pair[1]);
 				psq_stx(result,channels*2,dst,0,7);
 			}
@@ -71,10 +71,10 @@ static void float_to_int16_interleave_paired(int16_t *dst, const float **src, lo
 			for (int i = 0; i < len*4; i += 8) {
 				pair[0] = paired_lx(i, src[0]);
 				pair[1] = paired_lx(i, src[1]);
-				
+
 				result = paired_merge00(pair[0], pair[1]);
 				psq_stx(result,i,dst,0,7);
-				
+
 				result = paired_merge11(pair[0], pair[1]);
 				psq_stx(result,i,dst+2,0,7);
 			}

@@ -275,7 +275,7 @@ static void adjust_font_scale(ASS_Track* track)
 
 	//The case that I've commented out handles the font size of non-ass subs
 	//to fix this, just rely on setting init_styles FontSize to a hard default.
-	
+
 	//This messes EIA-608 FFmpeg converted ASS files that use those playres values.
 	//if(track && track->PlayResY == 288	&& (!track->PlayResX || track->PlayResX==384)) // embedded font not detected
 		//ass_font_scale = ((double)mplayerheight / (double)gx_height * mplayer_ass_font_scale * 2.0f)+3.0f;
@@ -291,7 +291,7 @@ void ass_configure(ASS_Renderer* priv, int w, int h, int unscaled) {
 	ass_set_use_margins(priv, ass_use_margins);
 #ifdef GEKKO
 	adjust_font_scale(ass_track);
-#endif	
+#endif
 	ass_set_font_scale(priv, ass_font_scale);
 	if (!unscaled && (ass_hinting & 4))
 		hinting = 0;

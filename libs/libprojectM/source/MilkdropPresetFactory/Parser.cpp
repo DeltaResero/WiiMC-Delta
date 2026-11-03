@@ -1837,7 +1837,7 @@ int Parser::parse_wavecode(char * token, std::istream &  fs, MilkdropPreset * pr
 
   /* Create new initial condition */
   init_cond = new InitCond(param, init_val);
-  
+
   if (init_cond == NULL)
   {
     if (PARSE_DEBUG) printf("parse_wavecode: new_init_cond failed!\n");

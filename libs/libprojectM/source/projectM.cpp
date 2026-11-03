@@ -93,7 +93,7 @@ void projectM::projectM_resetTextures()
     _renderer->ResetTextures();
 }
 
-projectM::projectM ( std::string config_file, int flags) : 
+projectM::projectM ( std::string config_file, int flags) :
 _pcm(0), _beatDetect ( 0 ), _renderer ( 0 ), _pipelineContext(new PipelineContext()), _pipelineContext2(new PipelineContext()), m_presetPos(0), m_flags(flags)
 {
     readConfig(config_file);
@@ -102,7 +102,7 @@ _pcm(0), _beatDetect ( 0 ), _renderer ( 0 ), _pipelineContext(new PipelineContex
 
 }
 
-projectM::projectM(pm_config settings, int flags) : 
+projectM::projectM(pm_config settings, int flags) :
 _pcm(0), _beatDetect ( 0 ), _renderer ( 0 ), _pipelineContext(new PipelineContext()), _pipelineContext2(new PipelineContext()), m_presetPos(0), m_flags(flags)
 {
     readSettings(settings);
@@ -129,7 +129,7 @@ bool projectM::writeConfig(const std::string & configFile, const pm_config & set
     config.add("Pulse Source", settings.pulseSource);
     config.add("Preset Directory", settings.presetDirectory);
     config.add("Initial Preset Name", settings.initialPresetName);
-    
+
     std::fstream file(configFile.c_str());
     if (file) {
         file << config;
@@ -158,7 +158,7 @@ void projectM::readConfig (const std::string & configFile )
     _settings.pulseSource = (pm_audchar) config.read<int> ( "Pulse Source", PM_AC_BASS);
     _settings.presetDirectory = config.read<string> ( "Preset Directory", "presets" );
     _settings.initialPresetName = config.read<string> ( "Default Preset Name", "" );
-    
+
     projectM_init ();
 
 }
@@ -181,7 +181,7 @@ void projectM::readSettings (const pm_config & settings )
     _settings.pulseSource = settings.pulseSource;
     _settings.presetDirectory = settings.presetDirectory;
     _settings.initialPresetName = settings.initialPresetName;
-    
+
     projectM_init ();
 
 }
@@ -224,7 +224,7 @@ void projectM::evaluateSecondPreset()
 void projectM::renderFrame()
 {
     timeKeeper->UpdateTimers();
-    
+
     /*if (timeKeeper->IsSmoothing())
     {
         printf("Smoothing A:%f, B:%f, S:%f\n", timeKeeper->PresetProgressA(), timeKeeper->PresetProgressB(), timeKeeper->SmoothRatio());
@@ -280,7 +280,7 @@ void projectM::renderFrame()
         LWP_MutexUnlock(mutex);
         #endif
         m_activePreset->Render(*_beatDetect, pipelineContext());
-        
+
         #ifdef USE_THREADS
         LWP_MutexLock(mutex);
         #else
@@ -319,29 +319,29 @@ void projectM::renderFrame()
         m_activePreset->Render(*_beatDetect, pipelineContext());
         _renderer->RenderFrame (m_activePreset->pipeline(), pipelineContext());
     }
-    
+
     //	std::cout<< m_activePreset->absoluteFilePath()<<std::endl;
     //	_renderer->presetName = m_activePreset->absoluteFilePath();
 
     /*glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     glClearColor(.3, .3, .3, 0);
     glClear(GL_COLOR_BUFFER_BIT);
-    
+
     glBegin(GL_QUADS);
     glVertex2f(10, 10);
     glVertex2f(100, 10);
     glVertex2f(100, 100);
     glVertex2f(10, 100);
     glEnd();
-    
+
     glFlush();
-    
+
     gxSwapBuffers();*/
-    
+
     count++;
-    
+
     /** Frame-rate limiter */
     /** Compute once per preset */
     if ( this->count%100==0 )
@@ -380,7 +380,7 @@ void projectM::projectM_reset()
 void projectM::projectM_init ()
 {
     double easterEgg = 0.0f; /* EASTER EGG */;
-    
+
     /** Initialise start time */
     timeKeeper = new TimeKeeper(_settings.presetDuration,_settings.smoothPresetDuration, easterEgg);
 
@@ -411,7 +411,7 @@ void projectM::projectM_init ()
     LWP_CondInit(&condition);
     if (LWP_CreateThread(&thread, thread_callback, this, NULL, 0, LWP_PRIO_HIGHEST) != 0)
     {
-        
+
         std::cerr << "[projectM] failed to allocate a thread! try building with option USE_THREADS turned off" << std::endl;;
         exit(EXIT_FAILURE);
     }
@@ -499,7 +499,7 @@ int projectM::initPresetTools(int gx, int gy)
         preset = _settings.presetDirectory + "/" + _settings.initialPresetName;
     }
     m_activePreset = m_presetLoader->loadPreset(preset);
-    
+
     _renderer->SetPipeline(m_activePreset->pipeline());
 
     // Case where no valid presets exist in directory. Could also mean
@@ -616,68 +616,68 @@ void projectM::selectPreset ( unsigned int index, bool hardCut)
 }
 
 void projectM::selectRandom(const bool hardCut) {
-    
+
     if (m_presetChooser->empty())
         return;
-    
+
     if (!hardCut) {
         timeKeeper->StartSmoothing();
     }
-    
+
     *m_presetPos = m_presetChooser->weightedRandom();
-    
+
     if (!hardCut) {
         switchPreset(m_activePreset2);
     } else {
         switchPreset(m_activePreset);
         timeKeeper->StartPreset();
     }
-    
+
     presetSwitchedEvent(hardCut, **m_presetPos);
-    
+
 }
 
 void projectM::selectPrevious(const bool hardCut) {
-    
+
     if (m_presetChooser->empty())
         return;
-    
+
     if (!hardCut) {
         timeKeeper->StartSmoothing();
     }
-    
+
     m_presetChooser->previousPreset(*m_presetPos);
-    
+
     if (!hardCut) {
         switchPreset(m_activePreset2);
     } else {
         switchPreset(m_activePreset);
         timeKeeper->StartPreset();
     }
-    
+
     presetSwitchedEvent(hardCut, **m_presetPos);
-    
+
     //      m_activePreset =  m_presetPos->allocate();
     //      _renderer->SetPipeline(m_activePreset->pipeline());
     //      _renderer->setPresetName(m_activePreset->name());
-    
+
     //timeKeeper->StartPreset();
-    
+
 }
 
 void projectM::selectNext(const bool hardCut) {
-    
+
     if (m_presetChooser->empty())
         return;
-    
+
     if (!hardCut) {
         timeKeeper->StartSmoothing();
         std::cout << "start smoothing" << std::endl;
     }
-    
+
     std::cout << "getting next preset" << std::endl;
     m_presetChooser->nextPreset(*m_presetPos);
-    
+
     if (!hardCut) {
         switchPreset(m_activePreset2);
     } else {
@@ -685,8 +685,8 @@ void projectM::selectNext(const bool hardCut) {
         timeKeeper->StartPreset();
     }
     presetSwitchedEvent(hardCut, **m_presetPos);
-    
-    
+
+
 }
 
 void projectM::switchPreset(std::auto_ptr<Preset> & targetPreset) {

@@ -50,7 +50,7 @@ msgid "Continuous"
 msgstr "계속"
 
 msgid "Through"
-msgstr "처음부터 끝까지"	   
+msgstr "처음부터 끝까지"
 
 msgid "Screensaver Art"
 msgstr "화면보호기 삽화"
@@ -308,7 +308,7 @@ msgid "Online Media Folder"
 msgstr "온라인 미디어 폴더"
 
 msgid "Banner Screensaver"
-msgstr "배너 스크린세이버"	   
+msgstr "배너 스크린세이버"
 
 msgid "Add SMB Share"
 msgstr "SMB 공유 추가"
@@ -323,7 +323,7 @@ msgid "DVD Sync Type"
 msgstr "DVD 동기화 유형"
 
 msgid "Mixed"
-msgstr "혼합"		  
+msgstr "혼합"
 
 msgid "Skip to Main Title"
 msgstr "메인 타이틀 넘어가기"
@@ -578,7 +578,7 @@ msgid "Interlacing"
 msgstr "인터레이스"
 
 msgid "Blur"
-msgstr "흐릿함"				
+msgstr "흐릿함"
 
 msgid "Resolution exceeds maximum allowed (1024x720)!"
 msgstr "해상도가 최대 허용치 (1024x720)를 초과합니다!"
@@ -596,8 +596,8 @@ msgid "Starting Area"
 msgstr "시작 지역"
 
 msgid "Artwork Viewer"
-msgstr "아트워크 뷰어"		
-	  						  
+msgstr "아트워크 뷰어"
+
 msgid "Artwork Viewer"
 msgstr "아트워크 뷰어"
 
@@ -614,7 +614,7 @@ msgid "JPEG Resample"
 msgstr "JPEG 리샘플링"
 
 msgid "Night Filter"
-msgstr "야간 필터"										
+msgstr "야간 필터"
 
 msgid "Screen Burn-in Reduction"
 msgstr "스크린 번인 감소"
@@ -623,7 +623,7 @@ msgid "Force 576p"
 msgstr "강제 576p"
 
 msgid "Enhanced Resolution"
-msgstr "향상된 해상도"						   
+msgstr "향상된 해상도"
 
 msgid "Error opening font file!"
 msgstr "폰트 파일 여는 중 오류 발생!"

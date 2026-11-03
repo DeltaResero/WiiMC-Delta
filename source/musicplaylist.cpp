@@ -63,7 +63,7 @@ BROWSERENTRY *MusicPlaylistGetNextShuffle()
 
 /****************************************************************************
  * ParsePlaylist
- * 
+ *
  * Loads the files inside the current playlist into the filebrowser
  ***************************************************************************/
 
@@ -128,7 +128,7 @@ int MusicPlaylistLoad()
 		f_entry->length = 0;
 		f_entry->type = TYPE_FILE;
 		f_entry->icon = ICON_FILE_CHECKED;
-		i = i->next; 
+		i = i->next;
 	}
 	browser.selIndex = browser.first;
 	return browser.numEntries;
@@ -143,7 +143,7 @@ BROWSERENTRY * MusicPlaylistFindIndex(char * fullpath)
 		if(i->file && strcmp(fullpath, i->file) == 0)
 			return i;
 		i=i->next;
-	}	
+	}
 	return NULL;
 }
 
@@ -163,7 +163,7 @@ bool MusicPlaylistFind(BROWSERENTRY *index)
 
 /****************************************************************************
  * EnqueueFile
- * 
+ *
  * Adds the specified file (with full path) to the playlist
  *  0 - not enqueued
  *  1 - enqueued
@@ -241,9 +241,9 @@ static int EnqueueFile(char * path)
 			}
 
 			// use parameter pt_prettyformat_title for display if it exists
-			if(i->params) 
+			if(i->params)
 			{
-				for (int n = 0; i->params[n].name != NULL; n++) 
+				for (int n = 0; i->params[n].name != NULL; n++)
 				{
 					if(strcasecmp(i->params[n].name,PLAY_TREE_PARAM_PRETTYFORMAT_TITLE) != 0)
 						continue;
@@ -347,7 +347,7 @@ static int MusicSortCallback(const void *f1, const void *f2)
 
 /****************************************************************************
  * EnqueueFolder
- * 
+ *
  * Adds all music files in the specified folder to the playlist
  ***************************************************************************/
 static bool EnqueueFolder(char * path, int silent)
@@ -367,7 +367,7 @@ static bool EnqueueFolder(char * path, int silent)
 		}
 		return false;
 	}
-	
+
 	filepath = (char*)mem2_malloc((MAXPATHLEN+1)*sizeof(char), MEM2_BROWSER);
 	if(!filepath) return false;
 
@@ -440,12 +440,12 @@ bool MusicPlaylistEnqueue(BROWSERENTRY *index)
 {
 	char fullpath[MAXPATHLEN+1];
 	GetFullPath(index, fullpath);
-	
+
 	if(index->type == TYPE_FOLDER)
 		index->icon = ICON_FOLDER_CHECKED;
 	else
 		index->icon = ICON_FILE_CHECKED;
-	
+
 	if(index->type == TYPE_FOLDER)
 		return EnqueueFolder(fullpath, NOTSILENT);
 
@@ -469,7 +469,7 @@ static void Remove(BROWSERENTRY *i)
 	if(n) n->prior = p;
 	if(p) p->next = n;
 
-	if(browserMusic.selIndex == i) 
+	if(browserMusic.selIndex == i)
 		browserMusic.selIndex = NULL;
 
 	shuffleIndex = -1; // reset shuffle
@@ -547,7 +547,7 @@ void MusicPlaylistDequeue(BROWSERENTRY *index)
 					Remove(m_entry);
 					break;
 				}
-				m_entry = m_entry->next; 
+				m_entry = m_entry->next;
 			}
 		}
 		pt_iter_destroy(&pt_iter);
@@ -562,10 +562,10 @@ void MusicPlaylistDequeue(BROWSERENTRY *index)
 		if(m_entry->file && strncmp(fullpath, m_entry->file, len) == 0)
 		{
 			aux = m_entry;
-			m_entry = m_entry->next; 
-			Remove(aux);			
+			m_entry = m_entry->next;
+			Remove(aux);
 		}
-		else 
-			m_entry = m_entry->next; 
+		else
+			m_entry = m_entry->next;
 	}
 }

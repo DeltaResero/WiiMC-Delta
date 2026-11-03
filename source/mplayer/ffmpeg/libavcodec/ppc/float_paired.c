@@ -26,11 +26,11 @@ static void vector_fmul_paired(float *dst, const float *src0, const float *src1,
 {
 	vector float pair[2];
 	vector float result;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair[0] = paired_lx(i, src0);
 		pair[1] = paired_lx(i, src1);
-		
+
 		result = paired_mul(pair[0], pair[1]);
 		paired_stx(result, i, dst);
 	}
@@ -40,14 +40,14 @@ static void vector_fmul_reverse_paired(float *dst, const float *src0, const floa
 {
 	vector float pair[2];
 	vector float result;
-	
+
 	src1 += len;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair[0] = paired_lx(i, src0);
 		pair[1] = psq_lu(-8,src1,0,0);
 		pair[1] = paired_merge10(pair[1], pair[1]);
-		
+
 		result = paired_mul(pair[0], pair[1]);
 		paired_stx(result, i, dst);
 	}
@@ -57,12 +57,12 @@ static void vector_fmul_add_paired(float *dst, const float *src0, const float *s
 {
 	vector float pair[3];
 	vector float result;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair[0] = paired_lx(i, src0);
 		pair[1] = paired_lx(i, src1);
 		pair[2] = paired_lx(i, src2);
-		
+
 		result = paired_madd(pair[0], pair[1], pair[2]);
 		paired_stx(result, i, dst);
 	}
@@ -72,24 +72,24 @@ static void vector_fmul_window_paired(float *dst, const float *src0, const float
 {
 	vector float pair[2], window[2];
 	vector float result;
-	
+
 	dst += len;
 	win += len;
 	src0 += len;
-	
+
 	for (int i = -len*4, j = len*4 - 8; i < 0; i += 8, j -= 8) {
 		pair[0] = paired_lx(i, src0);
 		pair[1] = paired_lx(j, src1);
 		pair[1] = paired_merge10(pair[1], pair[1]);
-		
+
 		window[0] = paired_lx(i, win);
 		window[1] = paired_lx(j, win);
 		window[1] = paired_merge10(window[1], window[1]);
-		
+
 		result = paired_mul(pair[1], window[0]);
 		result = paired_msub(pair[0], window[1], result);
 		paired_stx(result, i, dst);
-		
+
 		result = paired_mul(pair[1], window[1]);
 		result = paired_madd(pair[0], window[0], result);
 		result = paired_merge10(result, result);
@@ -101,14 +101,14 @@ static void butterflies_float_paired(float *restrict v1, float *restrict v2, int
 {
 	vector float pair[2];
 	vector float result;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair[0] = paired_lx(i, v1);
 		pair[1] = paired_lx(i, v2);
-		
+
 		result = paired_add(pair[0], pair[1]);
 		paired_stx(result, i, v1);
-		
+
 		result = paired_sub(pair[0], pair[1]);
 		paired_stx(result, i, v2);
 	}
@@ -118,13 +118,13 @@ static float scalarproduct_float_paired(const float *v1, const float *v2, int le
 {
 	vector float pair[2];
 	vector float result = {0.0,0.0};
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair[0] = paired_lx(i, v1);
 		pair[1] = paired_lx(i, v2);
 		result = paired_madd(pair[0], pair[1], result);
 	}
-	
+
 	register float scalar;
 	asm("ps_sum0 %0,%1,%1,%1" : "=f"(scalar) : "f"(result));
 	return scalar;
@@ -133,7 +133,7 @@ static float scalarproduct_float_paired(const float *v1, const float *v2, int le
 static void vector_fmul_scalar_paired(float *dst, const float *src, float mul, int len)
 {
 	vector float pair;
-	
+
 	for (int i = 0; i < len*4; i += 8) {
 		pair = paired_lx(i, src);
 		pair = ps_muls0(pair, mul);

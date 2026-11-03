@@ -52,11 +52,11 @@ static void * netcb (void *arg)
 	while(netHalt != 2)
 	{
 		retry = 5;
-		
+
 		while (retry > 0 && netHalt != 2)
 		{
 			net_deinit();
-			
+
 			if(prevInit)
 			{
 				prevInit=false; // only call net_wc24cleanup once
@@ -88,10 +88,10 @@ static void * netcb (void *arg)
 				//3DS Controller
 				if(want3DS)
 					CTRInit();
-				
+
 				struct in_addr hostip;
 				hostip.s_addr = net_gethostip();
-				
+
 				if (hostip.s_addr)
 				{
 					strcpy(wiiIP, inet_ntoa(hostip));
@@ -111,7 +111,7 @@ static void * netcb (void *arg)
 			usleep(100);
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -155,7 +155,7 @@ void CheckMplayerNetwork() //to use in cache2.c in mplayer
 	if(net_gethostip()==0)
 	{
 		networkInit = false;
-		StartNetworkThread();	
+		StartNetworkThread();
 	}
 }
 }
@@ -165,7 +165,7 @@ static bool cancelNetworkInit = false;
 static void networkInitCallback(void *ptr)
 {
 	GuiButton *b = (GuiButton *)ptr;
-	
+
 	if(b->GetState() == STATE_CLICKED)
 	{
 		b->ResetState();
@@ -252,7 +252,7 @@ ConnectShare (int num, bool silent)
 	{
 		if(!silent)
 			ShowAction ("Connecting to network share...");
-		
+
 		if(smbInitDevice(mountpoint, WiiSettings.smbConf[num-1].user, WiiSettings.smbConf[num-1].pwd,
 					WiiSettings.smbConf[num-1].share, WiiSettings.smbConf[num-1].ip))
 			networkShareInit[num-1] = true;
@@ -330,8 +330,8 @@ ConnectFTP (int num, bool silent)
 		if(!silent)
 			ShowAction ("Connecting to FTP site...");
 
-		if(ftpInitDevice(mountpoint, WiiSettings.ftpConf[num-1].user, 
-			WiiSettings.ftpConf[num-1].pwd, WiiSettings.ftpConf[num-1].folder, 
+		if(ftpInitDevice(mountpoint, WiiSettings.ftpConf[num-1].user,
+			WiiSettings.ftpConf[num-1].pwd, WiiSettings.ftpConf[num-1].folder,
 			WiiSettings.ftpConf[num-1].ip, WiiSettings.ftpConf[num-1].port, WiiSettings.ftpConf[num-1].passive))
 		{
 			ftpInit[num-1] = true;

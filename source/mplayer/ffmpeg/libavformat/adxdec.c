@@ -57,7 +57,7 @@ static int adx_read_packet(AVFormatContext *s, AVPacket *pkt)
     int ret, size;
 
     size = BLOCK_SIZE * avctx->channels;
-	
+
 	//for read_seek
 	//chans = avctx->channels;
 
@@ -76,7 +76,7 @@ static int adx_read_packet(AVFormatContext *s, AVPacket *pkt)
     } else {
         size = ret;
     }
-	
+
     pkt->duration = size / (BLOCK_SIZE * avctx->channels);
     pkt->pts      = (pkt->pos - c->header_size) / (BLOCK_SIZE * avctx->channels);
 

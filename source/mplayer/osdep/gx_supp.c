@@ -129,7 +129,7 @@ static f32 texcoordsY[] ATTRIBUTE_ALIGN(32) = {
 	1.0f, 0.0f,
 	1.0f, 1.0f,
 	0.0f, 1.0f,
-	
+
 	0.0f, 0.0f,
 	1.0f, 0.0f,
 	1.0f, 1.0f,
@@ -184,7 +184,7 @@ static void draw_initYUV()
 	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 	GX_SetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 	GX_SetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY);
-	
+
 	//Yl: GX_TEXMAP0, GX_TEXCOORD0 <- left half of Y buffer
 	//Yr: GX_TEXMAP1, GX_TEXCOORD1 <- right half of Y buffer
 	//U:  GX_TEXMAP2, GX_TEXCOORD2 (was MAP1 COORD1)
@@ -194,7 +194,7 @@ static void draw_initYUV()
 	GX_SetNumTevStages(15);
 	GX_SetTevKColor(GX_KCOLOR0, (GXColor){255,	 0,   0, levelconv ? 18 : 0});	//R {1, 0, 0, 16*1.164}
 	GX_SetTevKColor(GX_KCOLOR1, (GXColor){	0,	 0, 255, levelconv ? 41 : 0});	//B {0, 0, 1, 0.164}
-	
+
 	static const GXColor uv_coeffs[MP_CSP_COUNT][2] = {
 		[MP_CSP_DEFAULT] = {
 			{203, 103,	 0, 255},	// {1.596/2, 0.813/2, 0}
@@ -217,7 +217,7 @@ static void draw_initYUV()
 			{  0,  24, 129, 255}	// {0, 0.396/4, 2.029/4}
 		},
 	};
-	
+
 	//Brightness/Contrast Filter Setup:
 	// color_out = clamp[(Image - 128)*C + 128 + B] = clamp[(Image*C) - 128*C + 128 + B]
 	// 2 constant values will be stored in the alpha components of GX_KCOLOR2 & GX_KCOLOR3
@@ -440,17 +440,17 @@ static void draw_scaling()
 }
 
 void GX_ConfigTextureYUV(u16 width, u16 height, u16 chroma_width, u16 chroma_height)
-{	
+{
 	int wp;
 
 	Ywidth=(width+7)&~7;
 	UVwidth = (chroma_width+7)&~7;
 
 	st0=st1=0;
-	
-	w1 = Ywidth / 8;        
+
+	w1 = Ywidth / 8;
 	w2 = UVwidth / 8;
-            
+
 	wl = w1 > 1024/8 ? 1024/8 - 1 : w1;
 	wr = w1 > 1024/8 ? w1 - 1024/8 + 1 : 0;
 
@@ -502,7 +502,7 @@ inline void DrawMPlayer()
 		--timerFadeBlack;
 		return;
 	}
-	
+
 	DCFlushRange(Yltexture, Yltexsize);
 	if (wr>0) DCFlushRange(Yrtexture, Yrtexsize);
 	DCFlushRange(Utexture, UVtexsize);
@@ -552,11 +552,11 @@ inline void DrawMPlayer()
 	{
 		drawMode = DrawMPlayerGui();
 	}
-	
+
 	if(copyScreen == 2)
 	{
 		copyScreen = 0;
-		pause_gui = 1;		
+		pause_gui = 1;
 	}
 	else if(drawMode != 0)
 	{
@@ -566,7 +566,7 @@ inline void DrawMPlayer()
 			DrawMPlayerGui();
 			--guiDelay;
 		}
-		
+
 		// reconfigure GX for MPlayer
 		Mtx44 p;
 		draw_initYUV();
@@ -575,7 +575,7 @@ inline void DrawMPlayer()
 		GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);
 		drawMode = 0;
 	}
-	
+
 	//whichfb ^= 1; // flip framebuffer
 	}
 #if 1
@@ -591,21 +591,21 @@ else {
 			drawMode = DrawMPlayerGui();
 		}
 	}
-	
+
 	//set interlace mode if needed
 	if(sync_interlace > 0)
 		SetInterlace();
-	
+
 	// Switch to tile rendering
 	SetMplTiled();
-	
+
 	//int half_ht = vmode->efbHeight / 2;
 	int half_ht = vmode->efbHeight; // don't do height for now
 	int half_wh = vmode->fbWidth / 2;
 
 	bool pad_wh = (half_wh / 8) % 2;
 	int corr_wh = half_wh + (8 * pad_wh);
-	
+
 	// don't do height
 	int y = 0;
 
@@ -646,7 +646,7 @@ else {
 		else if(drawMode != 0)
 		{
 			//SetMplTiled();
-			
+
 			// Fixes gui bar from not displaying
 			// the left chunk on the first frame.
 			if(guiDelay != 0) {
@@ -654,7 +654,7 @@ else {
 				DrawMPlayerGui();
 				--guiDelay;
 			}
-			
+
 			//DrawMPlayerGui(); //fixes left chunk seek bar from remaining after loading a new video.
 			// reconfigure GX for MPlayer
 			Mtx44 p;
@@ -684,7 +684,7 @@ void GX_AllocTextureMemory()
 	Yltexture = (u8*)mem2_memalign(32, 1024*MAX_HEIGHT, MEM2_VIDEO);
 	Yrtexture = (u8*)mem2_memalign(32, (MAX_WIDTH-1024)*MAX_HEIGHT, MEM2_VIDEO);
 	Utexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);
-	Vtexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);        
+	Vtexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);
 }
 
 /****************************************************************************
@@ -712,7 +712,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
     memset(Yltexture, 0, 1024*MAX_HEIGHT);
     memset(Yrtexture, 0, (MAX_WIDTH-1024)*MAX_HEIGHT);
     memset(Utexture, 0x80, 1024*(MAX_HEIGHT/2));
-    memset(Vtexture, 0x80, 1024*(MAX_HEIGHT/2));	
+    memset(Vtexture, 0x80, 1024*(MAX_HEIGHT/2));
 
 	// center, to correct difference between pitch and real width
 	video_diffx = (w - width)/2.0;
@@ -757,13 +757,13 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	while (rows--) { \
 		tiles = wl; \
 		 \
-		while (tiles--) { \		
-			__asm__ volatile("dcbz 0,%0" : : "b" (++Yldst)); \ 
+		while (tiles--) { \
+			__asm__ volatile("dcbz 0,%0" : : "b" (++Yldst)); \
 			*Yldst = *++Ysrc1; \
 			*++Yldst = *++Ysrc2; \
 			*++Yldst = *++Ysrc3; \
 			*++Yldst = *++Ysrc4; \
-		} \	
+		} \
 		if (wr>0){ \
 			tiles = wr; \
 			 \
@@ -812,7 +812,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 			*++Udst = *++Usrc3; \
 			*++Udst = *++Usrc4; \
 			 \
-			__asm__ volatile("dcbz 0,%0" : : "b" (++Vdst) ); \ 
+			__asm__ volatile("dcbz 0,%0" : : "b" (++Vdst) ); \
 			*Vdst = *++Vsrc1; \
 			*++Vdst = *++Vsrc2; \
 			*++Vdst = *++Vsrc3; \
@@ -834,7 +834,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 
 void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 {
-	
+
 	if(st0!=stride[0] || st1!=stride[1])
 	{
 		st0=stride[0];
@@ -860,7 +860,7 @@ void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 
 void GX_RenderTexture()
 {
-	DrawMPlayer();  
+	DrawMPlayer();
 }
 
 void vo_draw_alpha_gekko(int x0, int y0, int w, int h, unsigned char *src, unsigned char *srca, int stride)
@@ -875,13 +875,13 @@ void vo_draw_alpha_gekko(int x0, int y0, int w, int h, unsigned char *src, unsig
 
 	h = h < 1024 ? h : 1024;
 
-	for (int y = 0; y < h; y++) 
+	for (int y = 0; y < h; y++)
 	{
 		yt = Yltexture + ((dys & (~3)) * Ylwidth) + ((dys & 3) << 3);
 		dxs = x0;
-		for (x = 0; x < w1; x++) 
+		for (x = 0; x < w1; x++)
 		{
-			if (*srca) 
+			if (*srca)
 			{
 				Ydst = yt + ((dxs & (~7)) << 2)  + (dxs & 7);
 				*Ydst = (((*Ydst) * (*srca)) >> 8) + (*src);
@@ -892,9 +892,9 @@ void vo_draw_alpha_gekko(int x0, int y0, int w, int h, unsigned char *src, unsig
 		if(w>1024)
 		{
 			yt = Yrtexture + ((dys & (~3)) * Yrwidth) + ((dys & 3) << 3);
-			for (; x < w; x++) 
+			for (; x < w; x++)
 			{
-				if (*srca) 
+				if (*srca)
 				{
 					Ydst = yt + ((dxs & (~7)) << 2) + (dxs & 7);
 					*Ydst = (((*Ydst) * (*srca)) >> 8) + (*src);

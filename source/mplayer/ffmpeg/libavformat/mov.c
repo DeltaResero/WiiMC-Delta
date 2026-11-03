@@ -218,11 +218,11 @@ static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
 	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
 	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 	//avio_seek(pb, -len, SEEK_CUR);
-	
+
 	//If the len is higher than the allocated buffer fix it
 	if(len > 1.5*1024*1024)
 		len = 1.5*1024*1024;
-	
+
 	avio_read(pb, pos_pic, len);
 	//avio_seek(pb, +len, SEEK_CUR);
 	embedded_pic = 1;
@@ -291,7 +291,7 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             avio_rb32(pb); // unknown
             str_size = data_size - 16;
             atom.size -= 16;
-			
+
 			//Cover stuff
 			if (atom.type == MKTAG('c', 'o', 'v', 'r')) {
                 int ret = mov_read_covr(c, pb, data_type, str_size);
@@ -1905,7 +1905,7 @@ static int mov_read_ctts(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
 	// 2015 change test
 	av_freep(&sc->ctts_data);
-	
+
     if (!entries)
         return 0;
     if (entries >= UINT_MAX / sizeof(*sc->ctts_data))

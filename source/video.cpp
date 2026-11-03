@@ -190,7 +190,7 @@ void Menu_Render()
 		if(timerBlack == 0)
 			tiledBlack = false;
 	}
-	
+
 	//whichfb ^= 1; // flip framebuffer
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
@@ -213,7 +213,7 @@ void Menu_Render()
 	else if (fade_not)
 		fadein_copyfilter();
 	++FrameTimer;
-	
+
 	if(delayrender && FrameTimer > 4) {
 		if(!AutobootExit)
 			VIDEO_SetBlack(FALSE);
@@ -232,7 +232,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 	if(data == NULL)
 		return;
 
-	// if width/height are not multiples of 4, assume that we correctly 
+	// if width/height are not multiples of 4, assume that we correctly
 	// padded the texture and also pad the dimensions
 	if(width%4) width += (4-width%4);
 	if(height%4) height += (4-height%4);
@@ -242,7 +242,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 	//u8 mipmap = GX_FALSE;
 	//if(width == 600 && height == 600)
 	//	mipmap = GX_TRUE;
-	
+
 	GX_InitTexObj(&texObj, data, width, height, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
 	//GX_InitTexObjFilterMode(&texObj, GX_NEAR, GX_NEAR);
 	GX_LoadTexObj(&texObj, GX_TEXMAP0);
@@ -282,7 +282,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
 	GX_TexCoord2f32(0, 1);
 	GX_End();
-	
+
 	GX_LoadPosMtxImm (GXmodelView2D, GX_PNMTX0);
 
 	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
@@ -495,7 +495,7 @@ void Set576p()
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,GX_DISABLE);
 	GX_Flush();
-	
+
 	// Allocate framebuffers
 /*	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
@@ -562,7 +562,7 @@ void SetInterlaceOff()
 		return;
 	else if(WiiSettings.interlaceHandle == 1)
 		SetDoubleStrikeOff();
-		
+
 	//handle deflicker
 	if(WiiSettings.videoDf == 1)
 		SetDf();
@@ -618,11 +618,11 @@ void SetMplTiled()
 {
 	if(vmode->fbWidth == 720 || !wiiTiledRender)
 		return;
-	
+
 	vmode->viWidth = VI_MAX_WIDTH_NTSC;
 	vmode->fbWidth = VI_MAX_WIDTH_NTSC;
 	HOffset();
-	
+
 	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
@@ -632,10 +632,10 @@ void SetMplTiled()
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 	GX_Flush();
-	
+
 	// Clear framebuffers
 	VIDEO_SetNextFramebuffer (xfb[0]);
-	
+
 	// TEST: If 480i is set this line can make line 21 cc work
 	//vmode->viYOrigin = -2;
 
@@ -647,7 +647,7 @@ void SetMplTiledOff()
 {
 	if(!WiiSettings.tiledRender || !wiiTiledRender || ssIsActive)
 		return;
-	
+
 	// This fixes tearing when calling the menu.
 	int i = 0;
 	do {
@@ -683,7 +683,7 @@ void SetMplTiledOff()
 	GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
-	
+
 	GX_Flush();
 
 	// Clear framebuffers

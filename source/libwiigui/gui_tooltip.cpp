@@ -29,7 +29,7 @@ GuiTooltip::GuiTooltip(const char *t)
 	leftImage.SetImage(tooltipLeft);
 	tileImage.SetImage(tooltipTile);
 	rightImage.SetImage(tooltipRight);
-	
+
 	height = leftImage.GetHeight();
 
 	text = NULL;
@@ -40,7 +40,7 @@ GuiTooltip::GuiTooltip(const char *t)
 	tileImage.SetParent(this);
 	rightImage.SetParent(this);
 	text->SetParent(this);
-	
+
 	time1 = 0;
 	time2 = 0;
 }

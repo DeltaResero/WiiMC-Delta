@@ -152,9 +152,9 @@ static void fill_block16_gekko(uint8_t *block, uint8_t value, int line_size, int
 	uint32_t word = value;
 	word |= (word << 8);
 	word |= (word << 16);
-	
+
 	block -= line_size;
-	
+
 	do {
 		__asm__ volatile (
 			"stwux	%2,%0,%1\n"
@@ -172,9 +172,9 @@ static void fill_block8_gekko(uint8_t *block, uint8_t value, int line_size, int 
 	uint32_t word = value;
 	word |= (word << 8);
 	word |= (word << 16);
-	
+
 	block -= line_size;
-	
+
 	do {
 		__asm__ volatile (
 			"stwux	%2,%0,%1\n"

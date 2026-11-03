@@ -395,9 +395,9 @@ while(1){
         priv->idx_size,avih.dwTotalFrames, (int64_t)stream_tell(demuxer->stream));
 #ifndef GEKKO
         priv->idx=malloc(priv->idx_size<<4);
-#else   
+#else
 		priv->idx = alloc_index(priv->idx_size<<4);
-#endif 
+#endif
 //      printf("\nindex to %p !!!!! (priv=%p)\n",priv->idx,priv);
       read = stream_read(demuxer->stream,(char*)priv->idx,priv->idx_size<<4);
       priv->idx_size = FFMAX(read, 0) >> 4;
@@ -628,7 +628,7 @@ if (index_file_load) {
   priv->idx=malloc(priv->idx_size*sizeof(AVIINDEXENTRY));
 #else
   priv->idx=alloc_index(priv->idx_size*sizeof(AVIINDEXENTRY));
-#endif 
+#endif
   if (!priv->idx) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_FailedMallocForIdxFile, index_file_load);
     priv->idx_size = 0;
@@ -687,10 +687,10 @@ if(index_mode>=2 || (priv->idx_size==0 && index_mode==1)){
 	{
 		free_index();
 		priv->idx=NULL;
-		idx_pos=0; 
+		idx_pos=0;
 		break;
 	}
-#endif 
+#endif
       if(!priv->idx){idx_pos=0; break;} // error!
     }
     idx=&((AVIINDEXENTRY *)priv->idx)[idx_pos++];

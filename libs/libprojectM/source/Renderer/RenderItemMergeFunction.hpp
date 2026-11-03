@@ -137,7 +137,7 @@ class BorderMerge : public RenderItemMerge<Border> {
         virtual inline Border * computeMerge(const Border * lhs, const Border * rhs, double ratio) const
         {
             Border * ret = new Border();
-		
+
 	    Border & target = *ret;
 
             target.inner_a = interpolate(lhs->inner_a, rhs->inner_a, ratio);

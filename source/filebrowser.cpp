@@ -78,23 +78,23 @@ void SortBrowser(BROWSER *_browser, int ( * comparator ) ( const void *, const v
 {
 	/* preform a bubble sort on the list */
 	BROWSERENTRY *a = NULL;
-	BROWSERENTRY *b = NULL; 
-	BROWSERENTRY *e = NULL; 
-	BROWSERENTRY *tmp = NULL; 
-	BROWSERENTRY *tmp2 = NULL; 
+	BROWSERENTRY *b = NULL;
+	BROWSERENTRY *e = NULL;
+	BROWSERENTRY *tmp = NULL;
+	BROWSERENTRY *tmp2 = NULL;
 	BROWSERENTRY *head = _browser->first;
 	BROWSERENTRY *tail = _browser->last;
 	int pos;
 	if(!head) return;
 	/*  tmp2 <-> a <-> b <-> tmp */
-	while(e != head->next) 
+	while(e != head->next)
 	{
 		a = head;
 		b = a->next;
-		while(a != e) 
+		while(a != e)
 		{
 			if(comparator(a,b)>0)
-			{	   
+			{
 				pos=a->pos;
 				tmp = b->next;
 				tmp2 = a->prior;
@@ -108,8 +108,8 @@ void SortBrowser(BROWSER *_browser, int ( * comparator ) ( const void *, const v
 				if(!tmp) tail = a;
 				a->pos=b->pos;
 				b->pos=pos;
-			} 
-			else 
+			}
+			else
 			{
 				a = a->next;
 			}
@@ -136,7 +136,7 @@ static BROWSERENTRY *AddEntry(BROWSER *info)
 
 	last_entry = info->last;
 	new_entry = (BROWSERENTRY *)mem2_calloc(1, sizeof(BROWSERENTRY), MEM2_BROWSER);
-	
+
 	if(!new_entry)
 		return NULL;
 
@@ -171,13 +171,13 @@ bool DeleteEntry(BROWSER *info, BROWSERENTRY *entry)
 			n=i->next;
 			if(!p) //first
 				info->first = n;
-			else 
+			else
 				p->next=n;
-			if(!n) //last	
+			if(!n) //last
 				info->last =p;
 			else
 				n->prior=p;
-			
+
 			mem2_free(i->file, MEM2_BROWSER);
 			mem2_free(i->url, MEM2_BROWSER);
 			mem2_free(i->display, MEM2_BROWSER);
@@ -187,11 +187,11 @@ bool DeleteEntry(BROWSER *info, BROWSERENTRY *entry)
 			mem2_free(i->image, MEM2_BROWSER);
 			mem2_free(i->tunein, MEM2_BROWSER);
 			mem2_free(i, MEM2_BROWSER);
-				
+
 			return true;
 		}
 		i=i->next;
-	}	
+	}
 	return false;
 }
 
@@ -261,7 +261,7 @@ int BrowserFindSub(char *path)
 		if (strcasecmp(i->file, path) == 0)
 			return 1;
 		i=i->next;
-	}	
+	}
 
 	return 0;
 }
@@ -325,7 +325,7 @@ void PopulateVideoPlaylist()
 		{
 			DeleteEntryVideos(entry);
 			break;
-		}	
+		}
 		if(browser.selIndex == i) browserVideos.selIndex = entry;
 		i=i->next;
 	}
@@ -357,7 +357,7 @@ static int UpdateDirName()
 		BrowserHistoryDiscard();
 		return 1;
 	}
-	
+
 	// something went wrong, let's reset everything
 	if(!browser.selIndex->file)
 	{
@@ -367,7 +367,7 @@ static int UpdateDirName()
 	}
 
 	// entering a playlist - this is handled when the playlist is parsed
-	if(browser.selIndex->type == TYPE_PLAYLIST || 
+	if(browser.selIndex->type == TYPE_PLAYLIST ||
 		strncmp(browser.selIndex->file, "http:", 5) == 0)
 	{
 		BrowserHistoryStore(browser.dir);
@@ -534,7 +534,7 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 			{
 				BROWSERENTRY *entry;
 				entry=AddEntryFiles();
-				
+
 				snprintf(tmp, sizeof(tmp), "%s:", part[DEVICE_SD][i].mount);
 				entry->file = mem2_strdup(tmp, MEM2_BROWSER);
 
@@ -581,10 +581,10 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 	}
 
 	if(!WiiSettings.dvdDisabled && isInserted[DEVICE_DVD])
-	{		
+	{
 		BROWSERENTRY *entry;
 		entry=AddEntryFiles();
-		
+
 		entry->file = mem2_strdup("dvd:", MEM2_BROWSER);
 		entry->display = mem2_strdup("Data DVD", MEM2_BROWSER);
 		entry->length = 0;
@@ -601,12 +601,12 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 
 			snprintf(tmp, sizeof(tmp), "smb%d:", i+1);
 			entry->file = mem2_strdup(tmp, MEM2_BROWSER);
-			
+
 			if(WiiSettings.smbConf[i].displayname[0] != 0)
 				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.smbConf[i].displayname);
 			else
 				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.smbConf[i].share);
-			
+
 			entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 			entry->length = 0;
 			entry->type = TYPE_FOLDER; // flag this as a dir
@@ -623,12 +623,12 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 
 			snprintf(tmp, sizeof(tmp), "ftp%d:", i+1);
 			entry->file = mem2_strdup(tmp, MEM2_BROWSER);
-			
+
 			if(WiiSettings.ftpConf[i].displayname[0] != 0)
 				snprintf(tmp, sizeof(tmp), "%s", WiiSettings.ftpConf[i].displayname);
 			else
 				snprintf(tmp, sizeof(tmp), "%s@%s/%s", WiiSettings.ftpConf[i].user, WiiSettings.ftpConf[i].ip, WiiSettings.ftpConf[i].folder);
-			
+
 			entry->display = mem2_strdup(tmp, MEM2_BROWSER);
 			entry->length = 0;
 			entry->type = TYPE_FOLDER; // flag this as a dir

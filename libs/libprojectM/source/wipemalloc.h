@@ -21,7 +21,7 @@
 /**
  * $Id: wipemalloc.h,v 1.1.1.1 2005/12/23 18:05:03 psperl Exp $
  *
- * Contains an inline function which can replace malloc() that also 
+ * Contains an inline function which can replace malloc() that also
  * call memset( ..., 0, sizeof( ... ) ) on the allocated block for
  * safe initialization
  *

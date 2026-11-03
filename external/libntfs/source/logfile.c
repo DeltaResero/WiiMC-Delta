@@ -733,7 +733,7 @@ int ntfs_empty_logfile(ntfs_attr *na)
 	char buf[NTFS_BUF_SIZE];
 
 	ntfs_log_trace("Entering.\n");
-	
+
 	if (NVolLogFileEmpty(na->ni->vol))
 		return 0;
 
@@ -747,7 +747,7 @@ int ntfs_empty_logfile(ntfs_attr *na)
 
 	pos = 0;
 	while ((count = na->data_size - pos) > 0) {
-		
+
 		if (count > NTFS_BUF_SIZE)
 			count = NTFS_BUF_SIZE;
 
@@ -763,6 +763,6 @@ int ntfs_empty_logfile(ntfs_attr *na)
 	}
 
 	NVolSetLogFileEmpty(na->ni->vol);
-	
+
 	return 0;
 }

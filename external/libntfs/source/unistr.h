@@ -89,7 +89,7 @@ extern int ntfs_set_char_encoding(const char *locale);
  * normalization form. Since Windows and most other OS:es use the NFC form while Mac OS X
  * mostly uses NFD, this conversion increases compatibility between Mac applications and
  * NTFS-3G.
- * 
+ *
  * @param normalize decides whether or not the string functions will do automatic filename
  *        normalization when converting to and from UTF-8. 0 means normalization is disabled,
  *        1 means it is enabled.
@@ -99,7 +99,7 @@ extern int ntfs_macosx_normalize_filenames(int normalize);
 
 /**
  * Mac OS X only.
- * 
+ *
  * Normalizes the input string "utf8_string" to one of the normalization forms NFD or NFC.
  * The parameter "composed" decides whether output should be in composed, NFC, form
  * (composed == 1) or decomposed, NFD, form (composed == 0).

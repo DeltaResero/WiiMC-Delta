@@ -38,7 +38,7 @@ typedef int (ntfs_log_handler)(const char *function, const char *file, int line,
 	u32 level, void *data, const char *format, va_list args);
 
 /* Set the logging handler from one of the functions, below. */
-void ntfs_log_set_handler(ntfs_log_handler *handler 
+void ntfs_log_set_handler(ntfs_log_handler *handler
 			  __attribute__((format(printf, 6, 0))));
 
 /* Logging handlers */

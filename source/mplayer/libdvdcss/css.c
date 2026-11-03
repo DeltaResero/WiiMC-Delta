@@ -1183,7 +1183,7 @@ static int CrackDiscKey( dvdcss_t dvdcss, uint8_t *p_disc_key )
     unsigned int nTry;          /* iterator for K[1] possibilities */
     unsigned int nPossibleK1;   /* #of possible K[1] values */
     unsigned char* K1table;     /* Lookup table for possible K[1] */
-#ifndef GEKKO    
+#ifndef GEKKO
     unsigned int*  BigTable;    /* LFSR2 startstate indexed by
                                  * 1,2,5 output byte */
 #else

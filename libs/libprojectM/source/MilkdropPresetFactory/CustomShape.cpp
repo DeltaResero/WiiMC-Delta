@@ -248,7 +248,7 @@ void CustomShape::loadUnspecInitConds()
 void CustomShape::evalInitConds()
 {
 	// NOTE: This is verified to be same behavior as trunk
-	for ( std::map<std::string, InitCond*>::iterator pos = per_frame_init_eqn_tree.begin(); 
+	for ( std::map<std::string, InitCond*>::iterator pos = per_frame_init_eqn_tree.begin();
 		     pos != per_frame_init_eqn_tree.end();++pos )
 		pos->second->evaluate();
 }

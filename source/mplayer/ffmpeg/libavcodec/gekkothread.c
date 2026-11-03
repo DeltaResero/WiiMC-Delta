@@ -58,7 +58,7 @@ void avcodec_thread_free(AVCodecContext *s)
         LWP_SemDestroy(c[i].work_sem);
         LWP_SemDestroy(c[i].done_sem);
     }
-    av_freep(&s->thread_opaque);  
+    av_freep(&s->thread_opaque);
 }
 
 int avcodec_thread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void *arg, int *ret, int count, int size){
@@ -93,7 +93,7 @@ int avcodec_thread_init(AVCodecContext *s, int thread_count){
     ThreadContext *c;
     s->thread_count = thread_count;
 
-    assert(!s->thread_opaque); 
+    assert(!s->thread_opaque);
     c= av_mallocz(sizeof(ThreadContext)*thread_count);
     s->thread_opaque= c;
 

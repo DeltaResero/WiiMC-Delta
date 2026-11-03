@@ -105,7 +105,7 @@ GuiFileBrowser::GuiFileBrowser(int w, int s)
 	scrollbarBoxBtn->SetClickable(false);
 	scrollbarBoxBtn->SetHoldable(true);
 	scrollbarBoxBtn->SetTrigger(trigHeldA);
-	
+
 	// hide scrollbar until we have sufficient entries
 	scrollbarTopImg->SetVisible(false);
 	scrollbarMidImg->SetVisible(false);
@@ -270,8 +270,8 @@ void GuiFileBrowser::SetRightCutoff()
 {
 	for(int i=0; i<size; i++)
 	{
-		fileListBg[i]->SetTile(width/16-2); 
-		fileListBgOver[i]->SetTile(width/16-2); 
+		fileListBg[i]->SetTile(width/16-2);
+		fileListBgOver[i]->SetTile(width/16-2);
 	}
 }
 
@@ -279,7 +279,7 @@ void GuiFileBrowser::ChangeSize(int newsize)
 {
 	if(newsize == size)
 		return;
-	
+
 	if(newsize < size)
 	{
 		for(int i=newsize; i<size; i++)
@@ -549,7 +549,7 @@ void GuiFileBrowser::Update(GuiTrigger * t)
 			fileList[i]->ResetState();
 		else if(i == selectedItem && fileList[i]->GetState() == STATE_DEFAULT)
 			fileList[selectedItem]->SetState(STATE_SELECTED, -1);
-		
+
 		if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))
 		{
 			int currChan = t->chan;

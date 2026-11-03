@@ -35,7 +35,7 @@ inline float gaussian(float mean, float sigma)
 {
 
 	float x1, x2, w, y1, y2;
- 
+
 	do {
 		x1 = 2.0 * uniform() - 1.0;
 		x2 = 2.0 * uniform() - 1.0;
@@ -45,7 +45,7 @@ inline float gaussian(float mean, float sigma)
 	w = sqrt( (-2.0 * log( w ) ) / w );
 	y1 = x1 * w;
 	y2 = x2 * w;
-	
+
 	float ret = y1*sigma + mean;
 
 	return ret;
@@ -53,15 +53,15 @@ inline float gaussian(float mean, float sigma)
 
 inline std::size_t uniformInteger(std::size_t upperBound=1) {
 
-	
+
 	/// @bug there was a man entry about how this leads to a lousy uniform
 	/// @bug distribution in practice. should probably review
 	assert(upperBound > 0);
 	return ((rand()) % ((int)upperBound));
 }
 
-	
-	
+
+
 
 /// Randomizes from probabilistically weighted distribution. Thus,
 /// sum of passed in weights should be 1.0
@@ -85,16 +85,16 @@ inline std::size_t weightedRandomNormalized(std::vector<float> weights) {
 }
 
 inline std::size_t weightedRandom(const std::vector<int> & weights, unsigned int weightTotalHint = 0) {
-	
 
-	if (weightTotalHint == 0)	{		
-		for (std::size_t i = 0; i < weights.size();i++) 
+
+	if (weightTotalHint == 0)	{
+		for (std::size_t i = 0; i < weights.size();i++)
 			weightTotalHint += weights[i];
 	}
-	
+
 	int sampledSum = uniformInteger(weightTotalHint);
 	int sum = 0;
-	
+
 	for (std::size_t i = 0; i < weights.size();i++) {
 		sum += weights[i];
 		if (sampledSum <= sum)

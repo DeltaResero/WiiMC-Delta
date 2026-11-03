@@ -204,7 +204,7 @@ static void * devicecallback (void *arg)
 			usleep(THREAD_SLEEP);
 			devsleep -= THREAD_SLEEP;
 		}
-		
+
 	}
 	return NULL;
 }
@@ -232,7 +232,7 @@ static void * parsecallback (void *arg)
 void ResumeDeviceThread()
 {
 	deviceHalt = 0;
-	
+
 	if(devicethread == LWP_THREAD_NULL)
 		LWP_CreateThread (&devicethread, devicecallback, NULL, devicestack, DEVICESTACK, 40);
 	else
@@ -520,7 +520,7 @@ static void GetFATVolumeLabel(const DISC_INTERFACE *disc, sec_t start, char *lab
 static void AddPartition(sec_t sector, int device, int type, int *devnum)
 {
 	int i;
-	
+
 	if (*devnum >= MAX_DEVICES)
 		return;
 
@@ -919,7 +919,7 @@ static bool MountPartitions(int device, int silent)
 {
 	bool mounted = false;
 	int retry = 1;
-	
+
 	if(device != DEVICE_SD && device != DEVICE_USB)
 		return false; // unknown device
 
@@ -1008,7 +1008,7 @@ void FindAppPath()
 				strcpy(appPath, filepath);
 				return;
 			}
-		}		
+		}
 	}
 
 	u64 start = gettime();
@@ -1027,7 +1027,7 @@ void FindAppPath()
 	if(isInserted[DEVICE_USB])
 	{
 		MountPartitions(DEVICE_USB, SILENT);
-			
+
 		for(int m=1; m<6; m++)
 		{
 			if(CheckMount(DEVICE_USB, m))
@@ -1064,7 +1064,7 @@ static bool MountDVD(bool silent)
 			ErrorPrompt("WiiMC does not have DVD access.");
 		return false;
 	}
-	
+
 	if(!DI_CheckDVDSupport())
 	{
 		if(!silent)
@@ -1090,7 +1090,7 @@ static bool MountDVD(bool silent)
 		{
 			if(silent)
 				break;
-			
+
 			retry = ErrorPromptRetry("Unsupported DVD.");
 		}
 		else
@@ -1122,7 +1122,7 @@ bool StartDVDMotor()
 
 	if(dvdLastUsed)
 		return true;
-	
+
 	ISO9660_Unmount("dvd:");
 
 	if(ISO9660_Mount("dvd", dvd))
@@ -1241,7 +1241,7 @@ bool IsOnlineMediaPath(char *path)
 				return true;
 		}
 		i=i->next;
-	}	
+	}
 
 	return false;
 }
@@ -1268,7 +1268,7 @@ void CleanupPath(char * path)
 		path[0] = 0;
 		return;
 	}
-	
+
 	if(IsAllowedProtocol(path))
 	{
 		char *c = strchr(path, ':');
@@ -1373,12 +1373,12 @@ char *GetPartitionLabel(char *path)
 
 	if(!FindDevice(path, &device, &devnum))
 	    return NULL;
-	
+
 	if (device != DEVICE_SD && device != DEVICE_USB)
 	    return NULL;
-	    
+
 	return part[device][devnum-1].name;
-	   
+
 }
 
 void GetFullPath(BROWSERENTRY *entry, char *path)
@@ -1413,7 +1413,7 @@ bool CheckMount(int device, int devnum)
 bool ChangeInterface(int device, int devnum, bool silent)
 {
 	bool mounted = false;
-	
+
 	switch(device)
 	{
 		case DEVICE_SD:
@@ -1464,7 +1464,7 @@ static int FileSortCallback(const void *f1, const void *f2)
 	if(!((BROWSERENTRY *)f1)->file || !((BROWSERENTRY *)f2)->file)
 		return -1;
 
-	// Special case for implicit directories 
+	// Special case for implicit directories
 	if(((BROWSERENTRY *)f1)->file[0] == '.' || ((BROWSERENTRY *)f2)->file[0] == '.')
 	{
 		if(strcmp(((BROWSERENTRY *)f1)->file, ".") == 0) { return -1; }
@@ -1519,7 +1519,7 @@ void GetExt(char *file, char *ext)
 			ext[0] = 0;
 			return;
 		}
-		
+
 		ext[i] = file_ext[i];
 		i++;
 	}
@@ -1649,8 +1649,8 @@ bool IsAllowedProtocol(char *file)
 	int j=0;
 	do
 	{
-		if (strcasecmp(protocol, validInternetProtocols[j]) == 0) 
-			return true;	
+		if (strcasecmp(protocol, validInternetProtocols[j]) == 0)
+			return true;
 	} while (validInternetProtocols[++j][0] != 0);
 
 	return false;
@@ -1662,7 +1662,7 @@ bool IsInternetStream(char *file)
 		return false;
 
 	char *pos = strchr(&file[7], '/');
-	
+
 	if(!pos || pos == &file[strlen(file)-1])
 		return true;
 
@@ -1683,7 +1683,7 @@ void FindDirectory()
 			break;
 		}
 		i=i->next;
-	}	
+	}
 
 	// move to this file
 	if(indexFound > 0)
@@ -1704,7 +1704,7 @@ void FindDirectory()
 
 			if(newIndex < 0)
 				newIndex = 0;
-			
+
 			browser.pageIndex = newIndex;
 		}
 		browser.selIndex = i;
@@ -1738,7 +1738,7 @@ void FindFile()
 			break;
 		}
 		entry = entry->next;
-	}	
+	}
 
 	// move to this file
 	if(indexFound > 0)
@@ -1835,7 +1835,7 @@ static bool ParseDirEntries()
 		{
 			continue;
 		}
-		
+
 		#ifdef _DIRENT_HAVE_D_TYPE
 		if(entry->d_type==DT_DIR)
 			filestat.st_mode = S_IFDIR;
@@ -1844,7 +1844,7 @@ static bool ParseDirEntries()
 
 		#endif
 
-		// skip this file if it's not an allowed extension 
+		// skip this file if it's not an allowed extension
 		if(!S_ISDIR(filestat.st_mode))
 		{
 			GetExt(entry->d_name, ext);
@@ -1856,11 +1856,11 @@ static bool ParseDirEntries()
 					s_entry->file = mem2_strdup(entry->d_name, MEM2_BROWSER);
 				if(!s_entry->file) // no mem
 				{
-					DeleteEntrySubs(s_entry);						
+					DeleteEntrySubs(s_entry);
 					InfoPrompt("Warning", "This directory contains more entries than the maximum allowed. Not all entries will be visible.");
 					entry = NULL;
-					break;						
-				}	
+					break;
+				}
 			}
 
 			if(!IsAllowedExt(ext) && (!IsPlaylistExt(ext)))
@@ -1900,7 +1900,7 @@ static bool ParseDirEntries()
 				//memset(art_disp,0,strlen(art_disp));
 			}
 
-			if(S_ISDIR(filestat.st_mode)) 
+			if(S_ISDIR(filestat.st_mode))
 			{
 				f_entry->type = TYPE_FOLDER;
 
@@ -1945,7 +1945,7 @@ static bool ParseDirEntries()
 		}
 		else
 		{
-nomemParseDirEntries:		
+nomemParseDirEntries:
 			InfoPrompt("Warning", "This directory contains more entries than the maximum allowed. Not all entries will be visible.");
 			entry = NULL;
 			break;
@@ -1962,10 +1962,10 @@ nomemParseDirEntries:
 		{
 			if(browser.lastdir[0] != 0)
 				FindDirectory(); // try to find and select the last directory
-	
+
 			if(findLoadedFile == 1)
 				FindFile(); // try to find and select the last loaded file
-			
+
 			UpdateBrowser();
 		}
 
@@ -1979,7 +1979,7 @@ nomemParseDirEntries:
 
 /***************************************************************************
  * ParseDirectory
- * 
+ *
  * Browse subdirectories
  **************************************************************************/
 int
@@ -2034,13 +2034,13 @@ ParseDirectory(bool waitParse)
 				break;
 		}
 	}
-	
+
 	if(dirHandle == NULL)
 		return -1;
 
 	// add Up One Level
 	BROWSERENTRY *f_entry = AddEntryFiles();
-	
+
 	if(!f_entry)
 		return 0;
 
@@ -2059,7 +2059,7 @@ ParseDirectory(bool waitParse)
 	f_entry->length = 0;
 	f_entry->type = TYPE_FOLDER; // flag this as a dir
 	f_entry->icon = ICON_FOLDER;
-	
+
 	// start parsing
 	parseHalt = 0;
 	findLoadedFile = 1;
@@ -2105,7 +2105,7 @@ static int ParsePLXPlaylist()
 		size = http_request(browser.dir, NULL, buffer, MAX_PLX_SIZE, SILENT);
 	else
 		size = LoadFile(buffer, MAX_PLX_SIZE, browser.dir, SILENT);
-	
+
 	if(size == 0)
 	{
 		mem2_free(buffer, MEM2_OTHER);
@@ -2126,7 +2126,7 @@ static int ParsePLXPlaylist()
 	memset(&newEntry, 0, sizeof(PLXENTRY));
 
 	while(lineptr < size)
-	{	
+	{
 		// setup next line
 		line[0] = 0;
 		c = 0;
@@ -2141,7 +2141,7 @@ static int ParsePLXPlaylist()
 			c++;
 		}
 		// line too long or we've run out of new lines
-		if(c == 4096 || lineptr+c > size) 
+		if(c == 4096 || lineptr+c > size)
 			break; // discard anything remaining
 
 		lineptr += c+1;
@@ -2159,7 +2159,7 @@ static int ParsePLXPlaylist()
 			{
 				// we're on a new entry - add previous entry to list, if complete
 				if(newEntry.type > 0 && strlen(newEntry.name) > 0 &&
-					strlen(newEntry.url) > 0 && newEntry.processor[0] == 0 && 
+					strlen(newEntry.url) > 0 && newEntry.processor[0] == 0 &&
 					IsAllowedProtocol(newEntry.url))
 				{
 					memcpy(&list[numEntries], &newEntry, sizeof(PLXENTRY));
@@ -2215,8 +2215,8 @@ static int ParsePLXPlaylist()
 	}
 
 	// add the final entry
-	if(newEntry.type > 0 && strlen(newEntry.name) > 0 && 
-		strlen(newEntry.url) > 0 && newEntry.processor[0] == 0 && 
+	if(newEntry.type > 0 && strlen(newEntry.name) > 0 &&
+		strlen(newEntry.url) > 0 && newEntry.processor[0] == 0 &&
 		IsAllowedProtocol(newEntry.url))
 	{
 		memcpy(&list[numEntries], &newEntry, sizeof(PLXENTRY));
@@ -2237,7 +2237,7 @@ static int ParsePLXPlaylist()
 	char *root = (char*)BrowserHistoryRetrieve();
 	char ext[7];
 	GetExt(root, ext);
-	
+
 	ResetFiles();
 
 	BROWSERENTRY *f_entry = AddEntryFiles();
@@ -2256,7 +2256,7 @@ static int ParsePLXPlaylist()
 		free(list);
 		mem2_free(buffer, MEM2_OTHER);
 		return -1;
-	}	
+	}
 	f_entry->display = mem2_strdup(gettext(" .."), MEM2_BROWSER);
 	if(!f_entry->display) // no mem
 	{
@@ -2264,7 +2264,7 @@ static int ParsePLXPlaylist()
 		free(list);
 		mem2_free(buffer, MEM2_OTHER);
 		return -1;
-	}	
+	}
 	f_entry->length = 0;
 	f_entry->icon = ICON_FOLDER;
 
@@ -2292,7 +2292,7 @@ static int ParsePLXPlaylist()
 				free(list);
 				mem2_free(buffer, MEM2_OTHER);
 				return -1;
-			}	
+			}
 		}
 
 		if(list[i].name)
@@ -2304,7 +2304,7 @@ static int ParsePLXPlaylist()
 				free(list);
 				mem2_free(buffer, MEM2_OTHER);
 				return -1;
-			}	
+			}
 		}
 
 		if(list[i].thumb)
@@ -2317,7 +2317,7 @@ static int ParsePLXPlaylist()
 				mem2_free(buffer, MEM2_OTHER);
 				return -1;
 			}
-		}	
+		}
 
 		if(list[i].xml)
 		{
@@ -2330,7 +2330,7 @@ static int ParsePLXPlaylist()
 				return -1;
 			}
 		}
-		
+
 		if(list[i].tunein)
 		{
 			f_entry->tunein = mem2_strdup(list[i].tunein, MEM2_BROWSER);
@@ -2360,7 +2360,7 @@ static int ParsePLXPlaylist()
 
 /****************************************************************************
  * ParsePlaylistFile
- * 
+ *
  * Loads a playlist selected from the filebrowser into the filebrowser
  ***************************************************************************/
 int ParsePlaylistFile()
@@ -2449,7 +2449,7 @@ int ParsePlaylistFile()
 
 			ResetFiles();
 			f_entry = AddEntryFiles();
-			
+
 			if(!f_entry) // add failed
 				break;
 
@@ -2463,8 +2463,8 @@ int ParsePlaylistFile()
 				{
 					DeleteEntryFiles(f_entry);
 					break;
-				}		
-				
+				}
+
 				if(IsPlaylistExt(ext) || strncmp(root, "http:", 5) == 0)
 					f_entry->type = TYPE_PLAYLIST;
 				else
@@ -2477,7 +2477,7 @@ int ParsePlaylistFile()
 				{
 					DeleteEntryFiles(f_entry);
 					break;
-				}	
+				}
 				f_entry->type = TYPE_FOLDER;
 			}
 
@@ -2486,7 +2486,7 @@ int ParsePlaylistFile()
 			{
 				DeleteEntryFiles(f_entry);
 				break;
-			}	
+			}
 			f_entry->length = 0;
 			f_entry->icon = ICON_FOLDER;
 
@@ -2495,7 +2495,7 @@ int ParsePlaylistFile()
 		f_entry = AddEntryFiles();
 		if(!f_entry) // add failed
 		{
-nomemParsePlaylistFile:		
+nomemParsePlaylistFile:
 			InfoPrompt("Warning", "This playlist contains more entries than the maximum allowed. Not all entries will be visible.");
 			break;
 		}
@@ -2505,12 +2505,12 @@ nomemParsePlaylistFile:
 		{
 			DeleteEntryFiles(f_entry);
 			goto nomemParsePlaylistFile;
-		}	
+		}
 
 		// use parameter pt_prettyformat_title for displayname if it exists
-		if(i->params) 
+		if(i->params)
 		{
-			for (int n = 0; i->params[n].name != NULL; n++) 
+			for (int n = 0; i->params[n].name != NULL; n++)
 			{
 				if(strcasecmp(i->params[n].name,PLAY_TREE_PARAM_PRETTYFORMAT_TITLE) != 0)
 					continue;
@@ -2587,7 +2587,7 @@ nomemParsePlaylistFile:
 
 /****************************************************************************
  * ParseOnlineMedia
- * 
+ *
  * Loads the current online media list into the filebrowser
  ***************************************************************************/
 int ParseOnlineMedia()
@@ -2600,10 +2600,10 @@ int ParseOnlineMedia()
 	if(browser.dir[0] != 0)
 	{
 		f_entry = AddEntryFiles();
-		
+
 		if(!f_entry)
 			return 0;
-		
+
 		f_entry->file = mem2_strdup("..", MEM2_BROWSER);
 		if(!f_entry->file) // no mem
 		{
@@ -2633,7 +2633,7 @@ int ParseOnlineMedia()
 			om_entry = om_entry->next;
 			continue;
 		}
-		
+
 		int filepathLen = strlen(om_entry->file);
 
 		// add file
@@ -2647,7 +2647,7 @@ int ParseOnlineMedia()
 			}
 
 			f_entry = AddEntryFiles();
-			
+
 			if(!f_entry)
 				break;
 
@@ -2695,14 +2695,14 @@ int ParseOnlineMedia()
 			f_entry->type = om_entry->type;
 			f_entry->icon = ICON_NONE;
 		}
-		else if(filepathLen > dirLen && 
+		else if(filepathLen > dirLen &&
 			strncmp(browser.dir, om_entry->file, dirLen) == 0)
 		{
 			char folder[MAXPATHLEN];
 			snprintf(folder, sizeof(folder), "%s", &om_entry->file[dirLen]);
 			char * end = strchr(folder, '/');
 			if(end) *end = 0; // strip end
-			
+
 			// check if this folder was already added
 			bool matchFound = false;
 			f_entry = browser.first;
@@ -2720,7 +2720,7 @@ int ParseOnlineMedia()
 			{
 				// add the folder
 				f_entry = AddEntryFiles();
-				
+
 				if(!f_entry)
 					break;
 
@@ -2765,7 +2765,7 @@ void CancelFileOp()
 
 /****************************************************************************
  * LoadFile
- * 
+ *
  * Loads the file specified into the provided buffer
  ***************************************************************************/
 size_t loadOffset = 0, loadSize = 0;
@@ -2783,7 +2783,7 @@ size_t LoadFile (char * buffer, size_t buffersize, char *filepath, bool silent)
 
 	// halt parsing
 	SuspendParseThread();
-	
+
 	loadOffset = 0;
 
 	// open the file
@@ -2806,7 +2806,7 @@ size_t LoadFile (char * buffer, size_t buffersize, char *filepath, bool silent)
 		fseeko(file,0,SEEK_END);
 		loadSize = ftello(file);
 		fseeko(file,0,SEEK_SET);
-		
+
 		if(loadSize < buffersize)
 		{
 			while(!feof(file))
@@ -2814,12 +2814,12 @@ size_t LoadFile (char * buffer, size_t buffersize, char *filepath, bool silent)
 				if(!silent)
 					ShowProgress ("Loading...", loadOffset, loadSize);
 				readsize = fread (buffer + loadOffset, 1, 4096, file); // read in next chunk
-	
+
 				if(readsize <= 0)
 					break; // reading finished (or failed)
-	
+
 				loadOffset += readsize;
-	
+
 				if(cancelFileLoad)
 				{
 					cancelFileLoad = false;
@@ -2849,7 +2849,7 @@ size_t LoadFile (char * buffer, size_t buffersize, char *filepath, bool silent)
 
 /****************************************************************************
  * SaveFile
- * 
+ *
  * Writes the provided buffer to the specified filepath
  ***************************************************************************/
 size_t SaveFile (char * buffer, char *filepath, size_t datasize, bool silent)

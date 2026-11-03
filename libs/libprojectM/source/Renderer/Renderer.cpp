@@ -13,7 +13,7 @@
 
 class Preset;
 
-Renderer::Renderer(const pm_config &settings, BeatDetect *beatDetect) : 
+Renderer::Renderer(const pm_config &settings, BeatDetect *beatDetect) :
 settings(settings), mesh(settings.meshX, settings.meshY), beatDetect(beatDetect)
 {
 	//int x;
@@ -27,7 +27,7 @@ settings(settings), mesh(settings.meshX, settings.meshY), beatDetect(beatDetect)
 	this->aspect = (float) settings.windowHeight / (float) settings.windowWidth;
 
     gxInit();
-    
+
 	/// @bug put these on member init list
     this->renderTarget = new RenderTarget(settings.textureSize, settings.windowWidth, settings.windowHeight);
     this->textureManager = new TextureManager(settings.presetDirectory);
@@ -222,11 +222,11 @@ void Renderer::RenderFrame(const Pipeline &pipeline, const PipelineContext &pipe
 	RenderItems(pipeline, pipelineContext);
 	FinishPass1();
 	Pass2(pipeline, pipelineContext);
-    
+
     glFlush();
-    
+
     gxSwapBuffers();
-    
+
 }
 
 void Renderer::Interpolation(const Pipeline &pipeline)
@@ -338,7 +338,7 @@ Renderer::~Renderer()
 		delete (textureManager);
 
     gxDestroy();
-    
+
 	//std::cerr << "grid assign end" << std::endl;
 
 	free(p);
@@ -347,7 +347,7 @@ Renderer::~Renderer()
 }
 
 void Renderer::reset()
-{    
+{
 #if defined(__wii__)
     wiiLightOff();
 #endif

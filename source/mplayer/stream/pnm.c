@@ -243,7 +243,7 @@ static ssize_t rm_read(int fd, void *buf, size_t count) {
 
     ret=recv (fd, ((uint8_t*)buf)+total, count-total, 0);
 
-#ifdef GEKKO   
+#ifdef GEKKO
 	if (ret == -EAGAIN) continue;
 #endif
 

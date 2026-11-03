@@ -25,12 +25,12 @@ Carmelo Piccione
     Evaluator
     Pulse Audio support (projectM-pulseaudio)
     Qt GUI (projectM-qt)
-	
+
 Peter Sperl
     Beat Detection
     Rendering
     XMMS Support (projectM-xmms)
-    libvisual Support (projectM-libvisual)   
+    libvisual Support (projectM-libvisual)
 
 Alligator Descartes
     Media Player Support (iTunes, Winamp, Windows Media Player)

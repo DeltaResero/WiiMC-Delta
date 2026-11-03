@@ -44,7 +44,7 @@
 #define HW_CHANNELS 	2
 
 #define PAN_CENTER 		0.7071067811865475f		// sqrt(1/2)
-#define PAN_SIDE 		0.871779788708134f      // sqrt(19/25)						
+#define PAN_SIDE 		0.871779788708134f      // sqrt(19/25)
 #define PAN_SIDE_INV 	0.4898979485566356f		// sqrt(6/25)
 
 #define PHASE_SHF 		0.25f					// "90 degrees"
@@ -94,19 +94,19 @@ static int control(int cmd, void *arg)
 		case AOCONTROL_SET_VOLUME:
 		{
 			ao_control_vol_t *vol = (ao_control_vol_t *)arg;
-			
+
 			if (cmd == AOCONTROL_SET_VOLUME)
 			{
 				volume.left = (vol->left / 100.0) * 0xFF;
 				volume.right = (vol->right / 100.0) * 0xFF;
-				
+
 				VIWriteI2CRegister8(AVE_AI_VOLUME, clamp(volume.left, 0x00, 0xFF));
 				VIWriteI2CRegister8(AVE_AI_VOLUME + 1, clamp(volume.right, 0x00, 0xFF));
 			}
-			
+
 			vol->left = (volume.left / 0xFF) * 100.0;
 			vol->right = (volume.right / 0xFF) * 100.0;
-			
+
 			return CONTROL_OK;
 		}
 		default:
@@ -133,7 +133,7 @@ static int init(int rate, int channels, int format, int flags)
 	request_size = BUFFER_SIZE * request_mult;
 	ao_data.buffersize = request_size * BUFFER_COUNT;
 	ao_data.outburst = request_size;
-	
+
 	for (int counter = 0; counter < BUFFER_COUNT; counter++)
 	{
 		memset(buffers[counter], 0, BUFFER_SIZE);
@@ -231,11 +231,11 @@ static inline void copy_channels(s16 *dst, s16 *src, int len, int processed, int
 				// Left rear
 				left += ((src[crs + 2] * PHASE_SHF_INV) + (src[nrs + 2] * PHASE_SHF)) * PAN_SIDE;
 				right += ((src[crs + 2] * PHASE_SHF_INV) + (src[prs + 2] * PHASE_SHF)) * PAN_SIDE_INV;
-				
+
 				// Right rear
 				left += ((src[crs + 3] * PHASE_SHF_INV) + (src[nrs + 3] * PHASE_SHF)) * PAN_SIDE_INV;
 				right += ((src[crs + 3] * PHASE_SHF_INV) + (src[prs + 3] * PHASE_SHF)) * PAN_SIDE;
-				
+
 				// Center front
 				left += src[crs + 4] * PAN_CENTER;
 				right += src[crs + 4] * PAN_CENTER;
@@ -244,13 +244,13 @@ static inline void copy_channels(s16 *dst, s16 *src, int len, int processed, int
 				// Center rear
 				left += ((src[crs + 2] * PHASE_SHF_INV) + (src[nrs + 2] * PHASE_SHF)) * PAN_CENTER;
 				right += ((src[crs + 2] * PHASE_SHF_INV) + (src[prs + 2] * PHASE_SHF)) * PAN_CENTER;
-				
+
 				// Center front
 				left += src[crs + 3] * PAN_CENTER;
 				right += src[crs + 3] * PAN_CENTER;
 				break;
 		}
-	
+
 		dst[cws++] = clamp(right, SHRT_MIN, SHRT_MAX);
 		dst[cws++] = clamp(left, SHRT_MIN, SHRT_MAX);
 
@@ -286,7 +286,7 @@ static int play(void *data, int remaining, int flags)
 		processed += request_size;
 		source += request_size / sizeof(s16);
 		add_buffered(BUFFER_SIZE);
-		remaining -= request_size;		
+		remaining -= request_size;
 	}
 
 	if ((flags & AOPLAY_FINAL_CHUNK) && remaining > 0)

@@ -205,9 +205,9 @@ bool LoadLanguage()
 {
 	char line[350];
 	char *lastID = NULL;
-	
+
 	char *file, *eof;
-	
+
 	switch(WiiSettings.language)
 	{
 		case LANG_JAPANESE: file = (char *)jp_lang; eof = file + jp_lang_size; break;

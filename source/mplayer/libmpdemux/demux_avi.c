@@ -782,7 +782,7 @@ static void demux_close_avi(demuxer_t *demuxer)
   if(priv->idx_size > 0)
 #ifndef GEKKO
 	free(priv->idx);
-#else  
+#else
 	free_index();
 #endif
   free(priv);

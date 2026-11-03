@@ -1563,24 +1563,24 @@ static void mpeg_decode_picture_coding_extension(Mpeg1Context *s1)
 	//because rips from many programs will mark interlaced as progressive
 	//Plus, if the content has random telecining changing from i output to p will be
 	//annoying on most TVs.
-	
+
 	//NOTE 2: MKV variable fps is currently not working, so mixed content will desync
 	//audio on MKV containers.
 	//Otherwise the following should be safe to enable.
-	
+
 	//To ignore these flags simply turn off 'Enhanced Resolution' in the settings.
 	if(s->top_field_first)
 		sync_interlace = 1;
 	else
 		sync_interlace = 2;
-	
+
 	if(s->progressive_frame)
 		sync_interlace = 0;
 
     if (s->progressive_sequence && !s->progressive_frame) {
         s->progressive_frame = 1;
         av_log(s->avctx, AV_LOG_ERROR, "interlaced frame in progressive sequence, ignoring\n");
-		
+
 		//better to avoid lag caused by excessive vsync
 		sync_interlace = 0;
     }

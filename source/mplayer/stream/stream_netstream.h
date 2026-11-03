@@ -81,7 +81,7 @@ static int net_read(int fd, char* buf, int len) {
   while(len) {
     r = recv(fd,buf,len,0);
     if(r <= 0) {
-#ifdef GEKKO      
+#ifdef GEKKO
       if (r == -EAGAIN) continue;
 #endif
       if(errno == EINTR) continue;
@@ -127,7 +127,7 @@ static mp_net_stream_packet_t* read_packet(int fd) {
     }
 #ifdef GEKKO
     if(!net_read_st(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
-#else    
+#else
     if(!net_read(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
 #endif
 

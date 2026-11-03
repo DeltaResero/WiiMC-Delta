@@ -149,7 +149,7 @@ DEVICE_STRUCT part[2][MAX_DEVICES];
 static void AddPartition(sec_t sector, int device, int type, int *devnum)
 {
 	int i;
-	
+
 	if (*devnum >= MAX_DEVICES)
 		return;
 
@@ -485,7 +485,7 @@ static void UnmountPartitions(int device)
 
 /****************************************************************************
  * MountPartitions
- * 
+ *
  * Shuts down the device
  * Attempts to startup the device specified and mounts all partitions
  ***************************************************************************/

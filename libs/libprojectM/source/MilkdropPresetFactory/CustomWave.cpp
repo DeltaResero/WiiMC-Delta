@@ -362,7 +362,7 @@ CustomWave::CustomWave(int _id) : Waveform(512),
   {
     abort();
   }
-  
+
   if ((param = Param::new_param_float("t6", P_FLAG_TVAR | P_FLAG_PER_POINT, &this->t6, NULL, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, 0.0)) == NULL)
   {
     abort();
@@ -407,7 +407,7 @@ CustomWave::CustomWave(int _id) : Waveform(512),
 		abort();
 	}
   }
-	
+
      /* End of parameter loading. Note that the read only parameters associated
      with custom waves (ie, sample) are variables stored in PresetFrameIO.hpp,
      and not specific to the custom wave datastructure. */

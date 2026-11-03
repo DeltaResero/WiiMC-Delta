@@ -8,7 +8,7 @@ this list of conditions and the following disclaimer.
 - Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-- Neither the name of Internet Society, IETF or IETF Trust, nor the 
+- Neither the name of Internet Society, IETF or IETF Trust, nor the
 names of specific contributors, may be used to endorse or promote
 products derived from this software without specific prior written
 permission.
@@ -95,7 +95,7 @@ void silk_find_pred_coefs_FLP(
     /* Limit on total predictive coding gain */
     if( psEnc->sCmn.first_frame_after_reset ) {
         minInvGain = 1.0f / MAX_PREDICTION_POWER_GAIN_AFTER_RESET;
-    } else {        
+    } else {
         minInvGain = (silk_float)pow( 2, psEncCtrl->LTPredCodGain / 3 ) /  MAX_PREDICTION_POWER_GAIN;
         minInvGain /= 0.25f + 0.75f * psEncCtrl->coding_quality;
     }

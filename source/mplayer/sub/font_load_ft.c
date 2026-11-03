@@ -910,7 +910,7 @@ static int load_sub_face(const char *name, int face_index, FT_Face *face)
     if (name) err = FT_New_Face(library, name, face_index, face);
 
     if (err) {
-#ifndef GEKKO 
+#ifndef GEKKO
 	char *font_file = get_path("subfont.ttf");
 	err = FT_New_Face(library, font_file, 0, face);
 	free(font_file);
@@ -918,7 +918,7 @@ static int load_sub_face(const char *name, int face_index, FT_Face *face)
 	if (err) {
 #ifdef GEKKO
 		char cad[100];
-		sprintf(cad,"%s%s",MPLAYER_DATADIR,"/subfont.ttf");	
+		sprintf(cad,"%s%s",MPLAYER_DATADIR,"/subfont.ttf");
 	    err = FT_New_Face(library, cad, 0, face);
 #else
 	    err = FT_New_Face(library, MPLAYER_DATADIR "/subfont.ttf", 0, face);

@@ -395,7 +395,7 @@ void GuiOptionBrowser::Update(GuiTrigger * t)
 		else if(focus && i == selectedItem && optionBtn[i]->GetState() == STATE_DEFAULT)
 			optionBtn[selectedItem]->SetState(STATE_SELECTED, -1);
 
-		if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))		
+		if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))
 		{
 			int currChan = t->chan;
 
@@ -404,7 +404,7 @@ void GuiOptionBrowser::Update(GuiTrigger * t)
 
 			optionBtn[i]->Update(t);
 			t->chan = currChan;
-			
+
 			// override state chan
 			if(optionBtn[i]->GetStateChan() != -1)
 				optionBtn[i]->SetStateChan(-1);

@@ -891,7 +891,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 			    }
 			    ifoClose(temp_vts_file);
 		    }
-		    
+
 	    }
 	    dvd_title = longest_title + 1; // remap +1 for the validation
     }
@@ -1155,7 +1155,7 @@ static int ifo_stream_open (stream_t *stream, int mode, void *opts, int *file_fo
 #endif
 
     spriv=calloc(1, sizeof(struct stream_priv_s));
-    
+
 #ifdef GEKKO
     spriv->device = gekko_dirname(stream->url);
 #else

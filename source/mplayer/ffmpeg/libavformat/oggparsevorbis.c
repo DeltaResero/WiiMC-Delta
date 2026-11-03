@@ -181,11 +181,11 @@ ff_vorbis_comment(AVFormatContext * as, AVDictionary **m, const uint8_t *buf, in
 					len_pic = avio_rb32(pb); //pic size
 
 					pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
-					
+
 					//if the length is higher memleak will occur, or crash
 					if(len_pic > 1.5*1024*1024)
 						len_pic = 1.5*1024*1024;
-					
+
 					memcpy(pos_pic, pict+32+len+len_desc, len_pic);
 					embedded_pic = 1;
 					//wiim_inf = len;
@@ -344,7 +344,7 @@ vorbis_header (AVFormatContext * s, int idx)
         if (srate > 0) {
 			//hack, use loop var for storing the rate
 			loop_st_point = srate;
-			
+
             st->codec->sample_rate = srate;
             avpriv_set_pts_info(st, 64, 1, srate);
         }

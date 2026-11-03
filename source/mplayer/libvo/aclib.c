@@ -173,22 +173,22 @@ void *fast_memcpy_Gekko(void *to, const void *from, size_t len)
 {
 	void *retval = to;
 	int delta;
-	
+
 	if (len < 32)
 		goto end;
-	
+
 	if (delta = (intptr_t)to & 31) {
 		delta = 32 - delta;
 		len -= delta;
 		small_memcpy(to, from, delta);
-		
+
 		from = (const unsigned char *)from + delta;
 		to = (unsigned char *)to + delta;
 	}
-	
+
 	if (len > 32) {
 		size_t lines = len / 32;
-		
+
 		do {
 			__asm__ volatile (
 				"lwz   %%r5,0(%0)\n"
@@ -211,14 +211,14 @@ void *fast_memcpy_Gekko(void *to, const void *from, size_t len)
 				:: "b"(from), "b"(to)
 				: "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12"
 			);
-			
+
 			from = (const unsigned char *)from + 32;
 			to = (unsigned char *)to + 32;
 		} while (--lines);
-		
+
 		len &= 31;
 	}
-	
+
 end:
 	if (len) small_memcpy(to, from, len);
 	return retval;
@@ -287,7 +287,7 @@ void * mem2agpcpy(void * to, const void * from, size_t len)
 #elif HAVE_MMX
 		mem2agpcpy_MMX(to, from, len);
 #elif defined(GEKKO)
-		fast_memcpy_Gekko(to, from, len);		
+		fast_memcpy_Gekko(to, from, len);
 #else
 		memcpy(to, from, len); // prior to mmx we use the standart memcpy
 #endif

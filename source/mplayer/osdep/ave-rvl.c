@@ -40,7 +40,7 @@ static inline void write32(u32 addr, u32 x)
 {
         asm("stw %0,0(%1) ; eieio" : : "r"(x), "b"(0xc0000000 | addr));
 }
- 
+
 static inline void aveSetDirection(u32 dir)
 {
         u32 val = (read32(HW_GPIO1BDIR)&~0x8000)|0x4000;
@@ -53,14 +53,14 @@ static inline void aveSetSCL(u32 scl)
         if(scl) val |= 0x4000;
         write32(HW_GPIO1BOUT, val);
 }
- 
+
 static inline void aveSetSDA(u32 sda)
 {
         u32 val = read32(HW_GPIO1BOUT)&~0x8000;
         if(sda) val |= 0x8000;
         write32(HW_GPIO1BOUT, val);
 }
- 
+
 static inline u32 aveGetSDA()
 {
         if(read32(HW_GPIO1BIN)&0x8000)
@@ -68,60 +68,60 @@ static inline u32 aveGetSDA()
         else
                 return 0;
 }
- 
+
 static u32 __sendSlaveAddress(u8 addr)
 {
         u32 i;
- 
+
         aveSetSDA(0);
         udelay(2);
- 
+
         aveSetSCL(0);
         for(i=0;i<8;i++) {
                 if(addr&0x80) aveSetSDA(1);
                 else aveSetSDA(0);
                 udelay(2);
- 
+
                 aveSetSCL(1);
                 udelay(2);
- 
+
                 aveSetSCL(0);
                 addr <<= 1;
         }
- 
+
         aveSetDirection(0);
         udelay(2);
- 
+
         aveSetSCL(1);
         udelay(2);
- 
+
         if(aveGetSDA()!=0) {
                 return 0;
         }
- 
+
         aveSetSDA(0);
         aveSetDirection(1);
         aveSetSCL(0);
- 
+
         return 1;
 }
- 
+
 static u32 __VISendI2CData(u8 addr,void *val,u32 len)
 {
         u8 c;
         u32 i,j;
         u32 ret;
- 
+
         aveSetDirection(1);
         aveSetSCL(1);
         aveSetSDA(1);
         udelay(4);
- 
+
         ret = __sendSlaveAddress(addr);
         if(ret==0) {
                 return 0;
         }
- 
+
         aveSetDirection(1);
         for(i=0;i<len;i++) {
                 c = ((u8*)val)[i];
@@ -129,35 +129,35 @@ static u32 __VISendI2CData(u8 addr,void *val,u32 len)
                         if(c&0x80) aveSetSDA(1);
                         else aveSetSDA(0);
                         udelay(2);
- 
+
                         aveSetSCL(1);
                         udelay(2);
                         aveSetSCL(0);
- 
+
                         c <<= 1;
                 }
                 aveSetDirection(0);
                 udelay(2);
                 aveSetSCL(1);
                 udelay(2);
- 
+
                 if(aveGetSDA()!=0) {
                         return 0;
                 }
- 
+
                 aveSetSDA(0);
                 aveSetDirection(1);
                 aveSetSCL(0);
         }
- 
+
         aveSetDirection(1);
         aveSetSDA(0);
         udelay(2);
         aveSetSDA(1);
- 
+
         return 1;
 }
- 
+
 void VIWriteI2CRegister8(u8 reg, u8 data)
 {
         u8 buf[2];
@@ -166,7 +166,7 @@ void VIWriteI2CRegister8(u8 reg, u8 data)
         __VISendI2CData(SLAVE_AVE,buf,2);
         udelay(2);
 }
- 
+
 void VIWriteI2CRegister16(u8 reg, u16 data)
 {
         u8 buf[3];
@@ -176,7 +176,7 @@ void VIWriteI2CRegister16(u8 reg, u16 data)
         __VISendI2CData(SLAVE_AVE,buf,3);
         udelay(2);
 }
- 
+
 void VIWriteI2CRegister32(u8 reg, u32 data)
 {
         u8 buf[5];

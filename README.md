@@ -102,7 +102,7 @@ entropy)
 [1.2.0 - September 4, 2011]
 
 * Synced to MPlayer r34053 and libav 5938e0218543
-* Adjusted DVD drive ID detection - fixes drives that stopped working 
+* Adjusted DVD drive ID detection - fixes drives that stopped working
 
 [1.1.9 - August 26, 2011]
 
@@ -240,7 +240,7 @@ entropy)
 
 [1.0.8 - August 17, 2010]
 
-* Improved USB mounting and updated channel. Should hopefully help those who 
+* Improved USB mounting and updated channel. Should hopefully help those who
   are receiving the "Could not find a valid SD or USB device" message
 * Improved network initialization
 
@@ -278,7 +278,7 @@ entropy)
 * Added volume control in Music area
 * Added option to hide DVD functionality from the UI
 * UTF-8 SMB support
-* Ability to use both USB ports (requires updated IOS 202 - WARNING: older 
+* Ability to use both USB ports (requires updated IOS 202 - WARNING: older
   versions of IOS 202 are NO LONGER supported)
 * Increase max SMB shares to 9
 * Fixed sleep timer
@@ -336,7 +336,7 @@ entropy)
 * Frame dropping now disabled by default (change it to Disabled in the Video
   settings to improve performance if you are updating from a previous version)
 * Corrections to device mounting code (fixes crashes on startup)
-* Translations to the following languages: Japanese, German, French, Spanish, 
+* Translations to the following languages: Japanese, German, French, Spanish,
   Italian, Dutch, Chinese (Simplified), Chinese (Traditional), Korean,
   Romanian, Estonian, and Brazilian Portuguese
 * Video scaling issues fixed

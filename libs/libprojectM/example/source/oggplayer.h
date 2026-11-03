@@ -32,17 +32,17 @@ typedef struct _eqState {
     f32 f1p1;
     f32 f1p2;
     f32 f1p3;
-    
+
     f32 hf;
     f32 f2p0;
     f32 f2p1;
     f32 f2p2;
     f32 f2p3;
-    
+
     f32 sdm1;
     f32 sdm2;
     f32 sdm3;
-    
+
     f32 lg;
     f32 mg;
     f32 hg;

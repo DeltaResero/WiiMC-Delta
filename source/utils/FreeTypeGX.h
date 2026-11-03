@@ -155,7 +155,7 @@ class FreeTypeGX {
 		void *operator new(size_t size);
 		void operator delete(void *p);
 		void *operator new[](size_t size);
-		void operator delete[](void *p);	
+		void operator delete[](void *p);
 
 		void setVertexFormat(uint8_t vertexIndex);
 		void setCompatibilityMode(uint32_t compatibilityMode);

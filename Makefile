@@ -129,14 +129,14 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
- 
+
 export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 				-L$(EXTPREFIX)/lib \
 				-L$(MPLAYER)/ \
 				-L$(MPLAYER)/ffmpeg/libavcodec \
 				-L$(MPLAYER)/ffmpeg/libavformat \
 				-L$(MPLAYER)/ffmpeg/libavutil \
-				-L$(MPLAYER)/ffmpeg/libswscale 
+				-L$(MPLAYER)/ffmpeg/libswscale
 
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 .PHONY: $(BUILD) clean

@@ -92,7 +92,7 @@ class RandomizerFunctor
         RandomizerFunctor(PresetChooser & chooser) ;
         virtual ~RandomizerFunctor();
         virtual double operator() (int index);
-        
+
     private:
         const PresetChooser & m_chooser;
 
@@ -113,7 +113,7 @@ class projectM
          * @param FLAGS Additional flags
          */
         projectM (std::string configFile, int flags = PM_FLAG_NONE);
-        
+
         /**
          * projectM constructor.
          *
@@ -121,15 +121,15 @@ class projectM
          * @param FLAGS Additional flags
          */
         projectM (pm_config settings, int flags = PM_FLAG_NONE);
-        
+
         virtual ~projectM ();
-        
+
         void renderFrame();
-        
+
         /// Occurs when active preset has switched. Switched to index is returned
         virtual void presetSwitchedEvent(bool isHardCut, unsigned int index) const {};
-        
-        
+
+
         /// Writes a settings configuration to the specified file
         static bool writeConfig(const std::string &filepath, const pm_config &settings);
 
@@ -198,11 +198,11 @@ class projectM
         inline pm_config & settings() {
             return _settings;
         }
-        
+
         inline PCM * pcm() {
             return _pcm;
         }
-        
+
         inline BeatDetect * beatDetect() {
             return _beatDetect;
         }
@@ -210,16 +210,16 @@ class projectM
         void *thread_func(void *vptr_args);
 
     private:
-    
+
         /** !!! LEAVE ME ALONE !!! **/
-        
+
         PCM *_pcm;
         BeatDetect *_beatDetect;
         Renderer *_renderer;
         PipelineContext *_pipelineContext;
         PipelineContext *_pipelineContext2;
         pm_config _settings;
-       
+
         /* Windowed dimensions */
         int wvw;
         int wvh;
@@ -230,14 +230,14 @@ class projectM
         int timestart;
         int count;
         float fpsstart;
-        
+
         PipelineContext & pipelineContext() { return *_pipelineContext; }
         PipelineContext & pipelineContext2() { return *_pipelineContext2; }
-        
+
         unsigned initRenderToTexture();
-        
+
         double sampledPresetDuration();
-        
+
         void readConfig(const std::string &configFile);
         void readSettings(const pm_config &settings);
         void projectM_init();
@@ -247,7 +247,7 @@ class projectM
         void selectPrevious(const bool);
         void selectNext(const bool);
         void selectRandom(const bool);
-        
+
         void projectM_initengine();
         void projectM_resetengine();
 
@@ -258,7 +258,7 @@ class projectM
         void destroyPresetTools();
 
         void switchPreset(std::auto_ptr<Preset> & targetPreset);
-        
+
         /// The current position of the directory iterator
         PresetIterator * m_presetPos;
 

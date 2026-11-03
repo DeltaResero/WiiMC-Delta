@@ -43,7 +43,7 @@ InitCond::InitCond( Param * _param, CValue _init_val ):param(_param), init_val(_
 
 
   //  std::cerr <<  "InitCond::InitCond: " << this->param->name << std::endl;
- 
+
   assert(param);
   assert(param->engine_val);
 }
@@ -51,7 +51,7 @@ InitCond::InitCond( Param * _param, CValue _init_val ):param(_param), init_val(_
 /* Frees initial condition structure */
 InitCond::~InitCond() {}
 
-void InitCond::evaluate() 
+void InitCond::evaluate()
 {
   evaluate(false);
 }
@@ -68,16 +68,16 @@ if (param->flags & P_FLAG_USERDEF && !evalUser)
 	return;
 
    /* Set matrix flag to zero. This ensures
-     its constant value will be used rather than a matrix value 
+     its constant value will be used rather than a matrix value
   */
 param->matrix_flag = false;
-  
+
   /* Parameter is of boolean type, either true/false */
-  
+
   if (param->type == P_TYPE_BOOL) {
 
-    //        printf( "init_cond: %s = %d (TYPE BOOL)\n", param->name.c_str(), init_val.bool_val); 
-	//std::cerr << "[InitCond] param is a boolean of with name " 
+    //        printf( "init_cond: %s = %d (TYPE BOOL)\n", param->name.c_str(), init_val.bool_val);
+	//std::cerr << "[InitCond] param is a boolean of with name "
 	//	<< param->name << std::endl;
 
 	assert(param->engine_val);
@@ -86,9 +86,9 @@ param->matrix_flag = false;
 
      return;
   }
-  
+
   /* Parameter is an integer type, just like C */
-  
+
   if ( param->type == P_TYPE_INT) {
  	assert(param->engine_val);
 	 *((int*)param->engine_val) = init_val.int_val;
@@ -109,16 +109,16 @@ param->matrix_flag = false;
 
 /* WIP */
 void InitCond::init_cond_to_string() {
-	
+
 	int string_length;
 	char string[MAX_TOKEN_SIZE];
-	
+
 	/* Create a string "param_name=val" */
 	switch (param->type) {
-		
+
 		case P_TYPE_BOOL:
 			sprintf(string, "%s=%d\n", param->name.c_str(), init_val.bool_val);
-			break; 
+			break;
 		case P_TYPE_INT:
 			sprintf(string, "%s=%d\n", param->name.c_str(), init_val.int_val);
 			break;
@@ -128,17 +128,17 @@ void InitCond::init_cond_to_string() {
 		default:
 			return;
 	}
-		
+
 	/* Compute the length of the string */
 	string_length = strlen(string);
-	
+
 	/* Buffer overflow check */
 	if ((init_cond_string_buffer_index + string_length + 1)  > (STRING_BUFFER_SIZE - 1))
 		return;
-	
-	/* Copy the string into the initial condition string buffer */	
+
+	/* Copy the string into the initial condition string buffer */
 	strncpy(init_cond_string_buffer + init_cond_string_buffer_index, string, string_length);
-	
+
 	/* Increment the string buffer, offset by one for the null terminator, which will be
 	   overwritten by the next call to this function */
 	init_cond_string_buffer_index+= string_length + 1;

@@ -69,7 +69,7 @@ public:
 
   GenExpr( int type, void *item );
   float eval_gen_expr(int mesh_i, int mesh_j);
- 
+
   static GenExpr *const_to_expr( float val );
   static GenExpr *param_to_expr( Param *param );
   static GenExpr *prefun_to_expr( float (*func_ptr)(void *), GenExpr **expr_list, int num_args );
@@ -84,7 +84,7 @@ public:
 
   ~ValExpr();
   ValExpr( int type, Term *term );
-  
+
   float eval_val_expr(int mesh_i, int mesh_j);
 };
 
@@ -99,7 +99,7 @@ public:
   ~TreeExpr();
   TreeExpr( InfixOp *infix_op, GenExpr *gen_expr,
                                   TreeExpr *left, TreeExpr *right );
-  
+
   float eval_tree_expr(int mesh_i, int mesh_j);
 };
 

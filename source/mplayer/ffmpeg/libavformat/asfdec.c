@@ -250,11 +250,11 @@ static int asf_read_picture(AVFormatContext *s, int len)
 
 	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 	avio_seek(s->pb, -picsize, SEEK_CUR);
-	
+
 	//limit length to avoid crash
 	if(picsize > 1.5*1024*1024)
 		picsize = 1.5*1024*1024;
-	
+
 	avio_read(s->pb, pos_pic, picsize);
 	embedded_pic = 1;
 //	wiim_inf = 23;

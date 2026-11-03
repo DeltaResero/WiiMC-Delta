@@ -31,7 +31,7 @@
  *  ... code requiring gcc 2.8 or later ...
  *  #endif
  *  Note - they won't work for gcc1 or glibc1, since the _MINOR macros
- *  were not defined then. 
+ *  were not defined then.
  */
 
 #ifndef __GNUC_PREREQ

@@ -1246,7 +1246,7 @@ static int usb_open(dvdcss_t dvdcss, char const * psz_device)
 	if(!read_buffer)
 		read_buffer = mem2_memalign(32, BUFFER_SECTOR_SIZE*DVDCSS_BLOCK_SIZE, MEM2_OTHER);
 
-	dvdcss->i_pos = 0;	
+	dvdcss->i_pos = 0;
 	cache_sectors = 0;
 	return 0;
 }

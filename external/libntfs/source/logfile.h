@@ -365,7 +365,7 @@ enum {
 typedef le32 LOG_RECORD_TYPE;
 
 /*
- *	ATTRIBUTE_FLAGS : flags describing the kind of NTFS record 
+ *	ATTRIBUTE_FLAGS : flags describing the kind of NTFS record
  *	is being updated.
  *	These flags were introduced in Vista, only two flags are known?
  */

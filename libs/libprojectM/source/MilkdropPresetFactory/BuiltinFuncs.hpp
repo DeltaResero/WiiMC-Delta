@@ -1,7 +1,7 @@
 //
 // C++ Interface: BuiltinFuncs
 //
-// Description: 
+// Description:
 //
 //
 // Author: Carmelo Piccione <carmelo.piccione@gmail.com>, (C) 2007
@@ -218,7 +218,7 @@ return (float)result;
 class BuiltinFuncs {
 
 public:
-    
+
     static int init_builtin_func_db();
     static int destroy_builtin_func_db();
     static int load_all_builtin_func();

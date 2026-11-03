@@ -367,7 +367,7 @@ static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
     s->size_in_bits_plus8 = bit_size + 8;
     s->buffer_end   = buffer + buffer_size;
     s->index        = 0;
-	
+
 	return ret;
 }
 

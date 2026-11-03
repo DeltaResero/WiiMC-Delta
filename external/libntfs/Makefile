@@ -27,7 +27,7 @@ wii-release:
 	-$(MAKE) -C libogc-rice PLATFORM=wii BUILD=wii_release
 	$(MAKE) -C libogc2 PLATFORM=wii BUILD=wii_release
 
-clean: 
+clean:
 	-$(MAKE) -C libogc-rice clean
 	$(MAKE) -C libogc2 clean
 

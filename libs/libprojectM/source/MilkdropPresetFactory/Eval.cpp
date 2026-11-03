@@ -53,7 +53,7 @@ int Eval::init_infix_ops() {
 	Eval::infix_and = new InfixOp(INFIX_AND,4);
 	Eval::infix_mod = new InfixOp(INFIX_MOD, 1);
 	Eval::infix_mult = new InfixOp(INFIX_MULT, 2);
-	
+
 	/* Prefix operators */
 	Eval::infix_positive = new InfixOp(INFIX_ADD, 0);
 	Eval::infix_negative = new InfixOp(INFIX_MINUS, 0);

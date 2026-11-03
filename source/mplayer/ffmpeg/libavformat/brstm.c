@@ -115,7 +115,7 @@ static int read_header(AVFormatContext *s)
 	int ret = AVERROR_EOF;
     int loop = 0;
     int bfstm = !strcmp("bfstm", s->iformat->name);
-	
+
 	citra = 0;
 
     st = avformat_new_stream(s, NULL);
@@ -133,7 +133,7 @@ static int read_header(AVFormatContext *s)
 
     if (bom == 0xFFFE)
         b->little_endian = 1;
-	
+
 	if(b->little_endian == 1) {
 		b->little_endian = 0;
 		citra = 1; //also Switch
@@ -208,15 +208,15 @@ static int read_header(AVFormatContext *s)
     if (toffset > size)
         return AVERROR_INVALIDDATA;
 
-	
+
     avio_skip(s->pb, pos + h1offset + 8 - avio_tell(s->pb));
-	
+
 	//mine
 	//valSTM = avio_rb32(s->pb);
 	//avio_skip(s->pb, pos + h1offset + 8 - avio_tell(s->pb));
-	
+
     codec = avio_r8(s->pb);
-	
+
 	//hack for pcm16
 	if(codec == 1 && citra == 1) {
 		b->little_endian = 1;
@@ -239,12 +239,12 @@ static int read_header(AVFormatContext *s)
     loop = avio_r8(s->pb); // loop flag
     st->codec->codec_id = codec;
     st->codec->channels = avio_r8(s->pb);
-	
+
 	if(st->codec->channels == 1)
 		useMono = 1;
 	else
 		useMono = 0;
-	
+
     if (!st->codec->channels)
         return AVERROR_INVALIDDATA;
 
@@ -255,7 +255,7 @@ static int read_header(AVFormatContext *s)
 
 	//valSTM = avio_rb32(s->pb);
 	//valSTM = st->codec->sample_rate;
-	
+
     if (!bfstm)
         avio_skip(s->pb, 2); // padding
 
@@ -321,7 +321,7 @@ static int read_header(AVFormatContext *s)
         }
 
         avio_skip(s->pb, pos + toffset - avio_tell(s->pb));
-		
+
 		//valSTM = avio_rb32(s->pb);
 		//avio_skip(s->pb, pos + toffset - avio_tell(s->pb));
 
@@ -354,7 +354,7 @@ static int read_header(AVFormatContext *s)
     //avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
 
 	avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
-	
+
 	//valSTM = avio_rb32(s->pb);
 	//avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
 	//jumps to SEEK
@@ -376,7 +376,7 @@ static int read_header(AVFormatContext *s)
 
 
 		//	valSTM = b->block_count * st->codec->channels * 4;
-			
+
             asize = b->block_count * st->codec->channels * 4;
             if (size < asize) {
                 ret = AVERROR_INVALIDDATA;
@@ -399,7 +399,7 @@ static int read_header(AVFormatContext *s)
                         b->adpc[i+1] = avio_r8(s->pb);
                         b->adpc[i]   = avio_r8(s->pb);
                     }*/
-					
+
 					//now I need this for the LE hack
 					if(citra == 1) {
 						int i;
@@ -408,7 +408,7 @@ static int read_header(AVFormatContext *s)
                             b->adpc[i]   = avio_r8(s->pb);
                         }
 					} else
-					
+
 					//Super confused, but adding this fixes the constant pops
 					avio_read(s->pb, b->adpc, asize);
                 } else {

@@ -1,7 +1,7 @@
 //
 // C++ Implementation: PresetFactoryManager
 //
-// Description: 
+// Description:
 //
 //
 // Author: Carmelo Piccione <carmelo.piccione@gmail.com>, (C) 2008
@@ -19,9 +19,9 @@ class PresetFactoryException : public std::exception
 	public:
 		inline PresetFactoryException(const std::string & message) : _message(message) {}
 		virtual ~PresetFactoryException() throw() {}
-		const std::string & message() const { return _message; } 
+		const std::string & message() const { return _message; }
 
-	private:	
+	private:
 		std::string _message;
 };
 
@@ -37,7 +37,7 @@ class PresetFactoryManager {
 		/// \param gy the height of the mesh
 		/// \note This must be called once before any other methods
 		void initialize(int gx, int gy);
-		
+
 		/// Requests a factory given a preset extension type
 		/// \param extension a string denoting the preset suffix type
 		/// \throws PresetFactoryException if the extension is unhandled
@@ -50,7 +50,7 @@ class PresetFactoryManager {
 		bool extensionHandled(const std::string & extension) const;
 
 	private:
-		int _gx, _gy;				
+		int _gx, _gy;
 		mutable std::map<std::string, PresetFactory *> _factoryMap;
 		mutable std::vector<PresetFactory *> _factoryList;
 		void registerFactory(const std::string & extension, PresetFactory * factory);

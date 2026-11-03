@@ -820,10 +820,10 @@ int ff_id3v2_parse_apic(AVFormatContext *s, ID3v2ExtraMeta **extra_meta)
 			pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 			//avio_seek(s->pb, -picsize, SEEK_CUR);
 			//avio_read(st->pb, pos_pic, st->attached_pic.size);
-			
+
 			//limit size ?
 			//not necessary because of current if case
-			
+
 			memcpy(pos_pic, apic->data, apic->len);
 			embedded_pic = 1;
 		}

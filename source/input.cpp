@@ -63,7 +63,7 @@ void UpdatePads()
 		userInput[i].pad.stickX = PAD_StickX(i);
 		userInput[i].pad.stickY = PAD_StickY(i);
 	}
-	
+
 	if(want3DS)
 		CTRScanPads();
 	userInput[0].cpad.data.down = ctr.data.down;
@@ -165,7 +165,7 @@ void MPlayerResize(float fZoomHorIncr, float fZoomVertIncr)
 {
 	WiiSettings.videoZoomHor += fZoomHorIncr;
 	WiiSettings.videoZoomVert += fZoomVertIncr;
-	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
+	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift,
 		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.335
 			: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 }
@@ -235,7 +235,7 @@ void MPlayerInput()
 			if(screenwidth > 640)
 				xoffset = 90;
 
-			if(!drawGui || (y < 360 && 
+			if(!drawGui || (y < 360 &&
 				(!VideoVolumeLevelBarVisible() || !(x > xoffset && x < xoffset+100 && y > 180))))
 			{
 				wiiPause();
@@ -245,7 +245,7 @@ void MPlayerInput()
 			userInput[0].cpad.data.down & CTR_BUTTON_Y)
 		{
 			volnow = gettime();
-	
+
 			if(diff_usec(volprev, volnow) > VOL_DELAY)
 			{
 				volprev = volnow;
@@ -260,7 +260,7 @@ void MPlayerInput()
 			userInput[0].cpad.data.down & CTR_BUTTON_X)
 		{
 			volnow = gettime();
-	
+
 			if(diff_usec(volprev, volnow) > VOL_DELAY)
 			{
 				volprev = volnow;
@@ -466,19 +466,19 @@ void MPlayerInput()
 		drawGui = false;
 		HideVideoVolumeLevelBar();
 		ShutoffRumble();
-		
+
 	//	rumbleRandEnable = false;
 	//	timerRumbleEnable = false;
-		
+
 		PAD_ControlMotor(0, PAD_MOTOR_STOP);
 	}
-	
+
 	//rumble in video
 #if 0
 	if(rumbleRandEnable) {
 		if(timerRumble == 0)
 			timerRumble = rand() % (70 + 1 - 1) + 1;
-		
+
 		--timerRumble;
 		if(timerRumble < 8) {
 			PAD_ControlMotor(0, PAD_MOTOR_RUMBLE);
@@ -491,7 +491,7 @@ void MPlayerInput()
 	else if(timerRumbleEnable) {
 		if(timerRumble == 0)
 			timerRumble = 12;
-		
+
 		--timerRumble;
 		if(timerRumble < 4) {
 			PAD_ControlMotor(0, PAD_MOTOR_RUMBLE);

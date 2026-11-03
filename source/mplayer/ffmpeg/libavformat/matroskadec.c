@@ -1712,14 +1712,14 @@ static int matroska_read_header(AVFormatContext *s)
             st->codec->codec_tag  = fourcc;
             st->codec->width  = track->video.pixel_width;
             st->codec->height = track->video.pixel_height;
-			
+
 			if (track->video.interlaced == MATROSKA_VIDEO_INTERLACE_FLAG_INTERLACED) {
 				sync_interlace = 1;
 				if(track->video.field_order > 1)
 					sync_interlace = 2;
                 //st->codecpar->field_order = mkv_field_order(track->video.field_order);
 			}
-			
+
             av_reduce(&st->sample_aspect_ratio.num,
                       &st->sample_aspect_ratio.den,
                       st->codec->height * track->video.display_width,

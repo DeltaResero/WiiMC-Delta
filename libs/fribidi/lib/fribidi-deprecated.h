@@ -12,22 +12,22 @@
  *
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2004, 2005 Behdad Esfahbod
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 #ifndef _FRIBIDI_DEPRECATED_H
@@ -57,9 +57,9 @@
  *
  * This function is used to turn character mirroring on or off.
  * Character mirroring is the act of replacing a mirrorable glyph
- * (character), eg. left paranthesis, with the matching glyph, 
+ * (character), eg. left paranthesis, with the matching glyph,
  * eg. right paranthesis, in a right-to-left resolved context.
- * If your rendering engine does mirroring itself, you may want to 
+ * If your rendering engine does mirroring itself, you may want to
  * turn it off here.
  *
  * This flag is on by default.
@@ -154,10 +154,10 @@ fribidi_get_type_internal (
  * position_from_this_list is positions_V_to_L;  if str is the logical
  * string, the other way. Moreover, the position maps should be filled with
  * valid entries.
- * 
+ *
  * A position map pointing to a removed character is filled with -1. By the
  * way, you should not use embedding_levels if str is visual string.
- * 
+ *
  * For best results this function should be run on a whole paragraph, not
  * lines; but feel free to do otherwise if you know what you are doing.
  * Deprecated.  Use fribidi_remove_special_chars instead.
@@ -189,7 +189,7 @@ fribidi_remove_bidi_marks (
  * If NULL is passed as any of the the lists, the list is ignored and not
  * filled.
  *
- * This function is obsolete because it only handles one-line paragraphs. 
+ * This function is obsolete because it only handles one-line paragraphs.
  * Please consider using other functions instead.  Deprecated.
  *
  * Returns: Maximum level found plus one, or zero if any error occured
@@ -201,7 +201,7 @@ fribidi_remove_bidi_marks (
   FriBidiParType *pbase_dir,	/* requested and resolved paragraph
 				 * base direction */
   FriBidiChar *visual_str,	/* output visual string */
-  FriBidiStrIndex *positions_L_to_V,	/* output mapping from logical to 
+  FriBidiStrIndex *positions_L_to_V,	/* output mapping from logical to
 					 * visual string positions */
   FriBidiStrIndex *positions_V_to_L,	/* output mapping from visual string
 					 * back to the logical string

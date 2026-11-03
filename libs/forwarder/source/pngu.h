@@ -1,7 +1,7 @@
 /****************************************************************************
  *
  * PNGU
- * 
+ *
  * Original author: frontier (http://frontier-dev.net)
  * Modified by Tantric, 2009-2010
  *
@@ -37,7 +37,7 @@ typedef struct
 
 // Image context, always initialize with SelectImageFrom* and free with ReleaseImageContext
 struct _IMGCTX;
-typedef struct _IMGCTX *IMGCTX; 
+typedef struct _IMGCTX *IMGCTX;
 
 /****************************************************************************
 * Image context handling							                        *

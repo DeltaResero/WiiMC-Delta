@@ -128,7 +128,7 @@ static int log_len=1;
 
 void reset_usb_log()
 {
-	if(!_log)_log=(char*)malloc(sizeof(char)*(USB_LOG_SIZE)); 
+	if(!_log)_log=(char*)malloc(sizeof(char)*(USB_LOG_SIZE));
 	memset(_log,0,USB_LOG_SIZE);
 	log_len=0;
 	enable_log=1;
@@ -142,16 +142,16 @@ void usb_log(char* format, ...)
 
   if(enable_log==0) return;
 
-  
+
   va_start (args, format);
   vsprintf (buffer,format, args);
   l=strlen(buffer);
-  if(log_len+l+1>USB_LOG_SIZE) 
+  if(log_len+l+1>USB_LOG_SIZE)
   {
   	enable_log=0;
   	printf("\nLog full. No more data will be logged\n");
   }
-  else 
+  else
   {
   	log_len+=l;
   	strcat(_log,buffer);
@@ -163,7 +163,7 @@ void usb_log(char* format, ...)
 void set_usb_method(int _method)
 {
 	method=_method;
-	if(method<0 || method>6) method=0; 
+	if(method<0 || method>6) method=0;
 }
 
 char * getusblog()
@@ -351,7 +351,7 @@ static s32 __cycle(usbstorage_handle *dev, u8 lun, u8 *buffer, u32 len, u8 *cb, 
 	u16 max_size;
 	u8 ep = write ? dev->ep_out : dev->ep_in;
 	s8 retries = USBSTORAGE_CYCLE_RETRIES + 1;
-	
+
 	if(usb2_mode)
 		max_size=MAX_TRANSFER_SIZE_V5;
 	else
@@ -499,8 +499,8 @@ retry_init:
 		usb_log("USB_GetDescriptors error, ret: %i\n",retval);
 		goto free_and_return;
 	}
-	else 
-	
+	else
+
 		usb_log("USB_GetDescriptors OK, configurations: %i\n",udd.bNumConfigurations);
 
 
@@ -519,10 +519,10 @@ retry_init:
 					|| uid->bInterfaceSubClass == MASS_STORAGE_SFF8070_COMMANDS) &&*/
 				   uid->bInterfaceProtocol == MASS_STORAGE_BULK_ONLY)
 			{
-				
+
 				if (uid->bNumEndpoints < 2)
 					continue;
-				
+
 
 				dev->ep_in = dev->ep_out = 0;
 				for (iEp = 0; iEp < uid->bNumEndpoints; iEp++) {
@@ -536,9 +536,9 @@ retry_init:
 					}
 					else {
 						dev->ep_out = ued->bEndpointAddress;
-						if(ued->wMaxPacketSize > 64 && (dev->usb_fd>=0x20 || dev->usb_fd<-1)) 
+						if(ued->wMaxPacketSize > 64 && (dev->usb_fd>=0x20 || dev->usb_fd<-1))
 							usb2_mode=true;
-						else 
+						else
 							usb2_mode=false;
 					}
 				}
@@ -577,17 +577,17 @@ found:
 			goto free_and_return;
 		}
 		else usb_log("USB_SetConfiguration ok\n");
-		
+
 		if (dev->altInterface !=0 && USB_SetAlternativeInterface(dev->usb_fd, dev->interface, dev->altInterface) < 0)
 		{
 			usb_log("Error USB_SetAlternativeInterface, alt: %i int: %i\n",dev->altInterface,dev->interface);
 			goto free_and_return;
 		}
 		else usb_log("USB_SetAlternativeInterface ok, alt: %i int: %i\n",dev->altInterface,dev->interface);
-		
+
 		dev->suspended = 0;
-		
-		
+
+
 		if(!reset_flag && dev->bInterfaceSubClass == MASS_STORAGE_SCSI_COMMANDS)
 		{
 			reset_flag = true;
@@ -607,7 +607,7 @@ found:
 			usb_log("Error USB_SetConfiguration\n");
 		}
 		else usb_log("USB_SetConfiguration ok\n");
-		
+
 		if (USB_SetAlternativeInterface(dev->usb_fd, dev->interface, dev->altInterface) < 0)
 		{
 			usb_log("Error USB_SetAlternativeInterface, alt: %i int: %i\n",dev->altInterface,dev->interface);
@@ -623,7 +623,7 @@ found:
 			usb_log("Error USB_SetConfiguration\n");
 		}
 		else usb_log("USB_SetConfiguration ok\n");
-		
+
 		if (USB_SetAlternativeInterface(dev->usb_fd, dev->interface, dev->altInterface) < 0)
 		{
 			usb_log("Error USB_SetAlternativeInterface, alt: %i int: %i\n",dev->altInterface,dev->interface);
@@ -652,16 +652,16 @@ found:
 			goto free_and_return;
 		}
 		else usb_log("USB_SetConfiguration ok\n");
-		
+
 		if (dev->altInterface !=0 && USB_SetAlternativeInterface(dev->usb_fd, dev->interface, dev->altInterface) < 0)
 		{
 			usb_log("Error USB_SetAlternativeInterface, alt: %i int: %i\n",dev->altInterface,dev->interface);
 			goto free_and_return;
 		}
 		else usb_log("USB_SetAlternativeInterface ok, alt: %i int: %i\n",dev->altInterface,dev->interface);
-		
+
 		dev->suspended = 0;
-		
+
 		retval = USBStorage_Reset(dev);
 		usb_log("USBStorage_Open, USBStorage_Reset: %i\n",retval);
 	}
@@ -673,7 +673,7 @@ found:
 			//goto free_and_return;
 		}
 		else usb_log("USB_SetConfiguration ok\n");
-		
+
 		if (dev->altInterface !=0 && USB_SetAlternativeInterface(dev->usb_fd, dev->interface, dev->altInterface) < 0)
 		{
 			usb_log("Error USB_SetAlternativeInterface, alt: %i int: %i\n",dev->altInterface,dev->interface);
@@ -686,7 +686,7 @@ found:
 			usb_log("USBStorage_Open, USBStorage_Reset: %i\n",retval);
 		}
 		dev->suspended = 0;
-		
+
 	}
 
 	if(method==6)
@@ -699,7 +699,7 @@ found:
 	LWP_MutexLock(dev->lock);
 	retval = __USB_CtrlMsgTimeout(dev, (USB_CTRLTYPE_DIR_DEVICE2HOST | USB_CTRLTYPE_TYPE_CLASS | USB_CTRLTYPE_REC_INTERFACE), USBSTORAGE_GET_MAX_LUN, 0, dev->interface, 1, max_lun);
 	LWP_MutexUnlock(dev->lock);
-	
+
 
 	if (retval < 0)
 		dev->max_lun = 1;
@@ -811,10 +811,10 @@ s32 USBStorage_MountLUN(usbstorage_handle *dev, u8 lun)
 		//return retval;
 	}
 	else usb_log("__usbstorage_clearerrors Ok\n");
-	
+
 	retval = USBStorage_Inquiry(dev,  lun);
 	usb_log("USBStorage_Inquiry: %i\n", retval);
-	
+
 	retval = USBStorage_ReadCapacity(dev, lun, &dev->sector_size[lun], NULL);
 	usb_log("USBStorage_ReadCapacity: %i    sector size: %i\n", retval,dev->sector_size[lun]);
 	return retval;
@@ -827,16 +827,16 @@ s32 USBStorage_Inquiry(usbstorage_handle *dev, u8 lun)
 	u8 cmd[] = {SCSI_INQUIRY, lun << 5,0,0,36,0};
 	u8 response[36];
 
-	
+
 	for(n=0;n<2;n++)
 	{
-	
+
 
 	memset(response,0,36);
 
 	retval = __cycle(dev, lun, response, 36, cmd, 6, 0, NULL, NULL);
 	if(retval>=0) break;
-	
+
 	}
 	if(retval>=0) retval=*response & 31;
 	/*
@@ -974,7 +974,7 @@ s32 USBStorage_Read(usbstorage_handle *dev, u8 lun, u32 sector, u16 n_sectors, u
 			usb_log("USBStorage_StartStop ret: %i\n",retval);
 			usleep(100);
 		}
-		
+
 	}
 
 	retval = __cycle(dev, lun, buffer, n_sectors * dev->sector_size[lun], cmd, sizeof(cmd), 0, &status, NULL);
@@ -1016,9 +1016,9 @@ s32 USBStorage_Write(usbstorage_handle *dev, u8 lun, u32 sector, u16 n_sectors, 
 
 		if(method==0)
 		{
-		
+
 			USB_ResumeDevice(dev->usb_fd);
-		
+
 			if(dev->bInterfaceSubClass == MASS_STORAGE_SCSI_COMMANDS)
 			{
 				retval = __usbstorage_clearerrors(dev, lun);
@@ -1026,10 +1026,10 @@ s32 USBStorage_Write(usbstorage_handle *dev, u8 lun, u32 sector, u16 n_sectors, 
 				if (retval < 0)
 					return retval;
 				retval = USBStorage_StartStop(dev, lun, 0, 1, 0);
-			
+
 				if (retval < 0)
 					return retval;
-			}		
+			}
 		}
 		else if(method==2)
 		{
@@ -1080,7 +1080,7 @@ static bool __usbstorage_IsInserted(void)
 	s32 maxLun;
 	s32 retval;
 
-#ifdef DEBUG_USB		
+#ifdef DEBUG_USB
 	usb_log("__usbstorage_IsInserted\n");
 	if(__mounted)
 		usb_log("device previously mounted.\n");

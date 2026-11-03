@@ -71,7 +71,7 @@ int Playlog_Exit(void)
 	// update exit time
 	u64 stime = getWiiTime();
 	playrec_buf->ticks_last = stime;
-	
+
 	//Calculate and update checksum
 	for(i = 0; i < 31; i++)
 		sum += playrec_buf->data[i];

@@ -118,8 +118,8 @@ void reinit_video()
 	ShutdownGui(); // tell GUI to shut down, MPlayer is ready to take over
 	SetMPlayerSettings(); // pass settings from WiiMC into MPlayer
 
-	GX_StartYUV(image_width, image_height, gx_width / 2, gx_height / 2 ); 
-	GX_ConfigTextureYUV(image_width, image_height, chroma_width, chroma_height);	
+	GX_StartYUV(image_width, image_height, gx_width / 2, gx_height / 2 );
+	GX_ConfigTextureYUV(image_width, image_height, chroma_width, chroma_height);
 }
 
 static int config(uint32_t width, uint32_t height, uint32_t d_width,
@@ -128,7 +128,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 {
 	image_width = width;
 	image_height = height;
-	
+
 	float screen_aspect = (float)mplayerwidth / (float)mplayerheight;
 	float image_aspect = (float)d_width / (float)d_height;
 
@@ -142,10 +142,10 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		gx_width = (f32)d_width * ((f32)mplayerheight / (f32)d_height);
 		gx_height = mplayerheight;
 	}
-	
+
 	vo_screenheight = image_height;
 	vo_screenwidth = image_width;
-	
+
 	int xs, ys;
 	mp_get_chroma_shift(format, &xs, &ys, NULL);
 	chroma_width=image_width >> xs;
@@ -207,10 +207,10 @@ static int control(uint32_t request, void *data)
             vo_screenwidth = mplayerheight;
             vo_screenheight = mplayerwidth;
             aspect_save_screenres(vo_screenwidth, vo_screenheight);
-            return VO_TRUE; 
+            return VO_TRUE;
 
 		case VOCTRL_DRAW_IMAGE:
-			return draw_image(data);            
+			return draw_image(data);
 		default:
 			return VO_NOTIMPL;
 	}

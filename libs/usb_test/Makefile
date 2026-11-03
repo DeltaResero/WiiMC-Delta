@@ -18,7 +18,7 @@ include $(DEVKITPPC)/wii_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source source/libmload/source
-DATA		:=	data  
+DATA		:=	data
 INCLUDES	:=  source/libmload/include
 
 

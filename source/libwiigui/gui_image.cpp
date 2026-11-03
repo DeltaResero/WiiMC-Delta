@@ -225,7 +225,7 @@ void GuiImage::ColorStripe(int shift)
 	GXColor color;
 	int x, y=0;
 	int alt = 0;
-	
+
 	int thisHeight =  this->GetHeight();
 	int thisWidth =  this->GetWidth();
 

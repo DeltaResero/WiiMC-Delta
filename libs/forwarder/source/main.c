@@ -30,7 +30,7 @@ static ssize_t __out_write(struct _reent *r, int fd, const char *ptr, size_t len
 	return -1;
 }
 
-const devoptab_t phony_out = 
+const devoptab_t phony_out =
 { "stdout",0,NULL,NULL,__out_write,
   NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL, NULL,0,NULL,NULL,NULL,NULL,NULL };
 
@@ -105,7 +105,7 @@ found:
 	args.endARGV = args.argv + 1;
 
 	entrypoint exeEntryPoint = (entrypoint)load_dol_image(buffer, &args);
-	
+
 	if(!exeEntryPoint)
 	{
 		StopGX();
@@ -121,7 +121,7 @@ found:
 	StopGX();
 	VIDEO_WaitVSync();
 	VIDEO_WaitVSync();
-	
+
 	__IOS_LaunchNewIOS(58);
 
 	u32 level;

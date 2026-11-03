@@ -26,7 +26,7 @@ int glob(const char *pattern, int flags,
     pglob->gl_pathc++;
 
     return 0;
-	
+
 }
 
 void globfree(glob_t *pglob)

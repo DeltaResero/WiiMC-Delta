@@ -380,7 +380,7 @@ extern s64 ntfs_get_attribute_value_length(const ATTR_RECORD *a);
  * then nothing was read due to a zero-length attribute value, otherwise
  * errno describes the error.
  */
-extern s64 ntfs_get_attribute_value(const ntfs_volume *vol, 
+extern s64 ntfs_get_attribute_value(const ntfs_volume *vol,
 				    const ATTR_RECORD *a, u8 *b);
 
 extern void  ntfs_attr_name_free(char **name);

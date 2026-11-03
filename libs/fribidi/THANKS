@@ -12,14 +12,14 @@ Tomas Frydrych <tomas@frydrych.uklinux.net>
 
 Dov Grobgeld <dov@imagic.weizmann.ac.il>
 	* Initial author, and maintainer before the 0.9 releases.
-   
+
 Franck Portaneri
 	* For the Mozilla BiDi languges support document;
 
 Roozbeh Pournader <roozbeh@sharif.edu>
 	* Fixed things here and there.
 
-Pablo Saratxaga <pablo@mandrakesoft.com>  
+Pablo Saratxaga <pablo@mandrakesoft.com>
 	* Contributed several Arabic charset converters.
 
 Owen Tayler <otaylor@redhat.com>

@@ -12,7 +12,7 @@
 #include "math.h"
 #include "BeatDetect.hpp"
 
-MilkdropWaveform::MilkdropWaveform() : 
+MilkdropWaveform::MilkdropWaveform() :
 RenderItem(), x(0.5), y(0.5), r(1), g(0), b(0), a(1), mystery(0), mode(Line), additive(false), dots(false), thick(false), modulateAlphaByVolume(false), maximizeColors(false), scale(10), smoothing(0), modOpacityStart(0), modOpacityEnd(1), rot(0), samples(0), loop(false) {}
 
 void MilkdropWaveform::Draw(RenderContext &context)

@@ -55,11 +55,11 @@ private:
 #ifdef USE_CG
   ShaderEngine shaderEngine;
 #endif
-  
+
   float* p;
 
   float aspect;
-  
+
   void SetupPass1(const Pipeline &pipeline, const PipelineContext &pipelineContext);
   void Interpolation(const Pipeline &pipeline);
   void RenderItems(const Pipeline &pipeline, const PipelineContext &pipelineContext);

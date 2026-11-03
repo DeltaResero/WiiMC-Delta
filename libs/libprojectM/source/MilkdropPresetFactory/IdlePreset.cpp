@@ -9,7 +9,7 @@ std::string IdlePresets::presetText() {
 
     std::ostringstream out;
 
-    out << 
+    out <<
     "[preset00]\n" <<
     "fRating=2.000000\n" <<
     "fGammaAdj=1.700000\n" <<

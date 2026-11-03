@@ -25,17 +25,17 @@ static void pred4x4_tm_vp8_paired(uint8_t *src, const uint8_t *topright, int str
 {
 	vector float pair[2];
 	vector float base, offset;
-	
+
 	src -= stride + 1;
 	base = psq_l(0,src,1,4);
-	
+
 	pair[0] = psq_l(1,src,0,4);
 	pair[1] = psq_l(3,src,0,4);
-	
+
 	for (int y = 0; y < 4; y++) {
 		offset = psq_lux(src,stride,1,4);
 		asm("fsubs %0,%1,%0" : "+f"(offset) : "f"(base));
-		
+
 		psq_st(ps_sub(pair[0], offset),1,src,0,4);
 		psq_st(ps_sub(pair[1], offset),3,src,0,4);
 	}
@@ -45,56 +45,56 @@ static void pred4x4_tm_vp8_paired(uint8_t *src, const uint8_t *topright, int str
 {
 	const float scale = 0.03125;
 	vector float fHV, fH, fV, fA, fB;
-	
+
 	const uint8_t *src0 = src + 7 - stride;
 	const uint8_t *src1 = src + 8 * stride - 1;
 	const uint8_t *src2 = src1 - 2 * stride;
-	
+
 	int iH = src0[1] - src0[-1];
 	int iV = src1[0] - src2[0];
-	
+
 	for (int k = 2; k <= 8; k++) {
 		src1 += stride; src2 -= stride;
 		iH += k * (src0[k] - src0[-k]);
 		iV += k * (src1[0] - src2[0]);
 	}
-	
+
 	iH = (5 * iH + 32) >> 6;
 	iV = (5 * iV + 32) >> 6;
-	
+
 	vec_s16_t iHV = {iH, iV};
 	uint16_t iA = 16 * (src1[0] + src2[16] + 1) - 7 * (iV + iH);
-	
+
 	asm("psq_l	%0,%2,0,7\n"
 		"psq_l	%1,%3,1,5\n"
 		: "=f"(fHV), "=f"(fA)
 		: "o"(iHV), "o"(iA));
-	
+
 	fH = ps_muls0(scale, fHV);
 	fV = ps_muls1(scale, fHV);
-	
+
 	asm("fmuls %0,%0,%1" : "+f"(fA) : "f"(scale));
 	fA = paired_sum1(fA, fA, fH);
-	
+
 	vector float add[2];
 	add[0] = paired_add(fH, fH);
 	add[1] = paired_add(add[0], add[0]);
-	
+
 	src -= stride;
-	
+
 	for (int j = 16; j > 0; j--) {
 		psq_stux(fA,src,stride,0,4);
 		psq_st(paired_add(fA, add[0]),2,src,0,4);
 		fB = paired_add(fA, add[1]);
-		
+
 		psq_st(fB,4,src,0,4);
 		psq_st(paired_add(fB, add[0]),6,src,0,4);
 		fB = paired_add(fB, add[1]);
-		
+
 		psq_st(fB,8,src,0,4);
 		psq_st(paired_add(fB, add[0]),10,src,0,4);
 		fB = paired_add(fB, add[1]);
-		
+
 		psq_st(fB,12,src,0,4);
 		psq_st(paired_add(fB, add[0]),14,src,0,4);
 		fA = paired_add(fA, fV);
@@ -105,10 +105,10 @@ static void pred16x16_tm_vp8_paired(uint8_t *src, int stride)
 {
 	vector float pair[8];
 	vector float base, offset;
-	
+
 	src -= stride + 1;
 	base = psq_l(0,src,1,4);
-	
+
 	pair[0] = psq_l(1,src,0,4);
 	pair[1] = psq_l(3,src,0,4);
 	pair[2] = psq_l(5,src,0,4);
@@ -117,11 +117,11 @@ static void pred16x16_tm_vp8_paired(uint8_t *src, int stride)
 	pair[5] = psq_l(11,src,0,4);
 	pair[6] = psq_l(13,src,0,4);
 	pair[7] = psq_l(15,src,0,4);
-	
+
 	for (int y = 0; y < 16; y++) {
 		offset = psq_lux(src,stride,1,4);
 		asm("fsubs %0,%1,%0" : "+f"(offset) : "f"(base));
-		
+
 		psq_st(ps_sub(pair[0], offset),1,src,0,4);
 		psq_st(ps_sub(pair[1], offset),3,src,0,4);
 		psq_st(ps_sub(pair[2], offset),5,src,0,4);
@@ -137,44 +137,44 @@ static void pred8x8_plane_paired(uint8_t *src, int stride)
 {
 	const float scale = 0.03125;
 	vector float fHV, fH, fV, fA;
-	
+
 	const uint8_t *src0 = src + 3 - stride;
 	const uint8_t *src1 = src + 4 * stride - 1;
 	const uint8_t *src2 = src1 - 2 * stride;
-	
+
 	int iH = src0[1] - src0[-1];
 	int iV = src1[0] - src2[0];
-	
+
 	for (int k = 2; k <= 4; k++) {
 		src1 += stride; src2 -= stride;
 		iH += k * (src0[k] - src0[-k]);
 		iV += k * (src1[0] - src2[0]);
 	}
-	
+
 	iH = (17 * iH + 16) >> 5;
 	iV = (17 * iV + 16) >> 5;
-	
+
 	vec_s16_t iHV = {iH, iV};
 	uint16_t iA = 16 * (src1[0] + src2[8] + 1) - 3 * (iV + iH);
-	
+
 	asm("psq_l	%0,%2,0,7\n"
 		"psq_l	%1,%3,1,5\n"
 		: "=f"(fHV), "=f"(fA)
 		: "o"(iHV), "o"(iA));
-	
+
 	fH = ps_muls0(scale, fHV);
 	fV = ps_muls1(scale, fHV);
-	
+
 	asm("fmuls %0,%0,%1" : "+f"(fA) : "f"(scale));
 	fA = paired_sum1(fA, fA, fH);
-	
+
 	vector float add[3];
 	add[0] = paired_add(fH, fH);
 	add[1] = paired_add(add[0], add[0]);
 	add[2] = paired_add(add[1], add[0]);
-	
+
 	src -= stride;
-	
+
 	for (int j = 8; j > 0; j--) {
 		psq_stux(fA,src,stride,0,4);
 		psq_st(paired_add(fA, add[0]),2,src,0,4);
@@ -188,19 +188,19 @@ static void pred8x8_tm_vp8_paired(uint8_t *src, int stride)
 {
 	vector float pair[4];
 	vector float base, offset;
-	
+
 	src -= stride + 1;
 	base = psq_l(0,src,1,4);
-	
+
 	pair[0] = psq_l(1,src,0,4);
 	pair[1] = psq_l(3,src,0,4);
 	pair[2] = psq_l(5,src,0,4);
 	pair[3] = psq_l(7,src,0,4);
-	
+
 	for (int y = 0; y < 8; y++) {
 		offset = psq_lux(src,stride,1,4);
 		asm("fsubs %0,%1,%0" : "+f"(offset) : "f"(base));
-		
+
 		psq_st(ps_sub(pair[0], offset),1,src,0,4);
 		psq_st(ps_sub(pair[1], offset),3,src,0,4);
 		psq_st(ps_sub(pair[2], offset),5,src,0,4);

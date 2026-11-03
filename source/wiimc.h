@@ -49,7 +49,7 @@ extern char loadedFileDisplay[];
 extern char appPath[];
 
 extern "C" {
-	
+
 bool FindNextFile(bool load);
 
 extern int controlledbygui;

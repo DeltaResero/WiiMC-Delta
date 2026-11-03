@@ -552,7 +552,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 			if(!memcmp(cur_bytes,"TIT2",4)) {
 				//encoding byte, 00 is ascii, 01 is u16
 				stream_seek(s, i+10);
-				
+
 				if(stream_read_char(s) == 0) {
 				uint8_t size_of_TIT2[4];
 				stream_seek(s, i+4);
@@ -574,7 +574,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 				stream_read(s,buf,sizeof(buf));
 				buf[sizeof(buf)] = '\0';
 				//buf[2] = '\0'; // first 0xFEXX
-				
+
 				//convert buf to utf8
 				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
 				memcpy(b, buf, sizeof(buf));
@@ -589,7 +589,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	//			ConvertUTF16toUTF8 (
 //	b[0], b[sizeof(buf)],
 //	buf[0], buf[sizeof(buf)], 0);
-				
+
 				demux_info_add(demuxer,"Title",get_ucs2strII(b, sizeof(buf)));
 				free(b);
 				skip_id3v1 = true;
@@ -604,7 +604,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 			if(!memcmp(cur_bytes,"TPE1",4)) {
 				//encoding byte, 00 is ascii, 01 is u16
 				stream_seek(s, i+10);
-				
+
 				if(stream_read_char(s) == 0) {
 				uint8_t size_of_TIT2[4];
 				stream_seek(s, i+4);
@@ -627,7 +627,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 				buf[sizeof(buf)] = '\0';
 				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
 				memcpy(b, buf, sizeof(buf));
-				
+
 				demux_info_add(demuxer,"Artist",get_ucs2strII(b, sizeof(buf)));
 				free(b);
 				skip_id3v1 = true;
@@ -725,7 +725,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 					apic_datstep = 24;
 				else
 					apic_datstep = 23; // jpg/png mimetype
-				
+
 				//handle description
 				stream_seek(s, apic_datstep == 24 ? i+23 : i+22); // Get desc if NULL
 				stream_read(s, apic_desc, 1);
@@ -738,7 +738,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 					}
 				}
 				//wiim_inf = apic_datstep+j;
-				
+
 				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 				stream_seek(s, i+apic_datstep+j); // Get pic data
 				stream_read(s, pos_pic, val_apic_size);
@@ -835,7 +835,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 					apic_datstep = 0xD;
 				else
 					apic_datstep = 0xE; // JPEG mimetype, not sure if it exists.
-				
+
 				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 				stream_seek(s, i+apic_datstep); // Get pic data
 				stream_read(s, pos_pic, val_apic_size);
@@ -843,7 +843,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 				break;
 			}
 			}
-			
+
 		}
 
 		//works, now to automate
@@ -1023,7 +1023,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	      sh_audio->i_bps = 64 * 1024;
 	    sh_audio->needs_parsing = 1;
 	    get_flac_metadata (demuxer);
-		
+
 		uint8_t cur_bytes[4];
 		uint8_t apic_size[4];
 		uint8_t apic_mime[4];
@@ -1051,20 +1051,20 @@ static int demux_audio_open(demuxer_t* demuxer) {
 				stream_seek(s, (i-0xA)+4); //mimetype length
 				stream_read(s, apic_mime, 4);
 				len_mimetype = (apic_mime[0] << 24) + (apic_mime[1] << 16) + (apic_mime[2] << 8) + apic_mime[3];
-				
+
 				stream_seek(s, (i-0xA)+8+len_mimetype); //desc length
 				stream_read(s, apic_desc, 4);
 				len_desc = (apic_desc[0] << 24) + (apic_desc[1] << 16) + (apic_desc[2] << 8) + apic_desc[3];
-				
+
 				stream_seek(s, (i-0xA)+8+len_mimetype+len_desc+4+4+4+4+4);
 				stream_read(s, apic_size, 4);
-				
+
 				//Goto pic
 				val_apic_size = (apic_size[0] << 24) + (apic_size[1] << 16) + (apic_size[2] << 8) + apic_size[3];
 				if(val_apic_size > 1.5*1024*1024)
 					break;
 				//wiim_inf = val_apic_size; // For debug
-				
+
 				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 				stream_seek(s, (i-0xA)+8+len_mimetype+len_desc+24); // Get pic data
 				stream_read(s, pos_pic, val_apic_size);
@@ -1074,7 +1074,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 			}
 		}
 		}
-		
+
 	    break;
   }
 

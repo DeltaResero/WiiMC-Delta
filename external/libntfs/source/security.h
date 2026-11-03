@@ -1,5 +1,5 @@
 /*
- * security.h - Exports for handling security/ACLs in NTFS.  
+ * security.h - Exports for handling security/ACLs in NTFS.
  *              Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2004      Anton Altaparmakov
@@ -153,13 +153,13 @@ struct SECURITY_CONTEXT {
 /*
  *		       Posix ACL structures
  */
-  
+
 struct POSIX_ACE {
 	u16 tag;
 	u16 perms;
-	s32 id;   
+	s32 id;
 } __attribute__((__packed__));
-        
+
 struct POSIX_ACL {
 	u8 version;
 	u8 flags;
@@ -176,12 +176,12 @@ struct POSIX_SECURITY {
 	u16 filler;
 	struct POSIX_ACL acl;
 } ;
-        
+
 /*
  *		Posix tags, cpu-endian 16 bits
  */
-   
-enum {  
+
+enum {
 	POSIX_ACL_USER_OBJ =	1,
 	POSIX_ACL_USER =	2,
 	POSIX_ACL_GROUP_OBJ =	4,
@@ -192,12 +192,12 @@ enum {
 } ;
 
 #define POSIX_ACL_EXTENSIONS (POSIX_ACL_USER | POSIX_ACL_GROUP | POSIX_ACL_MASK)
-        
+
 /*
  *		Posix permissions, cpu-endian 16 bits
  */
-   
-enum {  
+
+enum {
 	POSIX_PERM_X =		1,
 	POSIX_PERM_W =		2,
 	POSIX_PERM_R =		4,
@@ -217,7 +217,7 @@ extern char *ntfs_sid_to_mbs(const SID *sid, char *sid_str,
 extern void ntfs_generate_guid(GUID *guid);
 extern int ntfs_sd_add_everyone(ntfs_inode *ni);
 
-extern le32 ntfs_security_hash(const SECURITY_DESCRIPTOR_RELATIVE *sd, 
+extern le32 ntfs_security_hash(const SECURITY_DESCRIPTOR_RELATIVE *sd,
 			       const u32 len);
 
 int ntfs_build_mapping(struct SECURITY_CONTEXT *scx, const char *usermap_path,
@@ -277,12 +277,12 @@ int ntfs_remove_posix_acl(struct SECURITY_CONTEXT *scx, ntfs_inode *ni,
 int ntfs_get_ntfs_acl(struct SECURITY_CONTEXT *scx, ntfs_inode *ni,
 			char *value, size_t size);
 int ntfs_set_ntfs_acl(struct SECURITY_CONTEXT *scx, ntfs_inode *ni,
-			const char *value, size_t size, int flags); 
+			const char *value, size_t size, int flags);
 
 int ntfs_get_ntfs_attrib(ntfs_inode *ni, char *value, size_t size);
 int ntfs_set_ntfs_attrib(ntfs_inode *ni,
 			const char *value, size_t size,	int flags);
-			
+
 
 /*
  *		Security API for direct access to security descriptors
@@ -310,7 +310,7 @@ enum {	OWNER_SECURITY_INFORMATION = 1,
 } ;
 
 int ntfs_get_file_security(struct SECURITY_API *scapi,
-                const char *path, u32 selection,  
+                const char *path, u32 selection,
                 char *buf, u32 buflen, u32 *psize);
 int ntfs_set_file_security(struct SECURITY_API *scapi,
 		const char *path, u32 selection, const char *attr);

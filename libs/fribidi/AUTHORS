@@ -10,7 +10,7 @@ behdad: Behdad Esfahbod <behdad@gnu.org>
 dov-g: Dov Grobgeld <dov@imagic.weizmann.ac.il>
 #
 # Dov Grobgeld originally wrote FriBidi.  The 0.1.* releases were all done
-# by him.  After that, Dov rarely touched the code, but contributed ideas. 
+# by him.  After that, Dov rarely touched the code, but contributed ideas.
 # All files that he has originally authored have him listed as an author in
 # the header of the file.
 #

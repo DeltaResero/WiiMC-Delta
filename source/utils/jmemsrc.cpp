@@ -425,7 +425,7 @@ u8 * DecodeJPEG(const u8 *src, u32 len, int *width, int *height, u8 *dstPtr)
 	jpeg_memory_src(&cinfo, src, len);
 	jpeg_read_header(&cinfo, TRUE);
 	if(cinfo.jpeg_color_space == JCS_GRAYSCALE)
-		cinfo.out_color_space = JCS_RGB; 
+		cinfo.out_color_space = JCS_RGB;
 
 	jpeg_calc_output_dimensions(&cinfo);
 	jpeg_start_decompress(&cinfo);
@@ -438,7 +438,7 @@ u8 * DecodeJPEG(const u8 *src, u32 len, int *width, int *height, u8 *dstPtr)
 	// guarantee that one of width or height ends up at max allowed value
 	output_width = scale * cinfo.output_width;
 	output_height = scale * cinfo.output_height;
-	
+
 	// hack for 185, this scales images that were 185 to 188
 	// otherwise they get padded with alpha, causing the edges to get marked.
 	if(output_width == 185)

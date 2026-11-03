@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * See 'LICENSE' included within this release
- */ 
+ */
 
 #include <stdlib.h>
 
@@ -46,7 +46,7 @@ void wiiLightOn ()
 {
     // Turn the light on
     light_on = true;
-    
+
     // Spawn the lighting thread
     if (!light_thread)
         LWP_CreateThread(&light_thread, light_loop, NULL, NULL, 0, 64);
@@ -66,7 +66,7 @@ bool wiiLightIsOn ()
 void wiiLightSetLevel (int level)
 {
     light_level = MIN(MAX(level, 0), 100);
-    
+
     // Calculate the new on/off times for this light intensity
     u32 level_on;
     u32 level_off;
@@ -94,12 +94,12 @@ void *light_loop (void *arg)
 {
     struct timespec timeon;
     struct timespec timeoff;
-    
+
     // Loop whilst the light is still 'on'
     while (light_on) {
         timeon = light_timeon;
         timeoff = light_timeoff;
-        
+
         // Turn on the light and sleep for a bit
         *light_reg |= DISC_SLOT_LED;
         nanosleep(&timeon);
@@ -108,15 +108,15 @@ void *light_loop (void *arg)
         if (timeoff.tv_nsec > 0)
             *light_reg &= ~DISC_SLOT_LED;
         nanosleep(&timeoff);
-        
+
     }
-    
+
     // Turn off the light
     *light_reg &= ~DISC_SLOT_LED;
 
     //...
     light_thread = 0;
-    
+
     return NULL;
 }
 

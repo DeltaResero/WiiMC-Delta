@@ -1,10 +1,10 @@
 
 ## Introduction
 
-The NTFS-3G driver is an open source, freely available read/write NTFS driver 
-for Linux, FreeBSD, Mac OS X, NetBSD, Solaris and Haiku. It provides safe and 
-fast handling of the Windows XP, Windows Server 2003, Windows 2000, Windows 
-Vista, and Windows Server 2008 file systems. 
+The NTFS-3G driver is an open source, freely available read/write NTFS driver
+for Linux, FreeBSD, Mac OS X, NetBSD, Solaris and Haiku. It provides safe and
+fast handling of the Windows XP, Windows Server 2003, Windows 2000, Windows
+Vista, and Windows Server 2008 file systems.
 
 The purpose of the project is to develop, continuously quality test and
 support a trustable, featureful and high performance solution for hardware
@@ -18,8 +18,8 @@ can be found at
 
 	http://ntfs-3g.org/quality.html
 
-News, support answers, problem submission instructions, support and discussion 
-forums, performance numbers and other information are available on the project 
+News, support answers, problem submission instructions, support and discussion
+forums, performance numbers and other information are available on the project
 web site at
 
 	http://ntfs-3g.org
@@ -29,9 +29,9 @@ with this package.
 
 ## Compiling and Installing
 
-Make sure you have [devKitPro](https://devkitpro.org/wiki/Getting_Started) and 
-the latest Nintendo GameCube/Wii development component (libgc/libwii) installed. 
-Then type:  
+Make sure you have [devKitPro](https://devkitpro.org/wiki/Getting_Started) and
+the latest Nintendo GameCube/Wii development component (libgc/libwii) installed.
+Then type:
 
 ````bash
  make

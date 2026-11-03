@@ -37,7 +37,7 @@ struct MatchResults {
 	/// @param rhs the "right-hand side" list of render items.
 	/// @returns a list of match pairs, possibly self referencing, and an error estimate of the matching.
 	inline virtual void operator()(const RenderItemList & lhs, const RenderItemList & rhs) const {
-		
+
 		// Ensure the first argument is greater than next to aid the helper function's logic.
 		if (lhs.size() >= rhs.size()) {
 		  _results.error = computeMatching(lhs, rhs);
@@ -46,8 +46,8 @@ struct MatchResults {
 		  _results.error = computeMatching(rhs, lhs);
 		  setMatches(rhs, lhs);
 		}
-		
-	
+
+
 	}
 
 	RenderItemMatcher() {}
@@ -67,7 +67,7 @@ private:
 
 	/// @idea interface this entirely allow overriding of its type.
 	mutable MasterRenderItemDistance _distanceFunction;
-	
+
 	double computeMatching(const RenderItemList & lhs, const RenderItemList & rhs) const;
 
 	void setMatches(const RenderItemList & lhs_src, const RenderItemList & rhs_src) const;

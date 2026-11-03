@@ -320,7 +320,7 @@ extern bool hide240p;
 extern bool hide576p;
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
-{	
+{
 	if(oldBtn > MENU_SETTINGS)
 		oldBtn = MENU_SETTINGS;
 	if(newBtn > MENU_SETTINGS)
@@ -529,7 +529,7 @@ static void *ScreensaverThread(void *arg)
 					case ART_TOP:
 						//thumbImg->SetPosition(4, -96); // Type Top
 						thumbImg->SetPosition(4, -80);
-						
+
 						//banner ss
 						//hide text info
 						if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
@@ -551,10 +551,10 @@ static void *ScreensaverThread(void *arg)
 					case ART_SIDE:
 						//thumbImg->SetPosition(-189, -16); // Type Side
 						thumbImg->SetPosition(-189, -2);
-						
+
 						// Only do this once per run?
 						w.SetPosition(208, 170);
-						
+
 						//banner ss
 						//hide text info
 						if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
@@ -569,7 +569,7 @@ static void *ScreensaverThread(void *arg)
 						//hide text info
 						if(audiobarNowPlayingBtn->IsVisible())
 							audiobarNowPlayingBtn->SetVisible(false);
-						
+
 						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 							w.SetPosition(586, 170);
 						} else
@@ -582,7 +582,7 @@ static void *ScreensaverThread(void *arg)
 						//hide text info
 						if(audiobarNowPlayingBtn->IsVisible())
 							audiobarNowPlayingBtn->SetVisible(false);
-						
+
 						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 							w.SetPosition(586, 170);
 						} else
@@ -597,19 +597,19 @@ static void *ScreensaverThread(void *arg)
 				selectLoadedFile = true;
 				FindFile();
 				//This code only hits if the playing file is not highlighted.
-				
+
 				w.Append(thumbImg);
 				thumbImg->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM); // should be bottom, for poster art being of inconsistent size
 				switch(WiiSettings.screensaverArt) {
 					case ART_TOP:
 						//thumbImg->SetPosition(4, -96); // Type Top
 						thumbImg->SetPosition(4, -80);
-						
+
 						break;
 					case ART_SIDE:
 						//thumbImg->SetPosition(-189, -16); // Type Side
 						thumbImg->SetPosition(-189, -2);
-						
+
 						// Only do this once per run?
 						w.SetPosition(208, 170);
 						break;
@@ -620,7 +620,7 @@ static void *ScreensaverThread(void *arg)
 						//hide text info
 						if(audiobarNowPlayingBtn->IsVisible())
 							audiobarNowPlayingBtn->SetVisible(false);
-						
+
 						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 							w.SetPosition(586, 170);
 						} else
@@ -633,7 +633,7 @@ static void *ScreensaverThread(void *arg)
 						//hide text info
 						if(audiobarNowPlayingBtn->IsVisible())
 							audiobarNowPlayingBtn->SetVisible(false);
-						
+
 						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 							w.SetPosition(586, 170);
 						} else
@@ -651,16 +651,16 @@ static void *ScreensaverThread(void *arg)
 				correctss = false;
 			}
 		}
-		
+
 		if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
 			// Prevent file thumbs from appearing in the ss
 			thumbImg->SetVisible(false);
-			
+
 			// If you select 'no' for cover art in ss, you'll get the logo stuck in the BG.
 			w.Remove(&logoLargeImg);
-			
+
 			// NOTE: when using this variant of the screensaver, it may be best to disable burn-in reduction.
-			
+
 			w.Append(thumbImg);
 			thumbImg->SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
 			thumbImg->SetPosition(((thumbImg->GetWidth()*thumbImg->GetScaleX())-screenwidth)/2, (448-screenheight)/2);
@@ -669,14 +669,14 @@ static void *ScreensaverThread(void *arg)
 			if(audiobarNowPlayingBtn->IsVisible())
 				audiobarNowPlayingBtn->SetVisible(false);
 		}
-		
+
 		if((menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit == 0 && !thumbImg->IsVisible() && !audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt < ART_FULL)
 			 || !WiiSettings.screensaverArt) {
 			w.Remove(thumbImg);
 			w.Append(&logoLargeImg);
 			correctss = false;
 		}
-		
+
 		mainWindow = &w;
 		ResumeGui();
 
@@ -688,17 +688,17 @@ static void *ScreensaverThread(void *arg)
 			if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 6) {
 				waitReload = 0;
 				reloadTimer = 0;
-				
+
 				FindNextFile(true);
-				
+
 				//LoadNewFile();
 				//it keeps crashing but works sometimes.
-				
+
 				//wiiLoadFile(loadedFile, NULL);
 			}*/
 			//if I could just test with a fake button press
-			
-			
+
+
 			threadsleep = 1000*1000*6; // 6 sec
 			if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
 				//VIDEO_WaitVSync();
@@ -719,7 +719,7 @@ static void *ScreensaverThread(void *arg)
 					goto done;
 				usleep(THREAD_SLEEP);
 				threadsleep -= THREAD_SLEEP;
-				
+
 				// For video showcase
 			/*	if(userInput[0].pad.btns_d & PAD_TRIGGER_Z) {
 					StopMPlayerFile(); // end this song
@@ -751,7 +751,7 @@ static void *ScreensaverThread(void *arg)
 				al = MAX(audiobarNowPlaying[1]->GetTextWidth(), audiobarNowPlaying[2]->GetTextWidth());
 			else
 				al = audiobarNowPlaying[3]->GetTextWidth(); // really grasping at straws here.
-			
+
 			// Detect really long titles/artists/albums
 			for(int j=1;j<4;++j) {
 				if(audiobarNowPlaying[j]->GetTextWidth() > 347)
@@ -759,10 +759,10 @@ static void *ScreensaverThread(void *arg)
 			}
 			// Current: give me size: 430,507 // Amadeus
 			// Limit:   give me size: 340,347
-			
+
 			if(al > max)
 				max = al;
-			
+
 			int x=0,y=0;
 /*
 			while(x < 30 || x > (screenwidth-w.GetWidth()-30))
@@ -790,7 +790,7 @@ static void *ScreensaverThread(void *arg)
 					y = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenheight);
 			}
 			}
-			
+
 			// Sometimes this happens when it shouldn't, fixit
 			if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit == 0 && !audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt < ART_FULL) {
 				++logoReset;
@@ -815,7 +815,7 @@ static void *ScreensaverThread(void *arg)
 			} else if(WiiSettings.screensaverArt >= ART_FULL && thumbImg != NULL) {
 				x = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 586 : 372;
 				y = 170;
-				
+
 				if(WiiSettings.screensaverArt == ART_FULL_ALT)
 					x = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? rand() % (750 + 1 - 422) + 422 :
 							rand() % (440 + 1 - 300) + 300;
@@ -826,21 +826,21 @@ static void *ScreensaverThread(void *arg)
 					++lessPos;
 				else
 					--lessPos;
-				
+
 				if(audiobarNowPlayingBtn->IsVisible())
 					audiobarNowPlayingBtn->SetVisible(false);
 					//w.Remove(audiobarNowPlayingBtn);
-				
+
 				// Hey! This should be a setting
 			//	lessPos = 160;
-				
+
 				//if(lessPos > 2)
 					thumbImg->SetVisible(true);
 				w.SetPosition(x-lessPos, y);
 			} else
 				w.SetPosition(x, y);
 
-			if(WiiSettings.inactivityShutdown > 0 && 
+			if(WiiSettings.inactivityShutdown > 0 &&
 				!(wiiAudioOnly() && !wiiIsPaused()) &&
 				diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.inactivityShutdown*3600))
 			{
@@ -863,7 +863,7 @@ done:
 		thumbImg->SetPosition(-33, 91);
 		dontdim = false;
 		foundArt = false; // doing this in the loop doesn't work right.
-		
+
 		//For video tab ss (banner shift)
 		ssFirst = true;
 		changeDirection = true;
@@ -881,7 +881,7 @@ done:
 				thumbImg->SetScale(256, screenheight-100);
 			else
 				thumbImg->SetScale(188, screenheight-100);
-			
+
 			if(!audiobarNowPlayingBtn->IsVisible() && wiiAudioOnly())
 				audiobarNowPlayingBtn->SetVisible(true);
 		}
@@ -1065,7 +1065,7 @@ static void *GuiThread (void *arg)
 		mainWindow->Update(&userInput[2]);
 		mainWindow->Update(&userInput[1]);
 		mainWindow->Update(&userInput[0]);
-		
+
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		GX_SetColorUpdate(GX_TRUE);
 		GX_DrawDone();
@@ -1102,7 +1102,7 @@ static void *GuiThread (void *arg)
 					newMenu++;
 				if(newMenu > MENU_SETTINGS)
 					newMenu = MENU_BROWSE_VIDEOS;
-				
+
 				// GC controller can crash if screensaver is active.
 				if(screensaverThreadHalt != 0)
 					ChangeMenu(newMenu);
@@ -1115,7 +1115,7 @@ static void *GuiThread (void *arg)
 					newMenu--;
 				if(newMenu < MENU_BROWSE_VIDEOS)
 					newMenu = MENU_SETTINGS;
-				
+
 				// GC controller can crash if screensaver is active.
 				if(screensaverThreadHalt != 0)
 					ChangeMenu(newMenu);
@@ -1149,7 +1149,7 @@ static void *GuiThread (void *arg)
 			else
 				SetVIscaleback();
 		}
-		
+
 		UpdatePads();
 		mainWindow->Draw();
 
@@ -1159,7 +1159,7 @@ static void *GuiThread (void *arg)
 		if(userInput[0].wpad->ir.valid)
 			Menu_DrawImg(userInput[0].wpad->ir.x-48, userInput[0].wpad->ir.y-48,
 				96, 96, pointer[0]->GetImage(), userInput[0].wpad->ir.angle, 1, 1, 255, GX_TF_RGBA8);
-		
+
 		DoRumble(0);
 		mainWindow->Update(&userInput[3]);
 		mainWindow->Update(&userInput[2]);
@@ -1176,7 +1176,7 @@ static void *GuiThread (void *arg)
 					newMenu++;
 				if(newMenu > MENU_SETTINGS)
 					newMenu = MENU_BROWSE_VIDEOS;
-				
+
 				// GC controller can crash if screensaver is active.
 				if(screensaverThreadHalt != 0)
 					ChangeMenu(newMenu);
@@ -1189,7 +1189,7 @@ static void *GuiThread (void *arg)
 					newMenu--;
 				if(newMenu < MENU_BROWSE_VIDEOS)
 					newMenu = MENU_SETTINGS;
-				
+
 				// GC controller can crash if screensaver is active.
 				if(screensaverThreadHalt != 0)
 					ChangeMenu(newMenu);
@@ -1214,13 +1214,13 @@ static void *GuiThread (void *arg)
 			{
 				//Avoid the distortion caused in 4:3 mode, the extra resolution
 				//isn't useful if the texture has to be scaled.
-				
+
 				//don't bother triggering the first fade
 				if(ssFirst) {
 					doneSafe = true;
 					break;
 				}
-				
+
 				if(CONF_GetAspectRatio() != CONF_ASPECT_16_9) {
 					for(i = ssFirst ? 255 : 0; i <= 255; i += 15)
 					{
@@ -1232,7 +1232,7 @@ static void *GuiThread (void *arg)
 					doneSafe = true;
 					break;
 				}
-				
+
 				GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 				GX_SetColorUpdate(GX_TRUE);
 				GX_DrawDone();
@@ -1243,7 +1243,7 @@ static void *GuiThread (void *arg)
 					flip_pending = false;
 					VIDEO_WaitVSync();
 				}
-				
+
 				int half_ht = vmode->efbHeight; // >> 2 causes trouble, but let's not do height.
 				int half_wh = vmode->fbWidth / 2;
 				bool pad_wh = (half_wh / 8) % 2;
@@ -1266,7 +1266,7 @@ static void *GuiThread (void *arg)
 				}
 			}
 			doneSafe = true;
-			
+
 			//old fade-out effect
 		/*	for(i = ssFirst ? 255 : 0; i <= 255; i += 15)
 			{
@@ -1278,7 +1278,7 @@ static void *GuiThread (void *arg)
 			doneSafe = true; */
 			// Avoid burn-in reduction to work in video tab ss.
 			dontdim = true;
-			
+
 			ssFirst = false;
 			thumbLoad = true;
 			banner_pic = 1;
@@ -1287,7 +1287,7 @@ static void *GuiThread (void *arg)
 			if(changeDirection)
 				lessPos = 0;
 			changeDirection ^= 1;
-			
+
 			thumbImg->SetVisible(false);
 			ssTimer_2 = 0;
 		}
@@ -1326,23 +1326,23 @@ static void *GuiThread (void *arg)
 				}
 			}
 		}
-		
+
 		// Hack to reconnect radio streams
 		if(waitReload && reloadTimer == 0)
 			reloadTimer = gettime();
 		if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 72) {
 			waitReload = 0;
 			reloadTimer = 0;
-			
+
 			//if(add_time != 0)
 			//	++test_if_work;
-			
+
 			//60 doesn't work...
 			//65...doesn't work...
 			//68...doesn't work...
 			//69...works
 			//99 secs works but can be better
-			
+
 			//LoadNewFile();
 			//it keeps crashing but works sometimes.
 
@@ -1407,10 +1407,10 @@ static void *GuiThread (void *arg)
 			// Clean fallback server
 			if(hide_onlinemediafolder)
 				WiiSettings.onlinemediaFolder[0] = 0;
-			
+
 			// Update message board time
 			Playlog_Exit();
-			
+
 			guiShutdown = true;
 			guiHalt = 1;
 			ActivateExitThread();
@@ -1586,7 +1586,7 @@ void ChangeTheme()
 				val -= 2;
 			//printf("give me info: repeated");
 		}
-		
+
 		isRepeat = val;
 		switch(val) {
 			case 1: sprintf(curTheme, "%s", "gray"); break;
@@ -1596,7 +1596,7 @@ void ChangeTheme()
 			//case 5: sprintf(curTheme, "%s", "blank"); break;
 		}
 	}
-	
+
 	if(strcmp(curTheme, "blue") == 0)
 	{
 		bg->SetImage(bg_blue_jpg, bg_blue_jpg_size);
@@ -1783,18 +1783,18 @@ ProgressWindow(char *title, char *msg)
 	GuiImageData dialogBox(dialogue_box_png);
 	GuiImage dialogBoxImg(&dialogBox);
 	dialogBoxImg.SetAlpha(220);
-	
+
 	int baroffset = 556/2 - progressEmpty->GetWidth()/2;
 
 	GuiImage progressEmptyImg(progressEmpty);
 	progressEmptyImg.SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
 	progressEmptyImg.SetPosition(baroffset, 40);
-	
+
 	GuiImage progressLeftImg(progressLeft);
 	progressLeftImg.SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
 	progressLeftImg.SetPosition(baroffset, 40);
 	progressLeftImg.SetVisible(false);
-	
+
 	GuiImage progressMidImg(progressMid);
 	progressMidImg.SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
 	progressMidImg.SetPosition(baroffset+8, 40);
@@ -1835,11 +1835,11 @@ ProgressWindow(char *title, char *msg)
 	cancelBtn.SetSelectable(false);
 	cancelBtn.SetEffectGrow();
 	cancelBtn.SetUpdateCallback(progressCancelCallback);
-	
+
 	promptWindow.Append(&dialogBoxImg);
 	promptWindow.Append(&titleTxt);
 	promptWindow.Append(&msgTxt);
-	
+
 	if(progressCancelCallback)
 	{
 		msgTxt.SetPosition(0, 60);
@@ -1859,7 +1859,7 @@ ProgressWindow(char *title, char *msg)
 	{
 		promptWindow.Append(&throbberImg);
 	}
-	
+
 	// wait to see if progress flag changes soon
 	progsleep = 400000;
 
@@ -1900,7 +1900,7 @@ ProgressWindow(char *title, char *msg)
 			usleep(THREAD_SLEEP);
 			progsleep -= THREAD_SLEEP;
 		}
-		
+
 		if(ssTimer != 0) //avoind the screensaver, it causes weird glitches
 		{
 			ssTimer = 0;
@@ -1920,7 +1920,7 @@ ProgressWindow(char *title, char *msg)
 				progressLineImg.SetPosition(baroffset+8 + tile*4, 40);
 				progressLineImg.SetVisible(true);
 			}
-			
+
 			if(tile == maxtile)
 			{
 				progressLineImg.SetVisible(false);
@@ -2041,7 +2041,7 @@ ShowAction (const char *msg, UpdateCallback cancelCallback)
 	// Reduce the loop times for ADX/BRSTM/etc to 0 so that other files load freely
 	wiiSpecialLoops(0);
 	//loop_ed_point = 0;
-	
+
 	snprintf(progressMsg, 200, "%s", gettext(msg));
 	sprintf(progressTitle, "Please Wait");
 	progressThreadHalt = 0;
@@ -2049,7 +2049,7 @@ ShowAction (const char *msg, UpdateCallback cancelCallback)
 	progressDone = 0;
 	progressTotal = 0;
 	progressCancelCallback = cancelCallback;
-		
+
 	LWP_ResumeThread (progressthread);
 }
 
@@ -2178,7 +2178,7 @@ bool OnScreenKeypad(char *var, u32 maxlen, bool enableNegative = false)
 	int save = -1;
 
 	GuiKeypad keypad(var, maxlen);
-	
+
 	if(enableNegative)
 		keypad.EnableNegative();
 
@@ -2314,7 +2314,7 @@ SettingWindow(const char *title, GuiWindow *w)
 			save = 1;
 		else if(cancelBtn.GetState() == STATE_CLICKED)
 			save = 0;
-		
+
 		else if(userInput[0].pad.btns_d == PAD_BUTTON_A ||
 				userInput[0].cpad.data.down == CTR_BUTTON_A)
 			save = 1;
@@ -2408,31 +2408,31 @@ static void CreditsWindow()
 	txt[i] = new GuiText("Tantric", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++;
-	
+
 	txt[i] = new GuiText("|  rodries", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15+80,y); i++; y+=26;
-	
+
 	txt[i] = new GuiText("Extrems", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++;
-	
+
 	txt[i] = new GuiText("|  FFmpeg", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15+80,y); i++; y+=26;
-	
+
 	//break
 	txt[i] = new GuiText(" ", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
-	
+
 	txt[i] = new GuiText("Menu artwork", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
 	txt[i] = new GuiText("Sam Mularczyk", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
-	
+
 	txt[i] = new GuiText("Logo", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
@@ -2491,7 +2491,7 @@ static void CreditsWindow()
 	while(creditsThreadHalt == 0)
 	{
 		usleep(THREAD_SLEEP);
-		
+
 		if(backBtn.GetState() == STATE_CLICKED)
 			break;
 	}
@@ -2613,7 +2613,7 @@ void ShuffleBanners()
 {
 	//if(WiiSettings.bannerLimit == 1)
 		//return;
-	
+
 	WiiSettings.bannerLimit = ParseJPEG();
 
 	int low = 0;
@@ -2723,12 +2723,12 @@ static void *ThumbThread (void *arg)
 						memset(upArt_hard, 0, 1024*8);
 						int read = 0;
 						yggNoUpdate = false;
-						
+
 						read = browser.selIndex->tunein != NULL ?
 							http_request(browser.selIndex->tunein, NULL, upArt, 1024*8, SILENT) : 0;
 							//http_request("https://yggdrasilradio.net/api/", NULL, upArt, 1024*8, SILENT) : 0;
 						char *pCh = NULL;
-						
+
 						// Skip tunein if specified by settings
 						if((isYggdrasil && WiiSettings.yggdrasilQuality > YGG_TUNEIN)
 							|| (isAnisonFM && WiiSettings.anisonfmQuality > ANISON_TUNEIN_ANISON))
@@ -2737,7 +2737,7 @@ static void *ThumbThread (void *arg)
 						// Modify json to grab the image link.
 						if(read > 0) {
 							sprintf(linktoArt, "%s", upArt);
-							
+
 							pCh = strstr(linktoArt, "http://cdn-album"); // for Tunein
 							if(pCh) {
 								//sprintf(linktoArt, "%s", pCh);
@@ -2788,12 +2788,12 @@ static void *ThumbThread (void *arg)
 									//printf("give me info: %dx%dx%s,,", cnt_trans, read, transactionid);
 								}
 							}
-							
+
 							if(WiiSettings.yggdrasilQuality != YGG_HI) {
 								// For thumbs
 								char *dCh = strstr(linktoArt, "songi"); // for site, thumb (more compatible)
 								//dCh+=9;
-								
+
 								if(dCh) {
 									dCh+=9;
 									snprintf(linktoArt, strlen(linktoArt), "%s", dCh);
@@ -2808,7 +2808,7 @@ static void *ThumbThread (void *arg)
 							} else {
 								// For full-res site
 								char *dCh = strstr(linktoArt, "\"image\"");
-								
+
 								if(dCh) {
 									dCh+=10;
 									snprintf(linktoArt, strlen(linktoArt), "%s", dCh);
@@ -2830,10 +2830,10 @@ static void *ThumbThread (void *arg)
 							if(read > 0) {
 								sprintf(linktoArt, "%s", upArt_hard);
 							}
-							
+
 							char *dCh = strstr(linktoArt, "catalog");
 							//dCh+=9;
-							
+
 							if(dCh) {
 								dCh+=9;
 								snprintf(linktoArt, strlen(linktoArt), "%s", dCh);
@@ -2857,7 +2857,7 @@ static void *ThumbThread (void *arg)
 							// when I download the html file, site art works by chopping off those 10 characters.
 							char *dCh = strstr(linktoArt, "><img src");
 							//dCh+=32; // +10 for just the title
-							
+
 							if(dCh) {
 								dCh+=32;
 								snprintf(linktoArt, strlen(linktoArt), "%s", dCh);
@@ -2875,7 +2875,7 @@ static void *ThumbThread (void *arg)
 						//test links
 						//http://yggdrasilradio.net/images/albumart/az_B6177_Beatless_Tokyo Performance Doll.jpg
 						//http://yggdrasilradio.net/images/albumart/az_B5275__Kawada Mami.jpg
-						
+
 						if(pCh == NULL && isYggdrasil) {
 							switch(WiiSettings.yggdrasilQuality) {
 								case YGG_HI:
@@ -2909,7 +2909,7 @@ static void *ThumbThread (void *arg)
 							sprintf(finalArt, "http://www.cvgm.net/static/media/screens%s", linktoArt); // site thumbs
 						else
 							sprintf(finalArt, "%sg", linktoArt); // tunein
-						
+
 						//printf("give me info: %s", finalArt);
 						//artFailed = false;
 						if(artFailed) {
@@ -2919,7 +2919,7 @@ static void *ThumbThread (void *arg)
 								//finalArt[0] = '\0';
 							artFailed = false;
 						}
-						
+
 						// Only update art if the url is different.
 						char * ach;
 						ach = strstr (finalArt, dupeArt);
@@ -2930,16 +2930,16 @@ static void *ThumbThread (void *arg)
 							update_art = false;
 						sprintf(dupeArt, "%s", finalArt);
 						artFirst = false;
-						
+
 						//audiobarNowPlaying[0]->SetText(finalArt);
 						//audiobarNowPlaying[1]->SetText(dupeArt);
-						
+
 						// Stress test
 						//update_art = true; // always download art
 						//++artCounter;
 						// Report: #2620 runs, no problem so far (~4 hours)
 					}
-					
+
 		if(thumbBuffer && thumbLoad)
 		{
 			thumbLoad = false;
@@ -2964,7 +2964,7 @@ static void *ThumbThread (void *arg)
 							break;
 					} while (thumbImg->GetEffect() == EFFECT_FADE);
 				}
-				
+
 				delete thumb;
 				thumb = NULL;
 			}
@@ -2991,16 +2991,16 @@ static void *ThumbThread (void *arg)
 						read = loadIndex->image[0] == 'h' ? http_request(loadIndex->image, NULL, thumbBuffer, 880*1024, SILENT)
 							//load from sd or usb
 							: LoadFile(thumbBuffer, 880*1024, loadIndex->image, SILENT);
-					
+
 					// Reset flag
 					//artFailed = false;
-					
+
 					LoadThumbsFileHTTP(loadIndex->xml);
-					
+
 					if (WiiSettings.numThumb > 0) {
 						snprintf(year_txt, sizeof(year_txt), "%s", WiiSettings.yearNum);
 						snprintf(desc_txt, sizeof(desc_txt), "%s", WiiSettings.descTxt);
-						
+
 						WiiSettings.numThumb = 0;
 						if(WiiSettings.descTxt && WiiSettings.yearNum) {
 						// PLX XMLs would leak otherwise
@@ -3024,7 +3024,7 @@ static void *ThumbThread (void *arg)
 					char *slash_2 = strrchr(loadIndex->xml, '/');
 					if(slash_2) snprintf(loadIndex->xml, 256, "%s", slash_2+1);
 					snprintf(art_disp_2, sizeof(art_disp_2), "%s", loadIndex->xml); // For LoadThumbsFile to always load xml
-					
+
 					snprintf(locate_paths, sizeof(locate_paths), "%s%s.xml", WiiSettings.artworkFolder, art_disp_2);
 				//	usleep(6000);
 					LoadThumbsFile(locate_paths);
@@ -3038,7 +3038,7 @@ static void *ThumbThread (void *arg)
 						int rand_jpg = rand_r(&get_inf) % (WiiSettings.numThumb + 1 - 1) + 1;
 						if(forceArtVal > 0)
 							rand_jpg = forceArtVal > WiiSettings.numThumb ? 1 : forceArtVal;
-						
+
 						/* art_disp_2 has the og title(without the _xx appended)
 						 * so it's the best way to maintain the actual_path fresh. */
 						snprintf(actual_path, sizeof(actual_path), "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
@@ -3046,7 +3046,7 @@ static void *ThumbThread (void *arg)
 						snprintf(desc_txt, sizeof(desc_txt), "%s", WiiSettings.descTxt);
 						mem2_free(WiiSettings.descTxt, MEM2_DESC);
 						mem2_free(WiiSettings.yearNum, MEM2_DESC);
-						
+
 					//	++get_num;
 				//		printf("THUMBS: %s", actual_path);
 						WiiSettings.numThumb = 0;
@@ -3077,8 +3077,8 @@ static void *ThumbThread (void *arg)
 					//memset(art_disp_2,0,strlen(art_disp_2));
 					//memset(actual_path,0,strlen(actual_path));
 				//	printf("THUMBS: %s", loadIndex->year);
-				
-				
+
+
 				}
 				//banner pic
 					if(banner_pic == 1) {
@@ -3091,7 +3091,7 @@ static void *ThumbThread (void *arg)
 								if(BNRread) {
 									uint16_t value = (dlBNR[0] << 8) | dlBNR[1];
 									WiiSettings.bannerLimit = value;
-									
+
 									// remove the file from the link
 									char* loc_dot;
 									loc_dot = strrchr(onlineBNR, 0x2F); // /
@@ -3120,7 +3120,7 @@ static void *ThumbThread (void *arg)
 							dir = opendir(WiiSettings.bannerFolder);
 							if (dir!=NULL) {
 								u32 index = 0;
-								
+
 								while ((entry = readdir(dir)))
 								{
 									size_t length = strlen(entry->d_name);
@@ -3135,15 +3135,15 @@ static void *ThumbThread (void *arg)
 									}
 									if(length < 4)
 										continue;
-									
+
 									if (numarray[cnt_tes]==index++)
 										break;
 								}
-								
+
 								sprintf(banner_path,"%s%s", WiiSettings.bannerFolder, entry->d_name);
 								closedir(dir);
 								read = LoadFile(thumbBuffer, 880*1024, banner_path, SILENT);
-								
+
 								if(cnt_tes > (WiiSettings.bannerLimit-2)) {
 									cnt_tes = 0;
 									shuffleOnce = true;
@@ -3157,7 +3157,7 @@ static void *ThumbThread (void *arg)
 						cnt_tes++;
 						//read = LoadFile(thumbBuffer, 880*1024, "sd1:/apps/wiimc/Toradora!_03.jpg", SILENT);
 						//banner_pic = 0;
-						
+
 						// avoid embedded pictures from showing up.
 						if(embedded_pic) {
 							embedded_pic = 0;
@@ -3176,7 +3176,7 @@ static void *ThumbThread (void *arg)
 					}
 					embedded_pic = 0;
 					banner_pic = 0;
-					
+
 					if(thumb->GetImage())
 					{
 						//Store current height for screensaver
@@ -3187,11 +3187,11 @@ static void *ThumbThread (void *arg)
 							thumbImg->SetScale(256, screenheight-100);
 						else
 							thumbImg->SetScale(188, screenheight-100);
-						
+
 						//Fade in effect makes scrolling through art not flashy
 						if(cover_fade != 0 && screensaverThreadHalt)
 							thumbImg->SetEffect(EFFECT_FADE, cover_fade);
-						
+
 						//For ss set to full
 						if((!screensaverThreadHalt && WiiSettings.screensaverArt >= ART_FULL) ||
 							(!screensaverThreadHalt && menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0)) {
@@ -3199,13 +3199,13 @@ static void *ThumbThread (void *arg)
 							thumbImg->SetPosition(((thumbImg->GetWidth()*thumbImg->GetScaleX())-screenwidth)/2, (448-screenheight)/2);
 							thumbImg->SetScale(448, screenheight-32);
 						}
-						
+
 						//Video tab screensaver = banners
 						if(!screensaverThreadHalt && menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
 							thumbImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
 							thumbImg->SetPosition(((thumbImg->GetWidth()*thumbImg->GetScaleX())-screenwidth)/2, (448-screenheight)/2);
 							thumbImg->SetScale(978, 550);
-							
+
 							//fade-in effect
 							for(int j = 255; j >= 0; j -= 15)
 							{
@@ -3229,7 +3229,7 @@ static void *ThumbThread (void *arg)
 									flip_pending = false;
 									VIDEO_WaitVSync();
 								}
-		
+
 								int half_ht = vmode->efbHeight; // >> 2 causes trouble, but let's not do height.
 								int half_wh = vmode->fbWidth / 2;
 								bool pad_wh = (half_wh / 8) % 2;
@@ -3251,10 +3251,10 @@ static void *ThumbThread (void *arg)
 								}
 							}
 						}
-						
+
 						// Should work but because of the 768px difference I increase it depending on size.
 						//thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)192/thumbImg->GetWidth() : (float)138/thumbImg->GetWidth());
-						
+
 						//printf("get that width: %.4f", thumbImg->GetScaleX());
 						thumbHeight *= thumbImg->GetScaleY();
 						//banner ss, I think this was to avoid a glitch
@@ -3263,12 +3263,12 @@ static void *ThumbThread (void *arg)
 					//		;
 					//	else
 						thumbImg->SetVisible(true);
-						
+
 						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
 							fileInfo->SetText(WiiSettings.descTxt);
 						if(WiiSettings.yearNum != NULL && !secure_type)
 							fileYear->SetText(WiiSettings.yearNum);
-						
+
 						ResumeGui();
 					}
 					else
@@ -3305,7 +3305,7 @@ static int LoadNewFile()
 	audiobarNowPlaying[1]->SetText(NULL);
 	audiobarNowPlaying[2]->SetText(NULL);
 	audiobarNowPlaying[3]->SetText(NULL);
-	
+
 	//dynamic themes, this is too much
 /*	if(isDynamic) {
 		sprintf(curTheme, "%s", "dynamic");
@@ -3320,7 +3320,7 @@ static int LoadNewFile()
 	{
 		browserMusic.selIndex = NULL;
 		PopulateVideoPlaylist();
-		
+
 		isLoadingFile = false;
 		return 1; // playing a video
 	}
@@ -3395,7 +3395,7 @@ void UpdateBrowser()
 {
 	if(!fileBrowser)
 		return;
-	
+
 	fileBrowser->TriggerUpdate();
 }
 
@@ -3435,7 +3435,7 @@ static void MenuBrowse(int menu)
 		sprintf(curTheme, "%s", "dynamic");
 		ChangeTheme();
 	}
-	
+
 	GuiText backBtnTxt("Resume", 18, (GXColor){255, 255, 255, 255});
 	backBtnTxt.SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	backBtnTxt.SetPosition(-74, 10);
@@ -3507,7 +3507,7 @@ static void MenuBrowse(int menu)
 			sprintf(filepath, "%s", onlinePLS);
 			strcpy(browser.dir, filepath);
 			hide_onlinemediafolder = true;
-			
+
 		//	if(menuPrevious == MENU_BROWSE_ONLINEMEDIA)
 		//		menuPrevious = MENU_BROWSE_VIDEOS;
 		//	UndoChangeMenu();
@@ -3519,12 +3519,12 @@ static void MenuBrowse(int menu)
 		thumbImg->SetVisible(false);
 		thumbImg->SetPosition(-34, 91);
 		mainWindow->Append(thumbImg);
-		
+
 		// PLX desc/year
 		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
 		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
 		fileYear->SetPosition(-26, -107);
-		
+
 		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
 		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 608 : 396, -92);
@@ -3537,7 +3537,7 @@ static void MenuBrowse(int menu)
 		thumbImg->SetVisible(false);
 		thumbImg->SetPosition(-34, 91);
 		mainWindow->Append(thumbImg);
-		
+
 		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
 		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
 	//	fileYear->SetVisible(false);
@@ -3559,7 +3559,7 @@ static void MenuBrowse(int menu)
 			// This fixes the filenames with a "."
 			if(!WiiSettings.hideExtensions)
 				StripExt(loadedFileDisplay);
-			
+
 			nowPlaying->SetText(loadedFileDisplay);
 			nowPlaying->SetVisible(true);
 		}
@@ -3576,7 +3576,7 @@ static void MenuBrowse(int menu)
 	if(firstLoad && strncmp(browser.dir, "usb", 3) == 0 && !ChangeInterface(browser.dir, false))
 	{
 		firstLoad = false; // only do this on initial application load
-		
+
 		// wait to see if USB mounts soon
 		int progsleep = 400000;
 
@@ -3668,7 +3668,7 @@ static void MenuBrowse(int menu)
 			if(wiiAudioOnly())
 				mainWindow->Append(audiobar);
 		}
-		
+
 		if(wiiGetTimeLength() == 0)
 		{
 			audiobarProgressBtn->SetVisible(false);
@@ -3707,10 +3707,10 @@ static void MenuBrowse(int menu)
 			if(!ChangeInterface(browser.dir, SILENT))
 			{
 				fileBrowser->SetState(STATE_DISABLED);
-	
+
 				if(!BrowserChangeFolder(false))
 					goto done;
-	
+
 				fileBrowser->ResetState();
 			}
 		}
@@ -3832,10 +3832,10 @@ static void MenuBrowse(int menu)
 
 				// identified as a playlist, or file is an unrecognized audio or video extension or allowed protocol
 				// parse as a playlist
-				if(!IsAllowedExt(ext) && 
+				if(!IsAllowedExt(ext) &&
 					(browser.selIndex->type == TYPE_PLAYLIST ||
-					IsPlaylistExt(ext) || 
-					!IsAllowedProtocol(browser.selIndex->file) || 
+					IsPlaylistExt(ext) ||
+					!IsAllowedProtocol(browser.selIndex->file) ||
 					(strncmp(browser.selIndex->file, "http:", 5) == 0 && !IsInternetStream(browser.selIndex->file)))
 					)
 				{
@@ -3854,7 +3854,7 @@ static void MenuBrowse(int menu)
 						char ext2[7];
 						GetExt(browser.first->next->file, ext2);
 						// let's load this one file
-						if(numItems == 2 && IsPlaylistExt(ext) && !IsPlaylistExt(ext2)) 
+						if(numItems == 2 && IsPlaylistExt(ext) && !IsPlaylistExt(ext2))
 						{
 							sprintf(loadedFile, browser.first->next->file);
 							GetDisplay(browser.first->next, loadedFileDisplay, 128);
@@ -3890,7 +3890,7 @@ static void MenuBrowse(int menu)
 
 				if(numItems == 0)
 				{
-					if(menuCurrent == MENU_BROWSE_VIDEOS) 
+					if(menuCurrent == MENU_BROWSE_VIDEOS)
 					{
 						char aux[1024];
 						GetFullPath(browser.selIndex, aux);
@@ -3938,13 +3938,13 @@ static void MenuBrowse(int menu)
 						fileBrowser->ChangeSize(pagesize);
 						mainWindow->Remove(&backBtn);
 						mainWindow->Append(audiobar);
-						
+
 				// Trigger a refresh to avoid audiobar clipping some files.
 				//ChangeMenuNoHistory(MENU_BROWSE_ONLINEMEDIA);
 				//selectLoadedFile = true;
 				//FindFile();
 				//UpdateBrowser();
-						
+
 						ResumeGui();
 						break;
 					}
@@ -3963,7 +3963,7 @@ static void MenuBrowse(int menu)
 
 			if((menu == MENU_BROWSE_ONLINEMEDIA && update_art) || (menu == MENU_BROWSE_ONLINEMEDIA && browser.selIndex != currentIndex)
 				|| ((WiiSettings.artwork && (menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC)) && browser.selIndex != currentIndex))
-			{	
+			{
 				currentIndex = browser.selIndex;
 				thumbIndex = NULL;
 				// Tunein dynamic art
@@ -3975,7 +3975,7 @@ static void MenuBrowse(int menu)
 					artTimer = 0;
 					transactionid[0] = 0;
 				}
-				
+
 				if(WiiSettings.descTxt != NULL) {
 				//	WiiSettings.descTxt = NULL; //crashes
 					fileInfo->SetText(NULL);
@@ -3986,7 +3986,7 @@ static void MenuBrowse(int menu)
 					fileYear->SetText(NULL);
 					WiiSettings.yearNum[0] = 0;
 				}
-				
+
 			//	ShowAreaInfo(MEM2_DESC);
 				//ClearMem2Area(MEM2_DESC);
 
@@ -4001,7 +4001,7 @@ static void MenuBrowse(int menu)
 			}
 		}
 		//timer for banner ss
-		
+
 
 		if(backBtn.GetState() == STATE_CLICKED)
 		{
@@ -4020,7 +4020,7 @@ static void MenuBrowse(int menu)
 
 			if(addIndex && addIndex != browser.first)
 			{
-				if(addIndex->icon == ICON_FILE_CHECKED || 
+				if(addIndex->icon == ICON_FILE_CHECKED ||
 					addIndex->icon == ICON_FOLDER_CHECKED)
 				{
 					MusicPlaylistDequeue(addIndex);
@@ -4116,14 +4116,14 @@ static void MenuBrowse(int menu)
 			}
 		}
 		else
-		{		
+		{
 			if(audiobarPauseBtn->GetAlpha() == 255 || audiobarPauseBtn->GetState() != STATE_DISABLED)
 			{
 				audiobarPauseBtn->SetState(STATE_DISABLED);
 				audiobarPauseBtn->SetAlpha(128);
 			}
 		}
-		
+
 		if(wiiAudioOnly())
 		{
 			if(wiiGetTimeLength() > 0)
@@ -4447,12 +4447,12 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "JPEG Resample");
 	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
-	
+
 	if(hide240p)
 		sprintf(options.name[i++], nulo);
 	else
 		sprintf(options.name[i++], "Double Strike");
-	
+
 	if(VIDEO_HaveComponentCable() && !hide576p)
 		sprintf(options.name[i++], "Force 576p");
 	else
@@ -4602,12 +4602,12 @@ static void MenuSettingsGlobal()
 					WiiSettings.bannerLimit = 0;
 				else
 					WiiSettings.bannerLimit = 1;
-				
+
 				// count all files so one doesn't need to recall the amount each time
 			#if 0
 				if(WiiSettings.bannerLimit > 0 && WiiSettings.bannerFolder != NULL) {
 					u32 parseVal = ParseJPEG();
-					
+
 					if(parseVal > 0)
 						sprintf(limit, "%04d", parseVal);
 				}
@@ -4724,7 +4724,7 @@ static void MenuSettingsGlobal()
 				case LANG_DANISH:				sprintf(options.value[0], "Danish"); break;
 				case LANG_BULGARIAN:			sprintf(options.value[0], "Bulgarian"); break;*/
 			}
-			
+
 			sprintf (options.value[1], "%d%%", WiiSettings.volume);
 			sprintf(options.value[2], "%s", WiiSettings.hideExtensions ? "Hide" : "Show");
 
@@ -4744,14 +4744,14 @@ static void MenuSettingsGlobal()
 				sprintf(options.value[5], "Off");
 
 			sprintf(options.value[6], "%d %s", (int)(WiiSettings.screensaverDelay/60), gettext("min"));
-			
+
 			if(WiiSettings.inactivityShutdown > 0)
 				sprintf(options.value[7], "%d %s", WiiSettings.inactivityShutdown, gettext("hours"));
 			else
 				sprintf(options.value[7], "Off");
-			
+
 			sprintf(options.value[8], "%s", WiiSettings.lockFolders ? "Static" : "Use Last Browsed");
-			
+
 			switch(WiiSettings.startArea)
 			{
 				case MENU_BROWSE_VIDEOS: 		sprintf(options.value[9], "Videos"); break;
@@ -4759,7 +4759,7 @@ static void MenuSettingsGlobal()
 				case MENU_DVD: 					sprintf(options.value[9], "DVD"); break;
 				case MENU_BROWSE_ONLINEMEDIA: 	sprintf(options.value[9], "Online Media"); break;
 			}
-			
+
 			sprintf(options.value[10], "%s", WiiSettings.artwork ? "On" : "Off");
 			snprintf(options.value[11], 60, "%s", WiiSettings.artworkFolder);
 			sprintf(options.value[12], "%s, #%04d", WiiSettings.bannerLimit > 0 ?
@@ -4826,7 +4826,7 @@ static void ScreenZoomWindow()
 {
 	GuiWindow *w = new GuiWindow(200,200);
 	w->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
-	
+
 	GuiImageData arrowLeft(arrow_left_png);
 	GuiImage arrowLeftImg(&arrowLeft);
 	GuiImageData arrowLeftOver(arrow_left_over_png);
@@ -5140,7 +5140,7 @@ static void MenuSettingsVideos()
 	bool firstRun = true;
 	OptionList options;
 	char nulo[1] = {'\0'};
-	
+
 	sprintf(options.name[i++], "Screen Zoom");
 	sprintf(options.name[i++], "Screen Position");
 	sprintf(options.name[i++], "Frame Dropping");
@@ -5208,7 +5208,7 @@ static void MenuSettingsVideos()
 	mainWindow->Append(&w);
 	mainWindow->Append(&titleTxt);
 	ResumeGui();
-	
+
 	int skip[] = { 5, 10, 15, 30, 60, 120, 300, 600, 1200 };
 	int skipNum = sizeof(skip) / sizeof(int);
 	int bwSkip = 0;
@@ -5419,7 +5419,7 @@ static void MenuSettingsMusic()
 	sprintf(options.name[i++], "Music Folder");
 
 	options.length = i;
-		
+
 	for(i=0; i < options.length; i++)
 	{
 		options.value[i][0] = 0;
@@ -5668,7 +5668,7 @@ static void MenuSettingsDVD()
 			}
 			if(WiiSettings.dvdMenu > 1)
 				sprintf(options.value[0], "%d", WiiSettings.dvdMenu);
-			
+
 			sprintf(options.value[1], "%s", WiiSettings.dvdDisabled ? "Disabled" : "Enabled");
 		/*	switch(WiiSettings.dvdSyncType)
 			{
@@ -5801,13 +5801,13 @@ static void MenuSettingsOnlineMedia()
 				++WiiSettings.yggdrasilQuality;
 				if(WiiSettings.yggdrasilQuality > 4)
 					WiiSettings.yggdrasilQuality = 0;
-				
-				//thumbs 
+
+				//thumbs
 			/*	if(WiiSettings.yggdrasilQuality < YGG_HI)
 					use_thumbs = true;
 				else
 					use_thumbs = false; */
-				
+
 				artSettingsChanged = true;
 				break;
 			case 3:
@@ -5857,7 +5857,7 @@ static void MenuSettingsOnlineMedia()
 				sprintf(options.value[1], "High (854x480)");*/
 
 			snprintf(options.value[1], 60, "%s", WiiSettings.onlinemediaFolder);
-			
+
 			switch(WiiSettings.yggdrasilQuality)
 			{
 				case YGG_NONE:			sprintf(options.value[2], "Tunein"); break;
@@ -5867,7 +5867,7 @@ static void MenuSettingsOnlineMedia()
 				case YGG_HI:			sprintf(options.value[2], "Highest Resolution"); break;
 			}
 			//sprintf (options.value[2], "%d", WiiSettings.yggdrasilQuality);
-			
+
 			switch(WiiSettings.anisonfmQuality)
 			{
 				case ANISON_TUNEIN_ONLY:	sprintf(options.value[3], "Tunein"); break;
@@ -5897,10 +5897,10 @@ static void MenuSettingsNetwork()
 	int ret;
 	int i = 0;
 	OptionList options;
-	
+
 	// find all currently set SMB/FTP entries
 	int map[MAX_OPTIONS];
-	
+
 	for(int j=0; j < MAX_SHARES; j++)
 	{
 		if(WiiSettings.smbConf[j].share[0] != 0)
@@ -5977,7 +5977,7 @@ static void MenuSettingsNetwork()
 	addsmbBtn.SetImageOver(&addsmbBtnImgOver);
 	addsmbBtn.SetTrigger(trigA);
 	addsmbBtn.SetEffectGrow();
-	
+
 	GuiText addftpBtnTxt("Add FTP Site", 20, (GXColor){255, 255, 255, 255});
 	addftpBtnTxt.SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
 	GuiImage addftpBtnImg(&btnOutline);
@@ -6055,13 +6055,13 @@ static void MenuSettingsNetworkSMB()
 	sprintf(options.name[i++], "Password");
 
 	options.length = i;
-	
+
 	for(i=0; i < options.length; i++)
 	{
 		options.value[i][0] = 0;
 		options.icon[i] = 0;
 	}
-	
+
 	if(netEditIndex < 0)
 		sprintf(shareName, "New Share");
 	else if(WiiSettings.smbConf[netEditIndex].displayname[0] != 0)
@@ -6100,7 +6100,7 @@ static void MenuSettingsNetworkSMB()
 	backBtn.SetIcon(&backBtnArrow);
 	backBtn.SetTrigger(trigA);
 	backBtn.SetTrigger(trigB);
-	
+
 	GuiText deleteBtnTxt("Delete", 20, (GXColor){255, 255, 255, 255});
 	GuiImage deleteBtnImg(&btnOutline);
 	GuiImage deleteBtnImgOver(&btnOutlineOver);
@@ -6137,7 +6137,7 @@ static void MenuSettingsNetworkSMB()
 	{
 		w.Append(&deleteBtn);
 	}
-	
+
 	mainWindow->Append(&optionBrowser);
 	mainWindow->Append(&w);
 	mainWindow->Append(&titleTxt);
@@ -6164,15 +6164,15 @@ static void MenuSettingsNetworkSMB()
 					u8 oct3 = useDisp >> 8;
 					u8 oct4 = useDisp;
 					//printf("DEV IP: 0x%X,,", useDisp);
-					
+
 					if(oct1 == 0 && oct2 == 0 && oct3 == 0 && oct4 == 0) {
 						ip_failed = true;
 						WiiSettings.smbConf[netEditIndex].ip[0] = 0;
 					}
-					
+
 					char dispIP[16] = {0};
 					sprintf(dispIP, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);
-					
+
 					strcpy(WiiSettings.smbConf[netEditIndex].ip, dispIP);
 				}
 				//if getting the IP from display name failed, IP will be 0.0.0.
@@ -6269,7 +6269,7 @@ static void MenuSettingsNetworkFTP()
 	sprintf(options.name[i++], "Mode");
 
 	options.length = i;
-		
+
 	for(i=0; i < options.length; i++)
 	{
 		options.value[i][0] = 0;
@@ -6281,8 +6281,8 @@ static void MenuSettingsNetworkFTP()
 	else if(WiiSettings.ftpConf[netEditIndex].displayname[0] != 0)
 		sprintf(siteName, "%s", WiiSettings.ftpConf[netEditIndex].displayname);
 	else
-		snprintf(siteName, 100, "%s@%s:%d/%s", 
-		WiiSettings.ftpConf[netEditIndex].user, 
+		snprintf(siteName, 100, "%s@%s:%d/%s",
+		WiiSettings.ftpConf[netEditIndex].user,
 		WiiSettings.ftpConf[netEditIndex].ip,
 		WiiSettings.ftpConf[netEditIndex].port,
 		WiiSettings.ftpConf[netEditIndex].folder);
@@ -6318,7 +6318,7 @@ static void MenuSettingsNetworkFTP()
 	backBtn.SetIcon(&backBtnArrow);
 	backBtn.SetTrigger(trigA);
 	backBtn.SetTrigger(trigB);
-	
+
 	GuiText deleteBtnTxt("Delete", 20, (GXColor){255, 255, 255, 255});
 	GuiImage deleteBtnImg(&btnOutline);
 	GuiImage deleteBtnImgOver(&btnOutlineOver);
@@ -6343,7 +6343,7 @@ static void MenuSettingsNetworkFTP()
 	SuspendGui();
 	GuiWindow w(screenwidth, screenheight);
 	w.Append(&backBtn);
-	
+
 	if(netEditIndex < 0)
 	{
 		// find a site to put the data into
@@ -6581,7 +6581,7 @@ static void MenuSettingsSubtitles()
 	sprintf(options.name[i++], "Size");
 
 	options.length = i;
-		
+
 	for(i=0; i < options.length; i++)
 	{
 		options.value[i][0] = 0;
@@ -6734,7 +6734,7 @@ static void MenuSettings()
 {
 	int ret;
 	int i = 0;
-	
+
 	OptionList options;
 
 	sprintf(options.name[i++], "Global");
@@ -6838,10 +6838,10 @@ static void VideoProgressCallback(void *ptr)
 	double done = wiiGetTimePos();
 	double percent = 0;
 	double percent_2 = 0; // This fixes the seekbar delay when tiled rendering.
-	
+
 	if(total > 0)
 		percent = done/total;
-	
+
 	if(b->GetState() == STATE_CLICKED)
 	{
 		if(b->GetStateChan() >= 0)
@@ -6856,7 +6856,7 @@ static void VideoProgressCallback(void *ptr)
 		}
 		b->ResetState();
 	}
-	
+
 	if(percent <= 0.02)
 	{
 		videobarProgressLeftImg->SetVisible(false);
@@ -7194,7 +7194,7 @@ static void AudioNowPlayingCallback(void *ptr)
 
 	double total = wiiGetTimeLength();
 
-	
+
 /*	ShowAreaInfo(MEM2_OTHER); // Check gui and other
 							char debug_txtmem[32];
 							sprintf(debug_txtmem, "m1(%.4f) m2(%.4f) oth(%d)",
@@ -7204,7 +7204,7 @@ static void AudioNowPlayingCallback(void *ptr)
 	*/
 	if(embedded_pic)
 		thumbLoad = true;
-	
+
 	// Update art after 8 secs
 	if(artTimer == 0)
 		artTimer = gettime();
@@ -7220,7 +7220,7 @@ static void AudioNowPlayingCallback(void *ptr)
 			//streamtitle_changed = 1;
 			//++thishow;
 			//printf("how many: %d", thishow);
-			
+
 			if(WiiSettings.artwork && streamname[0] == 0x59 && streamname[1] == 0x67) // Yg
 						isYggdrasil = true;
 					else
@@ -7237,7 +7237,7 @@ static void AudioNowPlayingCallback(void *ptr)
 						isCVGM = true;
 					else
 						isCVGM = false;
-					
+
 					// Starting point
 					if(isTunein || isAnisonFM || isYggdrasil || isCVGM) {
 					//	isUpdateArt = true;
@@ -7271,7 +7271,7 @@ static void AudioNowPlayingCallback(void *ptr)
 					artTimer = 0;
 					// Avoid showing art on other (not playing) entries.
 					if(strstr(browser.selIndex->file, loadedFile) != NULL && browser.selIndex->image != NULL) {
-					
+
 					if(WiiSettings.artwork && streamname[0] == 0x59 && streamname[1] == 0x67) // Yg
 						isYggdrasil = true;
 					else
@@ -7288,13 +7288,13 @@ static void AudioNowPlayingCallback(void *ptr)
 						isCVGM = true;
 					else
 						isCVGM = false;
-					
+
 					// Starting point
 					if(isTunein || isAnisonFM || isYggdrasil || isCVGM)
 						isUpdateArt = true;
 					}
-					
-					char *dash = strchr(streamtitle,'-');  
+
+					char *dash = strchr(streamtitle,'-');
 					if(dash != NULL)
 					{
 						char artist[128];
@@ -7324,7 +7324,7 @@ static void AudioNowPlayingCallback(void *ptr)
 					audiobarNowPlaying[3]->SetText(streamname);
 				else
 					audiobarNowPlaying[3]->SetText(NULL);
-				
+
 				streamname_changed = 0;
 			}
 		}
@@ -7350,7 +7350,7 @@ static void AudioNowPlayingCallback(void *ptr)
 
 			if(strlen(title) > 0)
 				audiobarNowPlaying[1]->SetText(title);
-			
+
 			/*if(strlen(title) > 0)
 				adjustSS = strlen(title);
 			else
@@ -7372,10 +7372,10 @@ static void AudioNowPlayingCallback(void *ptr)
 		if(artist != NULL)
 		{
 			for(i=strlen(artist)-1; i >= 0; i--) if(artist[i] == ' ') artist[i] = '\0'; else break;
-			
+
 			if(strlen(artist) > 0)
 				audiobarNowPlaying[2]->SetText(artist);
-			
+
 			//show mem
 		/*	char debug_txtmem[64] = {0};
 			sprintf(debug_txtmem, "m1(%.4f) m2(%.4f)",
@@ -7424,9 +7424,9 @@ static void AudioNowPlayingCallback(void *ptr)
 }
 
 static void SetupGui()
-{	
+{
 	static bool guiSetup = false;
-	
+
 	if(guiSetup)
 		return;
 
@@ -7455,13 +7455,13 @@ static void SetupGui()
 
 	trigB = new GuiTrigger;
 	trigB->SetButtonOnlyTrigger(-1, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B);
-	
+
 	trigLeft = new GuiTrigger;
 	trigLeft->SetButtonOnlyTrigger(-1, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT);
-		
+
 	trigRight = new GuiTrigger;
 	trigRight->SetButtonOnlyTrigger(-1, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT);
-	
+
 	trigUp = new GuiTrigger;
 	trigUp->SetButtonOnlyTrigger(-1, WPAD_BUTTON_UP | WPAD_CLASSIC_BUTTON_UP, PAD_BUTTON_UP, CTR_BUTTON_UP);
 
@@ -7488,19 +7488,19 @@ static void SetupGui()
 	volumeBottom = new GuiImageData(volume_bottom_png);
 	volumeEmpty = new GuiImageData(volume_empty_png);
 	volumeLine = new GuiImageData(volume_line_png);
-	
+
 	bg = new GuiImageData(bg_jpg, GX_TF_RGBA8);
 	bg->SetImage(bg_jpg, bg_jpg_size);
 	navDivider = new GuiImageData(nav_divider_png);
 	btnBottom = new GuiImageData(button_bottom_png);
 	btnBottomOver = new GuiImageData(button_bottom_over_png);
 	arrowRightSmall = new GuiImageData(arrow_right_small_png);
-	
+
 	// When using 854x screenwidth, this becomes garbled.
 	disabled = new GuiImage(768,screenheight,(GXColor){0, 0, 0, 100});
 	if(screenwidth > 640)
 		disabled->SetScaleX(1.112f);
-	actionbarLeft = new GuiImageData(actionbar_left_png);	
+	actionbarLeft = new GuiImageData(actionbar_left_png);
 	actionbarMid = new GuiImageData(actionbar_mid_png);
 	actionbarRight = new GuiImageData(actionbar_right_png);
 	actionbarBackward = new GuiImageData(actionbar_backward_png);
@@ -7511,7 +7511,7 @@ static void SetupGui()
 	actionbarSingle = new GuiImageData(actionbar_single_png);
 	actionbarContinuous = new GuiImageData(actionbar_continuous_png);
 	actionbarShuffle = new GuiImageData(actionbar_shuffle_png);
-	actionbarLoop = new GuiImageData(actionbar_loop_png);	
+	actionbarLoop = new GuiImageData(actionbar_loop_png);
 	actionbarClose = new GuiImageData(actionbar_close_png);
 	actionbarPlaylist = new GuiImageData(actionbar_playlist_png);
 	actionbarVolume = new GuiImageData(actionbar_volume_png);
@@ -7547,7 +7547,7 @@ static void SetupGui()
 	videobarPauseImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
 	videobarForwardImg = new GuiImage(actionbarForward);
 	videobarForwardImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
-	
+
 	videobarVolumeLevelImg = new GuiImage(volumeEmpty);
 	videobarVolumeLevelImg->SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
 	videobarVolumeLevelTopImg = new GuiImage(volumeTop);
@@ -7565,19 +7565,19 @@ static void SetupGui()
 	videobarVolumeLevelBottomImg->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
 	videobarVolumeLevelBottomImg->SetPosition(20, -90);
 	videobarVolumeLevelBottomImg->SetVisible(false);
-	
+
 	videobarVolumeTip = new GuiTooltip("Volume");
 	videobarBackwardTip = new GuiTooltip("Skip Backward");
 	videobarPauseTip = new GuiTooltip("Pause");
 	videobarForwardTip = new GuiTooltip("Skip Forward");
-	
+
 	videobarProgressBtn = new GuiButton(videobarProgressImg->GetWidth(), videobarProgressImg->GetHeight());
 	videobarProgressBtn->SetImage(videobarProgressImg);
 	videobarProgressBtn->SetPosition(0, 60);
 	videobarProgressBtn->SetTrigger(trigA);
 	videobarProgressBtn->SetSelectable(false);
 	videobarProgressBtn->SetUpdateCallback(VideoProgressCallback);
-	
+
 	videobarVolumeLevelBtn = new GuiButton(videobarVolumeLevelImg->GetWidth(), videobarVolumeLevelImg->GetHeight());
 	videobarVolumeLevelBtn->SetImage(videobarVolumeLevelImg);
 	videobarVolumeLevelBtn->SetPosition(20, -90);
@@ -7617,7 +7617,7 @@ static void SetupGui()
 	videobarPauseBtn->SetSelectable(false);
 	videobarPauseBtn->SetUpdateCallback(VideoPauseCallback);
 	videobarPauseBtn->SetEffectGrow();
-	
+
 	videobarForwardBtn = new GuiButton(40, 40);
 	videobarForwardBtn->SetPosition(60, 4);
 	videobarForwardBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
@@ -7627,19 +7627,19 @@ static void SetupGui()
 	videobarForwardBtn->SetSelectable(false);
 	videobarForwardBtn->SetUpdateCallback(VideoForwardCallback);
 	videobarForwardBtn->SetEffectGrow();
-	
+
 	videobarTime = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	videobarTime->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	videobarTime->SetPosition(-20, 14);
-	
+
 	videobarDropped = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	videobarDropped->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarDropped->SetPosition(50, 12);
-	
+
 	videobarMemory = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 	videobarMemory->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarMemory->SetPosition(50, 0);
-	
+
 	videobarFPS = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 	videobarFPS->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarFPS->SetPosition(50, 28);
@@ -7670,7 +7670,7 @@ static void SetupGui()
 
 	videobar->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
 	videobar->SetPosition(0, -30);
-	
+
 	// audio bar
 
 	audiobarLeftImg = new GuiImage(actionbarLeft);
@@ -7741,7 +7741,7 @@ static void SetupGui()
 	audiobarProgressBtn->SetState(STATE_DISABLED);
 	audiobarProgressBtn->SetAlpha(128);
 	audiobarProgressBtn->SetUpdateCallback(AudioProgressCallback);
-	
+
 	audiobarPlaylistBtn = new GuiButton(40, 40);
 	audiobarPlaylistBtn->SetPosition(10, 4);
 	audiobarPlaylistBtn->SetImage(audiobarPlaylistImg);
@@ -7785,7 +7785,7 @@ static void SetupGui()
 	audiobarModeTip->SetPosition(-1, 0);
 	audiobarModeBtn->SetTrigger(trigA);
 	audiobarModeBtn->SetEffectGrow();
-	
+
 	audiobarVolumeLevelBtn = new GuiButton(audiobarVolumeLevelImg->GetWidth(), audiobarVolumeLevelImg->GetHeight());
 	audiobarVolumeLevelBtn->SetImage(audiobarVolumeLevelImg);
 	audiobarVolumeLevelBtn->SetPosition(320, -90);
@@ -7804,11 +7804,11 @@ static void SetupGui()
 	audiobarVolumeBtn->SetTrigger(trigA);
 	audiobarVolumeBtn->SetUpdateCallback(AudioVolumeCallback);
 	audiobarVolumeBtn->SetEffectGrow();
-	
+
 	audiobarNowPlaying[0] = new GuiText("now playing", 16, (GXColor){160, 160, 160, 255});
 	audiobarNowPlaying[0]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	audiobarNowPlaying[0]->SetPosition(10, 0);
-	
+
 	for(int i=1; i < 4; i++)
 	{
 		audiobarNowPlaying[i] = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
@@ -7874,7 +7874,7 @@ static void SetupGui()
 	if(screenwidth > 640)
 		bgImg->SetScaleX(1.112f);
 	bgImg->SetAlpha(200);
-	
+
 	navDividerImg = new GuiImage (navDivider);
 	navDividerImg->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	if(screenwidth > 640)
@@ -8064,7 +8064,7 @@ static void StopGuiThreads()
 	{
 		if(LWP_ThreadIsSuspended(progressthread))
 			LWP_ResumeThread (progressthread);
-		
+
 		// wait for thread to finish
 		LWP_JoinThread(progressthread, NULL);
 		progressthread = LWP_THREAD_NULL;
@@ -8104,7 +8104,7 @@ static void StopGuiThreads()
 	{
 		if(LWP_ThreadIsSuspended(guithread))
 			LWP_ResumeThread (guithread);
-		
+
 		// wait for thread to finish
 		LWP_JoinThread(guithread, NULL);
 		guithread = LWP_THREAD_NULL;
@@ -8159,7 +8159,7 @@ void WiiMenu()
 		menuPrevious = WiiSettings.startArea;
 		menuUndo = WiiSettings.startArea;
 	}
-	
+
 	UpdateMenuImages(-1, menuCurrent);
 
 	if(WiiSettings.dvdDisabled)
@@ -8175,7 +8175,7 @@ void WiiMenu()
 		ExitRequested = true;
 		return;
 	}
-	
+
 	// Try to autoboot the file sent by the plugin
 	if(firstboot)
 	{
@@ -8193,7 +8193,7 @@ void WiiMenu()
 		}
 		VIDEO_SetBlack(FALSE);
 	}
-	
+
 	usleep(500);
 	ResumeGui();
 
@@ -8222,7 +8222,7 @@ void WiiMenu()
 		{
 			case MENU_BROWSE_VIDEOS:
 			case MENU_BROWSE_MUSIC:
-			case MENU_BROWSE_ONLINEMEDIA:				
+			case MENU_BROWSE_ONLINEMEDIA:
 				MenuBrowse(menuCurrent);
 				break;
 			case MENU_DVD:
@@ -8317,7 +8317,7 @@ void MPlayerMenu()
 	mainWindow->SetState(STATE_DISABLED);
 
 	HideVideoVolumeLevelBar();
-	
+
 	if(strncmp(loadedFile, "http:", 5) == 0)
 	{
 		videobar->Remove(videobarBackwardBtn);
@@ -8328,7 +8328,7 @@ void MPlayerMenu()
 		videobar->Append(videobarBackwardBtn);
 		videobar->Append(videobarForwardBtn);
 	}
-	
+
 	menuMode = 1; // switch to MPlayer GUI mode
 	EnableRumble();
 
@@ -8340,7 +8340,7 @@ void MPlayerMenu()
 		CheckSleepTimer();
 		usleep(500000);
 
-		if(isInserted[DEVICE_DVD] && dvdLastUsed && wiiIsPaused() && 
+		if(isInserted[DEVICE_DVD] && dvdLastUsed && wiiIsPaused() &&
 			diff_sec(dvdLastUsed, gettime()) > 60)
 		{
 			DI_StopMotor();

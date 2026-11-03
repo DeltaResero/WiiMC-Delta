@@ -73,7 +73,7 @@ Param::Param(std::string _name) :
     /// @note may have fixed a recent bug. testing
     *((float*)engine_val) = default_init_val.float_val;
 
-   
+
 }
 
 /* Free's a parameter type */
@@ -137,7 +137,7 @@ Param * Param::new_param_float(const char * name, short int flags, void * engine
 }
 
 /* Creates a new parameter of type int */
-Param * Param::new_param_int(const char * name, short int flags, void * engine_val,	
+Param * Param::new_param_int(const char * name, short int flags, void * engine_val,
                              int upper_bound, int lower_bound, int init_val) {
 
     Param * param;

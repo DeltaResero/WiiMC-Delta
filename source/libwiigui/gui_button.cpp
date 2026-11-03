@@ -247,13 +247,13 @@ void GuiButton::Update(GuiTrigger * t)
 			if(state == STATE_DEFAULT) // we weren't on the button before!
 			{
 				this->SetState(STATE_SELECTED, t->chan);
-	
+
 				if(this->Rumble())
 					RequestRumble(t->chan);
-	
+
 				//if(soundOver)
 				//	soundOver->Play();
-	
+
 				if(effectsOver && !effects)
 				{
 					// initiate effects

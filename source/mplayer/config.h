@@ -101,7 +101,7 @@ extern char MPLAYER_CSSDIR[512];
 #define HAVE_BUILTIN_EXPECT 1
 #undef HAVE_LIBDL
 #define HAVE_DOS_PATHS 0
-#define EXTERN_ASM 
+#define EXTERN_ASM
 #define EXTERN_PREFIX ""
 #define CONFIG_ICONV 1
 #undef HAVE_LIBKSTAT
@@ -338,7 +338,7 @@ extern char MPLAYER_CSSDIR[512];
 #undef CONFIG_DIRECTFB
 
 #undef CONFIG_DVB
-#undef CONFIG_DVBIN 
+#undef CONFIG_DVBIN
 #undef CONFIG_DXR2
 #undef CONFIG_DXR3
 #undef CONFIG_FBDEV

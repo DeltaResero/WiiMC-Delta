@@ -48,13 +48,13 @@ int main(int argc, char **argv)
 {
     // Initialise the video sytem
     // TODO: This, once projectM display is sorted out
-    
+
     // Initialise the audio sytem
     AUDIO_Init(NULL);
-    
+
     // Initialise the attached controllers
     WPAD_Init();
-    
+
     // Initialise the attached FAT devices
     fatInitDefault();
 
@@ -74,50 +74,50 @@ int main(int argc, char **argv)
     config.pulseSource = PM_AC_VOLUME;          // The audio characteristic to use for pulsing
     config.presetDirectory = PRESET_DIRECTORY;  // Location of preset directory
     config.initialPresetName = PRESET_NAME;     // Initial preset name
-    
+
     // Initialise projectM
     pm = new projectM(config);
     if (!pm)
         exit(0);
-    
+
     // Play our audio file
     if (!oggPlay(AUDIO_FILE, pcmDecode))
         exit(0);
-        
+
     while (1) {
-        
+
         // Read the latest controller states
         WPAD_ScanPads();
-        
+
         // Get the buttons which were pressed this frame
         u32 pressed = WPAD_ButtonsDown(0);
-        
+
         // Quit if 'HOME' was pressed
         if (pressed & WPAD_BUTTON_HOME)
             break;
-        
+
         // Toggle the wii disc slot light pulsing if '1' was pressed
         if ((pressed & WPAD_BUTTON_1))
             pm->settings().pulseWiiLight = !pm->settings().pulseWiiLight;
-        
+
         // Update the audio buffers
         if (!oggUpdate())
             break;
-        
+
         // Render the next frame in the visualisation/preset
         pm->renderFrame();
-        
+
     }
-    
+
     // Stop our audio file
     oggStop();
-    
+
     // Destroy projectM
     if (pm)
         free(pm);
 
     // We return to the launcher application via exit
     exit(0);
-    
+
     return 0;
 }

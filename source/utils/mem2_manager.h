@@ -26,7 +26,7 @@ enum mem2_areas_enum {
 	MEM2_DESC,
 	MEM2_MAX
 };
- 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,14 +48,14 @@ extern "C" {
 #define mem2_strdup(a,b) _mem2_strdup(a,b,NULL,0)
 #define mem2_strndup(a,b,c) _mem2_strndup(a,b,c,NULL,0)
 #endif
- 
+
 bool AddMem2Area (u32 size, const int index);
 bool RemoveMem2Area(const int area);
 void ClearMem2Area (const int area);
 
 void* _mem2_memalign(u8 align, u32 size, const int area, const char *file, int line);
 void* _mem2_malloc(u32 size, const int area, const char *file, int line);
-void _mem2_free(void *ptr, const int area, const char *file, int line);	
+void _mem2_free(void *ptr, const int area, const char *file, int line);
 void* _mem2_calloc(u32 num, u32 size, const int area, const char *file, int line);
 void* _mem2_realloc(void *ptr, u32 newsize, const int area, const char *file, int line);
 char *_mem2_strdup(const char *s, const int area, const char *file, int line);

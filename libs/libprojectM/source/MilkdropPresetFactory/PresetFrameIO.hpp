@@ -49,7 +49,7 @@ public:
     PresetInputs();
 
     /// Initializes this preset inputs given a mesh size.
-    /// \param gx the width of the mesh 
+    /// \param gx the width of the mesh
     /// \param gy the height of the mesh
     /// \note This must be called before reading values from this class
     void Initialize(int gx, int gy);

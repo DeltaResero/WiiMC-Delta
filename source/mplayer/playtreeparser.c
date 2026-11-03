@@ -469,12 +469,12 @@ parse_m3u(play_tree_parser_t* p) {
 	    // Get the title of .m3u entry
         char *comma = strchr(line, ',');
         if(comma) snprintf(title, 256, "%s", comma+1);
-		
+
         if(eq) snprintf(logo, 256, "%s", eq+2);
 		//static const u16 twobyte[1] = { 0x222C };
 		//strtok(logo, twobyte);
 		strtok(logo, "\",");
-		
+
 		//printf("check thumb: %s", logo);
       }
 #endif
@@ -607,7 +607,7 @@ parse_smil(play_tree_parser_t* p) {
      }
     }
     if (entrymode) { //Entry found but not yet filled
-#ifdef GEKKO 
+#ifdef GEKKO
 	  // Get the title of .smi entry
 	  exists_title = 0;
 	  pos1 = strstr(pos,"title=");
@@ -632,7 +632,7 @@ parse_smil(play_tree_parser_t* p) {
 			exists_title = 1;
 			break;
 		}
-		
+
       }
 #endif
       pos = strstr(pos,"src=");   // Is source present on this line
@@ -725,10 +725,10 @@ parse_textplain(play_tree_parser_t* p) {
 #ifdef GEKKO
 	linenum++;
 	linelen = strlen(line);
-	
+
 	if(linenum > 10 && !list)
 		return NULL; // abort - this might be a stream
-	
+
 	if(linelen > 1024 || linenum > 500)
 	{
 		if(list) play_tree_free(list, 1);

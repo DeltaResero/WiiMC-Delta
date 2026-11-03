@@ -222,7 +222,7 @@ bool GuiTrigger::Left()
 		if(diff_usec(timeprev[chan], now[chan]) > delay[chan])
 		{
 			timeprev[chan] = now[chan];
-			
+
 			if(delay[chan] == SCROLL_DELAY_INITIAL)
 				delay[chan] = SCROLL_DELAY_LOOP;
 			else if(delay[chan] > SCROLL_DELAY_DECREASE)
@@ -257,7 +257,7 @@ bool GuiTrigger::Right()
 		if(diff_usec(timeprev[chan], now[chan]) > delay[chan])
 		{
 			timeprev[chan] = now[chan];
-			
+
 			if(delay[chan] == SCROLL_DELAY_INITIAL)
 				delay[chan] = SCROLL_DELAY_LOOP;
 			else if(delay[chan] > SCROLL_DELAY_DECREASE)
@@ -299,7 +299,7 @@ bool GuiTrigger::Up()
 		if(diff_usec(timeprev[chan], now[chan]) > delay[chan])
 		{
 			timeprev[chan] = now[chan];
-			
+
 			if(delay[chan] == SCROLL_DELAY_INITIAL)
 				delay[chan] = SCROLL_DELAY_LOOP;
 			else if(delay[chan] > SCROLL_DELAY_DECREASE)
@@ -341,7 +341,7 @@ bool GuiTrigger::Down()
 		if(diff_usec(timeprev[chan], now[chan]) > delay[chan])
 		{
 			timeprev[chan] = now[chan];
-			
+
 			if(delay[chan] == SCROLL_DELAY_INITIAL)
 				delay[chan] = SCROLL_DELAY_LOOP;
 			else if(delay[chan] > SCROLL_DELAY_DECREASE)

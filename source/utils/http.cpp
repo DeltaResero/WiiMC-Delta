@@ -154,15 +154,15 @@ static s32 tcp_connect(char *host, const u16 port)
 	}
 
 	t1=ticks_to_secs(gettime());
-	do 
+	do
 	{
 		res = net_connect(s,(struct sockaddr*) &sa, sizeof (sa));
-		if(ticks_to_secs(gettime())-t1 > TCP_CONNECT_TIMEOUT) break; 
+		if(ticks_to_secs(gettime())-t1 > TCP_CONNECT_TIMEOUT) break;
 		usleep(500);
 	} while(res != -EISCONN);
 
 	if(res != -EISCONN)
-	{		
+	{
 		net_close(s);
 		return -1;
 	}
@@ -238,7 +238,7 @@ static u32 tcp_read(const s32 s, u8 *buffer, const u32 length)
 			continue;
 		}
 
-		if(res<=0) break; 
+		if(res<=0) break;
 
 		received += res;
 		left -= res;
@@ -400,7 +400,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 		sscanf(line, "HTTP/1.%*u %u", &http_status);
 		sscanf(line, "Content-Length: %u", &content_length);
 		sscanf(line, "Location: %s", redirect);
-		sscanf(line, "Transfer-Encoding: %s", encoding);		
+		sscanf(line, "Transfer-Encoding: %s", encoding);
 	}
 
 	if (http_status != 200)
@@ -412,7 +412,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 		{
 			u32 ret = http_request(redirect, hfile, buffer, maxsize, silent, total_redirects+1);
 			free(redirect);
-			return ret; 
+			return ret;
 		}
 		return 0;
 	}
@@ -453,7 +453,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
 				if(content_length > 0)
 				{
-					if(sizeread+content_length > maxsize) 
+					if(sizeread+content_length > maxsize)
 						break;
 
 					ret = tcp_read(s, (u8 *)buffer+sizeread, content_length);
@@ -470,7 +470,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 			} while(content_length > 0);
 			content_length = sizeread;
 		}
-		else 
+		else
 		{
 			free(line);
 			sizeread = tcp_read(s, (u8 *)buffer, content_length);

@@ -1,5 +1,5 @@
 /*
- * compress.h - Exports for compressed attribute handling. 
+ * compress.h - Exports for compressed attribute handling.
  * 		Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2004 Anton Altaparmakov

@@ -58,7 +58,7 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Byelorussian", "be", "bel" },
 	{ "Cambodian", "km", "khm" },
 	{ "Catalan", "ca", "cat" },*/
-	
+
 	/*{ "Corsican", "co", "cos" },
 	{ "Ceske", "cs", "cze" },
 	{ "Dansk", "da", "dan" },*/
@@ -409,7 +409,7 @@ prepareSettingsData ()
 	createXMLSetting("outline", "Outline override", FtoStr(WiiSettings.outline));
 	createXMLSetting("shadow", "Shadow override", FtoStr(WiiSettings.shadow));
 	createXMLSetting("bold", "Always bold typeface", toStr(WiiSettings.bold));
-	createXMLSetting("monofont", "Use monospaced font", toStr(WiiSettings.monofont));	
+	createXMLSetting("monofont", "Use monospaced font", toStr(WiiSettings.monofont));
 
 	int datasize = mxmlSaveString(xml, (char *)savebuffer, SAVEBUFFERSIZE, XMLSaveCallback);
 
@@ -533,14 +533,14 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
 				DeleteEntryOnlineMedia(o_entry);
 				break;
 			}
-			
+
 			o_entry->url = mem2_strdup(addr, MEM2_BROWSER);
 			if(!o_entry->url) // no mem
 			{
 				DeleteEntryOnlineMedia(o_entry);
 				break;
 			}
-			
+
 			o_entry->display = mem2_strdup(name, MEM2_BROWSER);
 			if(!o_entry->display) // no mem
 			{
@@ -557,7 +557,7 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
 					break;
 				}
 			}
-			
+
 			if(tunein)
 			{
 				o_entry->tunein = mem2_strdup(tunein, MEM2_BROWSER);
@@ -595,7 +595,7 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
 	while(next != NULL)
 	{
 		const char * name = mxmlElementGetAttr(next, "name");
-		
+
 		if(name) // this is a folder
 		{
 			char *newpath;
@@ -685,7 +685,7 @@ void LoadThumbsFile(char * filepath)
 	offset = LoadFile(savebuffer, SAVEBUFFERSIZE, filepath, SILENT);
 
 	//printf("GIMMIE %s", filepath);
-	
+
 	if (offset > 0)
 	{
 		xml = mxmlLoadString(NULL, savebuffer, MXML_TEXT_CALLBACK);
@@ -706,7 +706,7 @@ void LoadThumbsFile(char * filepath)
 void LoadThumbsFileHTTP(char * filepath)
 {
 	int offset = 0;
-	
+
 	// This case is to reduce the number of http_requests
 	// when using dynamic artwork.
 	if(filepath == NULL) {
@@ -818,7 +818,7 @@ void DefaultSettings ()
 		WiiSettings.smbConf[i].share[0] = 0;
 		WiiSettings.smbConf[i].user[0] = 0;
 		WiiSettings.smbConf[i].pwd[0] = 0;
-	
+
 		WiiSettings.ftpConf[i].displayname[0] = 0;
 		WiiSettings.ftpConf[i].ip[0] = 0;
 		WiiSettings.ftpConf[i].folder[0] = 0;
@@ -925,7 +925,7 @@ static void FixInvalidSettings()
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
 		bool found = false;
-		
+
 		for(int i=0; i < LANGUAGE_SIZE; i++)
 		{
 			if(strcmp(WiiSettings.audioLanguage, languages[i].abbrev) == 0)
@@ -971,13 +971,13 @@ static void FixInvalidSettings()
 
 	if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
 		CleanupPath(WiiSettings.onlinemediaFolder);
-	
+
 	if(WiiSettings.yggdrasilQuality < 0 || WiiSettings.yggdrasilQuality > 4)
 		WiiSettings.yggdrasilQuality = 1;
-	
+
 	if(WiiSettings.anisonfmQuality < 0 || WiiSettings.anisonfmQuality > 300)
 		WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
-	
+
 	if(WiiSettings.onlineBanners < 0 || WiiSettings.onlineBanners > 1)
 		WiiSettings.onlineBanners = 1;
 
@@ -990,7 +990,7 @@ static void FixInvalidSettings()
 		if(WiiSettings.ftpConf[i].passive != 0) // disable PASV support
 			WiiSettings.ftpConf[i].passive = 0;
 	}
-	
+
 	// Subtitles
 	if(WiiSettings.subtitleVisibility < 0 || WiiSettings.subtitleVisibility > 1)
 		WiiSettings.subtitleVisibility = 1;
@@ -1000,7 +1000,7 @@ static void FixInvalidSettings()
 	if(WiiSettings.subtitleLanguage[0] != 0)
 	{
 		bool found = false;
-		
+
 		for(int i=0; i < LANGUAGE_SIZE; i++)
 		{
 			if(strcmp(WiiSettings.subtitleLanguage, languages[i].abbrev) == 0)
@@ -1027,17 +1027,17 @@ static void FixInvalidSettings()
 		if(!found)
 			WiiSettings.subtitleCodepage[0] = 0;
 	}
-	
+
 	if(WiiSettings.subtitleColor[0] == 0 || strlen(WiiSettings.subtitleColor) < 8 ||
-	(strcmp(WiiSettings.subtitleColor, "00000000") != 0 && 
-		strcmp(WiiSettings.subtitleColor, "FFFFFF00") != 0 && 
-		strcmp(WiiSettings.subtitleColor, "FFFF0000") != 0 && 
+	(strcmp(WiiSettings.subtitleColor, "00000000") != 0 &&
+		strcmp(WiiSettings.subtitleColor, "FFFFFF00") != 0 &&
+		strcmp(WiiSettings.subtitleColor, "FFFF0000") != 0 &&
 		strcmp(WiiSettings.subtitleColor, "FF000000") != 0))
 		sprintf(WiiSettings.subtitleColor, "FFFFFF00");
-	
+
 	if(WiiSettings.subtitleSize > 5 || WiiSettings.subtitleSize < 1)
 		WiiSettings.subtitleSize = 2.0;
-	
+
 	if(WiiSettings.borderstyle < 0 || WiiSettings.borderstyle > 4)
 		WiiSettings.borderstyle = 0;
 	if(WiiSettings.outline < -1 || WiiSettings.outline > 10)
@@ -1247,14 +1247,14 @@ static bool LoadSettingsFile(char * filepath)
 						result = false;
 					else if(verMajor < 1) // less than version 1.0.0
 						result = false; // reset settings
-					else if((verMajor*100 + verMinor*10 + verPoint) > 
+					else if((verMajor*100 + verMinor*10 + verPoint) >
 							(curMajor*100 + curMinor*10 + curPoint)) // some future version
 						result = false; // reset settings
 					else
 						result = true;
 				}
 			}
-						
+
 
 			if(result)
 			{
@@ -1318,13 +1318,13 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.anisonfmQuality, "anisonfmQuality");
 				loadXMLSetting(&WiiSettings.onlineBanners, "onlineBanners");
 				// Network
-				
+
 				for(int i=0; i<MAX_SHARES; i++)
 				{
 					loadXMLSMBShare(i);
 					loadXMLFTPSite(i);
 				}
-				
+
 				// Subtitles
 				loadXMLSetting(&WiiSettings.subtitleVisibility, "subtitleVisibility");
 				loadXMLSetting(&WiiSettings.subtitleDelay, "subtitleDelay");
@@ -1383,14 +1383,14 @@ bool LoadSettings()
 			//wiiDup();
 		if(WiiSettings.night == 1)
 			nightfade_cb();
-		
+
 		if(WiiSettings.tiledRender == 1)
 			wiiSetTiledVar();
 		else if(WiiSettings.tiledRender == 2) { // Automatic
 			wiiSetTiledVar();
 			wiiSetTiledAuto();
 		}
-		
+
 		if(WiiSettings.debug == 5)
 			WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC);
 
