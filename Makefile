@@ -17,13 +17,13 @@ export	FREETYPE_LIBS	:=	`$(DEVKITPRO)/portlibs/ppc/bin/powerpc-eabi-pkg-config -
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-MPLAYER		:=	$(CURDIR)/src/mplayer
+MPLAYER		:=	$(CURDIR)/src/mplayer-ce
 TARGET		:=	wiimc
 TARGETDIR	:=	executables
 BUILD		:=	build
 SOURCES		:=	src src/libwiigui src/utils src/utils/unzip
 DATA		:=	src/images src/lang src/fonts
-INCLUDES	:=	src src/mplayer
+INCLUDES	:=	src src/mplayer-ce
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -155,7 +155,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 #---------------------------------------------------------------------------------
 $(BUILD): $(EXTLIBS) $(FFMPEGLIBS)
 	@[ -d $(TARGETDIR) ] || mkdir -p $(TARGETDIR)
-	cd src/mplayer; $(MAKE) -f Makefile; cd ../..
+	cd src/mplayer-ce; $(MAKE) -f Makefile; cd ../..
 	@[ -d $@ ] || mkdir -p $@
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
@@ -209,7 +209,7 @@ clean:
 	$(BUILD)/*.o $(BUILD)/*.s
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
 	rm -rf $(EXTPREFIX) $(EXTBUILD) $(FFPREFIX)
-	cd src/mplayer; $(MAKE) -f Makefile clean
+	cd src/mplayer-ce; $(MAKE) -f Makefile clean
 	$(MAKE) -C extras/forwarder clean
 
 #---------------------------------------------------------------------------------
