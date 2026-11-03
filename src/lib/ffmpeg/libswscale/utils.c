@@ -716,7 +716,9 @@ static void fill_rgb2yuv_table(SwsInternal *c, const int table[4], int dstRange)
         AV_WL16(p + 16*4 + 2*i, map[i] >= 0 ? c->input_rgb2yuv_table[map[i]] : 0);
 }
 
-#if CONFIG_SMALL
+/* FF_HEAP_TABLES takes the CONFIG_SMALL path here alone: XYZ (JPEG 2000
+ * cinema) input is rare, and the static tables take 272 KiB. */
+#if CONFIG_SMALL || FF_HEAP_TABLES
 static void init_xyz_tables(uint16_t xyzgamma_tab[4096],  uint16_t xyzgammainv_tab[65536],
                             uint16_t rgbgamma_tab[65536], uint16_t rgbgammainv_tab[4096])
 #else
@@ -760,7 +762,7 @@ av_cold int ff_sws_fill_xyztables(SwsInternal *c)
     memcpy(c->xyz2rgb.mat, xyz2rgb_matrix, sizeof(c->xyz2rgb.mat));
     memcpy(c->rgb2xyz.mat, rgb2xyz_matrix, sizeof(c->rgb2xyz.mat));
 
-#if CONFIG_SMALL
+#if CONFIG_SMALL || FF_HEAP_TABLES
     c->xyz2rgb.gamma.in = av_malloc(sizeof(uint16_t) * 2 * (4096 + 65536));
     if (!c->xyz2rgb.gamma.in)
         return AVERROR(ENOMEM);
@@ -2366,7 +2368,7 @@ void sws_freeContext(SwsContext *sws)
 
     av_freep(&c->gamma);
     av_freep(&c->inv_gamma);
-#if CONFIG_SMALL
+#if CONFIG_SMALL || FF_HEAP_TABLES
     av_freep(&c->xyz2rgb.gamma.in);
 #endif
 

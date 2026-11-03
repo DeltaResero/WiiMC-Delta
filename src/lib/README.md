@@ -106,3 +106,6 @@ Local changes:
   `FF_LEAN_ATTACHMENTS` the Matroska demuxer lets go of its own copy of an
   attachment once the stream holds it, and an attachment stream's internal
   codec context gets no copy.
+- `libavcodec/h274.c`, `libswscale/utils.c`: with `FF_HEAP_TABLES` the
+  H.274 film grain database is allocated the first time a stream needs it,
+  and swscale allocates its XYZ gamma tables as it does with `CONFIG_SMALL`.

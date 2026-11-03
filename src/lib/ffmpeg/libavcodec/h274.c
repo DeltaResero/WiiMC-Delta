@@ -44,7 +44,19 @@ typedef struct H274FilmGrainDatabase {
     atomic_uint residency[6];
 } H274FilmGrainDatabase;
 
+#if FF_HEAP_TABLES
+/* Allocated on first use: few streams carry film grain, and as a static
+ * array the database would hold 676 KiB of a small console's RAM for good. */
+static H274FilmGrainDatabase *film_grain_db_ptr;
+#define film_grain_db (*film_grain_db_ptr)
+
+static av_cold void film_grain_db_alloc(void)
+{
+    film_grain_db_ptr = av_mallocz(sizeof(*film_grain_db_ptr));
+}
+#else
 static H274FilmGrainDatabase film_grain_db;
+#endif
 
 static const int8_t Gaussian_LUT[2048+4];
 static const uint32_t Seed_LUT[256];
@@ -253,6 +265,15 @@ int ff_h274_apply_film_grain(AVFrame *out_frame, const AVFrame *in_frame,
     av_assert1(out_frame->format == in_frame->format);
     if (in_frame->format != AV_PIX_FMT_YUV420P)
         return AVERROR_PATCHWELCOME;
+
+#if FF_HEAP_TABLES
+    {
+        static AVOnce film_grain_db_once = AV_ONCE_INIT;
+        ff_thread_once(&film_grain_db_once, film_grain_db_alloc);
+        if (!film_grain_db_ptr)
+            return AVERROR(ENOMEM);
+    }
+#endif
 
     for (int c = 0; c < 3; c++) {
         static const uint8_t color_offset[3] = { 0, 85, 170 };
