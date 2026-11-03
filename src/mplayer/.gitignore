@@ -5,7 +5,6 @@ codec-cfg
 codec-cfg-test
 codecs2html
 codecs.conf.h
-config.*
 cpuinfo
 ffmpeg
 gmplayer
