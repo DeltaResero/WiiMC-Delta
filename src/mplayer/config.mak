@@ -35,8 +35,8 @@ INSTALLSTRIP = -s
 WINDRES = false
 WINDRES_O = -o $@
 
-CFLAGS   = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security -Wstrict-prototypes -Wmissing-prototypes -Wdisabled-optimization -Wno-pointer-sign -Wdeclaration-after-statement -std=c11 -Werror-implicit-function-declaration -D_ISOC99_SOURCE -I. -Iffmpeg -O4 -pipe -fomit-frame-pointer -fno-tree-vectorize -fno-asynchronous-unwind-tables -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -D_GNU_SOURCE -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/ppc/include -I$(EXTPREFIX)/include -D_REENTRANT -I$(DEVKITPRO)/portlibs/ppc/include/freetype2 -I$(DEVKITPRO)/portlibs/ppc/include -I$(DEVKITPRO)/portlibs/ppc/include/libpng16 -DZLIB_CONST -I$(EXTPREFIX)/include
-CXXFLAGS = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security -D_ISOC99_SOURCE -I. -Iffmpeg -O4 -pipe -fomit-frame-pointer -fno-tree-vectorize -fno-asynchronous-unwind-tables -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++98 -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -D_GNU_SOURCE -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/ppc/include -I$(EXTPREFIX)/include -D_REENTRANT -I$(DEVKITPRO)/portlibs/ppc/include/freetype2 -I$(DEVKITPRO)/portlibs/ppc/include -I$(DEVKITPRO)/portlibs/ppc/include/libpng16 -DZLIB_CONST -I$(EXTPREFIX)/include
+CFLAGS   = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security -Wstrict-prototypes -Wmissing-prototypes -Wdisabled-optimization -Wno-pointer-sign -Wdeclaration-after-statement -std=c11 -Werror-implicit-function-declaration -D_ISOC99_SOURCE -I. -O4 -pipe -fomit-frame-pointer -fno-tree-vectorize -fno-asynchronous-unwind-tables -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -D_GNU_SOURCE -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/ppc/include -I$(EXTPREFIX)/include -D_REENTRANT -I$(DEVKITPRO)/portlibs/ppc/include/freetype2 -I$(DEVKITPRO)/portlibs/ppc/include -I$(DEVKITPRO)/portlibs/ppc/include/libpng16 -DZLIB_CONST -I$(EXTPREFIX)/include
+CXXFLAGS = -Wundef -Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security -D_ISOC99_SOURCE -I. -O4 -pipe -fomit-frame-pointer -fno-tree-vectorize -fno-asynchronous-unwind-tables -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++98 -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -D_GNU_SOURCE -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/ppc/include -I$(EXTPREFIX)/include -D_REENTRANT -I$(DEVKITPRO)/portlibs/ppc/include/freetype2 -I$(DEVKITPRO)/portlibs/ppc/include -I$(DEVKITPRO)/portlibs/ppc/include/libpng16 -DZLIB_CONST -I$(EXTPREFIX)/include
 CC_DEPFLAGS = -MMD -MP
 
 CFLAGS_DHAHELPER         =
@@ -50,9 +50,11 @@ EXTRALIBS_MENCODER =
 
 MP_MSG_LIBS =
 
-GETCH = getch2.c
+GETCH = getch2-gekko.c
 HELP_FILE = help/help_mp-en.h
-TIMER = timer-linux.c
+TIMER = timer-gekko.c
+
+GEKKO = yes
 
 EXESUF      =
 EXESUFS_ALL = .exe
@@ -231,8 +233,8 @@ DIRECT3D = auto
 DIRECTFB = no
 DIRECTX = auto
 DVBIN = no
-DVDNAV = no
-DVDREAD = no
+DVDNAV = yes
+DVDREAD = yes
 DXR2 = no
 DXR3 = no
 ESD = no
@@ -254,7 +256,7 @@ MATRIXVIEW = no
 GUI = no
 GUI_GTK =
 GUI_WIN32 =
-HAVE_POSIX_SELECT = yes
+HAVE_POSIX_SELECT = no
 HAVE_SYS_MMAN_H = no
 HAVE_WINDOWS_H = no
 JACK = no
@@ -385,7 +387,7 @@ CONFIG_SWRESAMPLE = no
 ASFLAGS    = $(CFLAGS)
 AS_DEPFLAGS= -MMD -MP
 HOSTCC     = $(HOST_CC)
-HOSTCFLAGS = -D_ISOC99_SOURCE -I. -Iffmpeg -O3
+HOSTCFLAGS = -D_ISOC99_SOURCE -I. -O3
 HOSTLIBS   = -lm
 AS_O       = -o $@
 CC_O       = -o $@

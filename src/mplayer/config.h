@@ -64,6 +64,8 @@
 
 
 /* libdvdcss + libdvdread */
+#define HAVE_DVDCSS_DVDCSS_H 1
+#define WORDS_BIGENDIAN 1
 #define HAVE_LIMITS_H 1
 /* libdvdread */
 #define HAVE_DLFCN_H 1
@@ -99,7 +101,7 @@
 #define HAVE_LOCALTIME_R 1
 #define HAVE_MEMALIGN 1
 #define HAVE_NANOSLEEP 1
-#define HAVE_POSIX_SELECT 1
+#undef HAVE_POSIX_SELECT
 #define HAVE_AUDIO_SELECT 1
 #define HAVE_SETENV 1
 #define HAVE_SETMODE 0
@@ -294,13 +296,13 @@
 
 
 /* Blu-ray/DVD/VCD/CD */
-#define DEFAULT_CDROM_DEVICE "/dev/cdrom"
-#define DEFAULT_DVD_DEVICE   "/dev/dvd"
+#define DEFAULT_CDROM_DEVICE "/dev/di"
+#define DEFAULT_DVD_DEVICE   "/dev/di"
 #undef CONFIG_LIBBLURAY
 #undef CONFIG_CDDB
 #undef CONFIG_CDDA
-#undef CONFIG_DVDNAV
-#undef CONFIG_DVDREAD
+#define CONFIG_DVDNAV 1
+#define CONFIG_DVDREAD 1
 #undef CONFIG_LIBCDIO
 #undef CONFIG_VCD
 
@@ -522,7 +524,7 @@
 
 /* headers */
 #define HAVE_ARPA_INET_H 1
-#define HAVE_DIRECT_H 0
+#undef HAVE_DIRECT_H
 #define HAVE_IO_H 0
 #define HAVE_POLL_H 1
 #define HAVE_WINDOWS_H 0

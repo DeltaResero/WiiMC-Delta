@@ -757,11 +757,11 @@ SRCS_MPLAYER += libao2/ao_gekko.c              \
                 osdep/mem_index.c              \
 
 DIRS         += libdvdcss libdvdnav libdvdnav/vm libdvdread4
+CFLAGS       += -Ilibdvdread4 -Ilibdvdnav
 
 libdvdcss/%:   CFLAGS := -Ilibdvdcss -D_GNU_SOURCE -DVERSION=\"1.2.10\" $(CFLAGS)
 libdvdnav/%:   CFLAGS := -Ilibdvdnav -D_GNU_SOURCE -DHAVE_CONFIG_H -DVERSION=\"MPlayer-custom\" $(CFLAGS)
 libdvdread4/%: CFLAGS := -Ilibdvdread4 -Ilibdvdcss -D_GNU_SOURCE $(CFLAGS)
-stream/stream_dvd%: CFLAGS := -Ilibdvdread4 -Ilibdvdnav $(CFLAGS)
 
 all: libmplayerwii.a
 
