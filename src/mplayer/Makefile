@@ -716,11 +716,71 @@ ALL_MSGS = $(foreach lang,$(filter-out $(firstword $(MSG_LANGS)),$(MSG_LANGS)),h
 
 GUI_ICONSIZES = 16x16 22x22 24x24 32x32 48x48 256x256
 
+###### WiiMC ######
+
+# WiiMC links MPlayer into its own DOL as libmplayerwii.a. The Wii drivers
+# and osdep files come from MPlayer CE. libdvdcss, libdvdread4 and libdvdnav
+# are CE's internal copies with its libdi changes, which trunk no longer
+# ships. codecs.conf.h is committed, so the host tool that writes it is
+# not built.
+ifeq ($(GEKKO),yes)
+SRCS_COMMON  += libdvdcss/css.c                \
+                libdvdcss/device.c             \
+                libdvdcss/error.c              \
+                libdvdcss/ioctl.c              \
+                libdvdcss/libdvdcss.c          \
+                libdvdnav/dvdnav.c             \
+                libdvdnav/highlight.c          \
+                libdvdnav/navigation.c         \
+                libdvdnav/read_cache.c         \
+                libdvdnav/remap.c              \
+                libdvdnav/searching.c          \
+                libdvdnav/settings.c           \
+                libdvdnav/vm/decoder.c         \
+                libdvdnav/vm/vm.c              \
+                libdvdnav/vm/vmcmd.c           \
+                libdvdread4/bitreader.c        \
+                libdvdread4/dvd_input.c        \
+                libdvdread4/dvd_reader.c       \
+                libdvdread4/dvd_udf.c          \
+                libdvdread4/ifo_print.c        \
+                libdvdread4/ifo_read.c         \
+                libdvdread4/md5.c              \
+                libdvdread4/nav_print.c        \
+                libdvdread4/nav_read.c         \
+
+SRCS_MPLAYER += libao2/ao_gekko.c              \
+                libvo/vo_gekko.c               \
+                osdep/ave-rvl.c                \
+                osdep/glob_gekko.c             \
+                osdep/gx_supp.c                \
+                osdep/mem_index.c              \
+
+DIRS         += libdvdcss libdvdnav libdvdnav/vm libdvdread4
+
+libdvdcss/%:   CFLAGS := -Ilibdvdcss -D_GNU_SOURCE -DVERSION=\"1.2.10\" $(CFLAGS)
+libdvdnav/%:   CFLAGS := -Ilibdvdnav -D_GNU_SOURCE -DHAVE_CONFIG_H -DVERSION=\"MPlayer-custom\" $(CFLAGS)
+libdvdread4/%: CFLAGS := -Ilibdvdread4 -Ilibdvdcss -D_GNU_SOURCE $(CFLAGS)
+stream/stream_dvd%: CFLAGS := -Ilibdvdread4 -Ilibdvdnav $(CFLAGS)
+
+all: libmplayerwii.a
+
+libmplayerwii.a: $(OBJS_MPLAYER) $(OBJS_COMMON)
+	rm -f $@
+	$(AR) rcs $@ $^
+
+wiiclean:
+	-rm -f $(call ADD_ALL_DIRS,/*.o /*.d /*.a /*.ho /*~)
+	-rm -f help_mp.h version.h
+endif
+
 
 
 ###### generic rules #######
 
+ifneq ($(GEKKO),yes)
 all: $(ALL_PRG-yes) $(ALL_MSGS)
+endif
 
 %.o: %.S
 	$(CC) $(CC_DEPFLAGS) $(CFLAGS) $(AS_C) $(AS_O) $<
@@ -754,8 +814,10 @@ codec-cfg$(EXESUF) codecs2html$(EXESUF):  HOSTCFLAGS := $(HOSTCFLAGS) -DCODECS2H
 codec-cfg$(EXESUF) codec-cfg-test$(EXESUF) codecs2html$(EXESUF): codec-cfg.c codec-cfg.h help_mp.h
 	$(HOST_CC) $(HOSTCFLAGS) -o $@ $<
 
+ifneq ($(GEKKO),yes)
 codecs.conf.h: codec-cfg$(EXESUF) etc/codecs.conf
 	./$^ > $@
+endif
 
 checksums: $(MPLAYER_DEPS) $(MENCODER_DEPS) mplayer$(EXESUF) mencoder$(EXESUF)
 	md5sum $^ > checksums
@@ -764,10 +826,12 @@ check_checksums: $(MPLAYER_DEPS) $(MENCODER_DEPS) mplayer$(EXESUF) mencoder$(EXE
 	md5sum -c checksums
 
 # ./configure must be rerun if it changed
+ifneq ($(GEKKO),yes)
 config.mak: configure
 	@echo "############################################################"
 	@echo "####### Please run ./configure again - it's changed! #######"
 	@echo "############################################################"
+endif
 
 helpcheck: $(addsuffix elpcheck,$(wildcard help/help_mp-*.h))
 
