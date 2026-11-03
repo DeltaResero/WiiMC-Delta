@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <ctype.h>
-
+#if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <netdb.h>
 #include <netinet/in.h>
@@ -41,6 +41,9 @@
 #else
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#endif
+#else
+#include "stream.h"
 #endif
 
 #include "mp_msg.h"
@@ -59,7 +62,9 @@ udp_open_socket (URL_t *url)
   socklen_t err_len;
   fd_set set;
   struct sockaddr_in server_address;
+  #if !defined(GEKKO)
   struct ip_mreq mcast;
+  #endif
   struct timeval tv;
   struct hostent *hp;
   int reuse=reuse_socket;
@@ -152,7 +157,7 @@ udp_open_socket (URL_t *url)
     mp_msg (MSGT_NETWORK, MSGL_ERR,
             "Couldn't set receive socket buffer size\n");
   }
-
+#if !defined(GEKKO)
   if ((ntohl (server_address.sin_addr.s_addr) >> 28) == 0xe)
   {
     mcast.imr_multiaddr.s_addr = server_address.sin_addr.s_addr;
@@ -166,7 +171,7 @@ udp_open_socket (URL_t *url)
       return -1;
     }
   }
-
+#endif
   tv.tv_sec = 1; /* 1 second timeout */
   tv.tv_usec = 0;
 
@@ -189,7 +194,7 @@ udp_open_socket (URL_t *url)
     closesocket (socket_server_fd);
     return -1;
   }
-
+#if !defined(GEKKO)
   err_len = sizeof (err);
   getsockopt (socket_server_fd, SOL_SOCKET, SO_ERROR, &err, &err_len);
   if (err)
@@ -198,6 +203,6 @@ udp_open_socket (URL_t *url)
     closesocket (socket_server_fd);
     return -1;
   }
-
+#endif
   return socket_server_fd;
 }

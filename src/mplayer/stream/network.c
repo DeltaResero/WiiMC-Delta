@@ -259,9 +259,9 @@ http_send_request( URL_t *url, int64_t pos ) {
       snprintf(str, sizeof(str), "Range: bytes=%"PRId64"-", (int64_t)pos);
       http_set_field(http_hdr, str);
     }
-
+#ifndef GEKKO
     if (network_cookies_enabled) cookies_set( http_hdr, server_url->hostname, server_url->url );
-
+#endif
     if (network_http_header_fields) {
         int i=0;
         while (network_http_header_fields[i])

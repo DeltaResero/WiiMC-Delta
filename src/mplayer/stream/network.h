@@ -27,12 +27,28 @@
 #include <sys/types.h>
 
 #include "config.h"
+
+#if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#endif
+#endif
+
+#if defined(GEKKO)
+#include <network.h>
+#define send(a, b, c, d) net_send(a, b, c, d)
+#define recv(a, b, c, d) net_recv(a, b, c, d)
+#define select(a, b, c, d, e) net_select(a, b, c, d, e)
+#define socket(a, b, c) net_socket(a, b, c)
+#define gethostbyname(a) net_gethostbyname(a)
+#define closesocket(a) net_close(a)
+#define setsockopt(a, b, c, d, e) net_setsockopt(a, b, c, d, e)
+#define bind(a, b, c) net_bind(a, b, c)
+#define connect(a, b, c) net_connect(a, b, c)
 #endif
 
 #include "stream.h"
@@ -45,8 +61,10 @@
 #define DEFAULT_SEND_FLAGS 0
 #endif
 
+#ifndef GEKKO
 #if !HAVE_CLOSESOCKET
 #define closesocket close
+#endif
 #endif
 #if !HAVE_SOCKLEN_T
 typedef int socklen_t;

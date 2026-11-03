@@ -43,9 +43,11 @@
 #include <errno.h>
 
 #if !HAVE_WINSOCK2_H
+#ifndef GEKKO
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 #else
 #include <winsock2.h>
 #endif

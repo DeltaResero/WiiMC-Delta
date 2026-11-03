@@ -26,10 +26,14 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <sys/socket.h>
 #else
 #include <winsock2.h>
+#endif
+#else
+#define MSG_OOB 0x01 //scip
 #endif
 
 #include "libavutil/avutil.h"

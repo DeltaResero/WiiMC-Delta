@@ -45,7 +45,9 @@
 #include <winsock2.h>
 #else
 #include <sys/time.h>
+#if !defined(GEKKO)
 #include <sys/socket.h>
+#endif
 #endif
 #include "libavutil/avstring.h"
 #include "mp_msg.h"

@@ -26,6 +26,8 @@
  * adopted from joschkas real tools
  */
 
+#include <sys/socket.h>
+
 #include "rmff.h"
 #include "xbuffer.h"
 #include "mp_msg.h"

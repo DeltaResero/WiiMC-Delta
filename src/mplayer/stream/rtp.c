@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include "config.h"
+#if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -21,6 +22,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #endif
+#endif
+
 #include <errno.h>
 #include "network.h"
 #include "stream.h"

@@ -360,10 +360,18 @@ int stream_fill_buffer(stream_t *s){
   s->buf_pos=0;
   s->buf_len=len;
   while (s->buf_len < STREAM_BUFFER_MIN) {
+    int have = s->buf_len;
     assert(s->buf_len + STREAM_BUFFER_MIN < STREAM_BUFFER_SIZE);
     len = stream_read_internal(s, s->buffer + s->buf_len, STREAM_BUFFER_MIN);
-    if (len <= 0)
+    if (len <= 0) {
+#ifdef GEKKO
+      // CE's error handling in stream_read_internal() empties the
+      // buffer, which would lose what the earlier reads put in it
+      s->buf_pos = 0;
+      s->buf_len = have;
+#endif
       break;
+    }
     s->buf_len += len;
   }
   // since the first read succeeded we are

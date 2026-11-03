@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#if !HAVE_WINSOCK2_H
+#if !HAVE_WINSOCK2_H && !defined(GEKKO)
 #include <sys/socket.h>
 #endif
 
@@ -78,11 +78,20 @@ typedef struct mp_net_stream_opened_st {
 #define NET_STREAM_ERROR 129
 // Data is the error message (if any ;)
 
+#ifdef GEKKO
+// libogc has its own net_read() and net_write()
+#define net_read  net_read_st
+#define net_write net_write_st
+#endif
+
 static int net_read(int fd, char* buf, int len) {
   int r = 0;
   while(len) {
     r = recv(fd,buf,len,0);
     if(r <= 0) {
+#ifdef GEKKO
+      if (r == -EAGAIN) continue;
+#endif
       if(errno == EINTR) continue;
       if(r < 0)
         mp_msg(MSGT_NETST,MSGL_ERR,"Read failed: %s\n",strerror(errno));

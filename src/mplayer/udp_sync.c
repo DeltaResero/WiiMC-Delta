@@ -18,6 +18,7 @@
  * with MPlayer; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+#ifndef GEKKO
 
 #define _BSD_SOURCE
 
@@ -247,3 +248,4 @@ int udp_slave_sync(MPContext *mpctx)
 
     return timed_out ? -1 : master_exited;
 }
+#endif
