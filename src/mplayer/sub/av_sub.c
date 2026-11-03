@@ -30,8 +30,8 @@ void reset_avsub(struct sh_sub *sh)
         AVCodecContext *ctx = sh->context;
         ctx->extradata = NULL;
         ctx->extradata_size = 0;
-        avcodec_close(sh->context);
-        av_freep(&sh->context);
+        avcodec_free_context(&ctx);
+        sh->context = NULL;
     }
 }
 

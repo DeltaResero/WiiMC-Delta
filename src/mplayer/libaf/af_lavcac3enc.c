@@ -100,8 +100,15 @@ static int control(struct af_instance_s *af, int cmd, void *arg)
                 s->lavc_actx->sample_rate != af->data->rate ||
                 s->lavc_actx->bit_rate != bit_rate) {
 
-            if (s->lavc_actx->codec)
-                avcodec_close(s->lavc_actx);
+            // An opened context can't be reopened; start from a fresh one.
+            if (s->lavc_actx->codec) {
+                avcodec_free_context(&s->lavc_actx);
+                s->lavc_actx = avcodec_alloc_context3(NULL);
+                if (!s->lavc_actx) {
+                    mp_msg(MSGT_AFILTER, MSGL_ERR, MSGTR_CouldntAllocateLavcContext);
+                    return AF_ERROR;
+                }
+            }
 
             // Put sample parameters
             s->lavc_actx->ch_layout.nb_channels = af->data->nch;
@@ -156,11 +163,7 @@ static void uninit(struct af_instance_s* af)
     if (af->setup) {
         af_ac3enc_t *s = af->setup;
         af->setup = NULL;
-        if(s->lavc_actx) {
-            if (s->lavc_actx->codec)
-                avcodec_close(s->lavc_actx);
-            free(s->lavc_actx);
-        }
+        avcodec_free_context(&s->lavc_actx);
         free(s->pending_data);
         free(s);
     }

@@ -196,11 +196,8 @@ static void uninit(sh_audio_t *sh)
 {
     AVCodecContext *lavc_context = sh->context;
 
-    if (avcodec_close(lavc_context) < 0)
-        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
     av_freep(&lavc_context->opaque);
-    av_freep(&lavc_context->extradata);
-    av_freep(&lavc_context);
+    avcodec_free_context(&lavc_context);
 }
 
 static int control(sh_audio_t *sh,int cmd,void* arg, ...)
