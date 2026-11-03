@@ -112,6 +112,7 @@ typedef struct ass_track {
     double Timer;
     int WrapStyle;
     int ScaledBorderAndShadow;
+    int CorrectPAR;
     int Kerning;
     char *Language;
     enum {

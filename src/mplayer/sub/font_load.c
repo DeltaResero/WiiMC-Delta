@@ -33,6 +33,13 @@
 #include "font_load.h"
 #include "sub.h"
 #include "mp_msg.h"
+/*
+#ifdef GEKKO
+#include "../../utils/mem2_manager.h"
+#define malloc(x) mem2_malloc(x,MEM2_OTHER)
+#define free(x) mem2_free(x,MEM2_OTHER)
+#define strdup(x) mem2_strdup(x,MEM2_OTHER)
+#endif*/
 
 raw_file* load_raw(char *name,int verbose){
     int bpp;
@@ -199,7 +206,12 @@ while(fgets(sor,1020,f)){
 #endif
 
   if(strcmp(section,"[files]")==0){
+#ifdef GEKKO
+      char default_dir[100];
+      sprintf(default_dir,"%s%s",MPLAYER_DATADIR,"/font");
+#else
       char *default_dir=MPLAYER_DATADIR FONT_PATH_SEP "font";
+#endif
       if(pdb==2 && strcmp(p[0],"alpha")==0){
           char *cp;
           if (!(cp=malloc(strlen(desc->fpath)+strlen(p[1])+2))) goto fail_out;

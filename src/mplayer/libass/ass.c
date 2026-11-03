@@ -175,20 +175,20 @@ static void set_default_style(ASS_Style *style)
 {
     style->Name             = strdup("Default");
     style->FontName         = strdup("Arial");
-    style->FontSize         = 18;
+    style->FontSize         = 22;
     style->PrimaryColour    = 0xffffff00;
     style->SecondaryColour  = 0x00ffff00;
     style->OutlineColour    = 0x00000000;
     style->BackColour       = 0x00000080;
-    style->Bold             = 200;
+    style->Bold             = 1; // why was this set to 200?
     style->ScaleX           = 1.0;
     style->ScaleY           = 1.0;
     style->Spacing          = 0;
     style->BorderStyle      = 1;
-    style->Outline          = 2;
-    style->Shadow           = 3;
+    style->Outline          = 1.7f;
+    style->Shadow           = 0;
     style->Alignment        = 2;
-    style->MarginL = style->MarginR = style->MarginV = 20;
+    style->MarginL = style->MarginR = style->MarginV = 26;
 }
 
 static uint32_t string2color(ASS_Library *library, char *p)
@@ -551,6 +551,7 @@ static int process_styles_line(ASS_Track *track, char *str)
     if (!strncmp(str, "Format:", 7)) {
         char *p = str + 7;
         skip_spaces(&p);
+        free(track->style_format);
         track->style_format = strdup(p);
         ass_msg(track->library, MSGL_DBG2, "Style format: %s",
                track->style_format);
@@ -574,6 +575,8 @@ static int process_info_line(ASS_Track *track, char *str)
         track->WrapStyle = atoi(str + 10);
     } else if (!strncmp(str, "ScaledBorderAndShadow:", 22)) {
         track->ScaledBorderAndShadow = parse_bool(str + 22);
+    } else if (!strncmp(str, "CorrectPAR:", 11)) {
+        track->CorrectPAR = parse_bool(str + 11);
     } else if (!strncmp(str, "Kerning:", 8)) {
         track->Kerning = parse_bool(str + 8);
     } else if (!strncmp(str, "YCbCr Matrix:", 13)) {
@@ -1257,7 +1260,8 @@ ASS_Track *ass_new_track(ASS_Library *library)
 {
     ASS_Track *track = calloc(1, sizeof(ASS_Track));
     track->library = library;
-    track->ScaledBorderAndShadow = 1;
+    track->ScaledBorderAndShadow = 0;
+    track->CorrectPAR = 0;
     track->parser_priv = calloc(1, sizeof(ASS_ParserPriv));
     return track;
 }

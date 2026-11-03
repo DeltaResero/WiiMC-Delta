@@ -38,6 +38,7 @@
 #include "libvo/video_out.h"
 #include "font_load.h"
 #include "sub.h"
+#include "access_mpcontext.h"
 #include "spudec.h"
 #include "libavutil/common.h"
 
@@ -1110,6 +1111,9 @@ void free_osd_list(void){
 }
 
 #define FONT_LOAD_DEFER 6
+#ifdef GEKKO
+int prev_dxs = 0, prev_dys = 0;
+#endif
 
 static int vo_update_osd_ext(int dxs,int dys, int left_border, int top_border,
                              int right_border, int bottom_border, int orig_w,
@@ -1118,7 +1122,11 @@ static int vo_update_osd_ext(int dxs,int dys, int left_border, int top_border,
     mp_osd_obj_t* obj=vo_osd_list;
     int chg=0;
 #ifdef CONFIG_FREETYPE
+#ifdef GEKKO
+        static int defer_counter = 0;
+#else
     static int defer_counter = 0, prev_dxs = 0, prev_dys = 0;
+#endif
 #endif
 
 #ifdef CONFIG_FREETYPE
@@ -1143,6 +1151,46 @@ static int vo_update_osd_ext(int dxs,int dys, int left_border, int top_border,
     if (force_load_font) {
         force_load_font = 0;
         load_font_ft(dxs, dys, &vo_font, font_name, osd_font_scale_factor);
+#ifdef GEKKO
+        if (mpctx_get_set_of_sub_size() > 0)
+        {
+                if (sub_font_name)
+                        load_font_ft(dxs, dys, &sub_font, sub_font_name, text_font_scale_factor);
+                else
+                {
+                        if(text_font_scale_factor==osd_font_scale_factor)
+                                sub_font = vo_font;
+                        else
+                                load_font_ft(dxs, dys, &sub_font, font_name, text_font_scale_factor);
+                }
+
+        }
+        else
+                sub_font = vo_font;
+        prev_dxs = dxs;
+        prev_dys = dys;
+        defer_counter = 0;
+    } else {
+       if (!vo_font)
+           load_font_ft(dxs, dys, &vo_font, font_name, osd_font_scale_factor);
+                if (!sub_font) {
+                        if (mpctx_get_set_of_sub_size() > 0)
+                        {
+                                if (sub_font_name)
+                                        load_font_ft(dxs, dys, &sub_font, sub_font_name, text_font_scale_factor);
+                                else
+                                {
+                                        if(text_font_scale_factor==osd_font_scale_factor)
+                                                sub_font = vo_font;
+                                        else
+                                                load_font_ft(dxs, dys, &sub_font, font_name, text_font_scale_factor);
+                                }
+                        }
+                        else
+                                sub_font = vo_font;
+                }
+    }
+#else
         if (sub_font_name)
             load_font_ft(dxs, dys, &sub_font, sub_font_name, text_font_scale_factor);
         else
@@ -1160,6 +1208,7 @@ static int vo_update_osd_ext(int dxs,int dys, int left_border, int top_border,
                load_font_ft(dxs, dys, &sub_font, font_name, text_font_scale_factor);
        }
     }
+#endif
 #endif
 
     while(obj){

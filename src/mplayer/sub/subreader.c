@@ -31,6 +31,11 @@
 #include <dirent.h>
 #endif
 
+#ifdef GEKKO
+extern void BrowserGetSubInit();
+extern char * BrowserGetSub(char *filename);
+extern int BrowserFindSub(char *path);
+#endif
 #include "ass_mp.h"
 #include "config.h"
 #include "mp_msg.h"
@@ -686,7 +691,7 @@ static subtitle *sub_read_line_ssa(stream_t *st,subtitle *current, int utf16) {
  * http://www.eswat.demon.co.uk is where the SSA specs can be found
  */
         int comma;
-        static int max_comma = 32; /* let's use 32 for the case that the */
+        static int max_comma = 12; /* let's use 32 for the case that the */
                     /*  amount of commas increase with newer SSA versions */
 
         int hour1, min1, sec1, hunsec1,
@@ -760,6 +765,10 @@ static void sub_pp_ssa(subtitle *sub) {
                 so=de=sub->text[--l];
                 while (*so) {
                         if(*so == '{' && so[1]=='\\') {
+                                        /*      if(so[1]=='\\' && so[2]=='a' && so[3]=='n' && so[4]=='8')
+                                                        sub_pos=50;
+                                                else
+                                                        sub_pos=92; */
                                 for (start=so; *so && *so!='}'; so++);
                                 if(*so) so++; else so=start;
                         }
@@ -2019,10 +2028,20 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
     // 1 = any subtitle file
     // 2 = any sub file containing movie name
     // 3 = sub file containing movie name and the lang extension
+#ifndef GEKKO
     d = opendir(path);
     if (d) {
         mp_msg(MSGT_SUBREADER, MSGL_INFO, "Load subtitles in %s\n", path);
         while ((de = readdir(d))) {
+#else
+                de = (struct dirent*)malloc(sizeof(struct dirent));
+                BrowserGetSubInit();
+                while(BrowserGetSub(de->d_name))
+                {
+                //int h;
+                //for(h=0; h < BrowserGetSubSize(); h++) {
+                //strcpy(de->d_name, BrowserGetSub(h));
+#endif
             // retrieve various parts of the filename
             strcpy_strip_ext_lower(tmp_fname_noext, de->d_name);
             strcpy_get_ext(tmp_fname_ext, de->d_name);
@@ -2034,6 +2053,12 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
                 char *idx, *idxname = strdup(de->d_name);
 
                 strcpy(idxname + strlen(de->d_name) - sizeof("idx") + 1, "idx");
+#ifdef GEKKO
+                found = BrowserFindSub(idxname);
+                free(idxname);
+                if(found)
+                        continue;
+#else
                 idx = mp_dir_join(path, idxname);
                 free(idxname);
                 f = fopen(idx, "rt");
@@ -2042,6 +2067,7 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
                     fclose(f);
                     continue;
                 }
+#endif
             }
 
             // does it end with a subtitle extension?
@@ -2122,9 +2148,12 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
             if (slist->sid >= MAX_SUBTITLE_FILES)
                 break;
         }
+#ifdef GEKKO
+        free(de);
+#else
         closedir(d);
     }
-
+#endif
     free(tmp_sub_id);
 
     free(f_fname);
@@ -2138,7 +2167,8 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
     free(tmpresult);
 #endif
 }
-
+//extern int ext_lang;
+//extern int find_prob;
 /**
  * @brief Load all subtitles matching the subtitle filename
  *
@@ -2163,6 +2193,16 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
     if (!sub_auto || !fname)
         return;
 
+#ifdef GEKKO
+        if(strncmp(fname, "sd", 2) != 0 &&
+                strncmp(fname, "usb", 3) != 0 &&
+                strncmp(fname, "smb", 3) != 0 &&
+                strncmp(fname, "ftp", 3) != 0 &&
+                strncmp(fname, "dvd", 3) != 0)
+                return;
+        if(strncmp(fname, "dvd://", 6) == 0 || strncmp(fname, "dvdnav", 6) == 0) return;
+#endif
+
     slist.sid  = 0;
     slist.subs = calloc(MAX_SUBTITLE_FILES, sizeof(*slist.subs));
     if (!slist.subs)
@@ -2176,6 +2216,7 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
     append_dir_subtitles(&slist, path, fname, 0);
     free(path);
 
+#ifndef GEKKO
     // Load subtitles in dirs specified by sub-paths option
     if (sub_paths) {
         for (i = 0; sub_paths[i]; i++) {
@@ -2194,10 +2235,17 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
     if (mp_subdir)
         append_dir_subtitles(&slist, mp_subdir, fname, 1);
     free(mp_subdir);
+#endif
 
     // Sort subs by priority and append them
     qsort(slist.subs, slist.sid, sizeof(*slist.subs), compare_sub_priority);
     for (i = 0; i < slist.sid; i++) {
+                //find_prob = ext_lang;
+                //Right now, assumes multiple external subs are 0=Eng and 1=Esp
+                //This is a bad design but how else could I identify subtitles?
+                //If I want Esp to override English by default then the lang setting
+                //would pick the wrong subtitle.
+       // struct subfn *sub = &slist.subs[i+ext_lang];
         struct subfn *sub = &slist.subs[i];
         add_f(sub->fname, fps, 1);
         free(sub->fname);
@@ -2236,6 +2284,7 @@ void load_vob_subtitle(const char *fname, const char * const ifo, void **spu,
     if (add_f(name, ifo, 0, spu))
         goto out;
 
+#ifndef GEKKO
     // Try looking at the dirs specified by sub-paths option
     if (sub_paths) {
         int i;
@@ -2269,7 +2318,7 @@ void load_vob_subtitle(const char *fname, const char * const ifo, void **spu,
         add_f(psub, ifo, 0, spu);
         free(psub);
     }
-
+#endif
 out:
     free(mp_subdir);
     free(name);
@@ -2600,6 +2649,7 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
       if (c == '\\' && i + 1 < len) {
         c = txt[++i];
         if (c == 'n' || c == 'N') c = 0;
+                if (c == 'h') c = 0x20; // h is hard space, used in CC converted subs.
       }
       if (c == '\n' || c == '\r') c = 0;
       if (c) {

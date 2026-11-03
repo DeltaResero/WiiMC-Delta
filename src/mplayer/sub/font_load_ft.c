@@ -51,6 +51,14 @@
 #include "mpcommon.h"
 #include "path.h"
 #include "osd_font.h"
+/*
+#ifdef GEKKO
+#include "../../utils/mem2_manager.h"
+#define malloc(x) mem2_malloc(x,MEM2_OTHER)
+#define free(x) mem2_free(x,MEM2_OTHER)
+#define realloc(x,y) mem2_realloc(x,y,MEM2_OTHER)
+#define calloc(x,y) mem2_calloc(x,y,MEM2_OTHER)
+#endif*/
 
 #if (FREETYPE_MAJOR > 2) || (FREETYPE_MAJOR == 2 && FREETYPE_MINOR >= 1)
 #define HAVE_FREETYPE21
@@ -349,7 +357,7 @@ static void outline0(
 }
 
 // gaussian blur
-static void blur(
+/*static void blur(
         unsigned char *buffer,
         unsigned short *tmp2,
         int width,
@@ -470,7 +478,7 @@ static void blur(
         s+= stride;
         t+= width + 1;
     }
-}
+}*/
 
 static void resample_alpha(unsigned char *abuf, unsigned char *bbuf, int width, int height, int stride, float factor)
 {
@@ -600,9 +608,9 @@ void render_one_glyph(font_desc_t *desc, int c)
 //    fprintf(stderr, "fg: outline t = %f\n", GetTimer()-t);
 
     if (desc->tables.g_r) {
-        blur(abuffer+off, desc->tables.tmp, width, height, stride,
+        /*blur(abuffer+off, desc->tables.tmp, width, height, stride,
              desc->tables.gt2, desc->tables.g_r,
-             desc->tables.g_w);
+             desc->tables.g_w);*/
 //      fprintf(stderr, "fg: blur t = %f\n", GetTimer()-t);
     }
 
@@ -884,9 +892,11 @@ void free_font_desc(font_desc_t *desc)
     free(desc->tables.omt);
     free(desc->tables.tmp);
 
+#ifndef GEKKO
     for(i = 0; i < desc->face_cnt; i++) {
         FT_Done_Face(desc->faces[i]);
     }
+#endif
 
     free(desc);
 }
@@ -898,11 +908,19 @@ static int load_sub_face(const char *name, int face_index, FT_Face *face)
     if (name) err = FT_New_Face(library, name, face_index, face);
 
     if (err) {
+#ifndef GEKKO
         char *font_file = get_path("subfont.ttf");
         err = FT_New_Face(library, font_file, 0, face);
         free(font_file);
+#endif
         if (err) {
+#ifdef GEKKO
+                char cad[100];
+                sprintf(cad,"%s%s",MPLAYER_DATADIR,"/subfont.ttf");
+            err = FT_New_Face(library, cad, 0, face);
+#else
             err = FT_New_Face(library, MPLAYER_DATADIR "/subfont.ttf", 0, face);
+#endif
             if (err) {
                 mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_NewFaceFailed);
                 return -1;
@@ -994,7 +1012,22 @@ static font_desc_t* read_font_desc_ft(const char *fname, int face_index, int mov
 //    t=GetTimer();
 
     /* generate the subtitle font */
+#ifdef GEKKO
+        static FT_Face cache_face;
+        static int face_cached=0;
+
+        err = 0;
+
+        if(!face_cached)
+    {   //rodries: need to be improved, (detect fname change)
+        err = load_sub_face(fname, face_index, &cache_face);
+        if (!err)face_cached=1;
+    }
+
+    if (!err) face=cache_face;
+#else
     err = load_sub_face(fname, face_index, &face);
+#endif
     if (err) {
         mp_msg(MSGT_OSD, MSGL_WARN, MSGTR_LIBVO_FONT_LOAD_FT_SubFaceFailed);
         goto gen_osd;
@@ -1106,6 +1139,20 @@ int done_freetype(void)
 
     return 0;
 }
+
+#ifdef GEKKO
+void ReInitTTFLib()
+{
+        if (sub_font && sub_font != vo_font)
+                free_font_desc(sub_font);
+
+        if (vo_font)
+                free_font_desc(vo_font);
+
+        sub_font = NULL;
+        vo_font = NULL;
+}
+#endif
 
 void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_name, float font_scale_factor)
 {
