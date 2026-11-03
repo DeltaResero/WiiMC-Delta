@@ -102,3 +102,7 @@ Local changes:
   returns `AVERROR(ENOSYS)` for those types.
 - `configure`: the PowerPC probe for `dcbzl` only runs when the option is
   still on, so `--disable-dcbzl` takes effect.
+- `libavformat/matroskadec.c`, `libavformat/demux.c`: with
+  `FF_LEAN_ATTACHMENTS` the Matroska demuxer lets go of its own copy of an
+  attachment once the stream holds it, and an attachment stream's internal
+  codec context gets no copy.

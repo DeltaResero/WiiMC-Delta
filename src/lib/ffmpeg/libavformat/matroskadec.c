@@ -3539,6 +3539,13 @@ static int matroska_read_header(AVFormatContext *s)
                     break;
                 memcpy(st->codecpar->extradata, attachments[j].bin.data,
                        attachments[j].bin.size);
+#if FF_LEAN_ATTACHMENTS
+                /* Nothing reads the element's own copy after this; on a
+                 * console with 88 MiB of RAM a large font attachment
+                 * shouldn't be held twice for the life of the demuxer. */
+                av_buffer_unref(&attachments[j].bin.buf);
+                attachments[j].bin.data = NULL;
+#endif
 
                 for (i = 0; mkv_mime_tags[i].id != AV_CODEC_ID_NONE; i++) {
                     if (av_strstart(attachments[j].mime, mkv_mime_tags[i].str, NULL)) {

@@ -2679,6 +2679,14 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
         ret = avcodec_parameters_to_context(avctx, st->codecpar);
         if (ret < 0)
             goto find_stream_info_err;
+#if FF_LEAN_ATTACHMENTS
+        /* No decoder runs on an attachment, so its internal context needs
+         * no copy of the attached file. */
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
+            av_freep(&avctx->extradata);
+            avctx->extradata_size = 0;
+        }
+#endif
         if (sti->request_probe <= 0)
             sti->avctx_inited = 1;
 
