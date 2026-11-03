@@ -93,7 +93,7 @@ extern const vf_info_t vf_info_palette;
 extern const vf_info_t vf_info_perspective;
 extern const vf_info_t vf_info_phase;
 extern const vf_info_t vf_info_pp7;
-extern const vf_info_t vf_info_pp;
+//extern const vf_info_t vf_info_pp;
 extern const vf_info_t vf_info_pullup;
 extern const vf_info_t vf_info_qp;
 extern const vf_info_t vf_info_rectangle;
@@ -150,7 +150,7 @@ static const vf_info_t* const filter_list[]={
     &vf_info_geq,
 #endif
 #ifdef CONFIG_POSTPROC
-    &vf_info_pp,
+   // &vf_info_pp,
 #endif
 #ifdef CONFIG_ZR
     &vf_info_zrmjpeg,

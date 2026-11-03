@@ -252,6 +252,15 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
         lavc_codec->id != AV_CODEC_ID_INTERPLAY_VIDEO &&
         lavc_codec->id != AV_CODEC_ID_H264 &&
         lavc_codec->id != AV_CODEC_ID_HEVC;
+#ifdef GEKKO
+    // vo_gekko has no buffers of its own, so direct rendering only decodes
+    // into filter-allocated images. FFmpeg's reference-counted MPEG-style
+    // decoders hold a third reference, which MPlayer's I/P image pair can't
+    // give ("DRI failure"), and the switch to FFmpeg's buffers that follows
+    // changes the stride for widths it pads (176, 720), which those
+    // decoders refuse for the rest of the file.
+    ctx->do_dr1 = 0;
+#endif
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
     // and seeking, usually failing with the "Ran out of numbered images" message,
@@ -997,8 +1006,10 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 //--
 
     if(!got_picture) {
+        // A frame dropped above (skip_frame raised to NONREF) gives no
+        // picture either, but it still has to advance the video timer.
         if (avctx->codec->id == AV_CODEC_ID_H264 &&
-        skip_frame <= AVDISCARD_DEFAULT)
+        avctx->skip_frame <= AVDISCARD_DEFAULT)
         return &mpi_no_picture; // H.264 first field only
     else
         return NULL;    // skipped image

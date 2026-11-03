@@ -875,6 +875,17 @@ void codecs_uninit_free(void) {
     codec_strs_len = 0;
 }
 
+#ifdef GEKKO
+void load_builtin_codecs() {
+    video_codecs = builtin_video_codecs;
+    audio_codecs = builtin_audio_codecs;
+    nr_vcodecs = sizeof(builtin_video_codecs)/sizeof(codecs_t);
+    nr_acodecs = sizeof(builtin_audio_codecs)/sizeof(codecs_t);
+    codec_strs = builtin_codec_strs;
+    codec_strs_len = sizeof(builtin_codec_strs);
+}
+#endif
+
 codecs_t *find_audio_codec(unsigned int fourcc, unsigned int *fourccmap,
                            codecs_t *start, int force)
 {
