@@ -133,7 +133,7 @@ const demuxer_desc_t *const demuxer_list[] = {
 #endif
     &demuxer_desc_avi,
     &demuxer_desc_y4m,
-    &demuxer_desc_asf,
+    //&demuxer_desc_asf,
     &demuxer_desc_nsv,
     &demuxer_desc_real,
     &demuxer_desc_smjpeg,
@@ -721,7 +721,16 @@ int ds_fill_buffer(demux_stream_t *ds)
         // This needs to be enough for at least 1 second of packets
         // since libavformat mov demuxer does not try to interleave
         // with more than 1s precision.
+#ifdef GEKKO
+        // Not on the Wii, as in CE: it counts each 2 KB MPEG-PS pack as a
+        // packet, and filling WiiMC's audio buffer at the start reads
+        // more than 80 video packs ahead, which ended the audio stream
+        // and left the video at its first frame. The MAX_PACKS and
+        // MAX_PACK_BYTES limits below still apply.
+        if (0) {
+#else
         if (!force_ni && ds->fill_count > 80) {
+#endif
             static int once;
             if (!once) {
                 mp_msg(MSGT_DEMUXER, MSGL_WARN, "Possibly bad interleaving detected.\n"
@@ -1601,8 +1610,9 @@ int demuxer_add_attachment(demuxer_t *demuxer, const char *name,
 
     demuxer->attachments[demuxer->num_attachments].name = name ? strdup(name) : NULL;
     demuxer->attachments[demuxer->num_attachments].type = strdup(type);
-    demuxer->attachments[demuxer->num_attachments].data = malloc(size);
-    memcpy(demuxer->attachments[demuxer->num_attachments].data, data, size);
+    demuxer->attachments[demuxer->num_attachments].data = data ? malloc(size) : NULL;
+    if (data)
+        memcpy(demuxer->attachments[demuxer->num_attachments].data, data, size);
     demuxer->attachments[demuxer->num_attachments].data_size = size;
 
     return demuxer->num_attachments++;
@@ -1623,9 +1633,9 @@ int demuxer_add_chapter(demuxer_t *demuxer, const char *name, uint64_t start,
     demuxer->chapters[demuxer->num_chapters].name = strdup(name ? name : MSGTR_Unknown);
 
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_ID=%d\n", demuxer->num_chapters);
-    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_START=%"PRIu64"\n", demuxer->num_chapters, start);
+    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_START=%"PRIu64"\n", demuxer->num_chapters, start / 1000000);
     if (end)
-        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_END=%"PRIu64"\n", demuxer->num_chapters, end);
+        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_END=%"PRIu64"\n", demuxer->num_chapters, end / 1000000);
     if (name)
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_NAME=%s\n", demuxer->num_chapters, name);
 
@@ -1715,7 +1725,7 @@ int demuxer_seek_chapter(demuxer_t *demuxer, int chapter, int mode,
         if (current < 0)
             current = 0;
 
-        *seek_pts = demuxer->chapters[current].start / 1000.0;
+        *seek_pts = demuxer->chapters[current].start / 1e9;
 
         if (num_chapters)
             *num_chapters = demuxer->num_chapters;
@@ -1743,7 +1753,7 @@ int demuxer_get_current_chapter(demuxer_t *demuxer)
         sh_audio_t *sh_audio = demuxer->audio->sh;
         uint64_t now;
         now = (sh_video ? sh_video->pts : (sh_audio ? sh_audio->pts : 0))
-              * 1000 + 0.5;
+              * 1e9 + 0.5;
         for (chapter = demuxer->num_chapters - 1; chapter >= 0; --chapter) {
             if (demuxer->chapters[chapter].start <= now)
                 break;
@@ -1786,8 +1796,10 @@ float demuxer_chapter_time(demuxer_t *demuxer, int chapter, float *end)
     if (demuxer->num_chapters && demuxer->chapters && chapter >= 0
         && chapter < demuxer->num_chapters) {
         if (end)
-            *end = demuxer->chapters[chapter].end / 1000.0;
-        return demuxer->chapters[chapter].start / 1000.0;
+          //  *end = demuxer->chapters[chapter].end / 1000.0;
+        //return demuxer->chapters[chapter].start / 1000.0;
+                 *end = demuxer->chapters[chapter].end / 1e9;
+        return demuxer->chapters[chapter].start / 1e9;
     }
     return -1.0;
 }

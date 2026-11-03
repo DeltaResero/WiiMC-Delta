@@ -646,6 +646,15 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
       break;
       case DEMUXER_TYPE_LAVF:
       case DEMUXER_TYPE_LAVF_PREFERRED:
+        // Newer FFmpeg takes r_frame_rate from the codec, which can
+        // disagree with the container (H.264 declaring 23.976 fps in a
+        // 29.97 fps Matroska file), so prefer the packet's own duration.
+        if(d_video->current && d_video->current->pts != MP_NOPTS_VALUE &&
+           d_video->current->endpts != MP_NOPTS_VALUE &&
+           d_video->current->endpts > d_video->current->pts){
+          frame_time = d_video->current->endpts - d_video->current->pts;
+          break;
+        }
         if((int)sh_video->fps==1000 || (int)sh_video->fps<=1){
           double next_pts = ds_get_next_pts(d_video);
           double d= (next_pts != MP_NOPTS_VALUE) ? next_pts - d_video->pts : d_video->pts-pts1;

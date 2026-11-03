@@ -528,9 +528,22 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             if (st->codecpar->codec_id == AV_CODEC_ID_TTF || st->codecpar->codec_id == AV_CODEC_ID_OTF) {
                 AVDictionaryEntry *fnametag = av_dict_get(st->metadata, "filename", NULL, 0);
                 AVDictionaryEntry *mimetype = av_dict_get(st->metadata, "mimetype", NULL, 0);
+#ifdef GEKKO
+                // WiiMC never loads attached fonts, it only notes that the
+                // file has one; copying a font of several MiB would add to
+                // the copies lavf already keeps and leave H.264 without
+                // room for its frames. Register it without data and free
+                // lavf's extradata copy, which nothing reads after this.
+                demuxer_add_attachment(demuxer, fnametag ? fnametag->value : NULL,
+                                       mimetype ? mimetype->value : "application/x-font",
+                                       NULL, codec->extradata_size);
+                av_freep(&codec->extradata);
+                codec->extradata_size = 0;
+#else
                 demuxer_add_attachment(demuxer, fnametag ? fnametag->value : NULL,
                                        mimetype ? mimetype->value : "application/x-font",
                                        codec->extradata, codec->extradata_size);
+#endif
             }
             break;
         }
@@ -643,8 +656,10 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
     for(i=0; i < avfc->nb_chapters; i++) {
         AVChapter *c = avfc->chapters[i];
-        uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000});
-        uint64_t end   = av_rescale_q(c->end, c->time_base, (AVRational){1,1000});
+      //  uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000});
+        //uint64_t end   = av_rescale_q(c->end, c->time_base, (AVRational){1,1000});
+                uint64_t start = av_rescale_q(c->start, c->time_base, (AVRational){1,1000000000});
+        uint64_t end   = av_rescale_q(c->end, c->time_base, (AVRational){1,1000000000});
         t = av_dict_get(c->metadata, "title", NULL, 0);
         demuxer_add_chapter(demuxer, t ? t->value : NULL, start, end);
     }
