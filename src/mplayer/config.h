@@ -38,9 +38,10 @@
 
 #define CONFIGURATION "--enable-cross-compile --cc=powerpc-eabi-gcc --host-cc=gcc --target=ppc-linux --enable-big-endian --ar=powerpc-eabi-ar --ranlib=powerpc-eabi-ranlib --nm=powerpc-eabi-nm --as=powerpc-eabi-as --windres=false --disable-ffmpeg_a --enable-static --disable-mencoder --disable-gui --disable-x11 --disable-xv --disable-gl --disable-sdl --disable-alsa --disable-ossaudio --disable-pulse --disable-jack --disable-openal --disable-arts --disable-esd --disable-nas --enable-iconv --disable-dvdread --disable-dvdnav --enable-freetype --disable-fontconfig --enable-ass --enable-ass-internal --enable-networking --enable-ftp --disable-inet6 --disable-unrarexec --disable-termcap --disable-termios --disable-lirc --disable-lircc --disable-joystick --disable-vcd --disable-bluray --disable-cdparanoia --disable-cddb --disable-tv --disable-dvb --disable-pvr --disable-radio --disable-smb --disable-live --disable-nemesi --disable-mad --disable-mp3lame --disable-faad --disable-libvorbis --disable-tremor --disable-mpg123 --disable-libopus --disable-liba52 --disable-libmpeg2 --disable-fribidi --disable-speex --disable-theora --disable-png --disable-jpeg --disable-gif --disable-mng --disable-win32dll --disable-qtx --disable-xanim --disable-real --disable-altivec --disable-vidix --disable-fbdev --disable-runtime-cpudetection --disable-md5sum --disable-yuv4mpeg --disable-pnm --disable-tga --extra-cflags=-DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -D_GNU_SOURCE -I<DEVKITPRO>/libogc/include -I<DEVKITPRO>/portlibs/ppc/include -I<EXTPREFIX>/include --extra-ldflags=-DGEKKO -mrvl -mcpu=750 -meabi -mhard-float -L<DEVKITPRO>/libogc/lib/wii -L<DEVKITPRO>/portlibs/ppc/lib -L<EXTPREFIX>/lib --extra-libs=-liconv -lbrotlicommon -logc -lm"
 
-#define MPLAYER_DATADIR "/usr/local/share/mplayer"
-#define MPLAYER_CONFDIR "/usr/local/etc/mplayer"
-#define MPLAYER_LIBDIR "/usr/local/lib"
+extern char MPLAYER_DATADIR[512];
+extern char MPLAYER_CONFDIR[512];
+extern char MPLAYER_LIBDIR[512];
+extern char MPLAYER_CSSDIR[512];
 
 /* definitions needed by included libraries */
 /* libmpeg2 */
