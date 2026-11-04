@@ -94,7 +94,7 @@ bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize)
     if(!ftSlot)
         return false;
 
-    for(int i=0; i<50; i++)
+    for(int i=0; i<=MAX_FONT_SIZE; i++)
     {
         fontSystem[i] = NULL;
         fontSystemBold[i] = NULL;
@@ -118,7 +118,7 @@ void ChangeFontSize(FT_UInt pixelSize)
 
 void ClearFontData()
 {
-    for(int i=0; i<50; i++)
+    for(int i=0; i<=MAX_FONT_SIZE; i++)
     {
         if(fontSystem[i])
             delete fontSystem[i];
