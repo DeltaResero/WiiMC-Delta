@@ -38,6 +38,8 @@ CFLAGS		=	-g -O3 -Wall $(MACHDEP) $(INCLUDE) $(FREETYPE_CFLAGS) \
 CXXFLAGS	=	$(CFLAGS)
 LDFLAGS		=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 LDFLAGS		+=	-L../buildtools
+# src/utils/tls.c shares one parsed CA bundle with FFmpeg's connections
+LDFLAGS		+=	-Wl,--wrap=mbedtls_x509_crt_parse_file,--wrap=mbedtls_ssl_conf_ca_chain
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project

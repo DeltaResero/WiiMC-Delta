@@ -37,10 +37,24 @@ struct wiimc_tls {
     mbedtls_ssl_context ssl;
 };
 
-/* The CA bundle is parsed once and then only read, by every connection. */
+/* The CA bundle is parsed once and then only read, by every connection:
+ * WiiMC's own and, through the wrappers below, FFmpeg's. */
 static mbedtls_x509_crt ca_chain;
 static int ca_state; /* 0 not loaded yet, 1 loaded, -1 failed */
+static int ca_error;
 static mutex_t ca_mutex = LWP_MUTEX_NULL;
+
+int __real_mbedtls_x509_crt_parse_file(mbedtls_x509_crt *chain, const char *path);
+int __wrap_mbedtls_x509_crt_parse_file(mbedtls_x509_crt *chain, const char *path);
+void __real_mbedtls_ssl_conf_ca_chain(mbedtls_ssl_config *conf, mbedtls_x509_crt *ca,
+    mbedtls_x509_crl *crl);
+void __wrap_mbedtls_ssl_conf_ca_chain(mbedtls_ssl_config *conf, mbedtls_x509_crt *ca,
+    mbedtls_x509_crl *crl);
+
+static void ca_path(char *path, size_t size)
+{
+    snprintf(path, size, "%s/cacert.pem", appPath);
+}
 
 static int load_ca_chain(void)
 {
@@ -51,13 +65,14 @@ static int load_ca_chain(void)
         LWP_MutexInit(&ca_mutex, false);
     LWP_MutexLock(ca_mutex);
     if (ca_state == 0) {
-        snprintf(path, sizeof(path), "%s/cacert.pem", appPath);
+        ca_path(path, sizeof(path));
         mbedtls_x509_crt_init(&ca_chain);
-        ret = mbedtls_x509_crt_parse_file(&ca_chain, path);
+        ret = __real_mbedtls_x509_crt_parse_file(&ca_chain, path);
         // a positive result counts certificates that failed to parse
         if (ret < 0 || ca_chain.version == 0) {
             printf("tls: no usable CA bundle at %s (%d), https is not available\n", path, ret);
             mbedtls_x509_crt_free(&ca_chain);
+            ca_error = ret < 0 ? ret : MBEDTLS_ERR_X509_INVALID_FORMAT;
             ca_state = -1;
         } else {
             ca_state = 1;
@@ -65,6 +80,29 @@ static int load_ca_chain(void)
     }
     LWP_MutexUnlock(ca_mutex);
     return ca_state == 1;
+}
+
+/* The DOL is linked with --wrap for these two. FFmpeg's tls_mbedtls.c
+ * parses its CA file into a chain of its own for every connection; when
+ * that file is WiiMC's bundle, its chain is left empty and the shared one
+ * is configured in its place. Other files are parsed as before. */
+int __wrap_mbedtls_x509_crt_parse_file(mbedtls_x509_crt *chain, const char *path)
+{
+    char ours[1024];
+
+    ca_path(ours, sizeof(ours));
+    if (strcmp(path, ours) == 0 && chain->version == 0)
+        return load_ca_chain() ? 0 : ca_error;
+
+    return __real_mbedtls_x509_crt_parse_file(chain, path);
+}
+
+void __wrap_mbedtls_ssl_conf_ca_chain(mbedtls_ssl_config *conf, mbedtls_x509_crt *ca,
+    mbedtls_x509_crl *crl)
+{
+    if (ca && ca != &ca_chain && ca->version == 0 && ca_state == 1)
+        ca = &ca_chain;
+    __real_mbedtls_ssl_conf_ca_chain(conf, ca, crl);
 }
 
 static int bio_send(void *ctx, const unsigned char *buf, size_t len)
