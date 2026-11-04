@@ -55,6 +55,8 @@
 
 double sub_last_pts = -303;
 
+static int an8_saved_pos = -1; // sub_pos to restore after {\an8} lines
+
 #ifdef CONFIG_ASS
 ASS_Track* ass_track = 0; // current track to render
 #endif
@@ -355,6 +357,14 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
                         continue;
                     len -= p - packet;
                     packet = p;
+                    if (len >= 5 && memcmp(packet, "{\\an8", 5) == 0) {
+                        if (an8_saved_pos < 0)
+                            an8_saved_pos = sub_pos;
+                        sub_pos = 20;
+                    } else if (an8_saved_pos >= 0) {
+                        sub_pos = an8_saved_pos;
+                        an8_saved_pos = -1;
+                    }
                 }
                 if (endpts == MP_NOPTS_VALUE) endpts = subpts + 4;
                 sub_add_text(&subs, packet, len, endpts, 1);
@@ -581,6 +591,7 @@ void common_preinit(int *argc_ptr, char **argv_ptr[])
  */
 int common_init(void)
 {
+#ifndef GEKKO
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL)
     set_path_env();
 #endif
@@ -603,7 +614,7 @@ int common_init(void)
         }
         free(conf_path);
     }
-
+#endif
     // check font
 #ifdef CONFIG_FREETYPE
     init_freetype();

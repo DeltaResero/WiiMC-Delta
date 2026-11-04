@@ -76,6 +76,9 @@
 #include "edl.h"
 
 #define IS_STREAMTYPE(t) (mpctx->stream && mpctx->stream->type == STREAMTYPE_##t)
+#ifdef GEKKO
+extern int copyScreen;
+#endif
 
 static void rescale_input_coordinates(int ix, int iy, double *dx, double *dy)
 {
@@ -2767,11 +2770,20 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             file_filter = cmd->args[0].v.i;
             break;
 
-        case MP_CMD_QUIT: {
+        case MP_CMD_QUIT:
+#ifdef GEKKO
+            // back to the GUI: pause and leave the play loop
+            cmd->pausing = 1;
+            brk_cmd = 1;
+            copyScreen = 1;
+            break;
+#else
+            {
                 int rc = cmd->nargs > 0 ? cmd->args[0].v.i : 0;
                 mp_cmd_free(cmd);
                 exit_player_with_rc(EXIT_QUIT, rc);
             }
+#endif
         case MP_CMD_PLAY_TREE_STEP:{
                 int n = cmd->args[0].v.i == 0 ? 1 : cmd->args[0].v.i;
                 int force = cmd->args[1].v.i;
@@ -3371,7 +3383,7 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             break;
 
         case MP_CMD_RUN:
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(GEKKO)
             if (!fork()) {
                 char *exp_cmd = property_expand_string(mpctx, cmd->args[0].v.s);
                 if (exp_cmd) {
