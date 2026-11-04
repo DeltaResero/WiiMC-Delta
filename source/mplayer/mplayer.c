@@ -3992,20 +3992,8 @@ stream_cache_min_percent=0.2;
     initialized_flags |= INITIALIZED_DEMUXER;
 
 #ifdef CONFIG_ASS
-    if (ass_enabled && ass_library) {
-        for (i = 0; i < mpctx->demuxer->num_attachments; ++i) {
-            demux_attachment_t *att = mpctx->demuxer->attachments + i;
-           /* if (extract_embedded_fonts &&
-                att->name && att->type && att->data && att->data_size &&
-                (strcmp(att->type, "application/x-truetype-font") == 0 ||
-                 strcmp(att->type, "application/x-font") == 0))
-                ass_add_font(ass_library, att->name, att->data, att->data_size); */
-              if (alt_font && att->name && att->type && att->data && att->data_size &&
-                  //(strcmp(att->type, "application/x-truetype-font") == 0 ||
-                   (strcmp(att->type, "application/x-font")))
-                     monospaced = 1;
-        }
-    }
+    if (ass_enabled && ass_library)
+        monospaced = alt_font; // the Monospaced subtitle setting, for every file
 #endif
 
     current_module = "demux_open2";
