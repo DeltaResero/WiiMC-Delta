@@ -121,3 +121,14 @@ Local changes:
   (`LICENSE`); WiiMC takes it under GPL 2.0 or later.
 - Trimmed to the library: `include/`, `library/`, `LICENSE` and
   `README.md`.
+
+Local changes:
+
+- `include/mbedtls/mbedtls_config.h` is WiiMC's configuration: a TLS 1.2
+  client (ECDHE-RSA, ECDHE-ECDSA and RSA key exchange; AES-GCM, AES-CBC and
+  ChaCha20-Poly1305; P-256, P-384, P-521 and X25519; SHA-1 to SHA-512),
+  X.509 certificate parsing, PEM, and CA files from SD or USB. Server
+  records up to 16 KiB are accepted; the client's own are at most 4 KiB.
+- `src/lib/mbedtls-wii/platform_wii.c`, outside the vendored tree and built
+  into `libmbedcrypto.a`, supplies the millisecond clock and the entropy
+  source for the Wii.
