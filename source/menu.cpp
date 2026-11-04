@@ -1472,6 +1472,7 @@ void ChangeLanguage()
                 break;
         #endif
             case LANG_ENGLISH:
+            case LANG_GERMAN:
             case LANG_SPANISH:
             //case LANG_FRENCH:
                 //if(currentFont == FONT_GENERIC) return;
@@ -4528,6 +4529,9 @@ static void MenuSettingsGlobal()
             case 0:
                 switch (WiiSettings.language) {
                     case LANG_ENGLISH:
+                        WiiSettings.language = LANG_GERMAN;
+                        break;
+                    case LANG_GERMAN:
                         WiiSettings.language = LANG_SPANISH;
                         break;
                     case LANG_SPANISH:
@@ -4707,7 +4711,7 @@ static void MenuSettingsGlobal()
                 //case LANG_JAPANESE:               sprintf(options.value[0], "Japanese"); break;
                 case LANG_ENGLISH:              sprintf(options.value[0], "English"); break;
                 //only support languages that can have all text translated
-                //case LANG_GERMAN:             sprintf(options.value[0], "Deutsch"); break;
+                case LANG_GERMAN:               sprintf(options.value[0], "Deutsch"); break;
                 //case LANG_FRENCH:             sprintf(options.value[0], "Français"); break;
                 case LANG_SPANISH:              sprintf(options.value[0], "Español"); break;
                 /*case LANG_ITALIAN:                sprintf(options.value[0], "Italiano"); break;
