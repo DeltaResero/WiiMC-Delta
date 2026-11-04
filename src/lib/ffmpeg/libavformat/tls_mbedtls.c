@@ -32,6 +32,19 @@
 #include <psa/crypto.h>
 #endif
 
+/* Generating a key and certificate (listen mode, WHIP) and DTLS need
+ * optional mbedTLS modules; without them those requests return ENOSYS. */
+#if defined(MBEDTLS_X509_CRT_WRITE_C) && defined(MBEDTLS_PK_WRITE_C) && defined(MBEDTLS_PEM_WRITE_C)
+#define TLS_MBEDTLS_GEN_CERT 1
+#else
+#define TLS_MBEDTLS_GEN_CERT 0
+#endif
+#if defined(MBEDTLS_SSL_PROTO_DTLS) && defined(MBEDTLS_TIMING_C)
+#define TLS_MBEDTLS_DTLS 1
+#else
+#define TLS_MBEDTLS_DTLS 0
+#endif
+
 #include "config_components.h"
 
 #include "avformat.h"
@@ -110,6 +123,7 @@ end:
     return ret;
 }
 
+#if TLS_MBEDTLS_GEN_CERT
 static int mbedtls_gen_pkey(mbedtls_pk_context *key)
 {
     int ret = 0;
@@ -242,6 +256,13 @@ end:
     mbedtls_pk_free(&key);
     return ret;
 }
+#else
+int ff_ssl_gen_key_cert(char *key_buf, size_t key_sz, char *cert_buf, size_t cert_sz, char **fingerprint)
+{
+    av_log(NULL, AV_LOG_ERROR, "TLS: key generation is not supported in this mbedtls build\n");
+    return AVERROR(ENOSYS);
+}
+#endif
 
 typedef struct dtls_srtp_keys {
     unsigned char master_secret[48];
@@ -609,6 +630,7 @@ static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **op
     }
 
     if (shr->listen && !shr->cert_file && !shr->cert_buf && !shr->key_file && !shr->key_buf) {
+#if TLS_MBEDTLS_GEN_CERT
         char buf[4096];
         if ((ret = mbedtls_gen_pkey(&tls_ctx->priv_key)) != 0) {
             av_log(h, AV_LOG_ERROR, "failed to generate priv_key, returned %d\n", ret);
@@ -622,6 +644,10 @@ static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **op
             av_log(h, AV_LOG_ERROR, "failed to parse generated cert, returned %d\n", ret);
             goto fail;
         }
+#else
+        av_log(h, AV_LOG_ERROR, "Generating a certificate is not supported in this mbedtls build\n");
+        goto fail;
+#endif
     }
 
     if ((ret = mbedtls_ssl_config_defaults(&tls_ctx->ssl_config,
@@ -652,7 +678,10 @@ static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **op
         goto fail;
     }
     if (shr->is_dtls) {
+#if TLS_MBEDTLS_DTLS
+#if defined(MBEDTLS_SSL_DTLS_HELLO_VERIFY) && defined(MBEDTLS_SSL_SRV_C)
         mbedtls_ssl_conf_dtls_cookies(&tls_ctx->ssl_config, NULL, NULL, NULL);
+#endif
         if (shr->use_srtp) {
 #if defined(MBEDTLS_SSL_DTLS_SRTP)
             if ((ret = mbedtls_ssl_conf_dtls_srtp_protection_profiles(&tls_ctx->ssl_config, profiles)) != 0) {
@@ -666,7 +695,10 @@ static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **op
             goto fail;
 #endif
         }
-
+#else
+        av_log(h, AV_LOG_ERROR, "DTLS is not supported in this mbedtls build\n");
+        goto fail;
+#endif
     }
     if ((ret = mbedtls_ssl_setup(&tls_ctx->ssl_context, &tls_ctx->ssl_config)) != 0) {
         av_log(h, AV_LOG_ERROR, "mbedtls_ssl_setup returned %d\n", ret);
@@ -683,11 +715,13 @@ static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **op
     // set I/O functions to use FFmpeg internal code for transport layer
     mbedtls_ssl_set_bio(&tls_ctx->ssl_context, tls_ctx, mbedtls_send, mbedtls_recv, NULL);
 
+#if TLS_MBEDTLS_DTLS
     if (shr->is_dtls) {
         mbedtls_ssl_set_timer_cb(&tls_ctx->ssl_context, &tls_ctx->timer, mbedtls_timing_set_delay, mbedtls_timing_get_delay);
         if (shr->mtu)
             mbedtls_ssl_set_mtu(&tls_ctx->ssl_context, shr->mtu);
     }
+#endif
     if (!shr->external_sock) {
         ret = tls_handshake(h);
         if (ret < 0)

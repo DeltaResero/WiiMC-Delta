@@ -66,7 +66,7 @@ FFMPEG_WII := \
 	-DFF_LEAN_ATTACHMENTS=1 \
 	-DFF_HEAP_TABLES=1
 
-FFMPEG_CFLAGS := $(MACHDEP) $(FFMPEG_WII) -I$(LIBOGC_INC) -I$(DEVKITPRO)/portlibs/ppc/include \
+FFMPEG_CFLAGS := $(MACHDEP) $(FFMPEG_WII) -I$(EXTPREFIX)/include -I$(LIBOGC_INC) -I$(DEVKITPRO)/portlibs/ppc/include \
 	-fno-asynchronous-unwind-tables -DTCP_MAXSEG=2
 
 ffmpeg_comma := ,
@@ -76,24 +76,30 @@ ffmpeg_list = $(subst $(ffmpeg_space),$(ffmpeg_comma),$(strip $(1)))
 
 # --target-os=none: bare metal, newlib and libsysbase provide the libc.
 # --disable-dcbzl: dcbzl is a 970 instruction the Wii's 750CL doesn't have.
+# Networking is only for https://, which MPlayer hands to lavf: the https
+# protocol (with tls and tcp) over mbedTLS and libogc's BSD sockets.
+# MPlayer's own stream layer still does http, ftp and the rest.
+# --enable-version3: FFmpeg counts mbedTLS as Apache 2.0, which needs GPL 3;
+# WiiMC is GPL 3 already.
 FFMPEG_CONFIGURE := \
 	--prefix=$(EXTPREFIX) \
 	--enable-cross-compile --cross-prefix=powerpc-eabi- \
 	--arch=ppc --cpu=750 --target-os=none \
 	--pkg-config=false \
-	--enable-static --disable-shared --enable-gpl \
+	--enable-static --disable-shared --enable-gpl --enable-version3 \
 	--disable-programs --disable-doc --disable-avdevice --disable-avfilter \
 	--disable-autodetect \
 	--disable-pthreads --disable-w32threads --disable-os2threads \
 	--disable-runtime-cpudetect --disable-debug \
 	--disable-dcbzl \
-	--enable-zlib \
+	--enable-zlib --enable-mbedtls \
 	--disable-everything \
 	--enable-decoder=$(call ffmpeg_list,$(FFMPEG_DECODERS)) \
 	--enable-demuxer=$(call ffmpeg_list,$(FFMPEG_DEMUXERS)) \
 	--enable-parser=$(call ffmpeg_list,$(FFMPEG_PARSERS)) \
 	--enable-bsf=$(call ffmpeg_list,$(FFMPEG_BSFS)) \
+	--enable-protocol=https \
 	--enable-swscale --enable-swresample \
 	--extra-cflags="$(FFMPEG_CFLAGS)" \
-	--extra-ldflags="$(MACHDEP) -L$(LIBOGC_LIB) -L$(DEVKITPRO)/portlibs/ppc/lib" \
+	--extra-ldflags="$(MACHDEP) -L$(EXTPREFIX)/lib -L$(LIBOGC_LIB) -L$(DEVKITPRO)/portlibs/ppc/lib" \
 	--extra-libs="-logc -lm"

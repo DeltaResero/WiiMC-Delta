@@ -43,6 +43,7 @@ LDFLAGS		+=	-L../buildtools
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lswresample -lavutil \
+                        -lmbedtls -lmbedx509 -lmbedcrypto \
                         -ljpeg -ldi -liso9660 -liconv -lpng -lz -lmxml $(FREETYPE_LIBS) \
                         -lfat -lwiiuse -lbte -logc -ltinysmb
 
@@ -211,7 +212,7 @@ $(MBEDTLSLIBS): $(MBEDTLSHDR)
 
 # FFmpeg 9: reconfigured from scratch when its options change, rebuilt and
 # reinstalled when any of its sources change. VPATH is WiiMC's, not FFmpeg's.
-$(FFBUILD)/ffbuild/config.mak: $(LIBSRC)/ffmpeg-wii.mak $(FFSRC)/configure
+$(FFBUILD)/ffbuild/config.mak: $(LIBSRC)/ffmpeg-wii.mak $(FFSRC)/configure $(MBEDTLSLIBS)
 	@rm -rf $(FFBUILD); mkdir -p $(FFBUILD)
 	cd $(FFBUILD) && $(FFSRC)/configure $(FFMPEG_CONFIGURE) > configure.log || { tail -30 configure.log; false; }
 
