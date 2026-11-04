@@ -25,6 +25,11 @@ Monospaced subtitle setting is on, which keeps closed captions lined up.
 - Cut down the same way to Basic Latin, Latin-1, Latin Extended-A,
   punctuation, currency signs and the other symbols closed captions use
   (`U+2120-2122`, `U+250C`, `U+2510`, `U+2514`, `U+2518`, `U+2588`).
+- Every character takes exactly one cell, so captions stay lined up. Noto
+  Sans Mono draws nine symbols two or three cells wide (such as `‱`, `※` and
+  the replacement character `�`), so the cut leaves them out and a missing
+  character shows as a one-cell box. Its fraction slash `⁄` has no width,
+  so it gets a cell of its own, and the font is marked fixed-pitch.
 
 Neither Noto font has a music note, which captions use for songs, so both
 get ♪ and ♫ (`U+266A`, `U+266B`) copied in from Noto Sans Symbols Bold, also
