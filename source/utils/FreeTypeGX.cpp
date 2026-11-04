@@ -169,7 +169,6 @@ FreeTypeGX::FreeTypeGX(FT_UInt pixelSize, bool bold, uint8_t vertexIndex)
     this->setCompatibilityMode(FTGX_COMPATIBILITY_DEFAULT_TEVOP_GX_PASSCLR | FTGX_COMPATIBILITY_DEFAULT_VTXDESC_GX_NONE);
     this->ftPointSize = pixelSize;
     this->bold = bold;
-    this->ftKerningEnabled = FT_HAS_KERNING(ftFace);
 }
 /**
  * Default destructor for the FreeTypeGX class.
@@ -363,7 +362,6 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode)
             this->fontData[charCode] = (ftgxCharData){
                 ftSlot->bitmap_left,
                 ftSlot->advance.x >> 6,
-                gIndex,
                 textureWidth,
                 textureHeight,
                 ftSlot->bitmap_top,
@@ -513,7 +511,6 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
     uint16_t x_pos = x, printed = 0;
     uint16_t x_offset = 0, y_offset = 0;
     GXTexObj glyphTexture;
-    FT_Vector pairDelta;
     ftgxDataOffset offset;
 
     if(!text)
@@ -544,12 +541,6 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
 
         if (glyphData != NULL)
         {
-            if (this->ftKerningEnabled && i)
-            {
-                FT_Get_Kerning(ftFace, this->fontData[text[i - 1]].glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
-                x_pos += pairDelta.x >> 6;
-            }
-
             GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
             this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos + glyphData->renderOffsetX + x_offset, y - glyphData->renderOffsetY + y_offset, color);
 
@@ -599,7 +590,6 @@ void FreeTypeGX::drawTextFeature(int16_t x, int16_t y, uint16_t width, ftgxDataO
 uint16_t FreeTypeGX::getWidth(wchar_t *text)
 {
     uint16_t strWidth = 0;
-    FT_Vector pairDelta;
 
     int i = 0;
     while (text[i])
@@ -613,11 +603,6 @@ uint16_t FreeTypeGX::getWidth(wchar_t *text)
 
         if (glyphData != NULL)
         {
-            if (this->ftKerningEnabled && i > 0 && this->fontData.find(text[i-1]) != this->fontData.end())
-            {
-                FT_Get_Kerning(ftFace, this->fontData[text[i - 1]].glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
-                strWidth += pairDelta.x >> 6;
-            }
             strWidth += glyphData->glyphAdvanceX;
         }
         ++i;

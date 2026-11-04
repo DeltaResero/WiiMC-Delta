@@ -42,7 +42,6 @@
 typedef struct ftgxCharData_ {
     int16_t renderOffsetX;      /**< Texture X axis bearing offset. */
     uint16_t glyphAdvanceX;     /**< Character glyph X coordinate advance in pixels. */
-    uint16_t glyphIndex;        /**< Charachter glyph index in the font face. */
 
     uint16_t textureWidth;      /**< Texture width in pixels/bytes. */
     uint16_t textureHeight;     /**< Texture glyph height in pixels/bytes. */
@@ -126,7 +125,6 @@ class FreeTypeGX {
     private:
         FT_UInt ftPointSize;    /**< Requested size of the rendered font. */
         bool bold;              /**< Flag indicating glyphs are thickened. */
-        bool ftKerningEnabled;  /**< Flag indicating the availability of font kerning data. */
         uint8_t vertexIndex;    /**< Vertex format descriptor index. */
         uint32_t compatibilityMode; /**< Compatibility mode for default tev operations and vertex descriptors. */
         std::map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
