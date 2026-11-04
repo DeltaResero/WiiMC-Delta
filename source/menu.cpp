@@ -1475,6 +1475,7 @@ void ChangeLanguage()
             case LANG_GERMAN:
             case LANG_FRENCH:
             case LANG_SPANISH:
+            case LANG_ITALIAN:
                 //if(currentFont == FONT_GENERIC) return;
                 sprintf(filepath, "%s/def.ttf", appPath);
                 newFont = FONT_GENERIC;
@@ -4538,6 +4539,9 @@ static void MenuSettingsGlobal()
                         WiiSettings.language = LANG_SPANISH;
                         break;
                     case LANG_SPANISH:
+                        WiiSettings.language = LANG_ITALIAN;
+                        break;
+                    case LANG_ITALIAN:
                         WiiSettings.language = LANG_KOREAN;
                         break;
                     case LANG_KOREAN:
@@ -4714,8 +4718,8 @@ static void MenuSettingsGlobal()
                 case LANG_GERMAN:               sprintf(options.value[0], "Deutsch"); break;
                 case LANG_FRENCH:               sprintf(options.value[0], "Français"); break;
                 case LANG_SPANISH:              sprintf(options.value[0], "Español"); break;
-                /*case LANG_ITALIAN:                sprintf(options.value[0], "Italiano"); break;
-                case LANG_DUTCH:                sprintf(options.value[0], "Dutch"); break;
+                case LANG_ITALIAN:              sprintf(options.value[0], "Italiano"); break;
+                /*case LANG_DUTCH:                sprintf(options.value[0], "Dutch"); break;
                 case LANG_SIMP_CHINESE:         sprintf(options.value[0], "Chinese (Simplified)"); break;
                 case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;*/
                 case LANG_KOREAN:               sprintf(options.value[0], "Korean"); break;
