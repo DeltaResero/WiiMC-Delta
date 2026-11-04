@@ -40,6 +40,7 @@
 //#include "../../utils/mem2_manager.h"
 //int once_fnt = 0;
 extern const int font_ttf[];
+extern const int font_ttf_end[];
 extern int font_mem;
 extern int mono_mem;
 extern unsigned font_mem_size;
@@ -185,7 +186,7 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
         if (have_mono && monospaced)
             error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)mono_mem, mono_mem_size, index, &face);
         else if(!subtitleFontFound)
-            error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_ttf, 0x8450, 0, &face);
+            error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_ttf, (const char *)font_ttf_end - (const char *)font_ttf, 0, &face);
         else
             error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_mem, font_mem_size, index, &face);
 
