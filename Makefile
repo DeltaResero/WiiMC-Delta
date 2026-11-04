@@ -79,6 +79,15 @@ LIBSRC		:=	$(CURDIR)/src/lib
 EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
 export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
 EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
+# mbedTLS: library sources split into the three archives upstream builds
+MBEDTLS		:=	$(LIBSRC)/mbedtls
+MBEDTLSLIBS	:=	$(EXTPREFIX)/lib/libmbedtls.a $(EXTPREFIX)/lib/libmbedx509.a $(EXTPREFIX)/lib/libmbedcrypto.a
+MBEDTLS_SRC	:=	$(notdir $(wildcard $(MBEDTLS)/library/*.c))
+MBEDTLS_X509	:=	$(filter x509%.c pkcs7.c,$(MBEDTLS_SRC))
+MBEDTLS_TLS	:=	$(filter ssl%.c mps%.c debug.c net_sockets.c,$(MBEDTLS_SRC))
+MBEDTLS_CRYPTO	:=	$(filter-out $(MBEDTLS_X509) $(MBEDTLS_TLS),$(MBEDTLS_SRC))
+mbedtls_objs	=	$(patsubst %.c,$(EXTBUILD)/mbedtls/%.o,$(1))
+EXTLIBS		+=	$(MBEDTLSLIBS)
 # libraries built in this tree, so the DOL relinks when one of them changes
 export LINKDEPS	=	$(MPLAYER)/libmplayerwii.a $(FFMPEGLIBS) $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
@@ -170,6 +179,35 @@ $(EXTPREFIX)/lib/libiconv.a:
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib install-lib libdir=$(EXTPREFIX)/lib includedir=$(EXTPREFIX)/include
 	cp $(EXTBUILD)/libiconv/include/iconv.h.inst $(EXTPREFIX)/include/iconv.h
+
+# mbedTLS, configured by its committed include/mbedtls/mbedtls_config.h;
+# libmbedcrypto also gets the Wii's clock and entropy source
+MBEDTLS_CFLAGS	:=	-O2 -Wall $(MACHDEP) -fno-asynchronous-unwind-tables \
+				-I$(MBEDTLS)/include -I$(LIBOGC_INC)
+
+$(EXTBUILD)/mbedtls/%.o: $(MBEDTLS)/library/%.c $(MBEDTLS)/include/mbedtls/mbedtls_config.h
+	@mkdir -p $(@D)
+	$(CC) $(MBEDTLS_CFLAGS) -c $< -o $@
+
+$(EXTBUILD)/mbedtls/platform_wii.o: $(LIBSRC)/mbedtls-wii/platform_wii.c $(MBEDTLS)/include/mbedtls/mbedtls_config.h
+	@mkdir -p $(@D)
+	$(CC) $(MBEDTLS_CFLAGS) -c $< -o $@
+
+$(EXTPREFIX)/lib/libmbedcrypto.a: $(call mbedtls_objs,$(MBEDTLS_CRYPTO)) $(EXTBUILD)/mbedtls/platform_wii.o
+$(EXTPREFIX)/lib/libmbedx509.a: $(call mbedtls_objs,$(MBEDTLS_X509))
+$(EXTPREFIX)/lib/libmbedtls.a: $(call mbedtls_objs,$(MBEDTLS_TLS))
+# headers are installed once, not by each archive rule, so parallel jobs
+# don't copy over each other
+MBEDTLSHDR	:=	$(EXTPREFIX)/include/mbedtls/mbedtls_config.h
+$(MBEDTLSHDR): $(wildcard $(MBEDTLS)/include/mbedtls/*.h $(MBEDTLS)/include/psa/*.h)
+	@mkdir -p $(EXTPREFIX)/include
+	rm -rf $(EXTPREFIX)/include/mbedtls $(EXTPREFIX)/include/psa
+	cp -r $(MBEDTLS)/include/mbedtls $(MBEDTLS)/include/psa $(EXTPREFIX)/include/
+
+$(MBEDTLSLIBS): $(MBEDTLSHDR)
+	@mkdir -p $(@D)
+	rm -f $@
+	$(AR) -rc $@ $(filter %.o,$^)
 
 # FFmpeg 9: reconfigured from scratch when its options change, rebuilt and
 # reinstalled when any of its sources change. VPATH is WiiMC's, not FFmpeg's.
