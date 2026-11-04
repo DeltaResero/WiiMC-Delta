@@ -85,9 +85,6 @@ msgstr "網路"
 msgid "Subtitles"
 msgstr "字幕"
 
-msgid "Subtitle Delay"
-msgstr "字幕延遲"
-
 msgid "Settings"
 msgstr "設定"
 
@@ -111,9 +108,6 @@ msgstr "前進"
 
 msgid "Single"
 msgstr "單獨播放"
-
-msgid "Now Playing"
-msgstr "正在播放"
 
 msgid "Previous"
 msgstr "上一個"
@@ -238,9 +232,6 @@ msgstr "播放順序"
 msgid "Music Folder"
 msgstr "音樂資料夾"
 
-msgid "Pictures Files Folder"
-msgstr "圖片資料夾"
-
 msgid "Display Name"
 msgstr "顯示名稱"
 
@@ -361,9 +352,6 @@ msgstr "載入DVD中..."
 msgid "No disc inserted!"
 msgstr "沒有插入DVD光碟！"
 
-msgid "Invalid DVD."
-msgstr "無效的DVD。"
-
 msgid "Error opening"
 msgstr "無法開啟"
 
@@ -463,9 +451,6 @@ msgstr "選單圖片"
 msgid "Programming"
 msgstr "程式設計"
 
-msgid "& menu design"
-msgstr "& 選單設計"
-
 msgid "This is a private build of WiiMC."
 msgstr "這是WiiMC的私人版本。"
 
@@ -480,9 +465,6 @@ msgstr "緩衝中..."
 
 msgid "Buffering"
 msgstr "緩衝中"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "無法初始化網路 (錯誤#："
 
 msgid "Settings - Subtitles"
 msgstr "設定 - 字幕"
@@ -507,12 +489,6 @@ msgstr "預設"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "無法更改語言，沒有足夠的記憶體！"
-
-msgid "Font Required"
-msgstr "需要字型"
-
-msgid "Out of Memory"
-msgstr "記憶體溢出"
 
 msgid "Subtitle Codepage"
 msgstr "字幕內碼表"
@@ -580,9 +556,6 @@ msgstr "解析度超過允許的最大值 (1024x720)！"
 msgid "Online media file is invalid."
 msgstr "線上媒體檔無效。"
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "字幕字型檔找不到。字幕將不被顯示。"
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC無法存取DVD光碟機。"
 
@@ -594,9 +567,6 @@ msgstr "封面檢視器"
 
 msgid "Art Folder"
 msgstr "封面資料夾"
-
-msgid "Screensaver Banner Limiter"
-msgstr "橫幅限制"
 
 msgid "Banner Folder"
 msgstr "橫幅資料夾"

@@ -85,9 +85,6 @@ msgstr "Conexión"
 msgid "Subtitles"
 msgstr "Subtítulos"
 
-msgid "Subtitle Delay"
-msgstr "Retraso de subtítulos"
-
 msgid "Settings"
 msgstr "Opciones"
 
@@ -111,9 +108,6 @@ msgstr "Avanzar"
 
 msgid "Single"
 msgstr "Individual"
-
-msgid "Now Playing"
-msgstr "Reproduciendo"
 
 msgid "Previous"
 msgstr "Anterior"
@@ -238,9 +232,6 @@ msgstr "Modo de reproducción"
 msgid "Music Folder"
 msgstr "Carpeta de audio"
 
-msgid "Pictures Files Folder"
-msgstr "Carpeta de imágenes"
-
 msgid "Display Name"
 msgstr "Nombre mostrado"
 
@@ -361,9 +352,6 @@ msgstr "Cargando DVD..."
 msgid "No disc inserted!"
 msgstr "¡Ningún disco insertado!"
 
-msgid "Invalid DVD."
-msgstr "DVD no válido."
-
 msgid "Error opening"
 msgstr "Error abriendo"
 
@@ -463,9 +451,6 @@ msgstr "Iconos del menú"
 msgid "Programming"
 msgstr "Programación"
 
-msgid "& menu design"
-msgstr "& diseño del menú"
-
 msgid "This is a private build of WiiMC."
 msgstr "Esto es una versión privada de WiiMC."
 
@@ -480,9 +465,6 @@ msgstr "Cargando..."
 
 msgid "Buffering"
 msgstr "Cargando"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "Imposible iniciar conexión (Error #:"
 
 msgid "Settings - Subtitles"
 msgstr "Opciones - Subtítulos"
@@ -507,12 +489,6 @@ msgstr "Por defecto"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "¡Imposible cambiar idioma. Memoria insuficiente!"
-
-msgid "Font Required"
-msgstr "Fuente requerida"
-
-msgid "Out of Memory"
-msgstr "Fuera de memoria"
 
 msgid "Subtitle Codepage"
 msgstr "Codificación Subtítulo"
@@ -580,9 +556,6 @@ msgstr "La resolución excede el máximo permitido (1024x720)!"
 msgid "Online media file is invalid."
 msgstr "El archivo Online Media es inválido"
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "La fuente del subtítulo no se encuentra. El subtítulo no estará visible."
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC no tiene acceso al DVD."
 
@@ -594,9 +567,6 @@ msgstr "Carátulas y portadas"
 
 msgid "Art Folder"
 msgstr "Carpeta de carátulas y portadas"
-
-msgid "Screensaver Banner Limiter"
-msgstr "Límite de banners"
 
 msgid "Banner Folder"
 msgstr "Carpeta de banners"

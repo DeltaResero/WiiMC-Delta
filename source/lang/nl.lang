@@ -85,9 +85,6 @@ msgstr "Netwerk"
 msgid "Subtitles"
 msgstr "Ondertiteling"
 
-msgid "Subtitle Delay"
-msgstr "Vertraging ondertiteling"
-
 msgid "Settings"
 msgstr "Instellingen"
 
@@ -111,9 +108,6 @@ msgstr "Vooruit"
 
 msgid "Single"
 msgstr "Enkel"
-
-msgid "Now Playing"
-msgstr "Wordt afgespeeld"
 
 msgid "Previous"
 msgstr "Vorige"
@@ -238,9 +232,6 @@ msgstr "Afspeelvolgorde"
 msgid "Music Folder"
 msgstr "Muziekmap"
 
-msgid "Pictures Files Folder"
-msgstr "Afbeeldingenmap"
-
 msgid "Display Name"
 msgstr "Weergavenaam"
 
@@ -361,9 +352,6 @@ msgstr "DVD laden..."
 msgid "No disc inserted!"
 msgstr "Geen schijf geplaatst!"
 
-msgid "Invalid DVD."
-msgstr "Ongeldige DVD."
-
 msgid "Error opening"
 msgstr "Fout bij openen"
 
@@ -463,9 +451,6 @@ msgstr "Vormgeving menu"
 msgid "Programming"
 msgstr "Programmering"
 
-msgid "& menu design"
-msgstr "& menuontwerp"
-
 msgid "This is a private build of WiiMC."
 msgstr "Dit is een privéversie van WiiMC."
 
@@ -480,9 +465,6 @@ msgstr "Bufferen..."
 
 msgid "Buffering"
 msgstr "Bufferen"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "Kan netwerk niet initialiseren (fout #:"
 
 msgid "Settings - Subtitles"
 msgstr "Instellingen - Ondertiteling"
@@ -507,12 +489,6 @@ msgstr "Standaard"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "Kon nieuwe taal niet instellen. Onvoldoende geheugen!"
-
-msgid "Font Required"
-msgstr "Lettertype benodigd"
-
-msgid "Out of Memory"
-msgstr "Onvoldoende geheugen"
 
 msgid "Subtitle Codepage"
 msgstr "Codepagina ondertiteling"
@@ -580,9 +556,6 @@ msgstr "Resolutie overschrijdt het toegestane maximum (1024x720)!"
 msgid "Online media file is invalid."
 msgstr "Online media-bestand is ongeldig."
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "Lettertypebestand van ondertiteling niet gevonden. De ondertiteling zal niet zichtbaar zijn."
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC heeft geen toegang tot het DVD-station."
 
@@ -594,9 +567,6 @@ msgstr "Hoezenweergave"
 
 msgid "Art Folder"
 msgstr "Hoezenmap"
-
-msgid "Screensaver Banner Limiter"
-msgstr "Bannerlimiet"
 
 msgid "Banner Folder"
 msgstr "Bannermap"

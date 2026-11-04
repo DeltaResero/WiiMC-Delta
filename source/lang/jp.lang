@@ -85,9 +85,6 @@ msgstr "ネットワーク"
 msgid "Subtitles"
 msgstr "字幕"
 
-msgid "Subtitle Delay"
-msgstr "字幕の遅延"
-
 msgid "Settings"
 msgstr "設定"
 
@@ -111,9 +108,6 @@ msgstr "次へスキップ"
 
 msgid "Single"
 msgstr "一曲だけ再生"
-
-msgid "Now Playing"
-msgstr "再生中"
 
 msgid "Previous"
 msgstr "前へ"
@@ -238,9 +232,6 @@ msgstr "再生順"
 msgid "Music Folder"
 msgstr "音楽フォルダ"
 
-msgid "Pictures Files Folder"
-msgstr "写真フォルダ"
-
 msgid "Display Name"
 msgstr "表示名"
 
@@ -361,9 +352,6 @@ msgstr "DVDを読み込み中…"
 msgid "No disc inserted!"
 msgstr "ディスクが挿入されていません！"
 
-msgid "Invalid DVD."
-msgstr "無効なDVDです"
-
 msgid "Error opening"
 msgstr "開けません："
 
@@ -463,9 +451,6 @@ msgstr "メニューアートワーク"
 msgid "Programming"
 msgstr "プログラム"
 
-msgid "& menu design"
-msgstr "＆メニューデザイン"
-
 msgid "This is a private build of WiiMC."
 msgstr "これはWiiMCの非公開ビルドです"
 
@@ -480,9 +465,6 @@ msgstr "バッファ中…"
 
 msgid "Buffering"
 msgstr "バッファ中"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "ネットワーク初期化エラー (Error #:"
 
 msgid "Settings - Subtitles"
 msgstr "設定 - 字幕"
@@ -507,12 +489,6 @@ msgstr "初期値"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "メモリ不足のため言語設定を変更できませんでした"
-
-msgid "Font Required"
-msgstr "フォントが必要です"
-
-msgid "Out of Memory"
-msgstr "メモリ不足エラー"
 
 msgid "Subtitle Codepage"
 msgstr "字幕の文字コード"
@@ -580,9 +556,6 @@ msgstr "解像度が上限（1024x720）を超えています！"
 msgid "Online media file is invalid."
 msgstr "無効なネットメディアファイルです"
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "字幕フォントが無いため 字幕は表示されません"
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMCはDVDドライブにアクセスできません"
 
@@ -594,9 +567,6 @@ msgstr "アートワーク表示"
 
 msgid "Art Folder"
 msgstr "アートワークフォルダ"
-
-msgid "Screensaver Banner Limiter"
-msgstr "バナーの制限"
 
 msgid "Banner Folder"
 msgstr "バナーフォルダ"

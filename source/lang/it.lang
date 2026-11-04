@@ -85,9 +85,6 @@ msgstr "Rete"
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
-msgid "Subtitle Delay"
-msgstr "Ritardo sottotitoli"
-
 msgid "Settings"
 msgstr "Impostazioni"
 
@@ -111,9 +108,6 @@ msgstr "Avanti"
 
 msgid "Single"
 msgstr "Singola"
-
-msgid "Now Playing"
-msgstr "In riproduzione"
 
 msgid "Previous"
 msgstr "Precedente"
@@ -238,9 +232,6 @@ msgstr "Ordine di esecuzione"
 msgid "Music Folder"
 msgstr "Cartella musica"
 
-msgid "Pictures Files Folder"
-msgstr "Cartella immagini"
-
 msgid "Display Name"
 msgstr "Nome visualizzato"
 
@@ -361,9 +352,6 @@ msgstr "Caricamento DVD..."
 msgid "No disc inserted!"
 msgstr "Nessun disco inserito!"
 
-msgid "Invalid DVD."
-msgstr "DVD non valido."
-
 msgid "Error opening"
 msgstr "Errore nell'apertura di"
 
@@ -463,9 +451,6 @@ msgstr "Grafica dei menu"
 msgid "Programming"
 msgstr "Programmazione"
 
-msgid "& menu design"
-msgstr "& design dei menu"
-
 msgid "This is a private build of WiiMC."
 msgstr "Questa è una versione privata di WiiMC."
 
@@ -480,9 +465,6 @@ msgstr "Buffering..."
 
 msgid "Buffering"
 msgstr "Buffering"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "Impossibile inizializzare la rete (Errore #:"
 
 msgid "Settings - Subtitles"
 msgstr "Impostazioni - Sottotitoli"
@@ -507,12 +489,6 @@ msgstr "Predefinito"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "Non è possibile cambiare lingua. Memoria insufficiente!"
-
-msgid "Font Required"
-msgstr "Font richiesto"
-
-msgid "Out of Memory"
-msgstr "Memoria esaurita"
 
 msgid "Subtitle Codepage"
 msgstr "Codifica sottotitoli"
@@ -580,9 +556,6 @@ msgstr "La risoluzione supera il massimo consentito (1024x720)!"
 msgid "Online media file is invalid."
 msgstr "File multimedia online non valido."
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "Font sottotitoli non trovato. I sottotitoli non saranno visibili."
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC non ha accesso al lettore DVD."
 
@@ -594,9 +567,6 @@ msgstr "Visualizzatore copertine"
 
 msgid "Art Folder"
 msgstr "Cartella copertine"
-
-msgid "Screensaver Banner Limiter"
-msgstr "Limite banner"
 
 msgid "Banner Folder"
 msgstr "Cartella banner"

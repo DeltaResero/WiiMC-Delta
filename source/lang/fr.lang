@@ -85,9 +85,6 @@ msgstr "Réseau"
 msgid "Subtitles"
 msgstr "Sous-titres"
 
-msgid "Subtitle Delay"
-msgstr "Délai du sous-titrage"
-
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -111,9 +108,6 @@ msgstr "Avancer"
 
 msgid "Single"
 msgstr "Lire le titre"
-
-msgid "Now Playing"
-msgstr "Lecture en cours"
 
 msgid "Previous"
 msgstr "Précédent"
@@ -238,9 +232,6 @@ msgstr "Mode de lecture"
 msgid "Music Folder"
 msgstr "Dossier de musique"
 
-msgid "Pictures Files Folder"
-msgstr "Dossier des fichiers d'Images"
-
 msgid "Display Name"
 msgstr "Nom à afficher"
 
@@ -361,9 +352,6 @@ msgstr "Chargement du DVD..."
 msgid "No disc inserted!"
 msgstr "Aucun disque inséré !"
 
-msgid "Invalid DVD."
-msgstr "DVD non valide."
-
 msgid "Error opening"
 msgstr "Erreur d'ouverture"
 
@@ -463,9 +451,6 @@ msgstr "Habillage des menus"
 msgid "Programming"
 msgstr "Programmation"
 
-msgid "& menu design"
-msgstr "& conception des menus"
-
 msgid "This is a private build of WiiMC."
 msgstr "Ceci est une version privée de WiiMC."
 
@@ -480,9 +465,6 @@ msgstr "Mise en mémoire tampon..."
 
 msgid "Buffering"
 msgstr "Mise en mémoire tampon"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "Impossible d'initialiser le réseau (Erreur #:"
 
 msgid "Settings - Subtitles"
 msgstr "Paramètres - Sous-titres"
@@ -507,12 +489,6 @@ msgstr "Par défaut"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "Impossible de changer la langue. Pas assez de mémoire !"
-
-msgid "Font Required"
-msgstr "Police requise"
-
-msgid "Out of Memory"
-msgstr "Mémoire pleine"
 
 msgid "Subtitle Codepage"
 msgstr "Encodage des sous-titres"
@@ -580,9 +556,6 @@ msgstr "La résolution dépasse le maximum autorisé (1024x720) !"
 msgid "Online media file is invalid."
 msgstr "Le fichier de médias en ligne est invalide."
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "Police des sous-titres introuvable. Les sous-titres ne seront pas affichés."
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC n'a pas accès au lecteur DVD."
 
@@ -594,9 +567,6 @@ msgstr "Affichage des pochettes"
 
 msgid "Art Folder"
 msgstr "Dossier des pochettes"
-
-msgid "Screensaver Banner Limiter"
-msgstr "Limite des bannières"
 
 msgid "Banner Folder"
 msgstr "Dossier des bannières"

@@ -85,9 +85,6 @@ msgstr "Netzwerk"
 msgid "Subtitles"
 msgstr "Untertitel"
 
-msgid "Subtitle Delay"
-msgstr "Untertitelverzögerung"
-
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -111,9 +108,6 @@ msgstr "Vorwärtsspringen"
 
 msgid "Single"
 msgstr "Einzeln"
-
-msgid "Now Playing"
-msgstr "Aktuelle Wiedergabe"
 
 msgid "Previous"
 msgstr "Vorheriges"
@@ -238,9 +232,6 @@ msgstr "Abspielreihenfolge"
 msgid "Music Folder"
 msgstr "Musik-Verzeichnis"
 
-msgid "Pictures Files Folder"
-msgstr "Bilder-Verzeichnis"
-
 msgid "Display Name"
 msgstr "Anzeigename"
 
@@ -361,9 +352,6 @@ msgstr "Lade DVD..."
 msgid "No disc inserted!"
 msgstr "Keine Disc eingelegt!"
 
-msgid "Invalid DVD."
-msgstr "Ungültige DVD."
-
 msgid "Error opening"
 msgstr "Fehler beim Öffnen"
 
@@ -463,9 +451,6 @@ msgstr "Menügestaltung"
 msgid "Programming"
 msgstr "Programmierung"
 
-msgid "& menu design"
-msgstr "& Menügestaltung"
-
 msgid "This is a private build of WiiMC."
 msgstr "Dies ist eine private Version von WiiMC."
 
@@ -480,9 +465,6 @@ msgstr "Puffern..."
 
 msgid "Buffering"
 msgstr "Puffern"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "Konnte Netzwerk nicht initialisieren (Fehler #:"
 
 msgid "Settings - Subtitles"
 msgstr "Einstellungen - Untertitel"
@@ -507,12 +489,6 @@ msgstr "Standard"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "Sprache konnte nicht geändert werden. Nicht genug Speicher!"
-
-msgid "Font Required"
-msgstr "Schriftart benötigt"
-
-msgid "Out of Memory"
-msgstr "Arbeitsspeicher voll"
 
 msgid "Subtitle Codepage"
 msgstr "Untertitel-Zeichentabelle"
@@ -580,9 +556,6 @@ msgstr "Die Auflösung überschreitet das erlaubte Maximum (1024x720)!"
 msgid "Online media file is invalid."
 msgstr "Online-Mediendatei ist ungültig."
 
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "Untertitel-Schriftartdatei nicht gefunden. Untertitel werden nicht angezeigt."
-
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC hat keinen Zugriff auf das DVD-Laufwerk."
 
@@ -594,9 +567,6 @@ msgstr "Cover-Anzeige"
 
 msgid "Art Folder"
 msgstr "Cover-Verzeichnis"
-
-msgid "Screensaver Banner Limiter"
-msgstr "Banner-Begrenzung"
 
 msgid "Banner Folder"
 msgstr "Banner-Verzeichnis"
