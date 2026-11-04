@@ -311,6 +311,33 @@ static void matroska_sync_interlace(enum AVFieldOrder field_order)
 }
 #endif
 
+#ifdef GEKKO
+#include "../../utils/mem2_manager.h"
+
+/* WiiMC shows a file's embedded cover art: the image file goes into a MEM2
+ * buffer in pos_pic and embedded_pic tells the GUI it is there; the GUI
+ * decodes it and frees the buffer. FFmpeg 0.10 filled these from its
+ * ID3v2, MP4, ASF and Vorbis comment parsers. 7.1 delivers the same
+ * pictures as attached-picture streams. */
+#define COVER_ART_MAX (1536 * 1024)
+extern u8 *pos_pic;
+extern int embedded_pic;
+
+static void export_cover_art(const AVStream *st)
+{
+    const AVPacket *pkt = &st->attached_pic;
+
+    // keep the first picture, and any the GUI hasn't taken yet
+    if (embedded_pic || pkt->size <= 0 || pkt->size > COVER_ART_MAX)
+        return;
+    pos_pic = mem2_memalign(32, COVER_ART_MAX, MEM2_OTHER);
+    if (!pos_pic)
+        return;
+    memcpy(pos_pic, pkt->data, pkt->size);
+    embedded_pic = 1;
+}
+#endif
+
 static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
     lavf_priv_t *priv= demuxer->priv;
     AVStream *st= avfc->streams[i];
@@ -320,6 +347,15 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
     AVDictionaryEntry *lang = av_dict_get(st->metadata, "language", NULL, 0);
     AVDictionaryEntry *title= av_dict_get(st->metadata, "title",    NULL, 0);
     int g;
+
+#ifdef GEKKO
+    // the GUI shows cover art itself; don't play it as a video track
+    if (st->disposition & AV_DISPOSITION_ATTACHED_PIC) {
+        export_cover_art(st);
+        st->discard = AVDISCARD_ALL;
+        return;
+    }
+#endif
 
     switch(codec->codec_type){
         case AVMEDIA_TYPE_AUDIO:{
