@@ -409,7 +409,7 @@ asx_parse_param(ASX_Parser_t* parser, char** attribs, play_tree_t* pt) {
     goto err_out;
   }
   mp_msg(MSGT_PLAYTREE, MSGL_ERR, "Support for specifying parameters in playlists has been disabled.\n");
-//  play_tree_set_param(pt,name,val);
+//  play_tree_set_param(pt,name,val,NULL);
 err_out:
   free(name);
   free(val);
@@ -503,6 +503,10 @@ asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
       asx_parse_ref(parser,attribs,ref);
       mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Adding element %s to entry\n",element);
       nref++;
+#ifdef GEKKO
+        } else if(strcasecmp(element,"TITLE") == 0) {
+          play_tree_set_param(ref, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, body, NULL);
+#endif
     } else
       mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Ignoring element %s\n",element);
     free(element);
