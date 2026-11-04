@@ -1566,6 +1566,7 @@ error:
         DeinitFreeType();
         if(ext_font_ttf) mem2_free(ext_font_ttf, MEM2_EXTFONT);
         ext_font_ttf = NULL;
+        RemoveMem2Area(MEM2_EXTFONT); // hand the language font's memory back
         InitFreeType((u8*)font_ttf, font_ttf_size);
         currentFont = FONT_DEFAULT;
         ResetText();
