@@ -18,9 +18,22 @@ subtitles unless `subfont.ttf` replaces it.
           --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting \
           --name-IDs='*' --name-languages='*'
 
+`source/fonts/mono.ttf` is compiled in too. Subtitles use it when the
+Monospaced subtitle setting is on, which keeps closed captions lined up.
+
+- Font: Noto Sans Mono Bold 2.014, same licence
+- Cut down the same way to Basic Latin, Latin-1, Latin Extended-A,
+  punctuation, currency signs and the other symbols closed captions use
+  (`U+2120-2122`, `U+250C`, `U+2510`, `U+2514`, `U+2518`, `U+2588`).
+
+Neither Noto font has a music note, which captions use for songs, so both
+get ♪ and ♫ (`U+266A`, `U+266B`) copied in from Noto Sans Symbols Bold, also
+under the SIL Open Font License; in `mono.ttf` they are centred in the
+fixed width.
+
 ## On the SD card
 
-The other files here go in `apps/wiimc/` next to `boot.dol`. WiiMC loads them
+The language fonts go in `apps/wiimc/` next to `boot.dol`. WiiMC loads them
 when it needs them.
 
 ### Language fonts
@@ -49,16 +62,6 @@ The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 None of the fonts keep kerning or vertical metrics. WiiMC only reads the
 older `kern` table, which Noto doesn't have, and never draws vertical text.
 
-### Closed-caption font
-
-`monospace.ttf` is Noto Sans Mono Bold 2.014. Subtitles use it when the
-Monospaced subtitle setting is on, which keeps closed captions lined up.
-WiiMC reads it the first time a subtitle needs it. It is cut to Latin
-(Vietnamese included), Greek, Cyrillic, punctuation, currency, arrows, box
-drawing and geometric shapes, with the same options as the built-in font:
-
-    --unicodes=U+0020-007E,U+00A0-024F,U+0370-03FF,U+0400-04FF,U+1E00-1EFF,U+2000-206F,U+20A0-20CF,U+2100-214F,U+2190-2193,U+2212,U+2500-257F,U+25A0-25FF,U+FFFD
-
 ## Your own fonts
 
 Any TrueType or OpenType font can take a file's place in `apps/wiimc/`:
@@ -67,7 +70,7 @@ Any TrueType or OpenType font can take a file's place in `apps/wiimc/`:
 |-----------------|------------------------------------------------------------|
 | `def.ttf`       | The built-in font, for menus in the Latin-script languages |
 | `subfont.ttf`   | The built-in font, for subtitles                           |
-| `monospace.ttf` | The closed-caption font                                    |
+| `monospace.ttf` | The built-in monospaced font, for subtitles                |
 
 For Japanese, Korean or Chinese subtitles, copy that language's font as
 `subfont.ttf`. A `def.ttf` turns off borrowing glyphs for Japanese, Korean
