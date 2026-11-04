@@ -142,7 +142,7 @@ static void rv34_gen_vlc(const uint8_t *bits, int size, VLC *vlc, const uint8_t 
                        bits2, 1, 1,
                        cw,    2, 2,
                        syms,  2, 2, INIT_VLC_USE_NEW_STATIC);
-#endif                       
+#endif
 }
 
 /**

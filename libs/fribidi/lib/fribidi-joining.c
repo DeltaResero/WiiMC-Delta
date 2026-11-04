@@ -12,22 +12,22 @@
  *
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2004 Behdad Esfahbod
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 
@@ -60,19 +60,19 @@ print_joining_types (
   MSG ("  Join. types: ");
   for (i = 0; i < len; i++)
     MSG2 ("%c", fribidi_char_from_joining_type (jtypes[i],
-						!FRIBIDI_LEVEL_IS_RTL
-						(embedding_levels[i])));
+                                                !FRIBIDI_LEVEL_IS_RTL
+                                                (embedding_levels[i])));
   MSG ("\n");
 }
 #endif /* DEBUG */
 
-#define FRIBIDI_CONSISTENT_LEVEL(i)	\
-	(FRIBIDI_IS_EXPLICIT_OR_BN (bidi_types[(i)])	\
-	 ? FRIBIDI_SENTINEL	\
-	 : embedding_levels[(i)])
+#define FRIBIDI_CONSISTENT_LEVEL(i)     \
+        (FRIBIDI_IS_EXPLICIT_OR_BN (bidi_types[(i)])    \
+         ? FRIBIDI_SENTINEL     \
+         : embedding_levels[(i)])
 
-#define FRIBIDI_LEVELS_MATCH(i, j)	\
-	((i) == (j) || (i) == FRIBIDI_SENTINEL || (j) == FRIBIDI_SENTINEL)
+#define FRIBIDI_LEVELS_MATCH(i, j)      \
+        ((i) == (j) || (i) == FRIBIDI_SENTINEL || (j) == FRIBIDI_SENTINEL)
 
 FRIBIDI_ENTRY void
 fribidi_join_arabic (
@@ -99,7 +99,7 @@ fribidi_join_arabic (
     {
       print_joining_types (embedding_levels, len, ar_props);
     }
-# endif	/* DEBUG */
+# endif /* DEBUG */
 
   /* The joining algorithm turned out very very dirty :(.  That's what happens
    * when you follow the standard which has never been implemented closely
@@ -121,57 +121,57 @@ fribidi_join_arabic (
 
     for (i = 0; i < len; i++)
       if (!FRIBIDI_IS_JOINING_TYPE_G (ar_props[i]))
-	{
-	  register fribidi_boolean disjoin = false;
-	  register fribidi_boolean shapes = FRIBIDI_ARAB_SHAPES (ar_props[i]);
-	  register FriBidiLevel level = FRIBIDI_CONSISTENT_LEVEL (i);
+        {
+          register fribidi_boolean disjoin = false;
+          register fribidi_boolean shapes = FRIBIDI_ARAB_SHAPES (ar_props[i]);
+          register FriBidiLevel level = FRIBIDI_CONSISTENT_LEVEL (i);
 
-	  if (joins && !FRIBIDI_LEVELS_MATCH (saved_level, level))
-	    {
-	      disjoin = true;
-	      joins = false;
-	    }
+          if (joins && !FRIBIDI_LEVELS_MATCH (saved_level, level))
+            {
+              disjoin = true;
+              joins = false;
+            }
 
-	  if (!FRIBIDI_IS_JOIN_SKIPPED (ar_props[i]))
-	    {
-	      register const FriBidiArabicProp joins_preceding_mask =
-		FRIBIDI_JOINS_PRECEDING_MASK (level);
+          if (!FRIBIDI_IS_JOIN_SKIPPED (ar_props[i]))
+            {
+              register const FriBidiArabicProp joins_preceding_mask =
+                FRIBIDI_JOINS_PRECEDING_MASK (level);
 
-	      if (!joins)
-		{
-		  if (shapes)
-		    FRIBIDI_UNSET_BITS (ar_props[i], joins_preceding_mask);
-		}
-	      else if (!FRIBIDI_TEST_BITS (ar_props[i], joins_preceding_mask))
-	        {
-		  disjoin = true;
-		}
-	      else
-	        {
-		  register FriBidiStrIndex j;
-		  /* This is a FriBidi extension:  we set joining properties
-		   * for skipped characters in between, so we can put NSMs on tatweel
-		   * later if we want.  Useful on console for example.
-		   */
-		  for (j = saved + 1; j < i; j++)
-		    FRIBIDI_SET_BITS (ar_props[j], joins_preceding_mask | saved_joins_following_mask);
-		}
-	    }
+              if (!joins)
+                {
+                  if (shapes)
+                    FRIBIDI_UNSET_BITS (ar_props[i], joins_preceding_mask);
+                }
+              else if (!FRIBIDI_TEST_BITS (ar_props[i], joins_preceding_mask))
+                {
+                  disjoin = true;
+                }
+              else
+                {
+                  register FriBidiStrIndex j;
+                  /* This is a FriBidi extension:  we set joining properties
+                   * for skipped characters in between, so we can put NSMs on tatweel
+                   * later if we want.  Useful on console for example.
+                   */
+                  for (j = saved + 1; j < i; j++)
+                    FRIBIDI_SET_BITS (ar_props[j], joins_preceding_mask | saved_joins_following_mask);
+                }
+            }
 
-	  if (disjoin && saved_shapes)
-	    FRIBIDI_UNSET_BITS (ar_props[saved], saved_joins_following_mask);
+          if (disjoin && saved_shapes)
+            FRIBIDI_UNSET_BITS (ar_props[saved], saved_joins_following_mask);
 
-	  if (!FRIBIDI_IS_JOIN_SKIPPED (ar_props[i]))
-	    {
-	      saved = i;
-	      saved_level = level;
-	      saved_shapes = shapes;
-	      saved_joins_following_mask =
-		FRIBIDI_JOINS_FOLLOWING_MASK (level);
-	      joins =
-		FRIBIDI_TEST_BITS (ar_props[i], saved_joins_following_mask);
-	    }
-	}
+          if (!FRIBIDI_IS_JOIN_SKIPPED (ar_props[i]))
+            {
+              saved = i;
+              saved_level = level;
+              saved_shapes = shapes;
+              saved_joins_following_mask =
+                FRIBIDI_JOINS_FOLLOWING_MASK (level);
+              joins =
+                FRIBIDI_TEST_BITS (ar_props[i], saved_joins_following_mask);
+            }
+        }
     if ((joins) && saved_shapes)
       FRIBIDI_UNSET_BITS (ar_props[saved], saved_joins_following_mask);
 
@@ -183,7 +183,7 @@ fribidi_join_arabic (
     {
       print_joining_types (embedding_levels, len, ar_props);
     }
-# endif	/* DEBUG */
+# endif /* DEBUG */
 
   DBG ("leaving fribidi_join_arabic");
 }

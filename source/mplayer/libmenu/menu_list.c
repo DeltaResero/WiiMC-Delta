@@ -119,7 +119,7 @@ void menu_list_draw(menu_t* menu,mp_image_t* mpi) {
     if(end > count) {
       end = count;
       if(end - start < mpriv->disp_lines)
-	start = end - mpriv->disp_lines < 0 ? 0 : end - mpriv->disp_lines;
+        start = end - mpriv->disp_lines < 0 ? 0 : end - mpriv->disp_lines;
     }
     m = mpriv->menu;
     for(i = 0 ; m->next && i < start ; ) {
@@ -141,11 +141,11 @@ void menu_list_draw(menu_t* menu,mp_image_t* mpi) {
                     x < 0 ? (mpi->w-bg_w)/2 : x-mpriv->minb,dy+y-mpriv->vspace/2,bg_w,th);
     }
     menu_draw_text_full(mpi,mpriv->title,
-			x < 0 ? mpi->w / 2 : x,
-			dy+y, x < 0 ? dw : (tw > need_w ? tw : need_w), 0,
-			mpriv->vspace,1,
-			MENU_TEXT_TOP|MENU_TEXT_HCENTER,
-			MENU_TEXT_TOP|(x < 0 ? MENU_TEXT_HCENTER :MENU_TEXT_LEFT));
+                        x < 0 ? mpi->w / 2 : x,
+                        dy+y, x < 0 ? dw : (tw > need_w ? tw : need_w), 0,
+                        mpriv->vspace,1,
+                        MENU_TEXT_TOP|MENU_TEXT_HCENTER,
+                        MENU_TEXT_TOP|(x < 0 ? MENU_TEXT_HCENTER :MENU_TEXT_LEFT));
     dy += th;
   }
 
@@ -200,11 +200,11 @@ void menu_list_draw(menu_t* menu,mp_image_t* mpi) {
                     bx, dy + y - mpriv->vspace / 2,
                     bg_w, line_h);
     menu_draw_text_full(mpi,m->txt,
-			dx + ptr_l,
-			dy+y,dw-ptr_l,dh - dy,
-			mpriv->vspace,0,
-			MENU_TEXT_TOP|MENU_TEXT_LEFT,
-			MENU_TEXT_TOP|MENU_TEXT_LEFT);
+                        dx + ptr_l,
+                        dy+y,dw-ptr_l,dh - dy,
+                        mpriv->vspace,0,
+                        MENU_TEXT_TOP|MENU_TEXT_LEFT,
+                        MENU_TEXT_TOP|MENU_TEXT_LEFT);
     dy += line_h;
   }
 
@@ -278,16 +278,16 @@ int menu_list_jump_to_key(menu_t* menu,int c) {
     list_entry_t* e = mpriv->current;
     if(e->txt[0] == c) e = e->next;
     for(  ; e ; e = e->next) {
-	if(e->txt[0] == c) {
-	  mpriv->current = e;
-	  return 1;
-	}
+        if(e->txt[0] == c) {
+          mpriv->current = e;
+          return 1;
+        }
     }
     for(e = mpriv->menu ; e ;  e = e->next) {
-	if(e->txt[0] == c) {
-	  mpriv->current = e;
-	  return 1;
-	}
+        if(e->txt[0] == c) {
+          mpriv->current = e;
+          return 1;
+        }
     }
     return 1;
   }

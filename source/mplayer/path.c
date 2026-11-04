@@ -45,132 +45,132 @@
 #include "osdep/osdep.h"
 
 char *get_path(const char *filename){
-	// temporary buffer that will be freed
-	char *tmp = 0;
-	char *homedir;
-	char *buff;
+    // temporary buffer that will be freed
+    char *tmp = 0;
+    char *homedir;
+    char *buff;
 #ifdef __MINGW32__
-	const char *config_dir = "/mplayer";
+    const char *config_dir = "/mplayer";
 #elif defined (GEKKO)
-	const char *config_dir = "";
+    const char *config_dir = "";
 #else
-	const char *config_dir = "/.mplayer";
+    const char *config_dir = "/.mplayer";
 #endif
-	int len;
+    int len;
 #ifdef CONFIG_MACOSX_BUNDLE
-	struct stat dummy;
-	CFIndex maxlen=256;
-	CFURLRef res_url_ref=NULL;
-	CFURLRef bdl_url_ref=NULL;
-	char *res_url_path = NULL;
-	char *bdl_url_path = NULL;
+    struct stat dummy;
+    CFIndex maxlen=256;
+    CFURLRef res_url_ref=NULL;
+    CFURLRef bdl_url_ref=NULL;
+    char *res_url_path = NULL;
+    char *bdl_url_path = NULL;
 #endif
 
-	if ((homedir = getenv("MPLAYER_HOME")) != NULL)
-		config_dir = "";
-	else if ((homedir = getenv("HOME")) == NULL)
-	{
+    if ((homedir = getenv("MPLAYER_HOME")) != NULL)
+        config_dir = "";
+    else if ((homedir = getenv("HOME")) == NULL)
+    {
 #if !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__OS2__)
-		return NULL;
+        return NULL;
 #else
-		int i;
-		char path[260];
+        int i;
+        char path[260];
 #ifdef __OS2__
-		PPIB ppib;
-		// Get process info blocks
-		DosGetInfoBlocks(NULL, &ppib);
-		// Get full path of the executable
-		DosQueryModuleName(ppib->pib_hmte, sizeof( path ), path);
+        PPIB ppib;
+        // Get process info blocks
+        DosGetInfoBlocks(NULL, &ppib);
+        // Get full path of the executable
+        DosQueryModuleName(ppib->pib_hmte, sizeof( path ), path);
 #else
-		GetModuleFileNameA(NULL, path, 260);
+        GetModuleFileNameA(NULL, path, 260);
 #endif
-		// Extract directory part
-		tmp = homedir = mp_dirname(path);
-		// Convert backslashes to slashes
-		for (i = 0; homedir[i]; i++)
-			if (homedir[i] == '\\') homedir[i] = '/';
-		// If there is a trailing slash remove it.
-		// If there isn't, remove the one from config dir (if homedir
-		// ends up e.g. c:)
-		if (i && homedir[i-1] == '/') homedir[i-1] = 0;
-		else config_dir++;
+        // Extract directory part
+        tmp = homedir = mp_dirname(path);
+        // Convert backslashes to slashes
+        for (i = 0; homedir[i]; i++)
+            if (homedir[i] == '\\') homedir[i] = '/';
+        // If there is a trailing slash remove it.
+        // If there isn't, remove the one from config dir (if homedir
+        // ends up e.g. c:)
+        if (i && homedir[i-1] == '/') homedir[i-1] = 0;
+        else config_dir++;
 #endif
-	}
-	len = strlen(homedir) + strlen(config_dir) + 1;
-	if (filename == NULL) {
-		if ((buff = malloc(len)) == NULL)
-			return NULL;
-		sprintf(buff, "%s%s", homedir, config_dir);
-	} else {
-		len += strlen(filename) + 1;
-		if ((buff = malloc(len)) == NULL)
-			return NULL;
-		sprintf(buff, "%s%s/%s", homedir, config_dir, filename);
-	}
+    }
+    len = strlen(homedir) + strlen(config_dir) + 1;
+    if (filename == NULL) {
+        if ((buff = malloc(len)) == NULL)
+            return NULL;
+        sprintf(buff, "%s%s", homedir, config_dir);
+    } else {
+        len += strlen(filename) + 1;
+        if ((buff = malloc(len)) == NULL)
+            return NULL;
+        sprintf(buff, "%s%s/%s", homedir, config_dir, filename);
+    }
 
 #ifdef CONFIG_MACOSX_BUNDLE
-	if (stat(buff, &dummy)) {
+    if (stat(buff, &dummy)) {
 
-		res_url_ref=CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
-		bdl_url_ref=CFBundleCopyBundleURL(CFBundleGetMainBundle());
+        res_url_ref=CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+        bdl_url_ref=CFBundleCopyBundleURL(CFBundleGetMainBundle());
 
-		if (res_url_ref&&bdl_url_ref) {
+        if (res_url_ref&&bdl_url_ref) {
 
-			res_url_path=malloc(maxlen);
-			bdl_url_path=malloc(maxlen);
+            res_url_path=malloc(maxlen);
+            bdl_url_path=malloc(maxlen);
 
-			while (!CFURLGetFileSystemRepresentation(res_url_ref, true, res_url_path, maxlen)) {
-				maxlen*=2;
-				res_url_path=realloc(res_url_path, maxlen);
-			}
-			CFRelease(res_url_ref);
+            while (!CFURLGetFileSystemRepresentation(res_url_ref, true, res_url_path, maxlen)) {
+                maxlen*=2;
+                res_url_path=realloc(res_url_path, maxlen);
+            }
+            CFRelease(res_url_ref);
 
-			while (!CFURLGetFileSystemRepresentation(bdl_url_ref, true, bdl_url_path, maxlen)) {
-				maxlen*=2;
-				bdl_url_path=realloc(bdl_url_path, maxlen);
-			}
-			CFRelease(bdl_url_ref);
+            while (!CFURLGetFileSystemRepresentation(bdl_url_ref, true, bdl_url_path, maxlen)) {
+                maxlen*=2;
+                bdl_url_path=realloc(bdl_url_path, maxlen);
+            }
+            CFRelease(bdl_url_ref);
 
-			if (strcmp(res_url_path, bdl_url_path) == 0)
-				res_url_path = NULL;
-		}
+            if (strcmp(res_url_path, bdl_url_path) == 0)
+                res_url_path = NULL;
+        }
 
-		if (res_url_path&&filename) {
-			if ((strlen(filename)+strlen(res_url_path)+2)>maxlen) {
-				maxlen=strlen(filename)+strlen(res_url_path)+2;
-			}
-			free(buff);
-			buff = malloc(maxlen);
-			strcpy(buff, res_url_path);
+        if (res_url_path&&filename) {
+            if ((strlen(filename)+strlen(res_url_path)+2)>maxlen) {
+                maxlen=strlen(filename)+strlen(res_url_path)+2;
+            }
+            free(buff);
+            buff = malloc(maxlen);
+            strcpy(buff, res_url_path);
 
-			strcat(buff,"/");
-			strcat(buff, filename);
-		}
-	}
+            strcat(buff,"/");
+            strcat(buff, filename);
+        }
+    }
 #endif
-	free(tmp);
-	mp_msg(MSGT_GLOBAL,MSGL_V,"get_path('%s') -> '%s'\n",filename,buff);
-	return buff;
+    free(tmp);
+    mp_msg(MSGT_GLOBAL,MSGL_V,"get_path('%s') -> '%s'\n",filename,buff);
+    return buff;
 }
 
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL)
 void set_path_env(void)
 {
-	/*make our codec dirs available for LoadLibraryA()*/
-	char win32path[MAX_PATH];
+    /*make our codec dirs available for LoadLibraryA()*/
+    char win32path[MAX_PATH];
 #ifdef __CYGWIN__
-	cygwin_conv_to_full_win32_path(BINARY_CODECS_PATH, win32path);
+    cygwin_conv_to_full_win32_path(BINARY_CODECS_PATH, win32path);
 #else /*__CYGWIN__*/
-	/* Expand to absolute path unless it's already absolute */
-	if (!strstr(BINARY_CODECS_PATH,":") && BINARY_CODECS_PATH[0] != '\\') {
-		GetModuleFileNameA(NULL, win32path, MAX_PATH);
-		strcpy(strrchr(win32path, '\\') + 1, BINARY_CODECS_PATH);
-	}
-	else strcpy(win32path, BINARY_CODECS_PATH);
+    /* Expand to absolute path unless it's already absolute */
+    if (!strstr(BINARY_CODECS_PATH,":") && BINARY_CODECS_PATH[0] != '\\') {
+        GetModuleFileNameA(NULL, win32path, MAX_PATH);
+        strcpy(strrchr(win32path, '\\') + 1, BINARY_CODECS_PATH);
+    }
+    else strcpy(win32path, BINARY_CODECS_PATH);
 #endif /*__CYGWIN__*/
-	mp_msg(MSGT_WIN32, MSGL_V, "Setting PATH to %s\n", win32path);
-	if (!SetEnvironmentVariableA("PATH", win32path))
-		mp_msg(MSGT_WIN32, MSGL_WARN, "Cannot set PATH!");
+    mp_msg(MSGT_WIN32, MSGL_V, "Setting PATH to %s\n", win32path);
+    if (!SetEnvironmentVariableA("PATH", win32path))
+        mp_msg(MSGT_WIN32, MSGL_WARN, "Cannot set PATH!");
 }
 #endif /* (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL) */
 

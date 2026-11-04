@@ -179,7 +179,7 @@ static int tdfx_vid_find_card(void)
   tdfx_ram_size = get_lfb_size();
 
   printk(KERN_INFO "tdfx_vid: Found %d MB (%d bytes) of memory\n",
-	 tdfx_ram_size / 1024 / 1024,tdfx_ram_size);
+         tdfx_ram_size / 1024 / 1024,tdfx_ram_size);
 
 
 #if 0
@@ -189,11 +189,11 @@ static int tdfx_vid_find_card(void)
     for(temp=0;temp<DEVICE_COUNT_RESOURCE;temp++){
       struct resource *res=&pci_dev->resource[temp];
       if(res->flags){
-	int size=(1+res->end-res->start)>>20;
-	printk(KERN_DEBUG "res %d:  start: 0x%X   end: 0x%X  (%d MB) flags=0x%X\n",temp,res->start,res->end,size,res->flags);
-	if(res->flags&(IORESOURCE_MEM|IORESOURCE_PREFETCH)){
-	  if(size>tdfx_ram_size && size<=64) tdfx_ram_size=size;
-	}
+        int size=(1+res->end-res->start)>>20;
+        printk(KERN_DEBUG "res %d:  start: 0x%X   end: 0x%X  (%d MB) flags=0x%X\n",temp,res->start,res->end,size,res->flags);
+        if(res->flags&(IORESOURCE_MEM|IORESOURCE_PREFETCH)){
+          if(size>tdfx_ram_size && size<=64) tdfx_ram_size=size;
+        }
       }
     }
   }
@@ -221,14 +221,14 @@ static int agp_init(void) {
   drm_agp->copy_info(&agp_info);
 #if 0
   printk(KERN_DEBUG "AGP Version : %d %d\n"
-	 "AGP Mode: %#X\nAperture Base: %p\nAperture Size: %d\n"
-	 "Max memory = %d\nCurrent mem = %d\nCan use perture : %s\n"
-	 "Page mask = %#X\n",
-	 agp_info.version.major,agp_info.version.minor,
-	 agp_info.mode,agp_info.aper_base,agp_info.aper_size,
-	 agp_info.max_memory,agp_info.current_memory,
-	 agp_info.cant_use_aperture ? "no" : "yes",
-	 agp_info.page_mask);
+         "AGP Mode: %#X\nAperture Base: %p\nAperture Size: %d\n"
+         "Max memory = %d\nCurrent mem = %d\nCan use perture : %s\n"
+         "Page mask = %#X\n",
+         agp_info.version.major,agp_info.version.minor,
+         agp_info.mode,agp_info.aper_base,agp_info.aper_size,
+         agp_info.max_memory,agp_info.current_memory,
+         agp_info.cant_use_aperture ? "no" : "yes",
+         agp_info.page_mask);
 #endif
   drm_agp->enable(agp_info.mode);
 
@@ -262,7 +262,7 @@ static int agp_move(tdfx_vid_agp_move_t* m) {
 
   if(m->move2 > 3) {
     printk(KERN_DEBUG "tdfx_vid: AGP move invalid destination %d\n",
-	   m->move2);
+           m->move2);
     return -EAGAIN;
   }
 
@@ -664,7 +664,7 @@ static int tdfx_vid_set_overlay(unsigned long arg) {
   tdfx_outl(VIDOVRSTARTCRD,(ov.dst_x & 0xFFF)|((ov.dst_y & 0xFFF)<<12));
   // End coord
   tdfx_outl(VIDOVRENDCRD, ((ov.dst_x + disp_w-1) & 0xFFF)|
-	    (((ov.dst_y + disp_h-1) & 0xFFF)<<12));
+            (((ov.dst_y + disp_h-1) & 0xFFF)<<12));
   // H Scaling
   tdfx_outl(VIDOVRDUDX,( ((u32)ov.src_width) << 20) / ov.dst_width);
   // Src offset and width (in bytes)
@@ -689,7 +689,7 @@ static int tdfx_vid_set_overlay(unsigned long arg) {
     tdfx_outl(SWAPBUFCMD, 1);
   }
   //printk(KERN_DEBUG "tdfx_vid: Buf0=0x%x Buf1=0x%x Current=0x%x\n",
-  //	 ov.src[0],ov.src[1],tdfx_inl(VIDCUROVRSTART));
+  //     ov.src[0],ov.src[1],tdfx_inl(VIDCUROVRSTART));
   // Colorkey
   if(ov.use_colorkey) {
     tdfx_outl(VIDCHRMIN,ov.colorkey[0]);
@@ -787,13 +787,13 @@ static int tdfx_vid_ioctl(struct inode *inode, struct file *file, unsigned int c
 
 static ssize_t tdfx_vid_read(struct file *file, char *buf, size_t count, loff_t *ppos)
 {
-	return 0;
+        return 0;
 }
 
 static ssize_t tdfx_vid_write(struct file *file, const char *buf, size_t count, loff_t *ppos)
 {
 
-	return 0;
+        return 0;
 }
 
 static void tdfx_vid_mopen(struct vm_area_struct *vma) {
@@ -836,8 +836,8 @@ static void tdfx_vid_mclose(struct vm_area_struct *vma)  {
 }
 
 static struct page *tdfx_vid_nopage(struct vm_area_struct *vma,
-				    unsigned long address,
-				    int write_access) {
+                                    unsigned long address,
+                                    int write_access) {
   unsigned long off;
   uint32_t n;
   struct page *page;
@@ -883,14 +883,14 @@ static int tdfx_vid_mmap(struct file *file, struct vm_area_struct *vma)
     }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,3)
     if(remap_page_range(vma, vma->vm_start,map_start,
-			vma->vm_end - vma->vm_start, vma->vm_page_prot))
+                        vma->vm_end - vma->vm_start, vma->vm_page_prot))
 #else
     if(remap_page_range(vma->vm_start, (unsigned long)map_start,
-			vma->vm_end - vma->vm_start, vma->vm_page_prot))
+                        vma->vm_end - vma->vm_start, vma->vm_page_prot))
 #endif
       {
-	printk(KERN_ERR "tdfx_vid: error mapping video memory\n");
-	return -EAGAIN;
+        printk(KERN_ERR "tdfx_vid: error mapping video memory\n");
+        return -EAGAIN;
       }
     printk(KERN_INFO "Physical mem 0x%lx mapped in userspace\n",map_start);
     return 0;
@@ -913,20 +913,20 @@ static int tdfx_vid_mmap(struct file *file, struct vm_area_struct *vma)
   }
 
   printk(KERN_INFO "%d pages of AGP mem allocated (%ld/%ld bytes) :)))\n",
-	 size,vma->vm_end-vma->vm_start,size*PAGE_SIZE);
+         size,vma->vm_end-vma->vm_start,size*PAGE_SIZE);
 
 
   if(tdfx_map_io) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,3)
     if(remap_page_range(vma, vma->vm_start,agp_info.aper_base,
-			vma->vm_end - vma->vm_start, vma->vm_page_prot))
+                        vma->vm_end - vma->vm_start, vma->vm_page_prot))
 #else
     if(remap_page_range(vma->vm_start, (unsigned long)agp_info.aper_base,
-			vma->vm_end - vma->vm_start, vma->vm_page_prot))
+                        vma->vm_end - vma->vm_start, vma->vm_page_prot))
 #endif
       {
-	printk(KERN_ERR "tdfx_vid: error mapping video memory\n");
-	return -EAGAIN;
+        printk(KERN_ERR "tdfx_vid: error mapping video memory\n");
+        return -EAGAIN;
       }
   } else {
     // Never swap it out
@@ -961,36 +961,36 @@ static int tdfx_vid_release(struct inode *inode, struct file *file)
 
 static long long tdfx_vid_lseek(struct file *file, long long offset, int origin)
 {
-	return -ESPIPE;
+        return -ESPIPE;
 }
 
 static int tdfx_vid_open(struct inode *inode, struct file *file)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,2)
-	int minor = MINOR(inode->i_rdev.value);
+        int minor = MINOR(inode->i_rdev.value);
 #else
-	int minor = MINOR(inode->i_rdev);
+        int minor = MINOR(inode->i_rdev);
 #endif
 
-	if(minor != 0)
-	 return -ENXIO;
+        if(minor != 0)
+         return -ENXIO;
 
-	if(tdfx_vid_in_use == 1)
-		return -EBUSY;
+        if(tdfx_vid_in_use == 1)
+                return -EBUSY;
 
-	tdfx_vid_in_use = 1;
-	MOD_INC_USE_COUNT;
-	return 0;
+        tdfx_vid_in_use = 1;
+        MOD_INC_USE_COUNT;
+        return 0;
 }
 
 #if LINUX_VERSION_CODE >= 0x020400
 static struct file_operations tdfx_vid_fops =
 {
   llseek:  tdfx_vid_lseek,
-  read:	   tdfx_vid_read,
+  read:    tdfx_vid_read,
   write:   tdfx_vid_write,
   ioctl:   tdfx_vid_ioctl,
-  mmap:	   tdfx_vid_mmap,
+  mmap:    tdfx_vid_mmap,
   open:    tdfx_vid_open,
   release: tdfx_vid_release
 };

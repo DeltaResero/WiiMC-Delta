@@ -42,7 +42,7 @@ extern "C" {
 class ReadBufferQueue {
 public:
   ReadBufferQueue(MediaSubsession* subsession, demuxer_t* demuxer,
-		  char const* tag);
+                  char const* tag);
   virtual ~ReadBufferQueue();
 
   FramedSource* readSource() const { return fReadSource; }
@@ -150,34 +150,34 @@ extern "C" demuxer_t* demux_open_rtp(demuxer_t* demuxer) {
       char const* protocol = demuxer->stream->streaming_ctrl->url->protocol;
       char const* url = demuxer->stream->streaming_ctrl->url->url;
       if (strcmp(protocol, "rtsp") == 0) {
-	if (rtsp_transport_http == 1) {
-	  rtsp_transport_http = demuxer->stream->streaming_ctrl->url->port;
-	  rtsp_transport_tcp = 1;
-	}
-	rtspClient = RTSPClient::createNew(*env, verbose, "MPlayer", rtsp_transport_http);
-	if (rtspClient == NULL) {
-	  fprintf(stderr, "Failed to create RTSP client: %s\n",
-		  env->getResultMsg());
-	  break;
-	}
-	sdpDescription = openURL_rtsp(rtspClient, url);
+        if (rtsp_transport_http == 1) {
+          rtsp_transport_http = demuxer->stream->streaming_ctrl->url->port;
+          rtsp_transport_tcp = 1;
+        }
+        rtspClient = RTSPClient::createNew(*env, verbose, "MPlayer", rtsp_transport_http);
+        if (rtspClient == NULL) {
+          fprintf(stderr, "Failed to create RTSP client: %s\n",
+                  env->getResultMsg());
+          break;
+        }
+        sdpDescription = openURL_rtsp(rtspClient, url);
       } else { // SIP
-	unsigned char desiredAudioType = 0; // PCMU (use 3 for GSM)
-	sipClient = SIPClient::createNew(*env, desiredAudioType, NULL,
-					 verbose, "MPlayer");
-	if (sipClient == NULL) {
-	  fprintf(stderr, "Failed to create SIP client: %s\n",
-		  env->getResultMsg());
-	  break;
-	}
-	sipClient->setClientStartPortNum(8000);
-	sdpDescription = openURL_sip(sipClient, url);
+        unsigned char desiredAudioType = 0; // PCMU (use 3 for GSM)
+        sipClient = SIPClient::createNew(*env, desiredAudioType, NULL,
+                                         verbose, "MPlayer");
+        if (sipClient == NULL) {
+          fprintf(stderr, "Failed to create SIP client: %s\n",
+                  env->getResultMsg());
+          break;
+        }
+        sipClient->setClientStartPortNum(8000);
+        sdpDescription = openURL_sip(sipClient, url);
       }
 
       if (sdpDescription == NULL) {
-	fprintf(stderr, "Failed to get a SDP description from URL \"%s\": %s\n",
-		url, env->getResultMsg());
-	break;
+        fprintf(stderr, "Failed to get a SDP description from URL \"%s\": %s\n",
+                url, env->getResultMsg());
+        break;
       }
     }
 
@@ -206,51 +206,51 @@ extern "C" demuxer_t* demux_open_rtp(demuxer_t* demuxer) {
     while ((subsession = iter.next()) != NULL) {
       // Ignore any subsession that's not audio or video:
       if (strcmp(subsession->mediumName(), "audio") == 0) {
-	if (audiofound) {
-	  fprintf(stderr, "Additional subsession \"audio/%s\" skipped\n", subsession->codecName());
-	  continue;
-	}
-	desiredReceiveBufferSize = 100000;
+        if (audiofound) {
+          fprintf(stderr, "Additional subsession \"audio/%s\" skipped\n", subsession->codecName());
+          continue;
+        }
+        desiredReceiveBufferSize = 100000;
       } else if (strcmp(subsession->mediumName(), "video") == 0) {
-	if (videofound) {
-	  fprintf(stderr, "Additional subsession \"video/%s\" skipped\n", subsession->codecName());
-	  continue;
-	}
-	desiredReceiveBufferSize = 2000000;
+        if (videofound) {
+          fprintf(stderr, "Additional subsession \"video/%s\" skipped\n", subsession->codecName());
+          continue;
+        }
+        desiredReceiveBufferSize = 2000000;
       } else {
-	continue;
+        continue;
       }
 
       if (rtsp_port)
           subsession->setClientPortNum (rtsp_port);
 
       if (!subsession->initiate()) {
-	fprintf(stderr, "Failed to initiate \"%s/%s\" RTP subsession: %s\n", subsession->mediumName(), subsession->codecName(), env->getResultMsg());
+        fprintf(stderr, "Failed to initiate \"%s/%s\" RTP subsession: %s\n", subsession->mediumName(), subsession->codecName(), env->getResultMsg());
       } else {
-	fprintf(stderr, "Initiated \"%s/%s\" RTP subsession on port %d\n", subsession->mediumName(), subsession->codecName(), subsession->clientPortNum());
+        fprintf(stderr, "Initiated \"%s/%s\" RTP subsession on port %d\n", subsession->mediumName(), subsession->codecName(), subsession->clientPortNum());
 
-	// Set the OS's socket receive buffer sufficiently large to avoid
-	// incoming packets getting dropped between successive reads from this
-	// subsession's demuxer.  Depending on the bitrate(s) that you expect,
-	// you may wish to tweak the "desiredReceiveBufferSize" values above.
-	int rtpSocketNum = subsession->rtpSource()->RTPgs()->socketNum();
-	int receiveBufferSize
-	  = increaseReceiveBufferTo(*env, rtpSocketNum,
-				    desiredReceiveBufferSize);
-	if (verbose > 0) {
-	  fprintf(stderr, "Increased %s socket receive buffer to %d bytes \n",
-		  subsession->mediumName(), receiveBufferSize);
-	}
+        // Set the OS's socket receive buffer sufficiently large to avoid
+        // incoming packets getting dropped between successive reads from this
+        // subsession's demuxer.  Depending on the bitrate(s) that you expect,
+        // you may wish to tweak the "desiredReceiveBufferSize" values above.
+        int rtpSocketNum = subsession->rtpSource()->RTPgs()->socketNum();
+        int receiveBufferSize
+          = increaseReceiveBufferTo(*env, rtpSocketNum,
+                                    desiredReceiveBufferSize);
+        if (verbose > 0) {
+          fprintf(stderr, "Increased %s socket receive buffer to %d bytes \n",
+                  subsession->mediumName(), receiveBufferSize);
+        }
 
-	if (rtspClient != NULL) {
-	  // Issue a RTSP "SETUP" command on the chosen subsession:
-	  if (!rtspClient->setupMediaSubsession(*subsession, False,
-						rtsp_transport_tcp)) break;
-	  if (!strcmp(subsession->mediumName(), "audio"))
-	    audiofound = 1;
-	  if (!strcmp(subsession->mediumName(), "video"))
+        if (rtspClient != NULL) {
+          // Issue a RTSP "SETUP" command on the chosen subsession:
+          if (!rtspClient->setupMediaSubsession(*subsession, False,
+                                                rtsp_transport_tcp)) break;
+          if (!strcmp(subsession->mediumName(), "audio"))
+            audiofound = 1;
+          if (!strcmp(subsession->mediumName(), "video"))
             videofound = 1;
-	}
+        }
       }
     }
 
@@ -269,15 +269,15 @@ extern "C" demuxer_t* demux_open_rtp(demuxer_t* demuxer) {
 
       unsigned flags = 0;
       if (strcmp(subsession->mediumName(), "audio") == 0) {
-	rtpState->audioBufferQueue
-	  = new ReadBufferQueue(subsession, demuxer, "audio");
-	rtpState->audioBufferQueue->otherQueue = &(rtpState->videoBufferQueue);
-	rtpCodecInitialize_audio(demuxer, subsession, flags);
+        rtpState->audioBufferQueue
+          = new ReadBufferQueue(subsession, demuxer, "audio");
+        rtpState->audioBufferQueue->otherQueue = &(rtpState->videoBufferQueue);
+        rtpCodecInitialize_audio(demuxer, subsession, flags);
       } else if (strcmp(subsession->mediumName(), "video") == 0) {
-	rtpState->videoBufferQueue
-	  = new ReadBufferQueue(subsession, demuxer, "video");
-	rtpState->videoBufferQueue->otherQueue = &(rtpState->audioBufferQueue);
-	rtpCodecInitialize_video(demuxer, subsession, flags);
+        rtpState->videoBufferQueue
+          = new ReadBufferQueue(subsession, demuxer, "video");
+        rtpState->videoBufferQueue->otherQueue = &(rtpState->audioBufferQueue);
+        rtpCodecInitialize_video(demuxer, subsession, flags);
       }
       rtpState->flags |= flags;
     }
@@ -291,7 +291,7 @@ extern "C" demuxer_t* demux_open_rtp(demuxer_t* demuxer) {
   if (demux_is_multiplexed_rtp_stream(demuxer)) {
     stream_t* s = new_ds_stream(demuxer->video);
     demuxer_t* od = demux_open(s, DEMUXER_TYPE_UNKNOWN,
-			       audio_id, video_id, dvdsub_id, NULL);
+                               audio_id, video_id, dvdsub_id, NULL);
     demuxer = new_demuxers_demuxer(od, od, od);
   }
 
@@ -313,8 +313,8 @@ extern "C" int demux_is_multiplexed_rtp_stream(demuxer_t* demuxer) {
 }
 
 static demux_packet_t* getBuffer(demuxer_t* demuxer, demux_stream_t* ds,
-				 Boolean mustGetNewData,
-				 float& ptsBehind); // forward
+                                 Boolean mustGetNewData,
+                                 float& ptsBehind); // forward
 
 extern "C" int demux_rtp_fill_buffer(demuxer_t* demuxer, demux_stream_t* ds) {
   // Get a filled-in "demux_packet" from the RTP source, and deliver it.
@@ -342,8 +342,8 @@ extern "C" int demux_rtp_fill_buffer(demuxer_t* demuxer, demux_stream_t* ds) {
     const float ptsBehindThreshold = 1.0; // seconds
     const float ptsBehindLimit = 60.0; // seconds
     if (ptsBehind < ptsBehindThreshold ||
-	ptsBehind > ptsBehindLimit ||
-	rtsp_transport_tcp) { // packet's OK
+        ptsBehind > ptsBehindLimit ||
+        rtsp_transport_tcp) { // packet's OK
       ds_add_packet(ds, dp);
       break;
     }
@@ -360,8 +360,8 @@ extern "C" int demux_rtp_fill_buffer(demuxer_t* demuxer, demux_stream_t* ds) {
 }
 
 Boolean awaitRTPPacket(demuxer_t* demuxer, demux_stream_t* ds,
-		       unsigned char*& packetData, unsigned& packetDataLen,
-		       float& pts) {
+                       unsigned char*& packetData, unsigned& packetDataLen,
+                       float& pts) {
   // Similar to "demux_rtp_fill_buffer()", except that the "demux_packet"
   // is not delivered to the "demux_stream".
   float ptsBehind;
@@ -412,13 +412,13 @@ extern "C" void demux_close_rtp(demuxer_t* demuxer) {
     // >= the largest conceivable frame composed from one or more RTP packets
 
 static void afterReading(void* clientData, unsigned frameSize,
-			 unsigned /*numTruncatedBytes*/,
-			 struct timeval presentationTime,
-			 unsigned /*durationInMicroseconds*/) {
+                         unsigned /*numTruncatedBytes*/,
+                         struct timeval presentationTime,
+                         unsigned /*durationInMicroseconds*/) {
   int headersize = 0;
   if (frameSize >= MAX_RTP_FRAME_SIZE) {
     fprintf(stderr, "Saw an input frame too large (>=%d).  Increase MAX_RTP_FRAME_SIZE in \"demux_rtp.cpp\".\n",
-	    MAX_RTP_FRAME_SIZE);
+            MAX_RTP_FRAME_SIZE);
   }
   ReadBufferQueue* bufferQueue = (ReadBufferQueue*)clientData;
   demuxer_t* demuxer = bufferQueue->ourDemuxer();
@@ -447,7 +447,7 @@ static void afterReading(void* clientData, unsigned frameSize,
   if (hasBeenSynchronized) {
     if (verbose > 0 && !bufferQueue->prevPacketWasSynchronized) {
       fprintf(stderr, "%s stream has been synchronized using RTCP \n",
-	      bufferQueue->tag());
+              bufferQueue->tag());
     }
 
     struct timeval* fst = &(rtpState->firstSyncTime); // abbrev
@@ -464,7 +464,7 @@ static void afterReading(void* clientData, unsigned frameSize,
   } else {
     if (verbose > 0 && bufferQueue->prevPacketWasSynchronized) {
       fprintf(stderr, "%s stream is no longer RTCP-synchronized \n",
-	      bufferQueue->tag());
+              bufferQueue->tag());
     }
 
     // use the previous packet's "pts" once again:
@@ -490,8 +490,8 @@ static void onSourceClosure(void* clientData) {
 }
 
 static demux_packet_t* getBuffer(demuxer_t* demuxer, demux_stream_t* ds,
-				 Boolean mustGetNewData,
-				 float& ptsBehind) {
+                                 Boolean mustGetNewData,
+                                 float& ptsBehind) {
   // Begin by finding the buffer queue that we want to read from:
   // (Get this from the RTP state, which we stored in
   //  the demuxer's 'priv' field)
@@ -570,8 +570,8 @@ static demux_packet_t* getBuffer(demuxer_t* demuxer, demux_stream_t* ds,
   // Schedule the read operation:
   bufferQueue->blockingFlag = 0;
   bufferQueue->readSource()->getNextFrame(&dp->buffer[headersize], MAX_RTP_FRAME_SIZE - headersize,
-					  afterReading, bufferQueue,
-					  onSourceClosure, bufferQueue);
+                                          afterReading, bufferQueue,
+                                          onSourceClosure, bufferQueue);
   // Block ourselves until data becomes available:
   TaskScheduler& scheduler
     = bufferQueue->readSource()->envir().taskScheduler();
@@ -628,7 +628,7 @@ static demux_packet_t* getBuffer(demuxer_t* demuxer, demux_stream_t* ds,
       && (*(bufferQueue->otherQueue))->prevPacketPTS != 0.0
       && (*(bufferQueue->otherQueue))->prevPacketWasSynchronized) {
     ptsBehind = (*(bufferQueue->otherQueue))->prevPacketPTS
-		 - bufferQueue->prevPacketPTS;
+                 - bufferQueue->prevPacketPTS;
   } else {
     ptsBehind = 0.0;
   }
@@ -654,7 +654,7 @@ static void teardownRTSPorSIPSession(RTPState* rtpState) {
 ////////// "ReadBuffer" and "ReadBufferQueue" implementation:
 
 ReadBufferQueue::ReadBufferQueue(MediaSubsession* subsession,
-				 demuxer_t* demuxer, char const* tag)
+                                 demuxer_t* demuxer, char const* tag)
   : prevPacketWasSynchronized(False), prevPacketPTS(0.0), otherQueue(NULL),
     dp(NULL), nextpacket(NULL),
     pendingDPHead(NULL), pendingDPTail(NULL),

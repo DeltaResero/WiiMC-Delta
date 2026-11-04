@@ -110,7 +110,7 @@ while(1){
     }
   default:
     mp_msg(MSGT_OSDEP, MSGL_FATAL,
-	"FATAL: Cannot allocate %"PRId64" bytes of shared memory :(\n",size);
+        "FATAL: Cannot allocate %"PRId64" bytes of shared memory :(\n",size);
     return NULL;
   }
   ++shmem_type;
@@ -126,18 +126,18 @@ p = NULL;
   switch(shmem_type){
     case 0:
     case 1:
-	    if(munmap(p,size)) {
-		mp_msg(MSGT_OSDEP, MSGL_ERR, "munmap failed on %p %"PRId64" bytes: %s\n",
-		    p,size,strerror(errno));
-	    }
+            if(munmap(p,size)) {
+                mp_msg(MSGT_OSDEP, MSGL_ERR, "munmap failed on %p %"PRId64" bytes: %s\n",
+                    p,size,strerror(errno));
+            }
       break;
     case 2:
 #ifdef HAVE_SHM
-	    if (shmdt(p) == -1)
-		mp_msg(MSGT_OSDEP, MSGL_ERR, "shmfree: shmdt() failed: %s\n",
-		    strerror(errno));
+            if (shmdt(p) == -1)
+                mp_msg(MSGT_OSDEP, MSGL_ERR, "shmfree: shmdt() failed: %s\n",
+                    strerror(errno));
 #else
-	    mp_msg(MSGT_OSDEP, MSGL_ERR, "shmfree: no SHM support was compiled in!\n");
+            mp_msg(MSGT_OSDEP, MSGL_ERR, "shmfree: no SHM support was compiled in!\n");
 #endif
       break;
   }

@@ -39,11 +39,11 @@
 
 static const ad_info_t info =
 {
-	"Duck Corp. DK3 ADPCM decoder",
-	"dk3adpcm",
-	"Nick Kurshev",
-	"Mike Melanson",
-	""
+        "Duck Corp. DK3 ADPCM decoder",
+        "dk3adpcm",
+        "Nick Kurshev",
+        "Mike Melanson",
+        ""
 };
 
 LIBAD_EXTERN(dk3adpcm)

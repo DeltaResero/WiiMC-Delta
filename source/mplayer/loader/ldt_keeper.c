@@ -99,7 +99,7 @@ struct modify_ldt_ldt_s {
 /* i got this value from wine sources, it's the first free LDT entry */
 #if (defined(__APPLE__) || defined(__FreeBSD__)) && defined(LDT_AUTO_ALLOC)
 #define       TEB_SEL_IDX     LDT_AUTO_ALLOC
-#define	      USE_LDT_AA
+#define       USE_LDT_AA
 #endif
 
 #ifndef       TEB_SEL_IDX
@@ -119,8 +119,8 @@ void Setup_FS_Segment(void)
     unsigned int ldt_desc = LDT_SEL(fs_ldt);
 
     __asm__ volatile(
-	"movl %0,%%eax; movw %%ax, %%fs" : : "r" (ldt_desc)
-	:"eax"
+        "movl %0,%%eax; movw %%ax, %%fs" : : "r" (ldt_desc)
+        :"eax"
     );
 }
 
@@ -130,28 +130,28 @@ void Setup_FS_Segment(void)
 /* XXX: why is this routine from libc redefined here? */
 /* NOTE: the redefined version ignores the count param, count is hardcoded as 16 */
 static int LDT_Modify( int func, struct modify_ldt_ldt_s *ptr,
-		       unsigned long count )
+                       unsigned long count )
 {
     int res;
 #ifdef __PIC__
     __asm__ volatile( "pushl %%ebx\n\t"
-			  "movl %2,%%ebx\n\t"
-			  "int $0x80\n\t"
-			  "popl %%ebx"
-			  : "=a" (res)
-			  : "0" (__NR_modify_ldt),
-			  "r" (func),
-			  "c" (ptr),
-			  "d"(16)//sizeof(*ptr) from kernel point of view
-			  :"esi"     );
+                          "movl %2,%%ebx\n\t"
+                          "int $0x80\n\t"
+                          "popl %%ebx"
+                          : "=a" (res)
+                          : "0" (__NR_modify_ldt),
+                          "r" (func),
+                          "c" (ptr),
+                          "d"(16)//sizeof(*ptr) from kernel point of view
+                          :"esi"     );
 #else
     __asm__ volatile("int $0x80"
-			 : "=a" (res)
-			 : "0" (__NR_modify_ldt),
-			 "b" (func),
-			 "c" (ptr),
-			 "d"(16)
-			 :"esi");
+                         : "=a" (res)
+                         : "0" (__NR_modify_ldt),
+                         "b" (func),
+                         "c" (ptr),
+                         "d"(16)
+                         :"esi");
 #endif  /* __PIC__ */
     if (res >= 0) return res;
     errno = -res;
@@ -164,15 +164,15 @@ static int LDT_Modify( int func, struct modify_ldt_ldt_s *ptr,
 static void LDT_EntryToBytes( unsigned long *buffer, const struct modify_ldt_ldt_s *content )
 {
     *buffer++ = ((content->base_addr & 0x0000ffff) << 16) |
-	(content->limit & 0x0ffff);
+        (content->limit & 0x0ffff);
     *buffer = (content->base_addr & 0xff000000) |
-	((content->base_addr & 0x00ff0000)>>16) |
-	(content->limit & 0xf0000) |
-	(content->contents << 10) |
-	((content->read_exec_only == 0) << 9) |
-	((content->seg_32bit != 0) << 22) |
-	((content->limit_in_pages != 0) << 23) |
-	0xf000;
+        ((content->base_addr & 0x00ff0000)>>16) |
+        (content->limit & 0xf0000) |
+        (content->contents << 10) |
+        ((content->read_exec_only == 0) << 9) |
+        ((content->seg_32bit != 0) << 22) |
+        ((content->limit_in_pages != 0) << 23) |
+        0xf000;
 }
 #endif
 
@@ -185,7 +185,7 @@ ldt_fs_t* Setup_LDT_Keeper(void)
     ldt_fs_t* ldt_fs = malloc(sizeof(ldt_fs_t));
 
     if (!ldt_fs)
-	return NULL;
+        return NULL;
 
 #ifdef __APPLE__
     if (getenv("DYLD_BIND_AT_LAUNCH") == NULL)
@@ -196,9 +196,9 @@ ldt_fs_t* Setup_LDT_Keeper(void)
     ldt_fs->fs_seg = mmap_anon(NULL, getpagesize(), PROT_READ | PROT_WRITE, MAP_PRIVATE, 0);
     if (ldt_fs->fs_seg == (void*)-1)
     {
-	perror("ERROR: Couldn't allocate memory for fs segment");
+        perror("ERROR: Couldn't allocate memory for fs segment");
         free(ldt_fs);
-	return NULL;
+        return NULL;
     }
     *(void**)((char*)ldt_fs->fs_seg+0x18) = ldt_fs->fs_seg;
     memset(&array, 0, sizeof(array));
@@ -215,8 +215,8 @@ ldt_fs_t* Setup_LDT_Keeper(void)
     ret=modify_ldt(0x1, &array, sizeof(struct modify_ldt_ldt_s));
     if(ret<0)
     {
-	perror("install_fs");
-	printf("Couldn't install fs segment, expect segfault\n");
+        perror("install_fs");
+        printf("Couldn't install fs segment, expect segfault\n");
     }
 #elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
     {
@@ -233,27 +233,27 @@ ldt_fs_t* Setup_LDT_Keeper(void)
         if (ret < 0)
         {
             perror("install_fs");
-	    printf("Couldn't install fs segment, expect segfault\n");
+            printf("Couldn't install fs segment, expect segfault\n");
             printf("Did you reconfigure the kernel with \"options USER_LDT\"?\n");
 #ifdef __OpenBSD__
-	    printf("On newer OpenBSD systems did you set machdep.userldt to 1?\n");
+            printf("On newer OpenBSD systems did you set machdep.userldt to 1?\n");
 #endif
         }
     }
 #elif defined(__svr4__)
     {
-	struct ssd ssd;
-	ssd.sel = LDT_SEL(TEB_SEL_IDX);
-	ssd.bo = array.base_addr;
-	ssd.ls = array.limit - array.base_addr;
-	ssd.acc1 = ((array.read_exec_only == 0) << 1) |
-	    (array.contents << 2) |
-	    0xf0;   /* P(resent) | DPL3 | S */
-	ssd.acc2 = 0x4;   /* byte limit, 32-bit segment */
-	if (sysi86(SI86DSCR, &ssd) < 0) {
-	    perror("sysi86(SI86DSCR)");
-	    printf("Couldn't install fs segment, expect segfault\n");
-	}
+        struct ssd ssd;
+        ssd.sel = LDT_SEL(TEB_SEL_IDX);
+        ssd.bo = array.base_addr;
+        ssd.ls = array.limit - array.base_addr;
+        ssd.acc1 = ((array.read_exec_only == 0) << 1) |
+            (array.contents << 2) |
+            0xf0;   /* P(resent) | DPL3 | S */
+        ssd.acc2 = 0x4;   /* byte limit, 32-bit segment */
+        if (sysi86(SI86DSCR, &ssd) < 0) {
+            perror("sysi86(SI86DSCR)");
+            printf("Couldn't install fs segment, expect segfault\n");
+        }
     }
 #elif defined(__OS2__)
     /* convert flat addr to sel idx for LDT_SEL() */
@@ -271,7 +271,7 @@ ldt_fs_t* Setup_LDT_Keeper(void)
 void Restore_LDT_Keeper(ldt_fs_t* ldt_fs)
 {
     if (ldt_fs == NULL || ldt_fs->fs_seg == 0)
-	return;
+        return;
     free(ldt_fs->prev_struct);
     munmap((char*)ldt_fs->fs_seg, getpagesize());
     ldt_fs->fs_seg = 0;

@@ -12,12 +12,12 @@ typedef struct IMediaBuffer_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *SetLength )(IMediaBuffer* This,
-				   unsigned long cbLength);
+                   unsigned long cbLength);
     HRESULT STDCALL ( *GetMaxLength )(IMediaBuffer* This,
-				      /* [out] */ unsigned long *pcbMaxLength);
+                      /* [out] */ unsigned long *pcbMaxLength);
     HRESULT STDCALL ( *GetBufferAndLength )(IMediaBuffer* This,
-					    /* [out] */ char** ppBuffer,
-					    /* [out] */ unsigned long* pcbLength);
+                        /* [out] */ char** ppBuffer,
+                        /* [out] */ unsigned long* pcbLength);
 } IMediaBuffer_vt;
 struct IMediaBuffer { IMediaBuffer_vt* vt; };
 
@@ -40,70 +40,70 @@ typedef struct IMediaObject_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *GetStreamCount )(IMediaObject * This,
-					/* [out] */ unsigned long *pcInputStreams,
-					/* [out] */ unsigned long *pcOutputStreams);
+                    /* [out] */ unsigned long *pcInputStreams,
+                    /* [out] */ unsigned long *pcOutputStreams);
     HRESULT STDCALL ( *GetInputStreamInfo )(IMediaObject * This,
-					    unsigned long dwInputStreamIndex,
-					    /* [out] */ unsigned long *pdwFlags);
+                        unsigned long dwInputStreamIndex,
+                        /* [out] */ unsigned long *pdwFlags);
     HRESULT STDCALL ( *GetOutputStreamInfo )(IMediaObject * This,
-					     unsigned long dwOutputStreamIndex,
-					     /* [out] */ unsigned long *pdwFlags);
+                         unsigned long dwOutputStreamIndex,
+                         /* [out] */ unsigned long *pdwFlags);
     HRESULT STDCALL ( *GetInputType )(IMediaObject * This,
-				      unsigned long dwInputStreamIndex,
-				      unsigned long dwTypeIndex,
-				      /* [out] */ DMO_MEDIA_TYPE *pmt);
+                      unsigned long dwInputStreamIndex,
+                      unsigned long dwTypeIndex,
+                      /* [out] */ DMO_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *GetOutputType )(IMediaObject * This,
-				       unsigned long dwOutputStreamIndex,
-				       unsigned long dwTypeIndex,
-				       /* [out] */ DMO_MEDIA_TYPE *pmt);
+                       unsigned long dwOutputStreamIndex,
+                       unsigned long dwTypeIndex,
+                       /* [out] */ DMO_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *SetInputType )(IMediaObject * This,
-				      unsigned long dwInputStreamIndex,
-				      /* [in] */ const DMO_MEDIA_TYPE *pmt,
-				      unsigned long dwFlags);
+                      unsigned long dwInputStreamIndex,
+                      /* [in] */ const DMO_MEDIA_TYPE *pmt,
+                      unsigned long dwFlags);
     HRESULT STDCALL ( *SetOutputType )(IMediaObject * This,
-				       unsigned long dwOutputStreamIndex,
-				       /* [in] */ const DMO_MEDIA_TYPE *pmt,
-				       unsigned long dwFlags);
+                       unsigned long dwOutputStreamIndex,
+                       /* [in] */ const DMO_MEDIA_TYPE *pmt,
+                       unsigned long dwFlags);
     HRESULT STDCALL ( *GetInputCurrentType )(IMediaObject * This,
-					     unsigned long dwInputStreamIndex,
-					     /* [out] */ DMO_MEDIA_TYPE *pmt);
+                         unsigned long dwInputStreamIndex,
+                         /* [out] */ DMO_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *GetOutputCurrentType )(IMediaObject * This,
-					      unsigned long dwOutputStreamIndex,
-					      /* [out] */ DMO_MEDIA_TYPE *pmt);
+                          unsigned long dwOutputStreamIndex,
+                          /* [out] */ DMO_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *GetInputSizeInfo )(IMediaObject * This,
-					  unsigned long dwInputStreamIndex,
-					  /* [out] */ unsigned long *pcbSize,
-					  /* [out] */ unsigned long *pcbMaxLookahead,
-					  /* [out] */ unsigned long *pcbAlignment);
+                      unsigned long dwInputStreamIndex,
+                      /* [out] */ unsigned long *pcbSize,
+                      /* [out] */ unsigned long *pcbMaxLookahead,
+                      /* [out] */ unsigned long *pcbAlignment);
     HRESULT STDCALL ( *GetOutputSizeInfo )(IMediaObject * This,
-					   unsigned long dwOutputStreamIndex,
-					   /* [out] */ unsigned long *pcbSize,
-					   /* [out] */ unsigned long *pcbAlignment);
+                       unsigned long dwOutputStreamIndex,
+                       /* [out] */ unsigned long *pcbSize,
+                       /* [out] */ unsigned long *pcbAlignment);
     HRESULT STDCALL ( *GetInputMaxLatency )(IMediaObject * This,
-					    unsigned long dwInputStreamIndex,
-					    /* [out] */ REFERENCE_TIME *prtMaxLatency);
+                        unsigned long dwInputStreamIndex,
+                        /* [out] */ REFERENCE_TIME *prtMaxLatency);
     HRESULT STDCALL ( *SetInputMaxLatency )(IMediaObject * This,
-					    unsigned long dwInputStreamIndex,
-					    REFERENCE_TIME rtMaxLatency);
+                        unsigned long dwInputStreamIndex,
+                        REFERENCE_TIME rtMaxLatency);
     HRESULT STDCALL ( *Flush )(IMediaObject * This);
     HRESULT STDCALL ( *Discontinuity )(IMediaObject * This,
-				       unsigned long dwInputStreamIndex);
+                       unsigned long dwInputStreamIndex);
     HRESULT STDCALL ( *AllocateStreamingResources )(IMediaObject * This);
     HRESULT STDCALL ( *FreeStreamingResources )(IMediaObject * This);
     HRESULT STDCALL ( *GetInputStatus )(IMediaObject * This,
-					unsigned long dwInputStreamIndex,
-					/* [out] */ unsigned long *dwFlags);
+                    unsigned long dwInputStreamIndex,
+                    /* [out] */ unsigned long *dwFlags);
     HRESULT STDCALL ( *ProcessInput )(IMediaObject * This,
-				      unsigned long dwInputStreamIndex,
-				      IMediaBuffer *pBuffer,
-				      unsigned long dwFlags,
-				      REFERENCE_TIME rtTimestamp,
-				      REFERENCE_TIME rtTimelength);
+                      unsigned long dwInputStreamIndex,
+                      IMediaBuffer *pBuffer,
+                      unsigned long dwFlags,
+                      REFERENCE_TIME rtTimestamp,
+                      REFERENCE_TIME rtTimelength);
     HRESULT STDCALL ( *ProcessOutput )(IMediaObject * This,
-				       unsigned long dwFlags,
-				       unsigned long cOutputBufferCount,
-				       /* [size_is][out][in] */ DMO_OUTPUT_DATA_BUFFER *pOutputBuffers,
-				       /* [out] */ unsigned long *pdwStatus);
+                       unsigned long dwFlags,
+                       unsigned long cOutputBufferCount,
+                       /* [size_is][out][in] */ DMO_OUTPUT_DATA_BUFFER *pOutputBuffers,
+                       /* [out] */ unsigned long *pdwStatus);
     HRESULT STDCALL ( *Lock )(IMediaObject * This, long bLock);
 } IMediaObject_vt;
 struct IMediaObject { IMediaObject_vt* vt; };
@@ -117,15 +117,15 @@ typedef struct IEnumDMO_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *Next )(IEnumDMO * This,
-			      unsigned long cItemsToFetch,
-			      /* [length_is][size_is][out] */ CLSID *pCLSID,
-			      /* [string][length_is][size_is][out] */ WCHAR **Names,
-			      /* [out] */ unsigned long *pcItemsFetched);
+                  unsigned long cItemsToFetch,
+                  /* [length_is][size_is][out] */ CLSID *pCLSID,
+                  /* [string][length_is][size_is][out] */ WCHAR **Names,
+                  /* [out] */ unsigned long *pcItemsFetched);
     HRESULT STDCALL ( *Skip )(IEnumDMO * This,
-			      unsigned long cItemsToSkip);
+                  unsigned long cItemsToSkip);
     HRESULT STDCALL ( *Reset )(IEnumDMO * This);
     HRESULT STDCALL ( *Clone )(IEnumDMO * This,
-			       /* [out] */ IEnumDMO **ppEnum);
+                   /* [out] */ IEnumDMO **ppEnum);
 } IEnumDMO_vt;
 struct IEnumDMO { IEnumDMO_vt* vt; };
 
@@ -138,14 +138,14 @@ typedef struct IMediaObjectInPlace_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *Process )(IMediaObjectInPlace * This,
-				 /* [in] */ unsigned long ulSize,
-				 /* [size_is][out][in] */ BYTE *pData,
-				 /* [in] */ REFERENCE_TIME refTimeStart,
-				 /* [in] */ unsigned long dwFlags);
+                 /* [in] */ unsigned long ulSize,
+                 /* [size_is][out][in] */ BYTE *pData,
+                 /* [in] */ REFERENCE_TIME refTimeStart,
+                 /* [in] */ unsigned long dwFlags);
     HRESULT STDCALL ( *Clone )(IMediaObjectInPlace * This,
-			       /* [out] */ IMediaObjectInPlace **ppMediaObject);
+                   /* [out] */ IMediaObjectInPlace **ppMediaObject);
     HRESULT STDCALL ( *GetLatency )(IMediaObjectInPlace * This,
-				    /* [out] */ REFERENCE_TIME *pLatencyTime);
+                    /* [out] */ REFERENCE_TIME *pLatencyTime);
 
 } IMediaObjectInPlace_vt;
 struct IMediaObjectInPlace { IMediaObjectInPlace_vt* vt; };
@@ -160,11 +160,11 @@ typedef struct IDMOQualityControl_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *SetNow )(IDMOQualityControl * This,
-				/* [in] */ REFERENCE_TIME rtNow);
+                /* [in] */ REFERENCE_TIME rtNow);
     HRESULT STDCALL ( *SetStatus )(IDMOQualityControl * This,
-				   /* [in] */ unsigned long dwFlags);
+                   /* [in] */ unsigned long dwFlags);
     HRESULT STDCALL ( *GetStatus )(IDMOQualityControl * This,
-				   /* [out] */ unsigned long *pdwFlags);
+                   /* [out] */ unsigned long *pdwFlags);
 } IDMOQualityControl_vt;
 struct IDMOQualityControl { IDMOQualityControl_vt* vt; };
 
@@ -177,17 +177,17 @@ typedef struct IDMOVideoOutputOptimizations_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *QueryOperationModePreferences )(IDMOVideoOutputOptimizations * This,
-						       unsigned long ulOutputStreamIndex,
-						       unsigned long *pdwRequestedCapabilities);
+                               unsigned long ulOutputStreamIndex,
+                               unsigned long *pdwRequestedCapabilities);
     HRESULT STDCALL ( *SetOperationMode )(IDMOVideoOutputOptimizations * This,
-					  unsigned long ulOutputStreamIndex,
-					  unsigned long dwEnabledFeatures);
+                      unsigned long ulOutputStreamIndex,
+                      unsigned long dwEnabledFeatures);
     HRESULT STDCALL ( *GetCurrentOperationMode )(IDMOVideoOutputOptimizations * This,
-						 unsigned long ulOutputStreamIndex,
-						 unsigned long *pdwEnabledFeatures);
+                         unsigned long ulOutputStreamIndex,
+                         unsigned long *pdwEnabledFeatures);
     HRESULT STDCALL ( *GetCurrentSampleRequirements )(IDMOVideoOutputOptimizations * This,
-						      unsigned long ulOutputStreamIndex,
-						      unsigned long *pdwRequestedFeatures);
+                              unsigned long ulOutputStreamIndex,
+                              unsigned long *pdwRequestedFeatures);
 } IDMOVideoOutputOptimizations_vt;
 struct IDMOVideoOutputOptimizations { IDMOVideoOutputOptimizations_vt* vt; };
 

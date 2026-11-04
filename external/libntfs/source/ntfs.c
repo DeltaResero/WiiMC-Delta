@@ -491,13 +491,13 @@ bool ntfsMount (const char *name, const DISC_INTERFACE *interface, sec_t startSe
 
     // Build the mount flags
     if (flags & NTFS_READ_ONLY)
-    	vd->flags |= NTFS_MNT_RDONLY;
+        vd->flags |= NTFS_MNT_RDONLY;
     else
     {
-	    if (!(interface->features & FEATURE_MEDIUM_CANWRITE))
-	        vd->flags |= NTFS_MNT_RDONLY;
-	    if ((interface->features & FEATURE_MEDIUM_CANREAD) && (interface->features & FEATURE_MEDIUM_CANWRITE))
-	        vd->flags |= NTFS_MNT_EXCLUSIVE;
+        if (!(interface->features & FEATURE_MEDIUM_CANWRITE))
+            vd->flags |= NTFS_MNT_RDONLY;
+        if ((interface->features & FEATURE_MEDIUM_CANREAD) && (interface->features & FEATURE_MEDIUM_CANWRITE))
+            vd->flags |= NTFS_MNT_EXCLUSIVE;
     }
     if (flags & NTFS_RECOVER)
         vd->flags |= NTFS_MNT_RECOVER;

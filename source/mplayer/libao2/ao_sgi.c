@@ -34,17 +34,17 @@
 
 static const ao_info_t info =
 {
-	"sgi audio output",
-	"sgi",
-	"Oliver Schoenbrunner",
-	""
+        "sgi audio output",
+        "sgi",
+        "Oliver Schoenbrunner",
+        ""
 };
 
 LIBAO_EXTERN(sgi)
 
 
-static ALconfig	ao_config;
-static ALport	ao_port;
+static ALconfig ao_config;
+static ALport   ao_port;
 static int sample_rate;
 static int queue_size;
 static int bytes_per_frame;
@@ -148,8 +148,8 @@ static int init(int rate, int channels, int format, int flags) {
     if(ao_subdevice) {
       rv = alGetResourceByName(AL_SYSTEM, ao_subdevice, AL_OUTPUT_DEVICE_TYPE);
       if (!rv) {
-	mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_SGI_InvalidDevice);
-	return 0;
+        mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_SGI_InvalidDevice);
+        return 0;
       }
     }
 

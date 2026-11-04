@@ -77,13 +77,13 @@ typedef struct af_surround_s
 {
   float lq[2*L]; // Circular queue for filtering left rear channel
   float rq[2*L]; // Circular queue for filtering right rear channel
-  float w[L]; 	 // FIR filter coefficients for surround sound 7kHz low-pass
-  float* dr;	 // Delay queue right rear channel
-  float* dl;	 // Delay queue left rear channel
-  float  d;	 // Delay time
-  int i;       	 // Position in circular buffer
-  int wi;	 // Write index for delay queue
-  int ri;	 // Read index for delay queue
+  float w[L];    // FIR filter coefficients for surround sound 7kHz low-pass
+  float* dr;     // Delay queue right rear channel
+  float* dl;     // Delay queue left rear channel
+  float  d;      // Delay time
+  int i;         // Position in circular buffer
+  int wi;        // Write index for delay queue
+  int ri;        // Read index for delay queue
 }af_surround_t;
 
 // Initialization and runtime control
@@ -137,7 +137,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     sscanf((char*)arg,"%f",&d);
     if ((d < 0) || (d > 1000)){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[surround] Invalid delay time, valid time values"
-	     " are 0ms to 1000ms current value is %0.3f ms\n",d);
+             " are 0ms to 1000ms current value is %0.3f ms\n",d);
       return AF_ERROR;
     }
     s->d = d;
@@ -158,10 +158,10 @@ static void uninit(struct af_instance_s* af)
 
 // The beginnings of an active matrix...
 static float steering_matrix[][12] = {
-//	LL	RL	LR	RR	LS	RS
-//	LLs	RLs	LRs	RRs	LC	RC
-       {.707,	.0,	.0,	.707,	.5,	-.5,
-	.5878,	-.3928,	.3928,	-.5878,	.5,	.5},
+//      LL      RL      LR      RR      LS      RS
+//      LLs     RLs     LRs     RRs     LC      RC
+       {.707,   .0,     .0,     .707,   .5,     -.5,
+        .5878,  -.3928, .3928,  -.5878, .5,     .5},
 };
 
 // Experimental moving average dominance
@@ -170,13 +170,13 @@ static float steering_matrix[][12] = {
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data){
   af_surround_t* s   = (af_surround_t*)af->setup;
-  float*	 m   = steering_matrix[0];
-  float*     	 in  = data->audio; 	// Input audio data
-  float*     	 out = NULL;		// Output audio data
-  float*	 end = in + data->len / sizeof(float); // Loop end
-  int 		 i   = s->i;	// Filter queue index
-  int 		 ri  = s->ri;	// Read index for delay queue
-  int 		 wi  = s->wi;	// Write index for delay queue
+  float*         m   = steering_matrix[0];
+  float*         in  = data->audio;     // Input audio data
+  float*         out = NULL;            // Output audio data
+  float*         end = in + data->len / sizeof(float); // Loop end
+  int            i   = s->i;    // Filter queue index
+  int            ri  = s->ri;   // Read index for delay queue
+  int            wi  = s->wi;   // Write index for delay queue
 
   if (AF_OK != RESIZE_LOCAL_BUFFER(af, data))
     return NULL;

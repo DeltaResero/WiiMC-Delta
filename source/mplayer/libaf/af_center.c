@@ -35,7 +35,7 @@
 // Data for specific instances of this filter
 typedef struct af_center_s
 {
-  int ch;		// Channel number which to insert the filtered data
+  int ch;               // Channel number which to insert the filtered data
 }af_center_t;
 
 // Initialization and runtime control
@@ -64,7 +64,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     // Sanity check
     if((*(int*)arg >= AF_NCH) || (*(int*)arg < 0)){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[sub] Center channel number must be between "
-	     " 0 and %i current value is %i\n", AF_NCH-1, *(int*)arg);
+             " 0 and %i current value is %i\n", AF_NCH-1, *(int*)arg);
       return AF_ERROR;
     }
     s->ch = *(int*)arg;
@@ -86,12 +86,12 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*    c   = data;	 // Current working data
+  af_data_t*    c   = data;      // Current working data
   af_center_t*  s   = af->setup; // Setup for this instance
-  float*   	a   = c->audio;	 // Audio data
-  int		len = c->len/4;	 // Number of samples in current audio block
-  int		nch = c->nch;	 // Number of channels
-  int		ch  = s->ch;	 // Channel in which to insert the center audio
+  float*        a   = c->audio;  // Audio data
+  int           len = c->len/4;  // Number of samples in current audio block
+  int           nch = c->nch;    // Number of channels
+  int           ch  = s->ch;     // Channel in which to insert the center audio
   register int  i;
 
   // Run filter
@@ -115,7 +115,7 @@ static int af_open(af_instance_t* af){
   if(af->data == NULL || af->setup == NULL)
     return AF_ERROR;
   // Set default values
-  s->ch = 1;  	 // Channel nr 2
+  s->ch = 1;     // Channel nr 2
   return AF_OK;
 }
 

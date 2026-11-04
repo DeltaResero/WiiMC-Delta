@@ -49,15 +49,15 @@ static inline unsigned vcd_get_msf(mp_vcd_priv_t* vcd, int track){
     int index = track - vcd->toc.FirstTrack;
     /* -150 to compensate the 2-second pregap */
     return vcd->toc.TrackData[index].Address[3] +
-	(vcd->toc.TrackData[index].Address[2] +
-	 vcd->toc.TrackData[index].Address[1] * 60) * 75 - 150;
+        (vcd->toc.TrackData[index].Address[2] +
+         vcd->toc.TrackData[index].Address[1] * 60) * 75 - 150;
 }
 
 static int vcd_seek_to_track(mp_vcd_priv_t* vcd, int track)
 {
     unsigned sect;
     if (track < vcd->toc.FirstTrack || track > vcd->toc.LastTrack)
-	return -1;
+        return -1;
     sect = vcd_get_msf(vcd, track);
     vcd_set_msf(vcd, sect);
     return VCD_SECTOR_DATA * (sect + 2);
@@ -66,7 +66,7 @@ static int vcd_seek_to_track(mp_vcd_priv_t* vcd, int track)
 static int vcd_get_track_end(mp_vcd_priv_t* vcd, int track)
 {
     if (track < vcd->toc.FirstTrack || track > vcd->toc.LastTrack)
-	return -1;
+        return -1;
     return VCD_SECTOR_DATA * (vcd_get_msf(vcd, track + 1));
 }
 
@@ -77,55 +77,55 @@ static mp_vcd_priv_t* vcd_read_toc(int fd)
     int i, min = 0, sec = 0, frame = 0;
     mp_vcd_priv_t* vcd = malloc(sizeof(mp_vcd_priv_t));
     if (!vcd)
-	return NULL;
+        return NULL;
 
     hd = (HANDLE)_get_osfhandle(fd);
     if (!DeviceIoControl(hd, IOCTL_CDROM_READ_TOC, NULL, 0, &vcd->toc,
-		sizeof(CDROM_TOC), &dwBytesReturned, NULL)) {
-	mp_msg(MSGT_OPEN, MSGL_ERR, "read CDROM toc header: %lu\n",
-		GetLastError());
-	free(vcd);
-	return NULL;
+                sizeof(CDROM_TOC), &dwBytesReturned, NULL)) {
+        mp_msg(MSGT_OPEN, MSGL_ERR, "read CDROM toc header: %lu\n",
+                GetLastError());
+        free(vcd);
+        return NULL;
     }
 
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VCD_START_TRACK=%d\n",
-	    vcd->toc.FirstTrack);
+            vcd->toc.FirstTrack);
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VCD_END_TRACK=%d\n",
-	    vcd->toc.LastTrack);
+            vcd->toc.LastTrack);
 
     for (i = vcd->toc.FirstTrack; i <= vcd->toc.LastTrack + 1; i++) {
-	int index = i - vcd->toc.FirstTrack;
-	if (i <= vcd->toc.LastTrack) {
-	    mp_msg(MSGT_OPEN, MSGL_INFO, "track %02d:  adr=%d  ctrl=%d"
-		    "  %02d:%02d:%02d\n",
-		    vcd->toc.TrackData[index].TrackNumber,
-		    vcd->toc.TrackData[index].Adr,
-		    vcd->toc.TrackData[index].Control,
-		    vcd->toc.TrackData[index].Address[1],
-		    vcd->toc.TrackData[index].Address[2],
-		    vcd->toc.TrackData[index].Address[3]);
-	}
+        int index = i - vcd->toc.FirstTrack;
+        if (i <= vcd->toc.LastTrack) {
+            mp_msg(MSGT_OPEN, MSGL_INFO, "track %02d:  adr=%d  ctrl=%d"
+                    "  %02d:%02d:%02d\n",
+                    vcd->toc.TrackData[index].TrackNumber,
+                    vcd->toc.TrackData[index].Adr,
+                    vcd->toc.TrackData[index].Control,
+                    vcd->toc.TrackData[index].Address[1],
+                    vcd->toc.TrackData[index].Address[2],
+                    vcd->toc.TrackData[index].Address[3]);
+        }
 
-	if (mp_msg_test(MSGT_IDENTIFY, MSGL_INFO)) {
-	    if (i > vcd->toc.FirstTrack) {
-		min = vcd->toc.TrackData[index].Address[1] - min;
-		sec = vcd->toc.TrackData[index].Address[2] - sec;
-		frame = vcd->toc.TrackData[index].Address[3] - frame;
-		if (frame < 0) {
-		    frame += 75;
-		    sec--;
-		}
-		if (sec < 0) {
-		    sec += 60;
-		    min--;
-		}
-		mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VCD_TRACK_%d_MSF="
-			"%02d:%02d:%02d\n", i - 1, min, sec, frame);
-		min = vcd->toc.TrackData[index].Address[1];
-		sec = vcd->toc.TrackData[index].Address[2];
-		frame = vcd->toc.TrackData[index].Address[3];
-	    }
-	}
+        if (mp_msg_test(MSGT_IDENTIFY, MSGL_INFO)) {
+            if (i > vcd->toc.FirstTrack) {
+                min = vcd->toc.TrackData[index].Address[1] - min;
+                sec = vcd->toc.TrackData[index].Address[2] - sec;
+                frame = vcd->toc.TrackData[index].Address[3] - frame;
+                if (frame < 0) {
+                    frame += 75;
+                    sec--;
+                }
+                if (sec < 0) {
+                    sec += 60;
+                    min--;
+                }
+                mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VCD_TRACK_%d_MSF="
+                        "%02d:%02d:%02d\n", i - 1, min, sec, frame);
+                min = vcd->toc.TrackData[index].Address[1];
+                sec = vcd->toc.TrackData[index].Address[2];
+                frame = vcd->toc.TrackData[index].Address[3];
+            }
+        }
     }
 
     vcd->hd = hd;
@@ -148,9 +148,9 @@ static int vcd_read(mp_vcd_priv_t* vcd, char *mem)
     cdrom_raw.TrackMode = XAForm2;
 
     if (!DeviceIoControl(vcd->hd, IOCTL_CDROM_RAW_READ, &cdrom_raw,
-		sizeof(RAW_READ_INFO), vcd->buf, sizeof(vcd->buf),
-		&dwBytesReturned, NULL))
-	return 0;
+                sizeof(RAW_READ_INFO), vcd->buf, sizeof(vcd->buf),
+                &dwBytesReturned, NULL))
+        return 0;
 
     vcd->sect++;
     memcpy(mem, &vcd->buf[VCD_SECTOR_OFFS], VCD_SECTOR_DATA);

@@ -32,10 +32,10 @@
 
 static const vo_info_t info =
 {
-	"Null video output",
-	"null",
-	"Aaron Holtzman <aholtzma@ess.engr.uvic.ca>",
-	""
+        "Null video output",
+        "null",
+        "Aaron Holtzman <aholtzma@ess.engr.uvic.ca>",
+        ""
 };
 
 const LIBVO_EXTERN(null)
@@ -46,7 +46,7 @@ static uint32_t image_width, image_height;
 static int draw_slice(uint8_t *image[], int stride[], int w,int h,int x,int y)
 //draw_slice(uint8_t *src[], uint32_t slice_num)
 {
-	return 0;
+        return 0;
 }
 
 static void draw_osd(void)
@@ -61,7 +61,7 @@ flip_page(void)
 static int
 draw_frame(uint8_t *src[])
 {
-	return 0;
+        return 0;
 }
 
 static int
@@ -75,9 +75,9 @@ query_format(uint32_t format)
 static int
 config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t flags, char *title, uint32_t format)
 {
-	image_width = width;
-	image_height = height;
-	return 0;
+        image_width = width;
+        image_height = height;
+        return 0;
 }
 
 static void
@@ -94,8 +94,8 @@ static int preinit(const char *arg)
 {
     if(arg)
     {
-	mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_NULL_UnknownSubdevice,arg);
-	return ENOSYS;
+        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_NULL_UnknownSubdevice,arg);
+        return ENOSYS;
     }
     return 0;
 }

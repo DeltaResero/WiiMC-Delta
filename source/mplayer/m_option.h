@@ -170,31 +170,31 @@ extern const m_obj_params_t m_span_params_def;
 
 
 // FIXME: backward compatibility
-#define CONF_TYPE_FLAG		(&m_option_type_flag)
-#define CONF_TYPE_INT		(&m_option_type_int)
-#define CONF_TYPE_INT64		(&m_option_type_int64)
-#define CONF_TYPE_FLOAT		(&m_option_type_float)
-#define CONF_TYPE_DOUBLE	(&m_option_type_double)
-#define CONF_TYPE_STRING	(&m_option_type_string)
-#define CONF_TYPE_FUNC		(&m_option_type_func)
-#define CONF_TYPE_FUNC_PARAM	(&m_option_type_func_param)
+#define CONF_TYPE_FLAG          (&m_option_type_flag)
+#define CONF_TYPE_INT           (&m_option_type_int)
+#define CONF_TYPE_INT64         (&m_option_type_int64)
+#define CONF_TYPE_FLOAT         (&m_option_type_float)
+#define CONF_TYPE_DOUBLE        (&m_option_type_double)
+#define CONF_TYPE_STRING        (&m_option_type_string)
+#define CONF_TYPE_FUNC          (&m_option_type_func)
+#define CONF_TYPE_FUNC_PARAM    (&m_option_type_func_param)
 #define CONF_TYPE_FUNC_PARAM_IMMEDIATE (&m_option_type_func_param_immediate)
-#define CONF_TYPE_PRINT		(&m_option_type_print)
+#define CONF_TYPE_PRINT         (&m_option_type_print)
 #define CONF_TYPE_PRINT_INDIRECT (&m_option_type_print_indirect)
-#define CONF_TYPE_PRINT_FUNC	(&m_option_type_print_func)
-#define CONF_TYPE_FUNC_FULL	(&m_option_type_func_full)
-#define CONF_TYPE_SUBCONFIG	(&m_option_type_subconfig)
-#define CONF_TYPE_STRING_LIST	(&m_option_type_string_list)
-#define CONF_TYPE_POSITION	(&m_option_type_position)
-#define CONF_TYPE_IMGFMT	(&m_option_type_imgfmt)
-#define CONF_TYPE_AFMT		(&m_option_type_afmt)
-#define CONF_TYPE_SPAN		(&m_option_type_span)
+#define CONF_TYPE_PRINT_FUNC    (&m_option_type_print_func)
+#define CONF_TYPE_FUNC_FULL     (&m_option_type_func_full)
+#define CONF_TYPE_SUBCONFIG     (&m_option_type_subconfig)
+#define CONF_TYPE_STRING_LIST   (&m_option_type_string_list)
+#define CONF_TYPE_POSITION      (&m_option_type_position)
+#define CONF_TYPE_IMGFMT        (&m_option_type_imgfmt)
+#define CONF_TYPE_AFMT          (&m_option_type_afmt)
+#define CONF_TYPE_SPAN          (&m_option_type_span)
 #define CONF_TYPE_OBJ_SETTINGS_LIST (&m_option_type_obj_settings_list)
-#define CONF_TYPE_OBJ_PRESETS	(&m_option_type_obj_presets)
-#define CONF_TYPE_CUSTOM_URL	(&m_option_type_custom_url)
-#define CONF_TYPE_OBJ_PARAMS	(&m_option_type_obj_params)
-#define CONF_TYPE_TIME		(&m_option_type_time)
-#define CONF_TYPE_TIME_SIZE	(&m_option_type_time_size)
+#define CONF_TYPE_OBJ_PRESETS   (&m_option_type_obj_presets)
+#define CONF_TYPE_CUSTOM_URL    (&m_option_type_custom_url)
+#define CONF_TYPE_OBJ_PARAMS    (&m_option_type_obj_params)
+#define CONF_TYPE_TIME          (&m_option_type_time)
+#define CONF_TYPE_TIME_SIZE     (&m_option_type_time_size)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -317,54 +317,54 @@ struct m_option {
 ///@{
 
 /// The option has a minimum set in \ref m_option::min.
-#define M_OPT_MIN		(1<<0)
+#define M_OPT_MIN               (1<<0)
 
 /// The option has a maximum set in \ref m_option::max.
-#define M_OPT_MAX		(1<<1)
+#define M_OPT_MAX               (1<<1)
 
 /// The option has a minimum and maximum in \ref m_option::min and \ref m_option::max.
-#define M_OPT_RANGE		(M_OPT_MIN|M_OPT_MAX)
+#define M_OPT_RANGE             (M_OPT_MIN|M_OPT_MAX)
 
 /// The option is forbidden in config files.
-#define M_OPT_NOCFG		(1<<2)
+#define M_OPT_NOCFG             (1<<2)
 
 /// The option is forbidden on the command line.
-#define M_OPT_NOCMD		(1<<3)
+#define M_OPT_NOCMD             (1<<3)
 
 /// The option is global in the \ref Config.
 /** It won't be saved on push and the command line parser will set it when
  *  it's parsed (i.e. it won't be set later)
  *  e.g options : -v, -quiet
  */
-#define M_OPT_GLOBAL		(1<<4)
+#define M_OPT_GLOBAL            (1<<4)
 
 /// The \ref Config won't save this option on push.
 /** It won't be saved on push but the command line parser will add it with
  *  its entry (i.e. it may be set later)
  *  e.g options : -include
  */
-#define M_OPT_NOSAVE		(1<<5)
+#define M_OPT_NOSAVE            (1<<5)
 
 /// \brief The \ref Config will emulate the old behavior by pushing the
 /// option only if it was set by the user.
-#define M_OPT_OLD		(1<<6)
+#define M_OPT_OLD               (1<<6)
 
 /// The option should be set during command line pre-parsing
-#define M_OPT_PRE_PARSE		(1<<7)
+#define M_OPT_PRE_PARSE         (1<<7)
 
 /// \defgroup OldOptionFlags Backward compatibility
 ///
 /// These are kept for compatibility with older code.
 /// @{
-#define CONF_MIN		M_OPT_MIN
-#define CONF_MAX		M_OPT_MAX
-#define CONF_RANGE		M_OPT_RANGE
-#define CONF_NOCFG		M_OPT_NOCFG
-#define CONF_NOCMD		M_OPT_NOCMD
-#define CONF_GLOBAL		M_OPT_GLOBAL
-#define CONF_NOSAVE		M_OPT_NOSAVE
-#define CONF_OLD		M_OPT_OLD
-#define CONF_PRE_PARSE		M_OPT_PRE_PARSE
+#define CONF_MIN                M_OPT_MIN
+#define CONF_MAX                M_OPT_MAX
+#define CONF_RANGE              M_OPT_RANGE
+#define CONF_NOCFG              M_OPT_NOCFG
+#define CONF_NOCMD              M_OPT_NOCMD
+#define CONF_GLOBAL             M_OPT_GLOBAL
+#define CONF_NOSAVE             M_OPT_NOSAVE
+#define CONF_OLD                M_OPT_OLD
+#define CONF_PRE_PARSE          M_OPT_PRE_PARSE
 ///@}
 
 ///@}
@@ -384,13 +384,13 @@ struct m_option {
  *  Also note that suboptions may be directly accessed by using
  *  -option:subopt blah.
  */
-#define M_OPT_TYPE_HAS_CHILD		(1<<0)
+#define M_OPT_TYPE_HAS_CHILD            (1<<0)
 
 /// Wildcard matching flag.
 /** If set the option type has a use for option names ending with a *
  *  (used for -aa*), this only affects the option name matching.
  */
-#define M_OPT_TYPE_ALLOW_WILDCARD	(1<<1)
+#define M_OPT_TYPE_ALLOW_WILDCARD       (1<<1)
 
 /// Dynamic data type.
 /** This flag indicates that the data is dynamically allocated (m_option::p
@@ -398,7 +398,7 @@ struct m_option {
  *  replaces the initial value of such variables with a dynamic copy in case
  *  the initial value is statically allocated (pretty common with strings).
  */
-#define M_OPT_TYPE_DYNAMIC		(1<<2)
+#define M_OPT_TYPE_DYNAMIC              (1<<2)
 
 /// Indirect option type.
 /** If this is set the parse function doesn't directly return
@@ -409,7 +409,7 @@ struct m_option {
  *  target var. It's used by the callback-based options as the callback call
  *  may append later on.
  */
-#define M_OPT_TYPE_INDIRECT		(1<<3)
+#define M_OPT_TYPE_INDIRECT             (1<<3)
 
 ///@}
 
@@ -445,20 +445,20 @@ struct m_option {
 ///@{
 
 /// For use by higher level APIs when the option name is invalid.
-#define M_OPT_UNKNOWN		-1
+#define M_OPT_UNKNOWN           -1
 
 /// Returned when a parameter is needed but wasn't provided.
-#define M_OPT_MISSING_PARAM	-2
+#define M_OPT_MISSING_PARAM     -2
 
 /// Returned when the given parameter couldn't be parsed.
-#define M_OPT_INVALID		-3
+#define M_OPT_INVALID           -3
 
 /// \brief Returned if the value is "out of range". The exact meaning may
 /// vary from type to type.
-#define M_OPT_OUT_OF_RANGE	-4
+#define M_OPT_OUT_OF_RANGE      -4
 
 /// Returned if the parser failed for any other reason than a bad parameter.
-#define M_OPT_PARSER_ERR	-5
+#define M_OPT_PARSER_ERR        -5
 
 /// Returned when MPlayer should exit. Used by various help stuff.
 /** M_OPT_EXIT must be the lowest number on this list.
@@ -470,10 +470,10 @@ struct m_option {
 /// These are kept for compatibility with older code.
 ///
 ///@{
-#define ERR_NOT_AN_OPTION	M_OPT_UNKNOWN
-#define ERR_MISSING_PARAM	M_OPT_MISSING_PARAM
-#define ERR_OUT_OF_RANGE	M_OPT_OUT_OF_RANGE
-#define ERR_FUNC_ERR		M_OPT_PARSER_ERR
+#define ERR_NOT_AN_OPTION       M_OPT_UNKNOWN
+#define ERR_MISSING_PARAM       M_OPT_MISSING_PARAM
+#define ERR_OUT_OF_RANGE        M_OPT_OUT_OF_RANGE
+#define ERR_FUNC_ERR            M_OPT_PARSER_ERR
 ///@}
 
 ///@}

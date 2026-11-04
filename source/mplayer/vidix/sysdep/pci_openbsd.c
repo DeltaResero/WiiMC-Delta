@@ -35,8 +35,8 @@
 static inline int enable_os_io(void)
 {
     if (i386_iopl(1) < 0) {
-	perror("i386_iopl");
-	return errno;
+        perror("i386_iopl");
+        return errno;
     }
     return 0;
 }

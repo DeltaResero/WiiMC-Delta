@@ -45,27 +45,27 @@ float avi_aspect_override = -1.0;
 int write_odml = 1;
 
 struct avi_odmlidx_entry {
-	uint64_t ofs;
-	uint32_t len;
-	uint32_t flags;
+        uint64_t ofs;
+        uint32_t len;
+        uint32_t flags;
 };
 
 struct avi_odmlsuperidx_entry {
-	uint64_t ofs;
-	uint32_t len;
-	uint32_t duration;
+        uint64_t ofs;
+        uint32_t len;
+        uint32_t duration;
 };
 
 struct avi_stream_info {
-	int idxsize;
-	int idxpos;
-	int superidxpos;
-	int superidxsize;
-	int riffofspos;
-	int riffofssize;
-	off_t *riffofs;
-	struct avi_odmlidx_entry *idx;
-	struct avi_odmlsuperidx_entry *superidx;
+        int idxsize;
+        int idxpos;
+        int superidxpos;
+        int superidxsize;
+        int riffofspos;
+        int riffofssize;
+        off_t *riffofs;
+        struct avi_odmlidx_entry *idx;
+        struct avi_odmlsuperidx_entry *superidx;
 };
 
 static unsigned int avi_aspect(muxer_stream_t *vstream)
@@ -102,8 +102,8 @@ static muxer_stream_t* avifile_new_stream(muxer_t *muxer,int type){
     muxer_stream_t* s;
     if (!muxer) return NULL;
     if(muxer->avih.dwStreams>=MUXER_MAX_STREAMS){
-	mp_msg(MSGT_MUXER, MSGL_ERR, "Too many streams! increase MUXER_MAX_STREAMS !\n");
-	return NULL;
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Too many streams! increase MUXER_MAX_STREAMS !\n");
+        return NULL;
     }
     s=malloc(sizeof(muxer_stream_t));
     memset(s,0,sizeof(muxer_stream_t));
@@ -303,16 +303,16 @@ static void avifile_write_header(muxer_t *muxer){
       switch(muxer->streams[i]->type){
       case MUXER_TYPE_VIDEO:
           hdrsize+=muxer->streams[i]->bih->biSize+8; // strf
-	  if (aspect != 0) {
-	      hdrsize+=8+4*(9+8*1); // vprp
-	  }
-	  break;
+          if (aspect != 0) {
+              hdrsize+=8+4*(9+8*1); // vprp
+          }
+          break;
       case MUXER_TYPE_AUDIO:
           hdrsize+=WFSIZE(muxer->streams[i]->wf)+8; // strf
-	  break;
+          break;
       }
       if (isodml && si && si->superidx && si->superidxsize) {
-	  hdrsize += 32 + 16*si->superidxsize; //indx
+          hdrsize += 32 + 16*si->superidxsize; //indx
       }
   }
   write_avi_list(muxer->stream,listtypeAVIHEADER,hdrsize);
@@ -330,7 +330,7 @@ static void avifile_write_header(muxer_t *muxer){
 
       hdrsize=sizeof(s->h)+8; // strh
       if (si && si->superidx && si->superidxsize) {
-	  hdrsize += 32 + 16*si->superidxsize; //indx
+          hdrsize += 32 + 16*si->superidxsize; //indx
       }
       switch(s->type){
       case MUXER_TYPE_VIDEO:
@@ -338,27 +338,27 @@ static void avifile_write_header(muxer_t *muxer){
           s->h.fccHandler = s->bih->biCompression;
           s->h.rcFrame.right = s->bih->biWidth;
           s->h.rcFrame.bottom = s->bih->biHeight;
-	  if (aspect != 0) {
-	      // fill out vprp info
-	      memset(&vprp, 0, sizeof(vprp));
-	      vprp.dwVerticalRefreshRate = (s->h.dwRate+s->h.dwScale-1)/s->h.dwScale;
-	      vprp.dwHTotalInT = muxer->avih.dwWidth;
-	      vprp.dwVTotalInLines = muxer->avih.dwHeight;
-	      vprp.dwFrameAspectRatio = aspect;
-	      vprp.dwFrameWidthInPixels = muxer->avih.dwWidth;
-	      vprp.dwFrameHeightInLines = muxer->avih.dwHeight;
-	      vprp.nbFieldPerFrame = 1;
-	      vprp.FieldInfo[0].CompressedBMHeight = muxer->avih.dwHeight;
-	      vprp.FieldInfo[0].CompressedBMWidth = muxer->avih.dwWidth;
-	      vprp.FieldInfo[0].ValidBMHeight = muxer->avih.dwHeight;
-	      vprp.FieldInfo[0].ValidBMWidth = muxer->avih.dwWidth;
-	      hdrsize+=8+4*(9+8*1); // vprp
-	  }
-	  break;
+          if (aspect != 0) {
+              // fill out vprp info
+              memset(&vprp, 0, sizeof(vprp));
+              vprp.dwVerticalRefreshRate = (s->h.dwRate+s->h.dwScale-1)/s->h.dwScale;
+              vprp.dwHTotalInT = muxer->avih.dwWidth;
+              vprp.dwVTotalInLines = muxer->avih.dwHeight;
+              vprp.dwFrameAspectRatio = aspect;
+              vprp.dwFrameWidthInPixels = muxer->avih.dwWidth;
+              vprp.dwFrameHeightInLines = muxer->avih.dwHeight;
+              vprp.nbFieldPerFrame = 1;
+              vprp.FieldInfo[0].CompressedBMHeight = muxer->avih.dwHeight;
+              vprp.FieldInfo[0].CompressedBMWidth = muxer->avih.dwWidth;
+              vprp.FieldInfo[0].ValidBMHeight = muxer->avih.dwHeight;
+              vprp.FieldInfo[0].ValidBMWidth = muxer->avih.dwWidth;
+              hdrsize+=8+4*(9+8*1); // vprp
+          }
+          break;
       case MUXER_TYPE_AUDIO:
           hdrsize+=WFSIZE(s->wf)+8; // strf
           s->h.fccHandler = s->wf->wFormatTag;
-	  break;
+          break;
       }
 
       write_avi_list(muxer->stream,listtypeSTREAMHEADER,hdrsize);
@@ -374,18 +374,18 @@ static void avifile_write_header(muxer_t *muxer){
           write_avi_chunk(muxer->stream,ckidSTREAMFORMAT,biSize,s->bih); /* BITMAPINFOHEADER */
           le2me_BITMAPINFOHEADER(s->bih);
 
-	  if (aspect != 0) {
-	      int fields = vprp.nbFieldPerFrame;
-	      le2me_VideoPropHeader(&vprp);
-	      le2me_VIDEO_FIELD_DESC(&vprp.FieldInfo[0]);
-	      le2me_VIDEO_FIELD_DESC(&vprp.FieldInfo[1]);
-	      write_avi_chunk(muxer->stream,mmioFOURCC('v','p','r','p'),
-	                      sizeof(VideoPropHeader) -
-	                      sizeof(VIDEO_FIELD_DESC)*(2-fields),
-	                      &vprp); /* Video Properties Header */
-	  }
+          if (aspect != 0) {
+              int fields = vprp.nbFieldPerFrame;
+              le2me_VideoPropHeader(&vprp);
+              le2me_VIDEO_FIELD_DESC(&vprp.FieldInfo[0]);
+              le2me_VIDEO_FIELD_DESC(&vprp.FieldInfo[1]);
+              write_avi_chunk(muxer->stream,mmioFOURCC('v','p','r','p'),
+                              sizeof(VideoPropHeader) -
+                              sizeof(VIDEO_FIELD_DESC)*(2-fields),
+                              &vprp); /* Video Properties Header */
+          }
 }
-	  break;
+          break;
       case MUXER_TYPE_AUDIO:
 {
           int wfsize = WFSIZE(s->wf);
@@ -393,30 +393,30 @@ static void avifile_write_header(muxer_t *muxer){
           write_avi_chunk(muxer->stream,ckidSTREAMFORMAT,wfsize,s->wf); /* WAVEFORMATEX */
           le2me_WAVEFORMATEX(s->wf);
 }
-	  break;
+          break;
       }
       if (isodml && si && si->superidx && si->superidxsize) {
-	  n = si->superidxsize;
+          n = si->superidxsize;
 
-	  idxhdr[0] = le2me_32(mmioFOURCC('i', 'n', 'd', 'x'));
-	  idxhdr[1] = le2me_32(24 + 16*n);
-	  idxhdr[2] = le2me_32(0x00000004);
-	  idxhdr[3] = le2me_32(si->superidxpos);
-	  idxhdr[4] = le2me_32(s->ckid);
-	  idxhdr[5] = 0;
-	  idxhdr[6] = 0;
-	  idxhdr[7] = 0;
+          idxhdr[0] = le2me_32(mmioFOURCC('i', 'n', 'd', 'x'));
+          idxhdr[1] = le2me_32(24 + 16*n);
+          idxhdr[2] = le2me_32(0x00000004);
+          idxhdr[3] = le2me_32(si->superidxpos);
+          idxhdr[4] = le2me_32(s->ckid);
+          idxhdr[5] = 0;
+          idxhdr[6] = 0;
+          idxhdr[7] = 0;
 
-	  stream_write_buffer(muxer->stream,idxhdr,sizeof(idxhdr));
-	  for (j=0; j<n; j++) {
-	      struct avi_odmlsuperidx_entry *entry = &si->superidx[j];
-	      unsigned int data[4];
-	      data[0] = le2me_32(entry->ofs);
-	      data[1] = le2me_32(entry->ofs >> 32);
-	      data[2] = le2me_32(entry->len);
-	      data[3] = le2me_32(entry->duration);
-	      stream_write_buffer(muxer->stream,data,sizeof(data));
-	  }
+          stream_write_buffer(muxer->stream,idxhdr,sizeof(idxhdr));
+          for (j=0; j<n; j++) {
+              struct avi_odmlsuperidx_entry *entry = &si->superidx[j];
+              unsigned int data[4];
+              data[0] = le2me_32(entry->ofs);
+              data[1] = le2me_32(entry->ofs >> 32);
+              data[2] = le2me_32(entry->len);
+              data[3] = le2me_32(entry->duration);
+              stream_write_buffer(muxer->stream,data,sizeof(data));
+          }
       }
   }
 
@@ -485,11 +485,11 @@ info[i].id=0;
     write_avi_list(muxer->stream,listtypeAVIMOVIE,muxer->movi_end-stream_tell(muxer->stream)-12);
   } else {
     if (stream_tell(muxer->stream) != MOVIALIGN) {
-	mp_msg(MSGT_MUXER, MSGL_ERR, "Opendml superindex is too big for reserved space!\n");
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Opendml superindex is too big for reserved space!\n");
         mp_msg(MSGT_MUXER, MSGL_ERR,
                "Expected filepos %d, real filepos %"PRIu64", missing space %"PRIu64"\n",
                MOVIALIGN, stream_tell(muxer->stream), stream_tell(muxer->stream) - MOVIALIGN);
-	mp_msg(MSGT_MUXER, MSGL_ERR, "Try increasing MOVIALIGN in libmpdemux/muxer_avi.c\n");
+        mp_msg(MSGT_MUXER, MSGL_ERR, "Try increasing MOVIALIGN in libmpdemux/muxer_avi.c\n");
     }
     write_avi_list(muxer->stream,listtypeAVIMOVIE,muxer->movi_end-stream_tell(muxer->stream)-12);
   }
@@ -521,21 +521,21 @@ static void avifile_write_chunk(muxer_stream_t *s,size_t len,unsigned int flags,
     int paddedlen = len + (len&1);
 
     if (s->type == MUXER_TYPE_VIDEO && !s->h.dwSuggestedBufferSize) {
-	off_t pos=stream_tell(muxer->stream);
-	stream_seek(muxer->stream, 0);
-	avifile_write_header(muxer);
-	stream_seek(muxer->stream, pos);
+        off_t pos=stream_tell(muxer->stream);
+        stream_seek(muxer->stream, 0);
+        avifile_write_header(muxer);
+        stream_seek(muxer->stream, pos);
     }
   if(index_mode){
     rifflen = muxer->file_end - vsi->riffofs[vsi->riffofspos] - 8;
     if (vsi->riffofspos == 0) {
-	rifflen += 8+muxer->idx_pos*sizeof(AVIINDEXENTRY);
+        rifflen += 8+muxer->idx_pos*sizeof(AVIINDEXENTRY);
     }
     if (rifflen + paddedlen > ODML_CHUNKLEN && write_odml == 1) {
-	if (vsi->riffofspos == 0) {
+        if (vsi->riffofspos == 0) {
             avifile_write_standard_index(muxer);
-	}
-	avifile_odml_new_riff(muxer);
+        }
+        avifile_odml_new_riff(muxer);
     }
 
     if (vsi->riffofspos == 0) {
@@ -553,8 +553,8 @@ static void avifile_write_chunk(muxer_stream_t *s,size_t len,unsigned int flags,
 
     // add to odml index
     if(si->idxpos>=si->idxsize){
-	si->idxsize+=256;
-	si->idx=realloc_struct(si->idx,si->idxsize,sizeof(*si->idx));
+        si->idxsize+=256;
+        si->idx=realloc_struct(si->idx,si->idxsize,sizeof(*si->idx));
     }
     si->idx[si->idxpos].flags=(flags&AVIIF_KEYFRAME)?0:ODML_NOTKEYFRAME;
     si->idx[si->idxpos].ofs=muxer->file_end;
@@ -565,7 +565,7 @@ static void avifile_write_chunk(muxer_stream_t *s,size_t len,unsigned int flags,
     write_avi_chunk(muxer->stream,s->ckid,len,s->buffer); /* unsigned char */
 
     if (len > s->h.dwSuggestedBufferSize){
-	s->h.dwSuggestedBufferSize = len;
+        s->h.dwSuggestedBufferSize = len;
     }
     if((unsigned int)len>s->h.dwSuggestedBufferSize) s->h.dwSuggestedBufferSize=len;
 
@@ -596,26 +596,26 @@ static void avifile_odml_write_index(muxer_t *muxer){
     n = 0;
     entries_per_subidx = INT_MAX;
     do {
-	off_t start = si->idx[0].ofs;
-	last = entries_per_subidx;
-	for (j=0; j<si->idxpos; j++) {
-	    len = si->idx[j].ofs - start;
-	    if(len >= ODML_CHUNKLEN || n >= entries_per_subidx) {
-		if (entries_per_subidx > n) {
-		    entries_per_subidx = n;
-		}
-		start = si->idx[j].ofs;
-		len = 0;
-		n = 0;
-	    }
-	    n++;
-	}
+        off_t start = si->idx[0].ofs;
+        last = entries_per_subidx;
+        for (j=0; j<si->idxpos; j++) {
+            len = si->idx[j].ofs - start;
+            if(len >= ODML_CHUNKLEN || n >= entries_per_subidx) {
+                if (entries_per_subidx > n) {
+                    entries_per_subidx = n;
+                }
+                start = si->idx[j].ofs;
+                len = 0;
+                n = 0;
+            }
+            n++;
+        }
     } while (last != entries_per_subidx);
 
     si->superidxpos = (si->idxpos+entries_per_subidx-1) / entries_per_subidx;
 
     mp_msg(MSGT_MUXER, MSGL_V, "ODML: Stream %d: Using %d entries per subidx, %d entries in superidx\n",
-		i, entries_per_subidx, si->superidxpos);
+                i, entries_per_subidx, si->superidxpos);
 
     si->superidxsize = si->superidxpos;
     si->superidx = calloc(si->superidxsize, sizeof(*si->superidx));
@@ -623,35 +623,35 @@ static void avifile_odml_write_index(muxer_t *muxer){
 
     idxpos = 0;
     for (j=0; j<si->superidxpos; j++) {
-	off_t start = si->idx[idxpos].ofs;
-	int duration;
+        off_t start = si->idx[idxpos].ofs;
+        int duration;
 
-	duration = 0;
-	for (k=0; k<entries_per_subidx && idxpos+k<si->idxpos; k++) {
-		duration += s->h.dwSampleSize ? si->idx[idxpos+k].len/s->h.dwSampleSize : 1;
-	}
+        duration = 0;
+        for (k=0; k<entries_per_subidx && idxpos+k<si->idxpos; k++) {
+                duration += s->h.dwSampleSize ? si->idx[idxpos+k].len/s->h.dwSampleSize : 1;
+        }
 
-	idxhdr[0] = le2me_32((s->ckid << 16) | mmioFOURCC('i', 'x', 0, 0));
-	idxhdr[1] = le2me_32(24 + 8*k);
-	idxhdr[2] = le2me_32(0x01000002);
-	idxhdr[3] = le2me_32(k);
-	idxhdr[4] = le2me_32(s->ckid);
-	idxhdr[5] = le2me_32(start + 8);
-	idxhdr[6] = le2me_32((start + 8)>> 32);
-	idxhdr[7] = 0; /* unused */
+        idxhdr[0] = le2me_32((s->ckid << 16) | mmioFOURCC('i', 'x', 0, 0));
+        idxhdr[1] = le2me_32(24 + 8*k);
+        idxhdr[2] = le2me_32(0x01000002);
+        idxhdr[3] = le2me_32(k);
+        idxhdr[4] = le2me_32(s->ckid);
+        idxhdr[5] = le2me_32(start + 8);
+        idxhdr[6] = le2me_32((start + 8)>> 32);
+        idxhdr[7] = 0; /* unused */
 
-	si->superidx[j].len = 32 + 8*k;
-	si->superidx[j].ofs = stream_tell(muxer->stream);
-	si->superidx[j].duration = duration;
+        si->superidx[j].len = 32 + 8*k;
+        si->superidx[j].ofs = stream_tell(muxer->stream);
+        si->superidx[j].duration = duration;
 
-	stream_write_buffer(muxer->stream, idxhdr,sizeof(idxhdr));
-	for (k=0; k<entries_per_subidx && idxpos<si->idxpos; k++) {
-	    unsigned int entry[2];
-	    entry[0] = le2me_32(si->idx[idxpos].ofs - start);
-	    entry[1] = le2me_32(si->idx[idxpos].len | si->idx[idxpos].flags);
-	    idxpos++;
-	    stream_write_buffer(muxer->stream, entry, sizeof(entry));
-	}
+        stream_write_buffer(muxer->stream, idxhdr,sizeof(idxhdr));
+        for (k=0; k<entries_per_subidx && idxpos<si->idxpos; k++) {
+            unsigned int entry[2];
+            entry[0] = le2me_32(si->idx[idxpos].ofs - start);
+            entry[1] = le2me_32(si->idx[idxpos].len | si->idx[idxpos].flags);
+            idxpos++;
+            stream_write_buffer(muxer->stream, entry, sizeof(entry));
+        }
      }
   }
   muxer->file_end=stream_tell(muxer->stream);

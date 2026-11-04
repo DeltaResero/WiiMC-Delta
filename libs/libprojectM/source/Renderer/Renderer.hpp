@@ -55,11 +55,11 @@ private:
 #ifdef USE_CG
   ShaderEngine shaderEngine;
 #endif
-  
+
   float* p;
 
   float aspect;
-  
+
   void SetupPass1(const Pipeline &pipeline, const PipelineContext &pipelineContext);
   void Interpolation(const Pipeline &pipeline);
   void RenderItems(const Pipeline &pipeline, const PipelineContext &pipelineContext);
@@ -69,7 +69,7 @@ private:
 
   inline static Point PerPixel(Point p, PerPixelContext &context)
   {
-	  return currentPipe->PerPixel(p,context);
+          return currentPipe->PerPixel(p,context);
   }
 
   void rescale_per_pixel_matrices();

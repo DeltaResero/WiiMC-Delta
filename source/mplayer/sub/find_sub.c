@@ -53,15 +53,15 @@ void step_sub(sub_data *subd, float pts, int movement) {
      * if we haven't displayed it yet. Same when moving other direction.
      */
     if (movement > 0 && key < subs[current_sub].start)
-    	movement--;
+        movement--;
     if (movement < 0 && key >= subs[current_sub].end)
-    	movement++;
+        movement++;
 
     /* Never move beyond first or last subtitle. */
     if (current_sub+movement < 0)
-    	movement = 0-current_sub;
+        movement = 0-current_sub;
     if (current_sub+movement >= subd->sub_num)
-    	movement = subd->sub_num - current_sub - 1;
+        movement = subd->sub_num - current_sub - 1;
 
     current_sub += movement;
     sub_delay = pts - subs[current_sub].start / (subd->sub_uses_time ? 100 : sub_fps);

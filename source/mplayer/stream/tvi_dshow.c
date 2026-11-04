@@ -128,15 +128,15 @@ const tvi_info_t tvi_info_dshow = {
 ringbuffer related info
 */
 typedef struct {
-    CRITICAL_SECTION *pMutex;	///< pointer to critical section (mutex)
-    char **ringbuffer;		///< ringbuffer array
-    double*dpts;		///< samples' timestamps
+    CRITICAL_SECTION *pMutex;   ///< pointer to critical section (mutex)
+    char **ringbuffer;          ///< ringbuffer array
+    double*dpts;                ///< samples' timestamps
 
-    int buffersize;		///< size of buffer in blocks
-    int blocksize;		///< size of individual block
-    int head;			///< index of first valid sample
-    int tail;			///< index of last valid sample
-    int count;			///< count of valid samples in ringbuffer
+    int buffersize;             ///< size of buffer in blocks
+    int blocksize;              ///< size of individual block
+    int head;                   ///< index of first valid sample
+    int tail;                   ///< index of last valid sample
+    int count;                  ///< count of valid samples in ringbuffer
     double tStart;              ///< pts of first sample (first sample should have pts 0)
 } grabber_ringbuffer_t;
 
@@ -220,20 +220,20 @@ typedef struct priv {
  structure have to be 2-byte aligned and have 10-byte length!!
 */
 typedef struct __attribute__((__packed__)) {
-    WORD CountryCode;		///< Country code
-    WORD CableFreqTable;	///< index of resource with frequencies for cable channels
-    WORD BroadcastFreqTable;	///< index of resource with frequencies for broadcast channels
-    DWORD VideoStandard;	///< used video standard
+    WORD CountryCode;           ///< Country code
+    WORD CableFreqTable;        ///< index of resource with frequencies for cable channels
+    WORD BroadcastFreqTable;    ///< index of resource with frequencies for broadcast channels
+    DWORD VideoStandard;        ///< used video standard
 } TRCCountryList;
 /**
     information about image formats
 */
 typedef struct {
-    uint32_t fmt;		///< FourCC
-    const GUID *subtype;	///< DirectShow's subtype
-    int nBits;			///< number of bits
-    int nCompression;		///< complression
-    int tail;			///< number of additional bytes followed VIDEOINFOHEADER structure
+    uint32_t fmt;               ///< FourCC
+    const GUID *subtype;        ///< DirectShow's subtype
+    int nBits;                  ///< number of bits
+    int nCompression;           ///< complression
+    int tail;                   ///< number of additional bytes followed VIDEOINFOHEADER structure
 } img_fmt;
 
 /*
@@ -244,7 +244,7 @@ typedef struct {
 *---------------------------------------------------------------------------------------
 */
 static HRESULT init_ringbuffer(grabber_ringbuffer_t * rb, int buffersize,
-			       int blocksize);
+                               int blocksize);
 static HRESULT show_filter_info(IBaseFilter * pFilter);
 #if 0
 //defined in current MinGW release
@@ -252,7 +252,7 @@ HRESULT STDCALL GetRunningObjectTable(DWORD, IRunningObjectTable **);
 HRESULT STDCALL CreateItemMoniker(LPCOLESTR, LPCOLESTR, IMoniker **);
 #endif
 static CSampleGrabberCB *CSampleGrabberCB_Create(grabber_ringbuffer_t *
-						 pbuf);
+                                                 pbuf);
 static int set_crossbar_input(priv_t * priv, int input);
 static int subtype2imgfmt(const GUID * subtype);
 
@@ -389,110 +389,110 @@ static int tv_available_inputs_count = 0;
 /// CLSID definitions (used for CoCreateInstance call)
 #define CLSID_SampleGrabber MP_CLSID_SampleGrabber
 MP_DEFINE_LOCAL_GUID(CLSID_SampleGrabber, 0xC1F400A0, 0x3F08, 0x11d3, 0x9F, 0x0B,
-	    0x00, 0x60, 0x08, 0x03, 0x9E, 0x37);
+            0x00, 0x60, 0x08, 0x03, 0x9E, 0x37);
 #define CLSID_NullRenderer MP_CLSID_NullRenderer
 MP_DEFINE_LOCAL_GUID(CLSID_NullRenderer, 0xC1F400A4, 0x3F08, 0x11d3, 0x9F, 0x0B,
-	    0x00, 0x60, 0x08, 0x03, 0x9E, 0x37);
+            0x00, 0x60, 0x08, 0x03, 0x9E, 0x37);
 #define CLSID_SystemDeviceEnum MP_CLSID_SystemDeviceEnum
 MP_DEFINE_LOCAL_GUID(CLSID_SystemDeviceEnum, 0x62BE5D10, 0x60EB, 0x11d0, 0xBD, 0x3B,
-	    0x00, 0xA0, 0xC9, 0x11, 0xCE, 0x86);
+            0x00, 0xA0, 0xC9, 0x11, 0xCE, 0x86);
 #define CLSID_CaptureGraphBuilder2 MP_CLSID_CaptureGraphBuilder2
 MP_DEFINE_LOCAL_GUID(CLSID_CaptureGraphBuilder2, 0xBF87B6E1, 0x8C27, 0x11d0, 0xB3,
-	    0xF0, 0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
+            0xF0, 0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
 #define CLSID_VideoInputDeviceCategory MP_CLSID_VideoInputDeviceCategory
 MP_DEFINE_LOCAL_GUID(CLSID_VideoInputDeviceCategory, 0x860BB310, 0x5D01, 0x11d0,
-	    0xBD, 0x3B, 0x00, 0xA0, 0xC9, 0x11, 0xCE, 0x86);
+            0xBD, 0x3B, 0x00, 0xA0, 0xC9, 0x11, 0xCE, 0x86);
 #define CLSID_AudioInputDeviceCategory MP_CLSID_AudioInputDeviceCategory
 MP_DEFINE_LOCAL_GUID(CLSID_AudioInputDeviceCategory, 0x33d9a762, 0x90c8, 0x11d0,
-	    0xbd, 0x43, 0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86);
+            0xbd, 0x43, 0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86);
 #define CLSID_FilterGraph MP_CLSID_FilterGraph
 MP_DEFINE_LOCAL_GUID(CLSID_FilterGraph, 0xe436ebb3, 0x524f, 0x11ce, 0x9f, 0x53,
-	    0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define CLSID_SystemClock MP_CLSID_SystemClock
 MP_DEFINE_LOCAL_GUID(CLSID_SystemClock, 0xe436ebb1, 0x524f, 0x11ce, 0x9f, 0x53,
-	    0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #ifdef NOT_USED
 #define CLSID_CaptureGraphBuilder MP_CLSID_CaptureGraphBuilder
 MP_DEFINE_LOCAL_GUID(CLSID_CaptureGraphBuilder, 0xBF87B6E0, 0x8C27, 0x11d0, 0xB3,
-	    0xF0, 0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
+            0xF0, 0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
 #define CLSID_VideoPortManager MP_CLSID_VideoPortManager
 MP_DEFINE_LOCAL_GUID(CLSID_VideoPortManager, 0x6f26a6cd, 0x967b, 0x47fd, 0x87, 0x4a,
-	    0x7a, 0xed, 0x2c, 0x9d, 0x25, 0xa2);
+            0x7a, 0xed, 0x2c, 0x9d, 0x25, 0xa2);
 #define IID_IPin MP_IID_IPin
 MP_DEFINE_LOCAL_GUID(IID_IPin, 0x56a86891, 0x0ad4, 0x11ce, 0xb0, 0x3a, 0x00, 0x20,
-	    0xaf, 0x0b, 0xa7, 0x70);
+            0xaf, 0x0b, 0xa7, 0x70);
 #define IID_ICaptureGraphBuilder MP_IID_ICaptureGraphBuilder
 MP_DEFINE_LOCAL_GUID(IID_ICaptureGraphBuilder, 0xbf87b6e0, 0x8c27, 0x11d0, 0xb3,
-	    0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5);
+            0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5);
 #define IID_IFilterGraph MP_IID_IFilterGraph
 MP_DEFINE_LOCAL_GUID(IID_IFilterGraph, 0x56a8689f, 0x0ad4, 0x11ce, 0xb0, 0x3a, 0x00,
-	    0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define PIN_CATEGORY_PREVIEW MP_PIN_CATEGORY_PREVIEW
 MP_DEFINE_LOCAL_GUID(PIN_CATEGORY_PREVIEW, 0xfb6c4282, 0x0353, 0x11d1, 0x90, 0x5f,
-	    0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
+            0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
 #endif
 
 /// IID definitions (used for QueryInterface call)
 #define IID_IReferenceClock MP_IID_IReferenceClock
 MP_DEFINE_LOCAL_GUID(IID_IReferenceClock, 0x56a86897, 0x0ad4, 0x11ce, 0xb0, 0x3a,
-	    0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define IID_IAMBufferNegotiation MP_IID_IAMBufferNegotiation
 MP_DEFINE_LOCAL_GUID(IID_IAMBufferNegotiation, 0x56ED71A0, 0xAF5F, 0x11D0, 0xB3, 0xF0,
             0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
 #define IID_IKsPropertySet MP_IID_IKsPropertySet
 MP_DEFINE_LOCAL_GUID(IID_IKsPropertySet, 0x31efac30, 0x515c, 0x11d0, 0xa9, 0xaa,
-	    0x00, 0xaa, 0x00, 0x61, 0xbe, 0x93);
+            0x00, 0xaa, 0x00, 0x61, 0xbe, 0x93);
 #define IID_ISampleGrabber MP_IID_ISampleGrabber
 MP_DEFINE_LOCAL_GUID(IID_ISampleGrabber, 0x6B652FFF, 0x11FE, 0x4fce, 0x92, 0xAD,
-	    0x02, 0x66, 0xB5, 0xD7, 0xC7, 0x8F);
+            0x02, 0x66, 0xB5, 0xD7, 0xC7, 0x8F);
 #define IID_ISampleGrabberCB MP_IID_ISampleGrabberCB
 MP_DEFINE_LOCAL_GUID(IID_ISampleGrabberCB, 0x0579154A, 0x2B53, 0x4994, 0xB0, 0xD0,
-	    0xE7, 0x73, 0x14, 0x8E, 0xFF, 0x85);
+            0xE7, 0x73, 0x14, 0x8E, 0xFF, 0x85);
 #define IID_ICaptureGraphBuilder2 MP_IID_ICaptureGraphBuilder2
 MP_DEFINE_LOCAL_GUID(IID_ICaptureGraphBuilder2, 0x93e5a4e0, 0x2d50, 0x11d2, 0xab,
-	    0xfa, 0x00, 0xa0, 0xc9, 0xc6, 0xe3, 0x8d);
+            0xfa, 0x00, 0xa0, 0xc9, 0xc6, 0xe3, 0x8d);
 #define IID_ICreateDevEnum MP_IID_ICreateDevEnum
 MP_DEFINE_LOCAL_GUID(IID_ICreateDevEnum, 0x29840822, 0x5b84, 0x11d0, 0xbd, 0x3b,
-	    0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86);
+            0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86);
 #define IID_IGraphBuilder MP_IID_IGraphBuilder
 MP_DEFINE_LOCAL_GUID(IID_IGraphBuilder, 0x56a868a9, 0x0ad4, 0x11ce, 0xb0, 0x3a,
-	    0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define IID_IAMVideoProcAmp MP_IID_IAMVideoProcAmp
 MP_DEFINE_LOCAL_GUID(IID_IAMVideoProcAmp, 0xC6E13360, 0x30AC, 0x11d0, 0xA1, 0x8C,
-	    0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56);
+            0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56);
 #define IID_IVideoWindow MP_IID_IVideoWindow
 MP_DEFINE_LOCAL_GUID(IID_IVideoWindow, 0x56a868b4, 0x0ad4, 0x11ce, 0xb0, 0x3a, 0x00,
-	    0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define IID_IMediaControl MP_IID_IMediaControl
 MP_DEFINE_LOCAL_GUID(IID_IMediaControl, 0x56a868b1, 0x0ad4, 0x11ce, 0xb0, 0x3a,
-	    0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+            0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 #define IID_IAMTVTuner MP_IID_IAMTVTuner
 MP_DEFINE_LOCAL_GUID(IID_IAMTVTuner, 0x211A8766, 0x03AC, 0x11d1, 0x8D, 0x13, 0x00,
-	    0xAA, 0x00, 0xBD, 0x83, 0x39);
+            0xAA, 0x00, 0xBD, 0x83, 0x39);
 #define IID_IAMCrossbar MP_IID_IAMCrossbar
 MP_DEFINE_LOCAL_GUID(IID_IAMCrossbar, 0xc6e13380, 0x30ac, 0x11d0, 0xa1, 0x8c, 0x00,
-	    0xa0, 0xc9, 0x11, 0x89, 0x56);
+            0xa0, 0xc9, 0x11, 0x89, 0x56);
 #define IID_IAMStreamConfig MP_IID_IAMStreamConfig
 MP_DEFINE_LOCAL_GUID(IID_IAMStreamConfig, 0xc6e13340, 0x30ac, 0x11d0, 0xa1, 0x8c,
-	    0x00, 0xa0, 0xc9, 0x11, 0x89, 0x56);
+            0x00, 0xa0, 0xc9, 0x11, 0x89, 0x56);
 #define IID_IAMAudioInputMixer MP_IID_IAMAudioInputMixer
 MP_DEFINE_LOCAL_GUID(IID_IAMAudioInputMixer, 0x54C39221, 0x8380, 0x11d0, 0xB3, 0xF0,
-	    0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
+            0x00, 0xAA, 0x00, 0x37, 0x61, 0xC5);
 #define IID_IAMTVAudio MP_IID_IAMTVAudio
 MP_DEFINE_LOCAL_GUID(IID_IAMTVAudio, 0x83EC1C30, 0x23D1, 0x11d1, 0x99, 0xE6, 0x00,
-	    0xA0, 0xC9, 0x56, 0x02, 0x66);
+            0xA0, 0xC9, 0x56, 0x02, 0x66);
 #define IID_IAMAnalogVideoDecoder MP_IID_IAMAnalogVideoDecoder
 MP_DEFINE_LOCAL_GUID(IID_IAMAnalogVideoDecoder, 0xC6E13350, 0x30AC, 0x11d0, 0xA1,
-	    0x8C, 0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56);
+            0x8C, 0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56);
 #define IID_IPropertyBag MP_IID_IPropertyBag
 MP_DEFINE_LOCAL_GUID(IID_IPropertyBag, 0x55272a00, 0x42cb, 0x11ce, 0x81, 0x35, 0x00,
-	    0xaa, 0x00, 0x4b, 0xb8, 0x51);
+            0xaa, 0x00, 0x4b, 0xb8, 0x51);
 #define PIN_CATEGORY_CAPTURE MP_PIN_CATEGORY_CAPTURE
 MP_DEFINE_LOCAL_GUID(PIN_CATEGORY_CAPTURE, 0xfb6c4281, 0x0353, 0x11d1, 0x90, 0x5f,
-	    0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
+            0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
 #define PIN_CATEGORY_VIDEOPORT MP_PIN_CATEGORY_VIDEOPORT
 MP_DEFINE_LOCAL_GUID(PIN_CATEGORY_VIDEOPORT, 0xfb6c4285, 0x0353, 0x11d1, 0x90, 0x5f,
-	    0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
+            0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
 #define PIN_CATEGORY_PREVIEW MP_PIN_CATEGORY_PREVIEW
 MP_DEFINE_LOCAL_GUID(PIN_CATEGORY_PREVIEW, 0xfb6c4282, 0x0353, 0x11d1, 0x90, 0x5f,
             0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
@@ -501,7 +501,7 @@ MP_DEFINE_LOCAL_GUID(PIN_CATEGORY_VBI, 0xfb6c4284, 0x0353, 0x11d1, 0x90, 0x5f,
             0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
 #define PROPSETID_TUNER MP_PROPSETID_TUNER
 MP_DEFINE_LOCAL_GUID(PROPSETID_TUNER, 0x6a2e0605, 0x28e4, 0x11d0, 0xa1, 0x8c, 0x00,
-	    0xa0, 0xc9, 0x11, 0x89, 0x56);
+            0xa0, 0xc9, 0x11, 0x89, 0x56);
 #define MEDIATYPE_VBI MP_MEDIATYPE_VBI
 MP_DEFINE_LOCAL_GUID(MEDIATYPE_VBI,   0xf72a76e1, 0xeb0a, 0x11d0, 0xac, 0xe4, 0x00,
             0x00, 0xc0, 0xcc, 0x16, 0xba);
@@ -566,23 +566,23 @@ static void CSampleGrabberCB_Destroy(CSampleGrabberCB * This)
 
 /// CSampleGrabberCD IUnknown interface methods implementation
 static long STDCALL CSampleGrabberCB_QueryInterface(ISampleGrabberCB *
-						    This,
-						    const GUID * riid,
-						    void **ppvObject)
+                                                    This,
+                                                    const GUID * riid,
+                                                    void **ppvObject)
 {
     CSampleGrabberCB *me = (CSampleGrabberCB *) This;
     GUID *r;
     unsigned int i = 0;
     Debug printf("CSampleGrabberCB_QueryInterface(%p) called\n", This);
     if (!ppvObject)
-	return E_POINTER;
+        return E_POINTER;
     for (r = me->interfaces;
-	 i < sizeof(me->interfaces) / sizeof(me->interfaces[0]); r++, i++)
-	if (!memcmp(r, riid, sizeof(*r))) {
-	    OLE_CALL(This, AddRef);
-	    *ppvObject = This;
-	    return 0;
-	}
+         i < sizeof(me->interfaces) / sizeof(me->interfaces[0]); r++, i++)
+        if (!memcmp(r, riid, sizeof(*r))) {
+            OLE_CALL(This, AddRef);
+            *ppvObject = This;
+            return 0;
+        }
     Debug printf("Query failed! (GUID: 0x%x)\n", *(unsigned int *) riid);
     return E_NOINTERFACE;
 }
@@ -591,7 +591,7 @@ static long STDCALL CSampleGrabberCB_AddRef(ISampleGrabberCB * This)
 {
     CSampleGrabberCB *me = (CSampleGrabberCB *) This;
     Debug printf("CSampleGrabberCB_AddRef(%p) called (ref:%d)\n", This,
-        	 me->refcount);
+                 me->refcount);
     return ++(me->refcount);
 }
 
@@ -599,9 +599,9 @@ static long STDCALL CSampleGrabberCB_Release(ISampleGrabberCB * This)
 {
     CSampleGrabberCB *me = (CSampleGrabberCB *) This;
     Debug printf("CSampleGrabberCB_Release(%p) called (new ref:%d)\n",
-		 This, me->refcount - 1);
+                 This, me->refcount - 1);
     if (--(me->refcount) == 0)
-	CSampleGrabberCB_Destroy(me);
+        CSampleGrabberCB_Destroy(me);
     return 0;
 }
 
@@ -615,23 +615,23 @@ static HRESULT STDCALL CSampleGrabberCB_BufferCB(ISampleGrabberCB *This,
     grabber_ringbuffer_t *rb = this->pbuf;
 
     if (!lBufferLen)
-	return E_FAIL;
+        return E_FAIL;
 
     if (!rb->ringbuffer) {
-	rb->buffersize /= lBufferLen;
-	if (init_ringbuffer(rb, rb->buffersize, lBufferLen) != S_OK)
-	    return E_FAIL;
+        rb->buffersize /= lBufferLen;
+        if (init_ringbuffer(rb, rb->buffersize, lBufferLen) != S_OK)
+            return E_FAIL;
     }
     mp_msg(MSGT_TV, MSGL_DBG4,
-	   "tvi_dshow: BufferCB(%p): len=%ld ts=%f\n", This, lBufferLen, SampleTime);
+           "tvi_dshow: BufferCB(%p): len=%ld ts=%f\n", This, lBufferLen, SampleTime);
     EnterCriticalSection(rb->pMutex);
     if (rb->count >= rb->buffersize) {
-	rb->head = (rb->head + 1) % rb->buffersize;
-	rb->count--;
+        rb->head = (rb->head + 1) % rb->buffersize;
+        rb->count--;
     }
 
     memcpy(rb->ringbuffer[rb->tail], pBuffer,
-	   lBufferLen < rb->blocksize ? lBufferLen : rb->blocksize);
+           lBufferLen < rb->blocksize ? lBufferLen : rb->blocksize);
     rb->dpts[rb->tail] =  SampleTime;
     rb->tail = (rb->tail + 1) % rb->buffersize;
     rb->count++;
@@ -669,16 +669,16 @@ static HRESULT STDCALL CSampleGrabberCB_SampleCB(ISampleGrabberCB *This,
 
 /// main grabbing routine
 static CSampleGrabberCB *CSampleGrabberCB_Create(grabber_ringbuffer_t *
-						 pbuf)
+                                                 pbuf)
 {
     CSampleGrabberCB *This = malloc(sizeof(CSampleGrabberCB));
     if (!This)
-	return NULL;
+        return NULL;
 
     This->lpVtbl = malloc(sizeof(ISampleGrabberVtbl));
     if (!This->lpVtbl) {
-	CSampleGrabberCB_Destroy(This);
-	return NULL;
+        CSampleGrabberCB_Destroy(This);
+        return NULL;
     }
     This->refcount = 1;
     This->lpVtbl->QueryInterface = CSampleGrabberCB_QueryInterface;
@@ -713,15 +713,15 @@ static HRESULT AddToRot(IUnknown * pUnkGraph, DWORD * pdwRegister)
     HRESULT hr;
 
     if (FAILED(GetRunningObjectTable(0, &pROT))) {
-	return E_FAIL;
+        return E_FAIL;
     }
     wsprintfW(wsz, L"FilterGraph %08x pid %08x", (DWORD_PTR) pUnkGraph,
-	      GetCurrentProcessId());
+              GetCurrentProcessId());
     hr = CreateItemMoniker(L"!", wsz, &pMoniker);
     if (SUCCEEDED(hr)) {
-	hr = OLE_CALL_ARGS(pROT, Register, ROTFLAGS_REGISTRATIONKEEPSALIVE,
-		       pUnkGraph, pMoniker, pdwRegister);
-	OLE_RELEASE_SAFE(pMoniker);
+        hr = OLE_CALL_ARGS(pROT, Register, ROTFLAGS_REGISTRATIONKEEPSALIVE,
+                       pUnkGraph, pMoniker, pdwRegister);
+        OLE_RELEASE_SAFE(pMoniker);
     }
     OLE_RELEASE_SAFE(pROT);
     return hr;
@@ -732,8 +732,8 @@ static void RemoveFromRot(DWORD dwRegister)
 {
     IRunningObjectTable *pROT;
     if (SUCCEEDED(GetRunningObjectTable(0, &pROT))) {
-	OLE_CALL_ARGS(pROT, Revoke, dwRegister);
-	OLE_RELEASE_SAFE(pROT);
+        OLE_CALL_ARGS(pROT, Revoke, dwRegister);
+        OLE_RELEASE_SAFE(pROT);
     }
 }
 
@@ -756,20 +756,20 @@ static void destroy_ringbuffer(grabber_ringbuffer_t * rb)
     int i;
 
     if (!rb)
-	return;
+        return;
 
     if (rb->ringbuffer) {
-	for (i = 0; i < rb->buffersize; i++)
-	    free(rb->ringbuffer[i]);
-	free(rb->ringbuffer);
-	rb->ringbuffer = NULL;
+        for (i = 0; i < rb->buffersize; i++)
+            free(rb->ringbuffer[i]);
+        free(rb->ringbuffer);
+        rb->ringbuffer = NULL;
     }
     free(rb->dpts);
     rb->dpts = NULL;
     if (rb->pMutex) {
-	DeleteCriticalSection(rb->pMutex);
-	free(rb->pMutex);
-	rb->pMutex = NULL;
+        DeleteCriticalSection(rb->pMutex);
+        free(rb->pMutex);
+        rb->pMutex = NULL;
     }
 
     rb->blocksize = 0;
@@ -792,35 +792,35 @@ static void destroy_ringbuffer(grabber_ringbuffer_t * rb)
  * \note routine does not allocates memory for grabber_rinbuffer_s structure
  */
 static HRESULT init_ringbuffer(grabber_ringbuffer_t * rb, int buffersize,
-			       int blocksize)
+                               int blocksize)
 {
     int i;
 
     if (!rb)
-	return E_OUTOFMEMORY;
+        return E_OUTOFMEMORY;
 
     rb->buffersize = buffersize < 2 ? 2 : buffersize;
     rb->blocksize = blocksize;
 
     mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Capture buffer: %d blocks of %d bytes.\n",
-	   rb->buffersize, rb->blocksize);
+           rb->buffersize, rb->blocksize);
 
     rb->ringbuffer = malloc(rb->buffersize * sizeof(char *));
     if (!rb)
-	return E_POINTER;
+        return E_POINTER;
     memset(rb->ringbuffer, 0, rb->buffersize * sizeof(char *));
 
     for (i = 0; i < rb->buffersize; i++) {
-	rb->ringbuffer[i] = malloc(rb->blocksize * sizeof(char));
-	if (!rb->ringbuffer[i]) {
-	    destroy_ringbuffer(rb);
-	    return E_OUTOFMEMORY;
-	}
+        rb->ringbuffer[i] = malloc(rb->blocksize * sizeof(char));
+        if (!rb->ringbuffer[i]) {
+            destroy_ringbuffer(rb);
+            return E_OUTOFMEMORY;
+        }
     }
     rb->dpts = malloc(rb->buffersize * sizeof(double));
     if (!rb->dpts) {
-	destroy_ringbuffer(rb);
-	return E_OUTOFMEMORY;
+        destroy_ringbuffer(rb);
+        return E_OUTOFMEMORY;
     }
     rb->head = 0;
     rb->tail = 0;
@@ -828,8 +828,8 @@ static HRESULT init_ringbuffer(grabber_ringbuffer_t * rb, int buffersize,
     rb->tStart = -1;
     rb->pMutex = malloc(sizeof(CRITICAL_SECTION));
     if (!rb->pMutex) {
-	destroy_ringbuffer(rb);
-	return E_OUTOFMEMORY;
+        destroy_ringbuffer(rb);
+        return E_OUTOFMEMORY;
     }
     InitializeCriticalSection(rb->pMutex);
     return S_OK;
@@ -904,11 +904,11 @@ static void *GetRC(HMODULE hDLL, int index)
 
     hRes = FindResource(hDLL, szName, szRCDATA);
     if (!hRes) {
-	return NULL;
+        return NULL;
     }
     hTable = LoadResource(hDLL, hRes);
     if (!hTable) {
-	return NULL;
+        return NULL;
     }
     return LockResource(hTable);
 }
@@ -931,8 +931,8 @@ static void *GetRC(HMODULE hDLL, int index)
  * - MSDN says that it is not neccessery to unlock or free resource. It will be done after unloading DLL
  */
 static HRESULT load_freq_table(int nCountry, int nInputType,
-			       long **pplFreqTable, int *pnLen,
-			       int *pnFirst)
+                               long **pplFreqTable, int *pnLen,
+                               int *pnFirst)
 {
     HMODULE hDLL;
     long *plFreqTable;
@@ -943,46 +943,46 @@ static HRESULT load_freq_table(int nCountry, int nInputType,
     /* ASSERT(sizeof(TRCCountryList)==10); // need properly aligned structure */
 
     if (!pplFreqTable || !pnFirst || !pnLen)
-	return E_POINTER;
+        return E_POINTER;
     if (!nCountry)
-	return E_FAIL;
+        return E_FAIL;
 
     hDLL = LoadLibrary("kstvtune.ax");
     if (!hDLL) {
-	return E_FAIL;
+        return E_FAIL;
     }
     pCountryList = GetRC(hDLL, 9999);
     if (!pCountryList) {
-	FreeLibrary(hDLL);
-	return E_FAIL;
+        FreeLibrary(hDLL);
+        return E_FAIL;
     }
     for (i = 0; pCountryList[i].CountryCode != 0; i++)
-	if (pCountryList[i].CountryCode == nCountry)
-	    break;
+        if (pCountryList[i].CountryCode == nCountry)
+            break;
     if (pCountryList[i].CountryCode == 0) {
-	FreeLibrary(hDLL);
-	return E_FAIL;
+        FreeLibrary(hDLL);
+        return E_FAIL;
     }
     if (nInputType == TunerInputCable)
-	index = pCountryList[i].CableFreqTable;
+        index = pCountryList[i].CableFreqTable;
     else
-	index = pCountryList[i].BroadcastFreqTable;
+        index = pCountryList[i].BroadcastFreqTable;
 
-    plFreqTable = GetRC(hDLL, index);	//First element is number of first channel, second - number of last channel
+    plFreqTable = GetRC(hDLL, index);   //First element is number of first channel, second - number of last channel
     if (!plFreqTable) {
-	FreeLibrary(hDLL);
-	return E_FAIL;
+        FreeLibrary(hDLL);
+        return E_FAIL;
     }
     *pnFirst = plFreqTable[0];
     *pnLen = (int) (plFreqTable[1] - plFreqTable[0] + 1);
     *pplFreqTable = malloc((*pnLen) * sizeof(long));
     if (!*pplFreqTable) {
-	FreeLibrary(hDLL);
-	return E_FAIL;
+        FreeLibrary(hDLL);
+        return E_FAIL;
     }
     for (i = 0; i < *pnLen; i++) {
-	(*pplFreqTable)[i] = plFreqTable[i + 2];
-	mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: load_freq_table #%d => (%ld)\n",i+*pnFirst,(*pplFreqTable)[i]);
+        (*pplFreqTable)[i] = plFreqTable[i + 2];
+        mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: load_freq_table #%d => (%ld)\n",i+*pnFirst,(*pplFreqTable)[i]);
     }
     FreeLibrary(hDLL);
     return S_OK;
@@ -1019,47 +1019,47 @@ static HRESULT set_frequency_direct(IAMTVTuner * pTVTuner, long lFreq)
 
     hr = OLE_QUERYINTERFACE(pTVTuner, IID_IKsPropertySet, pKSProp);
     if (FAILED(hr))
-	return hr;		//no IKsPropertySet interface
+        return hr;              //no IKsPropertySet interface
 
     mode_caps.Mode = AMTUNER_MODE_TV;
     hr = OLE_CALL_ARGS(pKSProp, QuerySupported, &PROPSETID_TUNER,
-		   KSPROPERTY_TUNER_MODE_CAPS, &dwSupported);
+                   KSPROPERTY_TUNER_MODE_CAPS, &dwSupported);
     if (FAILED(hr)) {
-	OLE_RELEASE_SAFE(pKSProp);
-	return hr;
+        OLE_RELEASE_SAFE(pKSProp);
+        return hr;
     }
 
     if (!dwSupported & KSPROPERTY_SUPPORT_GET) {
-	OLE_RELEASE_SAFE(pKSProp);
-	return E_FAIL;		//PROPSETID_TINER not supported
+        OLE_RELEASE_SAFE(pKSProp);
+        return E_FAIL;          //PROPSETID_TINER not supported
     }
 
     hr = OLE_CALL_ARGS(pKSProp, Get, &PROPSETID_TUNER,
-		   KSPROPERTY_TUNER_MODE_CAPS,
-		   INSTANCEDATA_OF_PROPERTY_PTR(&mode_caps),
-		   INSTANCEDATA_OF_PROPERTY_SIZE(mode_caps),
-		   &mode_caps, sizeof(mode_caps), &cbBytes);
+                   KSPROPERTY_TUNER_MODE_CAPS,
+                   INSTANCEDATA_OF_PROPERTY_PTR(&mode_caps),
+                   INSTANCEDATA_OF_PROPERTY_SIZE(mode_caps),
+                   &mode_caps, sizeof(mode_caps), &cbBytes);
 
     frequency.Frequency = lFreq;
 
     if (mode_caps.Strategy == KS_TUNER_STRATEGY_DRIVER_TUNES)
-	frequency.TuningFlags = KS_TUNER_TUNING_FINE;
+        frequency.TuningFlags = KS_TUNER_TUNING_FINE;
     else
-	frequency.TuningFlags = KS_TUNER_TUNING_EXACT;
+        frequency.TuningFlags = KS_TUNER_TUNING_EXACT;
 
     if (lFreq < mode_caps.MinFrequency || lFreq > mode_caps.MaxFrequency) {
-	OLE_RELEASE_SAFE(pKSProp);
-	return E_FAIL;
+        OLE_RELEASE_SAFE(pKSProp);
+        return E_FAIL;
     }
 
     hr = OLE_CALL_ARGS(pKSProp, Set, &PROPSETID_TUNER,
-		   KSPROPERTY_TUNER_FREQUENCY,
-		   INSTANCEDATA_OF_PROPERTY_PTR(&frequency),
-		   INSTANCEDATA_OF_PROPERTY_SIZE(frequency),
-		   &frequency, sizeof(frequency));
+                   KSPROPERTY_TUNER_FREQUENCY,
+                   INSTANCEDATA_OF_PROPERTY_PTR(&frequency),
+                   INSTANCEDATA_OF_PROPERTY_SIZE(frequency),
+                   &frequency, sizeof(frequency));
     if (FAILED(hr)) {
-	OLE_RELEASE_SAFE(pKSProp);
-	return hr;
+        OLE_RELEASE_SAFE(pKSProp);
+        return hr;
     }
 
     OLE_RELEASE_SAFE(pKSProp);
@@ -1106,27 +1106,27 @@ static HRESULT set_nearest_freq(priv_t * priv, long lFreq)
     }
 
     if (priv->freq_table_len <= 0)
-	return E_FAIL;
+        return E_FAIL;
 
     //FIXME: rewrite search algo
     nChannel = -1;
     for (i = 0; i < priv->freq_table_len; i++) {
-	if (nChannel == -1 || labs(lFreq - priv->freq_table[i]) < lFreqDiff) {
-	    nChannel = priv->first_channel + i;
-	    lFreqDiff = labs(lFreq - priv->freq_table[i]);
-	}
-	mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: set_nearest_freq #%d (%ld) => %d (%ld)\n",i+priv->first_channel,priv->freq_table[i], nChannel,lFreqDiff);
+        if (nChannel == -1 || labs(lFreq - priv->freq_table[i]) < lFreqDiff) {
+            nChannel = priv->first_channel + i;
+            lFreqDiff = labs(lFreq - priv->freq_table[i]);
+        }
+        mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: set_nearest_freq #%d (%ld) => %d (%ld)\n",i+priv->first_channel,priv->freq_table[i], nChannel,lFreqDiff);
     }
     if (nChannel == -1) {
-	mp_msg(MSGT_TV,MSGL_ERR, MSGTR_TVI_DS_UnableFindNearestChannel);
-	return E_FAIL;
+        mp_msg(MSGT_TV,MSGL_ERR, MSGTR_TVI_DS_UnableFindNearestChannel);
+        return E_FAIL;
     }
     mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: set_nearest_freq #%d (%ld)\n",nChannel,priv->freq_table[nChannel - priv->first_channel]);
     hr = OLE_CALL_ARGS(priv->pTVTuner, put_Channel, nChannel,
-		   AMTUNER_SUBCHAN_DEFAULT, AMTUNER_SUBCHAN_DEFAULT);
+                   AMTUNER_SUBCHAN_DEFAULT, AMTUNER_SUBCHAN_DEFAULT);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableToSetChannel, (unsigned int)hr);
-	return E_FAIL;
+        mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableToSetChannel, (unsigned int)hr);
+        return E_FAIL;
     }
     return S_OK;
 }
@@ -1148,19 +1148,19 @@ static int set_frequency(priv_t * priv, long lFreq)
 
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: set_frequency called: %ld\n", lFreq);
     if (!priv->pTVTuner)
-	return TVI_CONTROL_FALSE;
-    if (priv->direct_setfreq_call) {	//using direct call to set frequency
-	hr = set_frequency_direct(priv->pTVTuner, lFreq);
-	if (FAILED(hr)) {
-	    mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Unable to set frequency directly. OS built-in channels table will be used.\n");
-	    priv->direct_setfreq_call = 0;
-	}
+        return TVI_CONTROL_FALSE;
+    if (priv->direct_setfreq_call) {    //using direct call to set frequency
+        hr = set_frequency_direct(priv->pTVTuner, lFreq);
+        if (FAILED(hr)) {
+            mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Unable to set frequency directly. OS built-in channels table will be used.\n");
+            priv->direct_setfreq_call = 0;
+        }
     }
     if (!priv->direct_setfreq_call) {
-	hr = set_nearest_freq(priv, lFreq);
+        hr = set_nearest_freq(priv, lFreq);
     }
     if (FAILED(hr))
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 #ifdef DEPRECATED
     priv->pGrabber->ClearBuffer(priv->pGrabber);
 #endif
@@ -1186,22 +1186,22 @@ static HRESULT get_frequency_direct(IAMTVTuner * pTVTuner, long *plFreq)
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: get_frequency_direct called\n");
 
     if (!plFreq)
-	return E_POINTER;
+        return E_POINTER;
 
     hr = OLE_QUERYINTERFACE(pTVTuner, IID_IKsPropertySet, pKSProp);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Get freq QueryInterface failed\n");
-	return hr;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Get freq QueryInterface failed\n");
+        return hr;
     }
 
     hr = OLE_CALL_ARGS(pKSProp, Get, &PROPSETID_TUNER,
-		   KSPROPERTY_TUNER_STATUS,
-		   INSTANCEDATA_OF_PROPERTY_PTR(&TunerStatus),
-		   INSTANCEDATA_OF_PROPERTY_SIZE(TunerStatus),
-		   &TunerStatus, sizeof(TunerStatus), &cbBytes);
+                   KSPROPERTY_TUNER_STATUS,
+                   INSTANCEDATA_OF_PROPERTY_PTR(&TunerStatus),
+                   INSTANCEDATA_OF_PROPERTY_SIZE(TunerStatus),
+                   &TunerStatus, sizeof(TunerStatus), &cbBytes);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Get freq Get failure\n");
-	return hr;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Get freq Get failure\n");
+        return hr;
     }
     *plFreq = TunerStatus.CurrentFrequency;
     return S_OK;
@@ -1222,19 +1222,19 @@ static int get_frequency(priv_t * priv, long *plFreq)
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: get_frequency called\n");
 
     if (!plFreq || !priv->pTVTuner)
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
-    if (priv->direct_getfreq_call) {	//using direct call to get frequency
-	hr = get_frequency_direct(priv->pTVTuner, plFreq);
-	if (FAILED(hr)) {
-	    mp_msg(MSGT_TV, MSGL_INFO, MSGTR_TVI_DS_DirectGetFreqFailed);
-	    priv->direct_getfreq_call = 0;
-	}
+    if (priv->direct_getfreq_call) {    //using direct call to get frequency
+        hr = get_frequency_direct(priv->pTVTuner, plFreq);
+        if (FAILED(hr)) {
+            mp_msg(MSGT_TV, MSGL_INFO, MSGTR_TVI_DS_DirectGetFreqFailed);
+            priv->direct_getfreq_call = 0;
+        }
     }
     if (!priv->direct_getfreq_call) {
         hr=OLE_CALL_ARGS(priv->pTVTuner, get_VideoFrequency, plFreq);
-	if (FAILED(hr))
-	    return TVI_CONTROL_FALSE;
+        if (FAILED(hr))
+            return TVI_CONTROL_FALSE;
 
     }
     return TVI_CONTROL_TRUE;
@@ -1261,89 +1261,89 @@ static void get_capabilities(priv_t * priv)
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: get_capabilities called\n");
     if (priv->pTVTuner) {
 
-	mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: supported norms:");
-	hr = OLE_CALL_ARGS(priv->pTVTuner, get_AvailableTVFormats,
-		       &lAvailableFormats);
-	if (FAILED(hr))
-	    tv_available_norms_count = 0;
-	else {
-	    for (i = 0; i < TV_NORMS_COUNT; i++) {
-		if (lAvailableFormats & tv_norms[i].index) {
-		    tv_available_norms[tv_available_norms_count] = i;
-		    mp_msg(MSGT_TV, MSGL_V, " %d=%s;",
-			   tv_available_norms_count + 1, tv_norms[i].name);
-		    tv_available_norms_count++;
-		}
-	    }
-	}
-	mp_msg(MSGT_TV, MSGL_INFO, "\n");
+        mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: supported norms:");
+        hr = OLE_CALL_ARGS(priv->pTVTuner, get_AvailableTVFormats,
+                       &lAvailableFormats);
+        if (FAILED(hr))
+            tv_available_norms_count = 0;
+        else {
+            for (i = 0; i < TV_NORMS_COUNT; i++) {
+                if (lAvailableFormats & tv_norms[i].index) {
+                    tv_available_norms[tv_available_norms_count] = i;
+                    mp_msg(MSGT_TV, MSGL_V, " %d=%s;",
+                           tv_available_norms_count + 1, tv_norms[i].name);
+                    tv_available_norms_count++;
+                }
+            }
+        }
+        mp_msg(MSGT_TV, MSGL_INFO, "\n");
     }
     if (priv->pCrossbar) {
-	OLE_CALL_ARGS(priv->pCrossbar, get_PinCounts, &lOutputPins,
-		  &lInputPins);
+        OLE_CALL_ARGS(priv->pCrossbar, get_PinCounts, &lOutputPins,
+                  &lInputPins);
 
-	tv_available_inputs = malloc(sizeof(long) * lInputPins);
-	tv_available_inputs_count = 0;
+        tv_available_inputs = malloc(sizeof(long) * lInputPins);
+        tv_available_inputs_count = 0;
 
-	mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: available video inputs:");
-	for (i = 0; i < lInputPins; i++) {
-	    OLE_CALL_ARGS(priv->pCrossbar, get_CrossbarPinInfo, 1, i,
-		      &lRelated, &lPhysicalType);
+        mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: available video inputs:");
+        for (i = 0; i < lInputPins; i++) {
+            OLE_CALL_ARGS(priv->pCrossbar, get_CrossbarPinInfo, 1, i,
+                      &lRelated, &lPhysicalType);
 
-	    if (lPhysicalType < 0x1000) {
-		tv_available_inputs[tv_available_inputs_count++] = i;
-		mp_msg(MSGT_TV, MSGL_V, " %d=%s;",
-		       tv_available_inputs_count - 1,
-		       physcon2str(lPhysicalType));
-	    }
-	}
-	mp_msg(MSGT_TV, MSGL_INFO, "\n");
+            if (lPhysicalType < 0x1000) {
+                tv_available_inputs[tv_available_inputs_count++] = i;
+                mp_msg(MSGT_TV, MSGL_V, " %d=%s;",
+                       tv_available_inputs_count - 1,
+                       physcon2str(lPhysicalType));
+            }
+        }
+        mp_msg(MSGT_TV, MSGL_INFO, "\n");
 
-	set_crossbar_input(priv, 0);
+        set_crossbar_input(priv, 0);
     }
 
     if (priv->adev_index != -1) {
-	hr = OLE_CALL_ARGS(priv->chains[1]->pCaptureFilter, EnumPins, &pEnum);
-	if (FAILED(hr))
-	    return;
-	mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: available audio inputs:");
-	i = 0;
-	while (OLE_CALL_ARGS(pEnum, Next, 1, &pPin, NULL) == S_OK) {
-	    memset(&pi, 0, sizeof(pi));
-	    memset(tmp, 0, 200);
-	    OLE_CALL_ARGS(pPin, QueryDirection, &ThisPinDir);
-	    if (ThisPinDir == PINDIR_INPUT) {
-		OLE_CALL_ARGS(pPin, QueryPinInfo, &pi);
-		wtoa(pi.achName, tmp, 200);
-		OLE_RELEASE_SAFE(pi.pFilter);
-		mp_msg(MSGT_TV, MSGL_V, " %d=%s", i, tmp);
-		mp_msg(MSGT_TV, MSGL_DBG3, " (%p)", pPin);
-		hr = OLE_QUERYINTERFACE(pPin, IID_IAMAudioInputMixer,pIAMixer);
-		if (SUCCEEDED(hr)) {
-		    if (i == priv->tv_param->audio_id) {
-			OLE_CALL_ARGS(pIAMixer, put_Enable, TRUE);
+        hr = OLE_CALL_ARGS(priv->chains[1]->pCaptureFilter, EnumPins, &pEnum);
+        if (FAILED(hr))
+            return;
+        mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: available audio inputs:");
+        i = 0;
+        while (OLE_CALL_ARGS(pEnum, Next, 1, &pPin, NULL) == S_OK) {
+            memset(&pi, 0, sizeof(pi));
+            memset(tmp, 0, 200);
+            OLE_CALL_ARGS(pPin, QueryDirection, &ThisPinDir);
+            if (ThisPinDir == PINDIR_INPUT) {
+                OLE_CALL_ARGS(pPin, QueryPinInfo, &pi);
+                wtoa(pi.achName, tmp, 200);
+                OLE_RELEASE_SAFE(pi.pFilter);
+                mp_msg(MSGT_TV, MSGL_V, " %d=%s", i, tmp);
+                mp_msg(MSGT_TV, MSGL_DBG3, " (%p)", pPin);
+                hr = OLE_QUERYINTERFACE(pPin, IID_IAMAudioInputMixer,pIAMixer);
+                if (SUCCEEDED(hr)) {
+                    if (i == priv->tv_param->audio_id) {
+                        OLE_CALL_ARGS(pIAMixer, put_Enable, TRUE);
                         if(priv->tv_param->volume>0)
-			    OLE_CALL_ARGS(pIAMixer, put_MixLevel, 0.01 * priv->tv_param->volume);
+                            OLE_CALL_ARGS(pIAMixer, put_MixLevel, 0.01 * priv->tv_param->volume);
 #if 0
                         else
-			    OLE_CALL_ARGS(pIAMixer, put_MixLevel, 1.0);
+                            OLE_CALL_ARGS(pIAMixer, put_MixLevel, 1.0);
 #endif
-			mp_msg(MSGT_TV, MSGL_V, "(selected)");
-		    } else {
-			OLE_CALL_ARGS(pIAMixer, put_Enable, FALSE);
+                        mp_msg(MSGT_TV, MSGL_V, "(selected)");
+                    } else {
+                        OLE_CALL_ARGS(pIAMixer, put_Enable, FALSE);
 #if 0
-			OLE_CALL_ARGS(pIAMixer, put_MixLevel, 0.0);
+                        OLE_CALL_ARGS(pIAMixer, put_MixLevel, 0.0);
 #endif
-		    }
-		    OLE_RELEASE_SAFE(pIAMixer);
-		}
-		mp_msg(MSGT_TV, MSGL_V, ";");
-		OLE_RELEASE_SAFE(pPin);
-		i++;
-	    }
-	}
-	mp_msg(MSGT_TV, MSGL_INFO, "\n");
-	OLE_RELEASE_SAFE(pEnum);
+                    }
+                    OLE_RELEASE_SAFE(pIAMixer);
+                }
+                mp_msg(MSGT_TV, MSGL_V, ";");
+                OLE_RELEASE_SAFE(pPin);
+                i++;
+            }
+        }
+        mp_msg(MSGT_TV, MSGL_INFO, "\n");
+        OLE_RELEASE_SAFE(pEnum);
     }
 }
 
@@ -1382,9 +1382,9 @@ static HRESULT build_sub_graph(priv_t * priv, chain_t * chain, const GUID* ppin_
 
     do{
         hr = OLE_CALL_ARGS(priv->pBuilder, FindPin,
-    		   (IUnknown *) chain->pCaptureFilter,
-    		   PINDIR_OUTPUT, ppin_category,
-    		   chain->majortype, FALSE, 0, &chain->pCapturePin);
+                   (IUnknown *) chain->pCaptureFilter,
+                   PINDIR_OUTPUT, ppin_category,
+                   chain->majortype, FALSE, 0, &chain->pCapturePin);
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: FindPin(pCapturePin) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
@@ -1424,19 +1424,19 @@ static HRESULT build_sub_graph(priv_t * priv, chain_t * chain, const GUID* ppin_
             mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: QueryInterface(IID_ISampleGrabber) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
         }
-    //    hr = OLE_CALL_ARGS(pSG, SetCallback, (ISampleGrabberCB *) pCSGCB, 1);	//we want to receive copy of sample's data
-        hr = OLE_CALL_ARGS(chain->pSG, SetCallback, (ISampleGrabberCB *) chain->pCSGCB, 0);	//we want to receive sample
+    //    hr = OLE_CALL_ARGS(pSG, SetCallback, (ISampleGrabberCB *) pCSGCB, 1); //we want to receive copy of sample's data
+        hr = OLE_CALL_ARGS(chain->pSG, SetCallback, (ISampleGrabberCB *) chain->pCSGCB, 0);     //we want to receive sample
 
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: SetCallback(pSG) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
         }
-        hr = OLE_CALL_ARGS(chain->pSG, SetOneShot, FALSE);	//... for all frames
+        hr = OLE_CALL_ARGS(chain->pSG, SetOneShot, FALSE);      //... for all frames
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: SetOneShot(pSG) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
         }
-        hr = OLE_CALL_ARGS(chain->pSG, SetBufferSamples, FALSE);	//... do not buffer samples in sample grabber
+        hr = OLE_CALL_ARGS(chain->pSG, SetBufferSamples, FALSE);        //... do not buffer samples in sample grabber
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: SetBufferSamples(pSG) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
@@ -1449,7 +1449,7 @@ static HRESULT build_sub_graph(priv_t * priv, chain_t * chain, const GUID* ppin_
         for(nFormatProbed=0; chain->arpmt[nFormatProbed]; nFormatProbed++)
         {
             DisplayMediaType("Probing format", chain->arpmt[nFormatProbed]);
-            hr = OLE_CALL_ARGS(chain->pSG, SetMediaType, chain->arpmt[nFormatProbed]);	//set desired mediatype
+            hr = OLE_CALL_ARGS(chain->pSG, SetMediaType, chain->arpmt[nFormatProbed]);  //set desired mediatype
             if(FAILED(hr)){
                 mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: SetMediaType(pSG) call failed. Error:0x%x\n", (unsigned int)hr);
                 continue;
@@ -1460,7 +1460,7 @@ static HRESULT build_sub_graph(priv_t * priv, chain_t * chain, const GUID* ppin_
                 mp_msg(MSGT_TV,MSGL_DBG2,"tvi_dshow: Unable to create pCapturePin<->pSGIn connection. Error:0x%x\n", (unsigned int)hr);
                 continue;
             }
-	    break;
+            break;
         }
 
         if(!chain->arpmt[nFormatProbed])
@@ -1557,47 +1557,47 @@ static int set_crossbar_input(priv_t * priv, int input)
     HRESULT hr;
     int i, nVideoDecoder, nAudioDecoder;
     long lInput, lInputRelated, lRelated, lPhysicalType, lOutputPins,
-	lInputPins;
+        lInputPins;
 
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: Configuring crossbar\n");
     if (!priv->pCrossbar || input < 0
-	|| input >= tv_available_inputs_count)
-	return TVI_CONTROL_FALSE;
+        || input >= tv_available_inputs_count)
+        return TVI_CONTROL_FALSE;
 
     OLE_CALL_ARGS(priv->pCrossbar, get_PinCounts, &lOutputPins, &lInputPins);
 
     lInput = tv_available_inputs[input];
 
     if (lInput < 0 || lInput >= lInputPins)
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     OLE_CALL_ARGS(priv->pCrossbar, get_CrossbarPinInfo, 1 /* input */ , lInput,
-	      &lInputRelated, &lPhysicalType);
+              &lInputRelated, &lPhysicalType);
 
     nVideoDecoder = nAudioDecoder = -1;
     for (i = 0; i < lOutputPins; i++) {
-	OLE_CALL_ARGS(priv->pCrossbar, get_CrossbarPinInfo, 0 /*output */ , i,
-		  &lRelated, &lPhysicalType);
-	if (lPhysicalType == PhysConn_Video_VideoDecoder)
-	    nVideoDecoder = i;
-	if (lPhysicalType == PhysConn_Audio_AudioDecoder)
-	    nAudioDecoder = i;
+        OLE_CALL_ARGS(priv->pCrossbar, get_CrossbarPinInfo, 0 /*output */ , i,
+                  &lRelated, &lPhysicalType);
+        if (lPhysicalType == PhysConn_Video_VideoDecoder)
+            nVideoDecoder = i;
+        if (lPhysicalType == PhysConn_Audio_AudioDecoder)
+            nAudioDecoder = i;
     }
     if (nVideoDecoder >= 0) {
-	//connecting given input with video decoder
-	hr = OLE_CALL_ARGS(priv->pCrossbar, Route, nVideoDecoder, lInput);
-	if (hr != S_OK) {
-	    mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableConnectInputVideoDecoder, (unsigned int)hr);
-	    return TVI_CONTROL_FALSE;
-	}
+        //connecting given input with video decoder
+        hr = OLE_CALL_ARGS(priv->pCrossbar, Route, nVideoDecoder, lInput);
+        if (hr != S_OK) {
+            mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableConnectInputVideoDecoder, (unsigned int)hr);
+            return TVI_CONTROL_FALSE;
+        }
     }
     if (nAudioDecoder >= 0 && lInputRelated >= 0) {
-	hr = OLE_CALL_ARGS(priv->pCrossbar, Route, nAudioDecoder,
-		       lInputRelated);
-	if (hr != S_OK) {
-	    mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableConnectInputAudioDecoder, (unsigned int)hr);
-	    return TVI_CONTROL_FALSE;
-	}
+        hr = OLE_CALL_ARGS(priv->pCrossbar, Route, nAudioDecoder,
+                       lInputRelated);
+        if (hr != S_OK) {
+            mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableConnectInputAudioDecoder, (unsigned int)hr);
+            return TVI_CONTROL_FALSE;
+        }
     }
     return TVI_CONTROL_TRUE;
 }
@@ -1619,28 +1619,28 @@ static int set_control(priv_t * priv, int control, int value)
 
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: set_control called\n");
     if (value < -100 || value > 100 || !priv->pVideoProcAmp)
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     hr = OLE_CALL_ARGS(priv->pVideoProcAmp, GetRange, control,
-		   &lMin, &lMax, &lStepping, &lDefault, &lFlags);
+                   &lMin, &lMax, &lStepping, &lDefault, &lFlags);
     if (FAILED(hr) || lFlags != VideoProcAmp_Flags_Manual)
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     lValue = lMin + (value + 100) * (lMax - lMin) / 200;
     /*
        Workaround for ATI AIW 7500. The driver reports: max=255, stepping=256
      */
     if (lStepping > lMax) {
-	mp_msg(MSGT_TV, MSGL_DBG3,
-	       "tvi_dshow: Stepping (%ld) is bigger than max value (%ld) for control %d. Assuming 1\n",
-	       lStepping, lMax,control);
-	lStepping = 1;
+        mp_msg(MSGT_TV, MSGL_DBG3,
+               "tvi_dshow: Stepping (%ld) is bigger than max value (%ld) for control %d. Assuming 1\n",
+               lStepping, lMax,control);
+        lStepping = 1;
     }
     lValue -= lValue % lStepping;
     hr = OLE_CALL_ARGS(priv->pVideoProcAmp, Set, control, lValue,
-		   VideoProcAmp_Flags_Manual);
+                   VideoProcAmp_Flags_Manual);
     if (FAILED(hr))
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     return TVI_CONTROL_TRUE;
 }
@@ -1662,20 +1662,20 @@ static int get_control(priv_t * priv, int control, int *pvalue)
 
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: get_control called\n");
     if (!pvalue || !priv->pVideoProcAmp)
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     hr = OLE_CALL_ARGS(priv->pVideoProcAmp, GetRange, control,
-		   &lMin, &lMax, &lStepping, &lDefault, &lFlags);
+                   &lMin, &lMax, &lStepping, &lDefault, &lFlags);
     if (FAILED(hr))
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
     if (lMin == lMax) {
-	*pvalue = lMin;
-	return TVI_CONTROL_TRUE;
+        *pvalue = lMin;
+        return TVI_CONTROL_TRUE;
     }
 
     hr = OLE_CALL_ARGS(priv->pVideoProcAmp, Get, control, &lValue, &lFlags);
     if (FAILED(hr))
-	return TVI_CONTROL_FALSE;
+        return TVI_CONTROL_FALSE;
 
     *pvalue = 200 * (lValue - lMin) / (lMax - lMin) - 100;
 
@@ -1740,21 +1740,21 @@ static AM_MEDIA_TYPE* create_video_format(int fcc, int width, int height, int fp
  * \return 1 if data extracted successfully, 0 - otherwise
  */
 static int extract_video_format(AM_MEDIA_TYPE * pmt, int *pfcc,
-				int *pwidth, int *pheight)
+                                int *pwidth, int *pheight)
 {
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: extract_video_format called\n");
     if (!pmt)
-	return 0;
+        return 0;
     if (!pmt->pbFormat)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->formattype), &FORMAT_VideoInfo, 16) != 0)
-	return 0;
+        return 0;
     if (pfcc)
-	*pfcc = subtype2imgfmt(&(pmt->subtype));
+        *pfcc = subtype2imgfmt(&(pmt->subtype));
     if (pwidth)
-	*pwidth = ((VIDEOINFOHEADER *) pmt->pbFormat)->bmiHeader.biWidth;
+        *pwidth = ((VIDEOINFOHEADER *) pmt->pbFormat)->bmiHeader.biWidth;
     if (pheight)
-	*pheight = ((VIDEOINFOHEADER *) pmt->pbFormat)->bmiHeader.biHeight;
+        *pheight = ((VIDEOINFOHEADER *) pmt->pbFormat)->bmiHeader.biHeight;
     return 1;
 }
 
@@ -1769,21 +1769,21 @@ static int extract_video_format(AM_MEDIA_TYPE * pmt, int *pfcc,
  * \return 1 if data extracted successfully, 0 - otherwise
  */
 static int extract_audio_format(AM_MEDIA_TYPE * pmt, int *psamplerate,
-				int *pbits, int *pchannels)
+                                int *pbits, int *pchannels)
 {
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: extract_audio_format called\n");
     if (!pmt)
-	return 0;
+        return 0;
     if (!pmt->pbFormat)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->formattype), &FORMAT_WaveFormatEx, 16) != 0)
-	return 0;
+        return 0;
     if (psamplerate)
-	*psamplerate = ((WAVEFORMATEX *) pmt->pbFormat)->nSamplesPerSec;
+        *psamplerate = ((WAVEFORMATEX *) pmt->pbFormat)->nSamplesPerSec;
     if (pbits)
-	*pbits = ((WAVEFORMATEX *) pmt->pbFormat)->wBitsPerSample;
+        *pbits = ((WAVEFORMATEX *) pmt->pbFormat)->wBitsPerSample;
     if (pchannels)
-	*pchannels = ((WAVEFORMATEX *) pmt->pbFormat)->nChannels;
+        *pchannels = ((WAVEFORMATEX *) pmt->pbFormat)->nChannels;
     return 1;
 }
 
@@ -1799,26 +1799,26 @@ static int extract_audio_format(AM_MEDIA_TYPE * pmt, int *psamplerate,
  * \return 0 if not
  */
 static int check_audio_format(AM_MEDIA_TYPE * pmt, int samplerate,
-			      int bits, int channels)
+                              int bits, int channels)
 {
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: check_audio_format called\n");
     if (!pmt)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->majortype), &MEDIATYPE_Audio, 16) != 0)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->subtype), &MEDIASUBTYPE_PCM, 16) != 0)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->formattype), &FORMAT_WaveFormatEx, 16) != 0)
-	return 0;
+        return 0;
     if (!pmt->pbFormat)
-	return 0;
+        return 0;
     if (((WAVEFORMATEX *) pmt->pbFormat)->nSamplesPerSec != samplerate)
-	return 0;
+        return 0;
     if (((WAVEFORMATEX *) pmt->pbFormat)->wBitsPerSample != bits)
-	return 0;
+        return 0;
     if (channels > 0
-	&& ((WAVEFORMATEX *) pmt->pbFormat)->nChannels != channels)
-	return 0;
+        && ((WAVEFORMATEX *) pmt->pbFormat)->nChannels != channels)
+        return 0;
 
     return 1;
 }
@@ -1841,15 +1841,15 @@ static int check_audio_format(AM_MEDIA_TYPE * pmt, int samplerate,
  * add width/height check
  */
 static int check_video_format(AM_MEDIA_TYPE * pmt, int fcc, int width,
-			      int height)
+                              int height)
 {
     mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: check_video_format called\n");
     if (!pmt)
-	return 0;
+        return 0;
     if (memcmp(&(pmt->majortype), &MEDIATYPE_Video, 16) != 0)
-	return 0;
+        return 0;
     if (subtype2imgfmt(&(pmt->subtype)) != fcc)
-	return 0;
+        return 0;
     return 1;
 }
 
@@ -1864,8 +1864,8 @@ static int subtype2imgfmt(const GUID * subtype)
 {
     int i;
     for (i = 0; img_fmt_list[i].fmt; i++) {
-	if (memcmp(subtype, img_fmt_list[i].subtype, 16) == 0)
-	    return img_fmt_list[i].fmt;
+        if (memcmp(subtype, img_fmt_list[i].subtype, 16) == 0)
+            return img_fmt_list[i].fmt;
     }
     return 0;
 }
@@ -1896,25 +1896,25 @@ static HRESULT show_filter_info(IBaseFilter * pFilter)
     OLE_RELEASE_SAFE(fi.pGraph);
     wtoa(fi.achName, tmp, 200);
     mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: BaseFilter (%p): Name=%s, Graph=%p output pins:",
-	   pFilter, tmp, fi.pGraph);
+           pFilter, tmp, fi.pGraph);
     hr = OLE_CALL_ARGS(pFilter, EnumPins, &pEnum);
     if (FAILED(hr))
-	return hr;
+        return hr;
     i = 0;
     while (OLE_CALL_ARGS(pEnum, Next, 1, &pPin, NULL) == S_OK) {
-	memset(&pi, 0, sizeof(pi));
-	memset(tmp, 0, 200);
-	OLE_CALL_ARGS(pPin, QueryDirection, &ThisPinDir);
-	if (ThisPinDir == PINDIR_OUTPUT) {
-	    OLE_CALL_ARGS(pPin, QueryPinInfo, &pi);
-	    wtoa(pi.achName, tmp, 200);
-	    OLE_RELEASE_SAFE(pi.pFilter);
-	    mp_msg(MSGT_TV, MSGL_DBG2, " %d=%s", i, tmp);
-	    mp_msg(MSGT_TV, MSGL_DBG3, " (%p)", pPin);
-	    mp_msg(MSGT_TV, MSGL_DBG2, ";");
-	    OLE_RELEASE_SAFE(pPin);
-	    i++;
-	}
+        memset(&pi, 0, sizeof(pi));
+        memset(tmp, 0, 200);
+        OLE_CALL_ARGS(pPin, QueryDirection, &ThisPinDir);
+        if (ThisPinDir == PINDIR_OUTPUT) {
+            OLE_CALL_ARGS(pPin, QueryPinInfo, &pi);
+            wtoa(pi.achName, tmp, 200);
+            OLE_RELEASE_SAFE(pi.pFilter);
+            mp_msg(MSGT_TV, MSGL_DBG2, " %d=%s", i, tmp);
+            mp_msg(MSGT_TV, MSGL_DBG3, " (%p)", pPin);
+            mp_msg(MSGT_TV, MSGL_DBG2, ";");
+            OLE_RELEASE_SAFE(pPin);
+            i++;
+        }
     }
     mp_msg(MSGT_TV, MSGL_DBG2, "\n");
     OLE_RELEASE_SAFE(pEnum);
@@ -1936,19 +1936,19 @@ static int get_device_name(IMoniker * pM, char *pBuf, int nLen)
     IPropertyBag *pPropBag;
     hr = OLE_CALL_ARGS(pM, BindToStorage, 0, 0, &IID_IPropertyBag,(void *) &pPropBag);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Call to BindToStorage failed\n");
-	return TVI_CONTROL_FALSE;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Call to BindToStorage failed\n");
+        return TVI_CONTROL_FALSE;
     }
     var.vt = VT_BSTR;
     hr = OLE_CALL_ARGS(pPropBag, Read, L"Description", (LPVARIANT) & var,
-		   NULL);
+                   NULL);
     if (FAILED(hr)) {
-	hr = OLE_CALL_ARGS(pPropBag, Read, L"FriendlyName", (LPVARIANT) & var,
-		       NULL);
+        hr = OLE_CALL_ARGS(pPropBag, Read, L"FriendlyName", (LPVARIANT) & var,
+                       NULL);
     }
     OLE_RELEASE_SAFE(pPropBag);
     if (SUCCEEDED(hr)) {
-	wtoa(var.bstrVal, pBuf, nLen);
+        wtoa(var.bstrVal, pBuf, nLen);
         return TVI_CONTROL_TRUE;
     }
     return TVI_CONTROL_FALSE;
@@ -1978,41 +1978,41 @@ static IBaseFilter *find_capture_device(int index, REFCLSID category)
     int i;
     char tmp[DEVICE_NAME_MAX_LEN + 1];
     hr = CoCreateInstance((GUID *) & CLSID_SystemDeviceEnum, NULL,
-			  CLSCTX_INPROC_SERVER, &IID_ICreateDevEnum,
-			  (void *) &pDevEnum);
+                          CLSCTX_INPROC_SERVER, &IID_ICreateDevEnum,
+                          (void *) &pDevEnum);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Unable to create device enumerator\n");
-	return NULL;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Unable to create device enumerator\n");
+        return NULL;
     }
 
     hr = OLE_CALL_ARGS(pDevEnum, CreateClassEnumerator, category, &pClassEnum, 0);
     OLE_RELEASE_SAFE(pDevEnum);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Unable to create class enumerator\n");
-	return NULL;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Unable to create class enumerator\n");
+        return NULL;
     }
     if (hr == S_FALSE) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: No capture devices found\n");
-	return NULL;
+        mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: No capture devices found\n");
+        return NULL;
     }
 
     OLE_CALL(pClassEnum,Reset);
     for (i = 0; OLE_CALL_ARGS(pClassEnum, Next, 1, &pM, &cFetched) == S_OK; i++) {
-	if(get_device_name(pM, tmp, DEVICE_NAME_MAX_LEN)!=TVI_CONTROL_TRUE)
-	    mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnableGetDeviceName, i);
+        if(get_device_name(pM, tmp, DEVICE_NAME_MAX_LEN)!=TVI_CONTROL_TRUE)
+            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnableGetDeviceName, i);
         else
-	    mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Device #%d: %s\n", i, tmp);
-	if (index != -1 && i == index) {
-	    mp_msg(MSGT_TV, MSGL_INFO, MSGTR_TVI_DS_UsingDevice, index, tmp);
-	    hr = OLE_CALL_ARGS(pM, BindToObject, 0, 0, &IID_IBaseFilter,(void *) &pFilter);
-	    if (FAILED(hr))
-		pFilter = NULL;
-	}
-	OLE_RELEASE_SAFE(pM);
+            mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Device #%d: %s\n", i, tmp);
+        if (index != -1 && i == index) {
+            mp_msg(MSGT_TV, MSGL_INFO, MSGTR_TVI_DS_UsingDevice, index, tmp);
+            hr = OLE_CALL_ARGS(pM, BindToObject, 0, 0, &IID_IBaseFilter,(void *) &pFilter);
+            if (FAILED(hr))
+                pFilter = NULL;
+        }
+        OLE_RELEASE_SAFE(pM);
     }
     if (index != -1 && !pFilter) {
-	mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_DeviceNotFound,
-	       index);
+        mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_DeviceNotFound,
+               index);
     }
     OLE_RELEASE_SAFE(pClassEnum);
 
@@ -2043,75 +2043,75 @@ static HRESULT get_available_formats_stream(chain_t *chain)
     int done;
 
     mp_msg(MSGT_TV, MSGL_DBG4,
-	   "tvi_dshow: get_available_formats_stream called\n");
+           "tvi_dshow: get_available_formats_stream called\n");
 
     if (!chain->pStreamConfig)
-	return E_POINTER;
+        return E_POINTER;
 
     hr=OLE_CALL_ARGS(chain->pStreamConfig, GetNumberOfCapabilities, &count, &size);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG4,
-	       "tvi_dshow: Call to GetNumberOfCapabilities failed (get_available_formats_stream)\n");
-	return hr;
+        mp_msg(MSGT_TV, MSGL_DBG4,
+               "tvi_dshow: Call to GetNumberOfCapabilities failed (get_available_formats_stream)\n");
+        return hr;
     }
     if (chain->type == video){
-	if (size != sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
-	    mp_msg(MSGT_TV, MSGL_DBG4,
-		   "tvi_dshow: Wrong video structure size for GetNumberOfCapabilities (get_available_formats_stream)\n");
-	    return E_FAIL;
-	}
+        if (size != sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
+            mp_msg(MSGT_TV, MSGL_DBG4,
+                   "tvi_dshow: Wrong video structure size for GetNumberOfCapabilities (get_available_formats_stream)\n");
+            return E_FAIL;
+        }
     } else if (chain->type == audio){
-	if (size != sizeof(AUDIO_STREAM_CONFIG_CAPS)) {
-	    mp_msg(MSGT_TV, MSGL_DBG4,
-		       "tvi_dshow: Wrong audio structure size for GetNumberOfCapabilities (get_available_formats_stream)\n");
-	    return E_FAIL;
-	}
+        if (size != sizeof(AUDIO_STREAM_CONFIG_CAPS)) {
+            mp_msg(MSGT_TV, MSGL_DBG4,
+                       "tvi_dshow: Wrong audio structure size for GetNumberOfCapabilities (get_available_formats_stream)\n");
+            return E_FAIL;
+        }
     } else {
-		mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnsupportedMediaType,"get_available_formats_stream");
-		return E_FAIL;
+                mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnsupportedMediaType,"get_available_formats_stream");
+                return E_FAIL;
     }
     done = 0;
 
     arpmt = malloc((count + 1) * sizeof(AM_MEDIA_TYPE *));
     if (arpmt) {
-	memset(arpmt, 0, (count + 1) * sizeof(AM_MEDIA_TYPE *));
+        memset(arpmt, 0, (count + 1) * sizeof(AM_MEDIA_TYPE *));
 
-	pBuf = malloc((count + 1) * sizeof(void *));
-	if (pBuf) {
-	    memset(pBuf, 0, (count + 1) * sizeof(void *));
+        pBuf = malloc((count + 1) * sizeof(void *));
+        if (pBuf) {
+            memset(pBuf, 0, (count + 1) * sizeof(void *));
 
-	    for (i = 0; i < count; i++) {
-		pBuf[i] = malloc(size);
+            for (i = 0; i < count; i++) {
+                pBuf[i] = malloc(size);
 
-		if (!pBuf[i])
-		    break;
+                if (!pBuf[i])
+                    break;
 
-		hr = OLE_CALL_ARGS(chain->pStreamConfig, GetStreamCaps, i,
-			       &(arpmt[i]), pBuf[i]);
-		if (FAILED(hr))
-		    break;
-	    }
-	    if (i == count) {
-		chain->arpmt = arpmt;
-		chain->arStreamCaps = pBuf;
-		done = 1;
-	    }
-	}
+                hr = OLE_CALL_ARGS(chain->pStreamConfig, GetStreamCaps, i,
+                               &(arpmt[i]), pBuf[i]);
+                if (FAILED(hr))
+                    break;
+            }
+            if (i == count) {
+                chain->arpmt = arpmt;
+                chain->arStreamCaps = pBuf;
+                done = 1;
+            }
+        }
     }
     if (!done) {
-	for (i = 0; i < count; i++) {
-	    if (pBuf)
-		free(pBuf[i]);
-	    if (arpmt && arpmt[i])
-		DeleteMediaType(arpmt[i]);
-	}
-	free(pBuf);
-	free(arpmt);
-	if (hr != S_OK) {
-	    mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: Call to GetStreamCaps failed (get_available_formats_stream)\n");
-	    return hr;
-	} else
-	    return E_OUTOFMEMORY;
+        for (i = 0; i < count; i++) {
+            if (pBuf)
+                free(pBuf[i]);
+            if (arpmt && arpmt[i])
+                DeleteMediaType(arpmt[i]);
+        }
+        free(pBuf);
+        free(arpmt);
+        if (hr != S_OK) {
+            mp_msg(MSGT_TV, MSGL_DBG4, "tvi_dshow: Call to GetStreamCaps failed (get_available_formats_stream)\n");
+            return hr;
+        } else
+            return E_OUTOFMEMORY;
     }
     return S_OK;
 }
@@ -2127,7 +2127,7 @@ static HRESULT get_available_formats_stream(chain_t *chain)
  * \return apropriate error code otherwise
  */
 static HRESULT get_available_formats_pin(ICaptureGraphBuilder2 * pBuilder,
-					 chain_t *chain)
+                                         chain_t *chain)
 {
     IEnumMediaTypes *pEnum;
     int i, count, size;
@@ -2135,104 +2135,104 @@ static HRESULT get_available_formats_pin(ICaptureGraphBuilder2 * pBuilder,
     AM_MEDIA_TYPE *pmt;
     HRESULT hr;
     void **pBuf;
-    AM_MEDIA_TYPE **arpmt;	//This will be real array
+    AM_MEDIA_TYPE **arpmt;      //This will be real array
     VIDEO_STREAM_CONFIG_CAPS *pVideoCaps;
     AUDIO_STREAM_CONFIG_CAPS *pAudioCaps;
     int p1, p2, p3;
 
     mp_msg(MSGT_TV, MSGL_DBG4,
-	   "tvi_dshow: get_available_formats_pin called\n");
+           "tvi_dshow: get_available_formats_pin called\n");
     if (!pBuilder || !chain->pCaptureFilter)
-	return E_POINTER;
+        return E_POINTER;
 
     if (!chain->pCapturePin)
     {
         hr = OLE_CALL_ARGS(pBuilder, FindPin,
-    		   (IUnknown *) chain->pCaptureFilter,
-    		   PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE,
-    		   chain->majortype, FALSE, 0, &chain->pCapturePin);
+                   (IUnknown *) chain->pCaptureFilter,
+                   PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE,
+                   chain->majortype, FALSE, 0, &chain->pCapturePin);
 
         if (!chain->pCapturePin)
             return E_POINTER;
     }
     if (chain->type == video) {
-	size = sizeof(VIDEO_STREAM_CONFIG_CAPS);
+        size = sizeof(VIDEO_STREAM_CONFIG_CAPS);
     } else if (chain->type == audio) {
-	size = sizeof(AUDIO_STREAM_CONFIG_CAPS);
+        size = sizeof(AUDIO_STREAM_CONFIG_CAPS);
     } else {
-	mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnsupportedMediaType,"get_available_formats_pin");
-	return E_FAIL;
+        mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_UnsupportedMediaType,"get_available_formats_pin");
+        return E_FAIL;
     }
 
     hr = OLE_CALL_ARGS(chain->pCapturePin, EnumMediaTypes, &pEnum);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV, MSGL_DBG4,
-	       "tvi_dshow: Call to EnumMediaTypes failed (get_available_formats_pin)\n");
-	return hr;
+        mp_msg(MSGT_TV, MSGL_DBG4,
+               "tvi_dshow: Call to EnumMediaTypes failed (get_available_formats_pin)\n");
+        return hr;
     }
     for (i = 0; OLE_CALL_ARGS(pEnum, Next, 1, &pmt, &cFetched) == S_OK; i++) {
-	if (!pmt)
-	    break;
+        if (!pmt)
+            break;
     }
     OLE_CALL(pEnum,Reset);
 
     count = i;
     arpmt = malloc((count + 1) * sizeof(AM_MEDIA_TYPE *));
     if (!arpmt)
-	return E_OUTOFMEMORY;
+        return E_OUTOFMEMORY;
     memset(arpmt, 0, (count + 1) * sizeof(AM_MEDIA_TYPE *));
 
     for (i = 0;
-	 i < count
-	 && OLE_CALL_ARGS(pEnum, Next, 1, &(arpmt[i]), &cFetched) == S_OK;
-	 i++);
+         i < count
+         && OLE_CALL_ARGS(pEnum, Next, 1, &(arpmt[i]), &cFetched) == S_OK;
+         i++);
 
     OLE_RELEASE_SAFE(pEnum);
 
 
     pBuf = malloc((count + 1) * sizeof(void *));
     if (!pBuf) {
-	for (i = 0; i < count; i++)
-	    if (arpmt[i])
-		DeleteMediaType(arpmt[i]);
-	free(arpmt);
-	return E_OUTOFMEMORY;
+        for (i = 0; i < count; i++)
+            if (arpmt[i])
+                DeleteMediaType(arpmt[i]);
+        free(arpmt);
+        return E_OUTOFMEMORY;
     }
     memset(pBuf, 0, (count + 1) * sizeof(void *));
 
     for (i = 0; i < count; i++) {
-	pBuf[i] = malloc(size);
-	if (!pBuf[i])
-	    break;
-	memset(pBuf[i], 0, size);
+        pBuf[i] = malloc(size);
+        if (!pBuf[i])
+            break;
+        memset(pBuf[i], 0, size);
 
-	if (chain->type == video) {
-	    pVideoCaps = (VIDEO_STREAM_CONFIG_CAPS *) pBuf[i];
-	    extract_video_format(arpmt[i], NULL, &p1, &p2);
-	    pVideoCaps->MaxOutputSize.cx = pVideoCaps->MinOutputSize.cx =
-		p1;
-	    pVideoCaps->MaxOutputSize.cy = pVideoCaps->MinOutputSize.cy =
-		p2;
-	} else {
-	    pAudioCaps = (AUDIO_STREAM_CONFIG_CAPS *) pBuf[i];
-	    extract_audio_format(arpmt[i], &p1, &p2, &p3);
-	    pAudioCaps->MaximumSampleFrequency =
-		pAudioCaps->MinimumSampleFrequency = p1;
-	    pAudioCaps->MaximumBitsPerSample =
-		pAudioCaps->MinimumBitsPerSample = p2;
-	    pAudioCaps->MaximumChannels = pAudioCaps->MinimumChannels = p3;
-	}
+        if (chain->type == video) {
+            pVideoCaps = (VIDEO_STREAM_CONFIG_CAPS *) pBuf[i];
+            extract_video_format(arpmt[i], NULL, &p1, &p2);
+            pVideoCaps->MaxOutputSize.cx = pVideoCaps->MinOutputSize.cx =
+                p1;
+            pVideoCaps->MaxOutputSize.cy = pVideoCaps->MinOutputSize.cy =
+                p2;
+        } else {
+            pAudioCaps = (AUDIO_STREAM_CONFIG_CAPS *) pBuf[i];
+            extract_audio_format(arpmt[i], &p1, &p2, &p3);
+            pAudioCaps->MaximumSampleFrequency =
+                pAudioCaps->MinimumSampleFrequency = p1;
+            pAudioCaps->MaximumBitsPerSample =
+                pAudioCaps->MinimumBitsPerSample = p2;
+            pAudioCaps->MaximumChannels = pAudioCaps->MinimumChannels = p3;
+        }
 
     }
     if (i != count) {
-	for (i = 0; i < count; i++) {
-	    if (arpmt[i])
-		DeleteMediaType(arpmt[i]);
-	    free(pBuf[i]);
-	}
-	free(arpmt);
-	free(pBuf);
-	return E_OUTOFMEMORY;
+        for (i = 0; i < count; i++) {
+            if (arpmt[i])
+                DeleteMediaType(arpmt[i]);
+            free(pBuf[i]);
+        }
+        free(arpmt);
+        free(pBuf);
+        return E_OUTOFMEMORY;
     }
     chain->arpmt = arpmt;
     chain->arStreamCaps = pBuf;
@@ -2265,7 +2265,7 @@ static double grab_audio_frame(priv_t * priv, char *buffer, int len)
     grabber_ringbuffer_t *vrb = priv->chains[0]->rbuf;
 
     if (!rb || !rb->ringbuffer)
-	return 1;
+        return 1;
 
     if(vrb && vrb->tStart<0){
         memset(buffer,0,len);
@@ -2275,12 +2275,12 @@ static double grab_audio_frame(priv_t * priv, char *buffer, int len)
         rb->tStart=vrb->tStart;
 
     if (len < rb->blocksize)
-	bytes = len;
+        bytes = len;
     else
-	bytes = rb->blocksize;
+        bytes = rb->blocksize;
 
     mp_msg(MSGT_TV, MSGL_DBG3,"tvi_dshow: FillBuffer (audio) called. %d blocks in buffer, %d bytes requested\n",
-	   rb->count, len);
+           rb->count, len);
     if(!rb->count){
         mp_msg(MSGT_TV,MSGL_DBG4,"tvi_dshow: waiting for frame\n");
         for(i=0;i<1000 && !rb->count;i++) usec_sleep(1000);
@@ -2310,7 +2310,7 @@ static double grab_audio_frame(priv_t * priv, char *buffer, int len)
 static int get_audio_framesize(priv_t * priv)
 {
     if (!priv->chains[1]->rbuf)
-	return 1;		//no audio
+        return 1;               //no audio
     mp_msg(MSGT_TV,MSGL_DBG3,"get_audio_framesize: %d\n",priv->chains[1]->rbuf->blocksize);
     return priv->chains[1]->rbuf->blocksize;
 }
@@ -2349,7 +2349,7 @@ static void vbi_grabber(priv_t* priv)
     int i;
     unsigned char* buf;
     if (!rb || !rb->ringbuffer)
-	return;
+        return;
 
     buf=calloc(1,rb->blocksize);
     for(i=0; i<23 && rb->count; i++){
@@ -2378,14 +2378,14 @@ static double grab_video_frame(priv_t * priv, char *buffer, int len)
     grabber_ringbuffer_t *rb = priv->chains[0]->rbuf;
 
     if (!rb || !rb->ringbuffer)
-	return 1;
+        return 1;
     if (len < rb->blocksize)
-	bytes = len;
+        bytes = len;
     else
-	bytes = rb->blocksize;
+        bytes = rb->blocksize;
 
     mp_msg(MSGT_TV, MSGL_DBG3,"tvi_dshow: FillBuffer (video) called. %d blocks in buffer, %d bytes requested\n",
-	   rb->count, len);
+           rb->count, len);
     if(!rb->count){
         mp_msg(MSGT_TV,MSGL_DBG4,"tvi_dshow: waiting for frame\n");
         for(i=0;i<1000 && !rb->count;i++) usec_sleep(1000);
@@ -2420,7 +2420,7 @@ static int get_video_framesize(priv_t * priv)
 //      if(!priv->pmtVideo) return 1; //no video
 //      return priv->pmtVideo->lSampleSize;
     if (!priv->chains[0]->rbuf)
-	return 1;		//no video
+        return 1;               //no video
 mp_msg(MSGT_TV,MSGL_DBG3,"geT_video_framesize: %d\n",priv->chains[0]->rbuf->blocksize);
     return priv->chains[0]->rbuf->blocksize;
 }
@@ -2516,10 +2516,10 @@ static HRESULT build_video_chain(priv_t *priv)
         return S_OK;
 
     if (priv->chains[0]->pStreamConfig) {
-	hr = OLE_CALL_ARGS(priv->chains[0]->pStreamConfig, SetFormat, priv->chains[0]->pmt);
-	if (FAILED(hr)) {
-	    mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableSelectVideoFormat, (unsigned int)hr);
-	}
+        hr = OLE_CALL_ARGS(priv->chains[0]->pStreamConfig, SetFormat, priv->chains[0]->pmt);
+        if (FAILED(hr)) {
+            mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableSelectVideoFormat, (unsigned int)hr);
+        }
     }
 
     priv->chains[0]->rbuf=calloc(1,sizeof(grabber_ringbuffer_t));
@@ -2527,9 +2527,9 @@ static HRESULT build_video_chain(priv_t *priv)
         return E_OUTOFMEMORY;
 
     if (priv->tv_param->buffer_size >= 0) {
-	priv->chains[0]->rbuf->buffersize = priv->tv_param->buffer_size;
+        priv->chains[0]->rbuf->buffersize = priv->tv_param->buffer_size;
     } else {
-	priv->chains[0]->rbuf->buffersize = 16;
+        priv->chains[0]->rbuf->buffersize = 16;
     }
 
     priv->chains[0]->rbuf->buffersize *= 1024 * 1024;
@@ -2558,11 +2558,11 @@ static HRESULT build_audio_chain(priv_t *priv)
         return S_OK;
 
     if (priv->chains[1]->pStreamConfig) {
-	hr = OLE_CALL_ARGS(priv->chains[1]->pStreamConfig, SetFormat,
-		       priv->chains[1]->pmt);
-	if (FAILED(hr)) {
-	    mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableSelectAudioFormat, (unsigned int)hr);
-	}
+        hr = OLE_CALL_ARGS(priv->chains[1]->pStreamConfig, SetFormat,
+                       priv->chains[1]->pmt);
+        if (FAILED(hr)) {
+            mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableSelectAudioFormat, (unsigned int)hr);
+        }
     }
 
     if(priv->chains[1]->pmt){
@@ -2644,9 +2644,9 @@ static int start(priv_t * priv)
        Graph is ready to capture. Starting graph.
      */
     if (mp_msg_test(MSGT_TV, MSGL_DBG2)) {
-	mp_msg(MSGT_TV, MSGL_DBG2, "Debug pause 10sec\n");
-	usec_sleep(10000000);
-	mp_msg(MSGT_TV, MSGL_DBG2, "Debug pause end\n");
+        mp_msg(MSGT_TV, MSGL_DBG2, "Debug pause 10sec\n");
+        usec_sleep(10000000);
+        mp_msg(MSGT_TV, MSGL_DBG2, "Debug pause end\n");
     }
     if (!priv->pMediaControl) {
         mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableGetMediaControlInterface,(unsigned int)E_POINTER);
@@ -2654,8 +2654,8 @@ static int start(priv_t * priv)
     }
     hr = OLE_CALL(priv->pMediaControl, Run);
     if (FAILED(hr)) {
-	mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableStartGraph, (unsigned int)hr);
-	return 0;
+        mp_msg(MSGT_TV,MSGL_ERR,MSGTR_TVI_DS_UnableStartGraph, (unsigned int)hr);
+        return 0;
     }
     mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Graph is started.\n");
     priv->state = 1;
@@ -2699,8 +2699,8 @@ static int init(priv_t * priv)
 
     do{
         hr = CoCreateInstance((GUID *) & CLSID_FilterGraph, NULL,
-    			  CLSCTX_INPROC_SERVER, &IID_IGraphBuilder,
-    			  (void **) &priv->pGraph);
+                          CLSCTX_INPROC_SERVER, &IID_IGraphBuilder,
+                          (void **) &priv->pGraph);
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: CoCreateInstance(FilterGraph) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
@@ -2711,8 +2711,8 @@ static int init(priv_t * priv)
         }
 
         hr = CoCreateInstance((GUID *) & CLSID_CaptureGraphBuilder2, NULL,
-    			  CLSCTX_INPROC_SERVER, &IID_ICaptureGraphBuilder2,
-    			  (void **) &priv->pBuilder);
+                          CLSCTX_INPROC_SERVER, &IID_ICaptureGraphBuilder2,
+                          (void **) &priv->pBuilder);
         if(FAILED(hr)){
             mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: CoCreateInstance(CaptureGraphBuilder) call failed. Error:0x%x\n", (unsigned int)hr);
             break;
@@ -2737,22 +2737,22 @@ static int init(priv_t * priv)
         }
         mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Searching for available audio capture devices\n");
         if (priv->adev_index != -1) {
-        	priv->chains[1]->pCaptureFilter = find_capture_device(priv->adev_index, &CLSID_AudioInputDeviceCategory);	//output available audio edevices
+                priv->chains[1]->pCaptureFilter = find_capture_device(priv->adev_index, &CLSID_AudioInputDeviceCategory);       //output available audio edevices
                 if(!priv->chains[1]->pCaptureFilter){
                     mp_msg(MSGT_TV,MSGL_ERR, MSGTR_TVI_DS_NoAudioCaptureDevice);
                     break;
                 }
 
-        	hr = OLE_CALL_ARGS(priv->pGraph, AddFilter, priv->chains[1]->pCaptureFilter, NULL);
+                hr = OLE_CALL_ARGS(priv->pGraph, AddFilter, priv->chains[1]->pCaptureFilter, NULL);
                 if(FAILED(hr)){
-        	    mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: Unable to add audio capture device to Directshow graph. Error:0x%x\n", (unsigned int)hr);
+                    mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: Unable to add audio capture device to Directshow graph. Error:0x%x\n", (unsigned int)hr);
                     break;
                 }
         } else
-        	hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter, IID_IBaseFilter, priv->chains[1]->pCaptureFilter);
+                hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter, IID_IBaseFilter, priv->chains[1]->pCaptureFilter);
 
- 	/* increase refrence counter for capture filter ad store pointer into vbi chain structure too */
-      	hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter, IID_IBaseFilter, priv->chains[2]->pCaptureFilter);
+        /* increase refrence counter for capture filter ad store pointer into vbi chain structure too */
+        hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter, IID_IBaseFilter, priv->chains[2]->pCaptureFilter);
 
         hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter, IID_IAMVideoProcAmp,priv->pVideoProcAmp);
         if (FAILED(hr) && hr != E_NOINTERFACE)
@@ -2764,18 +2764,18 @@ static int init(priv_t * priv)
         }
 
         hr = OLE_CALL_ARGS(priv->pBuilder, FindInterface,
-        		   &PIN_CATEGORY_CAPTURE,
-        		   priv->chains[0]->majortype,
-        		   priv->chains[0]->pCaptureFilter,
-        		   &IID_IAMCrossbar, (void **) &(priv->pCrossbar));
+                           &PIN_CATEGORY_CAPTURE,
+                           priv->chains[0]->majortype,
+                           priv->chains[0]->pCaptureFilter,
+                           &IID_IAMCrossbar, (void **) &(priv->pCrossbar));
         if (FAILED(hr)) {
             mp_msg(MSGT_TV, MSGL_INFO, MSGTR_TVI_DS_SelectingInputNotSupported);
             priv->pCrossbar = NULL;
         }
 
         if (priv->tv_param->amode >= 0) {
-	    IAMTVAudio *pTVAudio;
-	    hr = OLE_CALL_ARGS(priv->pBuilder, FindInterface, NULL, NULL,priv->chains[0]->pCaptureFilter,&IID_IAMTVAudio, (void *) &pTVAudio);
+            IAMTVAudio *pTVAudio;
+            hr = OLE_CALL_ARGS(priv->pBuilder, FindInterface, NULL, NULL,priv->chains[0]->pCaptureFilter,&IID_IAMTVAudio, (void *) &pTVAudio);
             if (hr == S_OK) {
                 switch (priv->tv_param->amode) {
                 case 0:
@@ -2786,11 +2786,11 @@ static int init(priv_t * priv)
                     break;
                 case 2:
                     hr = OLE_CALL_ARGS(pTVAudio, put_TVAudioMode,
-			       AMTVAUDIO_MODE_LANG_A);
+                               AMTVAUDIO_MODE_LANG_A);
                     break;
                 case 3:
                     hr = OLE_CALL_ARGS(pTVAudio, put_TVAudioMode,
-			       AMTVAUDIO_MODE_LANG_B);
+                               AMTVAUDIO_MODE_LANG_B);
                     break;
                 }
                 OLE_RELEASE_SAFE(pTVAudio);
@@ -2841,8 +2841,8 @@ static int init(priv_t * priv)
 
         if (!priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed]
             || !extract_video_format(priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed],
-				 &(priv->fcc), &(priv->width),
-				 &(priv->height))) {
+                                 &(priv->fcc), &(priv->width),
+                                 &(priv->height))) {
             mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_ErrorParsingVideoFormatStruct);
             break;
         }
@@ -2861,9 +2861,9 @@ static int init(priv_t * priv)
             break;
         }
         hr = OLE_CALL_ARGS(priv->pBuilder, FindInterface,
-		   &PIN_CATEGORY_CAPTURE, NULL,
-		   priv->chains[0]->pCaptureFilter,
-		   &IID_IAMTVTuner, (void **) &(priv->pTVTuner));
+                   &PIN_CATEGORY_CAPTURE, NULL,
+                   priv->chains[0]->pCaptureFilter,
+                   &IID_IAMTVTuner, (void **) &(priv->pTVTuner));
 
         if (!priv->pTVTuner) {
             mp_msg(MSGT_TV, MSGL_DBG2, "tvi_dshow: Unable to access IAMTVTuner (0x%x)\n", (unsigned int)hr);
@@ -2874,7 +2874,7 @@ static int init(priv_t * priv)
 
         if (priv->pTVTuner) {
             hr = OLE_CALL_ARGS(priv->pTVTuner, put_CountryCode,
-		       chanlist2country(priv->tv_param->chanlist));
+                       chanlist2country(priv->tv_param->chanlist));
             if(FAILED(hr)){
                 mp_msg(MSGT_TV,MSGL_DBG2, "tvi_dshow: Call to put_CountryCode failed. Error:0x%x\n",(unsigned int)hr);
             }
@@ -2908,10 +2908,10 @@ static int init(priv_t * priv)
          Otherwise we will get 0x8007001f (Device is not functioning properly) when attempting to start graph
         */
         hr = OLE_CALL_ARGS(priv->pBuilder, FindPin,
-		   (IUnknown *) priv->chains[0]->pCaptureFilter,
-		   PINDIR_OUTPUT,
-		   &PIN_CATEGORY_VIDEOPORT, NULL, FALSE,
-		   0, (IPin **) & pVPOutPin);
+                   (IUnknown *) priv->chains[0]->pCaptureFilter,
+                   PINDIR_OUTPUT,
+                   &PIN_CATEGORY_VIDEOPORT, NULL, FALSE,
+                   0, (IPin **) & pVPOutPin);
         if (SUCCEEDED(hr)) {
             hr = OLE_CALL_ARGS(priv->pGraph, Render, pVPOutPin);
             OLE_RELEASE_SAFE(pVPOutPin);
@@ -2945,8 +2945,8 @@ static int init(priv_t * priv)
             LPREFERENCECLOCK rc;
             IBaseFilter* pBF;
             hr = CoCreateInstance((GUID *) & CLSID_SystemClock, NULL,
-			      CLSCTX_INPROC_SERVER, &IID_IReferenceClock,
-			      (void *) &rc);
+                              CLSCTX_INPROC_SERVER, &IID_IReferenceClock,
+                              (void *) &rc);
 
             OLE_QUERYINTERFACE(priv->pBuilder,IID_IBaseFilter,pBF);
             OLE_CALL_ARGS(pBF,SetSyncSource,rc);
@@ -2958,7 +2958,7 @@ static int init(priv_t * priv)
 
     if (!result){
         mp_msg(MSGT_TV,MSGL_ERR, MSGTR_TVI_DS_GraphInitFailure);
-	uninit(priv);
+        uninit(priv);
     }
     return result;
 }
@@ -2983,26 +2983,26 @@ static void destroy_chain(chain_t *chain)
     OLE_RELEASE_SAFE(chain->pSGF);
 
     if (chain->pmt)
-	DeleteMediaType(chain->pmt);
+        DeleteMediaType(chain->pmt);
 
     if (chain->arpmt) {
-	for (i = 0; chain->arpmt[i]; i++) {
-	    DeleteMediaType(chain->arpmt[i]);
-	}
-	free(chain->arpmt);
+        for (i = 0; chain->arpmt[i]; i++) {
+            DeleteMediaType(chain->arpmt[i]);
+        }
+        free(chain->arpmt);
     }
 
     if (chain->arStreamCaps) {
-	for (i = 0; chain->arStreamCaps[i]; i++) {
-	    free(chain->arStreamCaps[i]);
-	}
-	free(chain->arStreamCaps);
+        for (i = 0; chain->arStreamCaps[i]; i++) {
+            free(chain->arStreamCaps[i]);
+        }
+        free(chain->arStreamCaps);
     }
 
     if (chain->rbuf) {
-	destroy_ringbuffer(chain->rbuf);
-	free(chain->rbuf);
-	chain->rbuf = NULL;
+        destroy_ringbuffer(chain->rbuf);
+        free(chain->rbuf);
+        chain->rbuf = NULL;
     }
     free(chain);
 }
@@ -3017,7 +3017,7 @@ static int uninit(priv_t * priv)
 {
     int i;
     if (!priv)
-	return 1;
+        return 1;
     //Debug
     if (priv->dwRegister) {
         RemoveFromRot(priv->dwRegister);
@@ -3026,16 +3026,16 @@ static int uninit(priv_t * priv)
     //stop audio grabber thread
 
     if (priv->state && priv->pMediaControl) {
-	OLE_CALL(priv->pMediaControl, Stop);
+        OLE_CALL(priv->pMediaControl, Stop);
     }
     OLE_RELEASE_SAFE(priv->pMediaControl);
     priv->state = 0;
 
     if (priv->pGraph) {
-	if (priv->chains[0]->pCaptureFilter)
-	    OLE_CALL_ARGS(priv->pGraph, RemoveFilter, priv->chains[0]->pCaptureFilter);
-	if (priv->chains[1]->pCaptureFilter)
-	    OLE_CALL_ARGS(priv->pGraph, RemoveFilter, priv->chains[1]->pCaptureFilter);
+        if (priv->chains[0]->pCaptureFilter)
+            OLE_CALL_ARGS(priv->pGraph, RemoveFilter, priv->chains[0]->pCaptureFilter);
+        if (priv->chains[1]->pCaptureFilter)
+            OLE_CALL_ARGS(priv->pGraph, RemoveFilter, priv->chains[1]->pCaptureFilter);
     }
     OLE_RELEASE_SAFE(priv->pCrossbar);
     OLE_RELEASE_SAFE(priv->pVideoProcAmp);
@@ -3072,44 +3072,44 @@ static tvi_handle_t *tvi_init_dshow(tv_param_t* tv_param)
 
     h = tv_new_handle(sizeof(priv_t), &functions);
     if (!h)
-	return NULL;
+        return NULL;
 
     priv = h->priv;
 
     memset(priv, 0, sizeof(priv_t));
-    priv->direct_setfreq_call = 1;	//first using direct call. if it fails, workaround will be enabled
-    priv->direct_getfreq_call = 1;	//first using direct call. if it fails, workaround will be enabled
+    priv->direct_setfreq_call = 1;      //first using direct call. if it fails, workaround will be enabled
+    priv->direct_getfreq_call = 1;      //first using direct call. if it fails, workaround will be enabled
     priv->adev_index = -1;
     priv->freq_table_len=-1;
     priv->tv_param=tv_param;
 
     if (tv_param->device) {
-	if (sscanf(tv_param->device, "%d", &a) == 1) {
-	    priv->dev_index = a;
-	} else {
-	    mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongDeviceParam, tv_param->device);
-	    tv_free_handle(h);
-	    return NULL;
-	}
-	if (priv->dev_index < 0) {
-	    mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongDeviceIndex, a);
-	    tv_free_handle(h);
-	    return NULL;
-	}
+        if (sscanf(tv_param->device, "%d", &a) == 1) {
+            priv->dev_index = a;
+        } else {
+            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongDeviceParam, tv_param->device);
+            tv_free_handle(h);
+            return NULL;
+        }
+        if (priv->dev_index < 0) {
+            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongDeviceIndex, a);
+            tv_free_handle(h);
+            return NULL;
+        }
     }
     if (tv_param->adevice) {
-	if (sscanf(tv_param->adevice, "%d", &a) == 1) {
-	    priv->adev_index = a;
-	} else {
-	    mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongADeviceParam, tv_param->adevice);
-	    tv_free_handle(h);
-	    return NULL;
-	}
-	if (priv->dev_index < 0) {
-	    mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongADeviceIndex, a);
-	    tv_free_handle(h);
-	    return NULL;
-	}
+        if (sscanf(tv_param->adevice, "%d", &a) == 1) {
+            priv->adev_index = a;
+        } else {
+            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongADeviceParam, tv_param->adevice);
+            tv_free_handle(h);
+            return NULL;
+        }
+        if (priv->dev_index < 0) {
+            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TVI_DS_WrongADeviceIndex, a);
+            tv_free_handle(h);
+            return NULL;
+        }
     }
     return h;
 }
@@ -3130,50 +3130,50 @@ static int control(priv_t * priv, int cmd, void *arg)
     switch (cmd) {
 /* need rewrite */
     case TVI_CONTROL_VID_SET_FORMAT:
-	{
-	    int fcc, i,j;
-	    void* tmp,*tmp2;
-	    int result = TVI_CONTROL_TRUE;
+        {
+            int fcc, i,j;
+            void* tmp,*tmp2;
+            int result = TVI_CONTROL_TRUE;
 
-	    if (priv->state)
-		return TVI_CONTROL_FALSE;
-	    fcc = *(int *) arg;
+            if (priv->state)
+                return TVI_CONTROL_FALSE;
+            fcc = *(int *) arg;
 
             if(!priv->chains[0]->arpmt)
                 return TVI_CONTROL_FALSE;
-	    for (i = 0; priv->chains[0]->arpmt[i]; i++)
-		if (check_video_format
-		    (priv->chains[0]->arpmt[i], fcc, priv->width, priv->height))
-		    break;
-	    if (!priv->chains[0]->arpmt[i])
-	    {
-		int fps = 0;
-		VIDEOINFOHEADER* Vhdr = NULL;
-		AM_MEDIA_TYPE *pmt;
+            for (i = 0; priv->chains[0]->arpmt[i]; i++)
+                if (check_video_format
+                    (priv->chains[0]->arpmt[i], fcc, priv->width, priv->height))
+                    break;
+            if (!priv->chains[0]->arpmt[i])
+            {
+                int fps = 0;
+                VIDEOINFOHEADER* Vhdr = NULL;
+                AM_MEDIA_TYPE *pmt;
 
-		mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: will try also use undeclared video format: %dx%d, %s\n",priv->width, priv->height, vo_format_name(fcc));
+                mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: will try also use undeclared video format: %dx%d, %s\n",priv->width, priv->height, vo_format_name(fcc));
 
-		if (priv->chains[0]->arpmt[0])
-		    Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->arpmt[0]->pbFormat;
+                if (priv->chains[0]->arpmt[0])
+                    Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->arpmt[0]->pbFormat;
 
-		if(Vhdr && Vhdr->bmiHeader.biSizeImage)
-		    fps = Vhdr->dwBitRate / (8 * Vhdr->bmiHeader.biSizeImage);
+                if(Vhdr && Vhdr->bmiHeader.biSizeImage)
+                    fps = Vhdr->dwBitRate / (8 * Vhdr->bmiHeader.biSizeImage);
 
-		pmt=create_video_format(fcc, priv->width, priv->height, fps);
-		if(!pmt)
-		{
-		    mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Unable to create AM_MEDIA_TYPE structure for given format\n");
-		    return TVI_CONTROL_FALSE;
-		}
-		priv->chains[0]->arpmt=realloc(priv->chains[0]->arpmt, (i+2)*sizeof(AM_MEDIA_TYPE*));
-		priv->chains[0]->arpmt[i+1] = NULL;
-		priv->chains[0]->arpmt[i] = pmt;
+                pmt=create_video_format(fcc, priv->width, priv->height, fps);
+                if(!pmt)
+                {
+                    mp_msg(MSGT_TV, MSGL_V, "tvi_dshow: Unable to create AM_MEDIA_TYPE structure for given format\n");
+                    return TVI_CONTROL_FALSE;
+                }
+                priv->chains[0]->arpmt=realloc(priv->chains[0]->arpmt, (i+2)*sizeof(AM_MEDIA_TYPE*));
+                priv->chains[0]->arpmt[i+1] = NULL;
+                priv->chains[0]->arpmt[i] = pmt;
 
-		priv->chains[0]->arStreamCaps=realloc(priv->chains[0]->arStreamCaps, (i+2)*sizeof(void*));
-		priv->chains[0]->arpmt[i+1] = NULL;
+                priv->chains[0]->arStreamCaps=realloc(priv->chains[0]->arStreamCaps, (i+2)*sizeof(void*));
+                priv->chains[0]->arpmt[i+1] = NULL;
 
-		result = TVI_CONTROL_FALSE;
-	    }
+                result = TVI_CONTROL_FALSE;
+            }
 
 
             tmp=priv->chains[0]->arpmt[i];
@@ -3186,347 +3186,347 @@ static int control(priv_t * priv, int cmd, void *arg)
             priv->chains[0]->arpmt[0] = tmp;
             priv->chains[0]->arStreamCaps[0] = tmp2;
 
-	    priv->chains[0]->nFormatUsed = 0;
+            priv->chains[0]->nFormatUsed = 0;
 
-	    if (priv->chains[0]->pmt)
-		DeleteMediaType(priv->chains[0]->pmt);
-	    priv->chains[0]->pmt =
-		CreateMediaType(priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed]);
-	    DisplayMediaType("VID_SET_FORMAT", priv->chains[0]->pmt);
-	    /*
-	       Setting width & height to preferred by driver values
-	     */
-	    extract_video_format(priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed],
-				 &(priv->fcc), &(priv->width),
-				 &(priv->height));
-	    return result;
-	}
+            if (priv->chains[0]->pmt)
+                DeleteMediaType(priv->chains[0]->pmt);
+            priv->chains[0]->pmt =
+                CreateMediaType(priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed]);
+            DisplayMediaType("VID_SET_FORMAT", priv->chains[0]->pmt);
+            /*
+               Setting width & height to preferred by driver values
+             */
+            extract_video_format(priv->chains[0]->arpmt[priv->chains[0]->nFormatUsed],
+                                 &(priv->fcc), &(priv->width),
+                                 &(priv->height));
+            return result;
+        }
     case TVI_CONTROL_VID_GET_FORMAT:
-	{
+        {
             if(!priv->chains[0]->pmt)
                 return TVI_CONTROL_FALSE;
-	    /*
-	       Build video chain (for video format negotiation).
-	       If this was done before, routine will do nothing.
-	    */
-	    build_video_chain(priv);
-	    DisplayMediaType("VID_GET_FORMAT", priv->chains[0]->pmt);
-	    if (priv->fcc) {
-		*(int *) arg = priv->fcc;
-		return TVI_CONTROL_TRUE;
-	    } else
-		return TVI_CONTROL_FALSE;
-	}
+            /*
+               Build video chain (for video format negotiation).
+               If this was done before, routine will do nothing.
+            */
+            build_video_chain(priv);
+            DisplayMediaType("VID_GET_FORMAT", priv->chains[0]->pmt);
+            if (priv->fcc) {
+                *(int *) arg = priv->fcc;
+                return TVI_CONTROL_TRUE;
+            } else
+                return TVI_CONTROL_FALSE;
+        }
     case TVI_CONTROL_VID_SET_WIDTH:
-	{
-	    VIDEO_STREAM_CONFIG_CAPS *pCaps;
-	    VIDEOINFOHEADER *Vhdr;
-	    int width = *(int *) arg;
-	    if (priv->state)
-		return TVI_CONTROL_FALSE;
+        {
+            VIDEO_STREAM_CONFIG_CAPS *pCaps;
+            VIDEOINFOHEADER *Vhdr;
+            int width = *(int *) arg;
+            if (priv->state)
+                return TVI_CONTROL_FALSE;
 
-	    pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
-	    if (!pCaps)
-		return TVI_CONTROL_FALSE;
-	    if (width < pCaps->MinOutputSize.cx
-		|| width > pCaps->MaxOutputSize.cx)
-		return TVI_CONTROL_FALSE;
+            pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
+            if (!pCaps)
+                return TVI_CONTROL_FALSE;
+            if (width < pCaps->MinOutputSize.cx
+                || width > pCaps->MaxOutputSize.cx)
+                return TVI_CONTROL_FALSE;
 
-	    if (width % pCaps->OutputGranularityX)
-		return TVI_CONTROL_FALSE;
+            if (width % pCaps->OutputGranularityX)
+                return TVI_CONTROL_FALSE;
 
-	    if (!priv->chains[0]->pmt || !priv->chains[0]->pmt->pbFormat)
-		return TVI_CONTROL_FALSE;
-	    Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
-	    Vhdr->bmiHeader.biWidth = width;
-	    priv->chains[0]->pmt->lSampleSize = Vhdr->bmiHeader.biSizeImage =
-		labs(Vhdr->bmiHeader.biBitCount * Vhdr->bmiHeader.biWidth *
-		     Vhdr->bmiHeader.biHeight) >> 3;
+            if (!priv->chains[0]->pmt || !priv->chains[0]->pmt->pbFormat)
+                return TVI_CONTROL_FALSE;
+            Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
+            Vhdr->bmiHeader.biWidth = width;
+            priv->chains[0]->pmt->lSampleSize = Vhdr->bmiHeader.biSizeImage =
+                labs(Vhdr->bmiHeader.biBitCount * Vhdr->bmiHeader.biWidth *
+                     Vhdr->bmiHeader.biHeight) >> 3;
 
-	    priv->width = width;
+            priv->width = width;
 
-	    return TVI_CONTROL_TRUE;
-	}
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_VID_GET_WIDTH:
-	{
-	    if (priv->width) {
-		*(int *) arg = priv->width;
-		return TVI_CONTROL_TRUE;
-	    } else
-		return TVI_CONTROL_FALSE;
-	}
+        {
+            if (priv->width) {
+                *(int *) arg = priv->width;
+                return TVI_CONTROL_TRUE;
+            } else
+                return TVI_CONTROL_FALSE;
+        }
     case TVI_CONTROL_VID_CHK_WIDTH:
-	{
-	    VIDEO_STREAM_CONFIG_CAPS *pCaps;
-	    int width = *(int *) arg;
-	    pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
-	    if (!pCaps)
-		return TVI_CONTROL_FALSE;
-	    if (width < pCaps->MinOutputSize.cx
-		|| width > pCaps->MaxOutputSize.cx)
-		return TVI_CONTROL_FALSE;
+        {
+            VIDEO_STREAM_CONFIG_CAPS *pCaps;
+            int width = *(int *) arg;
+            pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
+            if (!pCaps)
+                return TVI_CONTROL_FALSE;
+            if (width < pCaps->MinOutputSize.cx
+                || width > pCaps->MaxOutputSize.cx)
+                return TVI_CONTROL_FALSE;
 
-	    if (width % pCaps->OutputGranularityX)
-		return TVI_CONTROL_FALSE;
-	    return TVI_CONTROL_TRUE;
-	}
+            if (width % pCaps->OutputGranularityX)
+                return TVI_CONTROL_FALSE;
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_VID_SET_HEIGHT:
-	{
-	    VIDEO_STREAM_CONFIG_CAPS *pCaps;
-	    VIDEOINFOHEADER *Vhdr;
-	    int height = *(int *) arg;
-	    if (priv->state)
-		return TVI_CONTROL_FALSE;
+        {
+            VIDEO_STREAM_CONFIG_CAPS *pCaps;
+            VIDEOINFOHEADER *Vhdr;
+            int height = *(int *) arg;
+            if (priv->state)
+                return TVI_CONTROL_FALSE;
 
-	    pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
-	    if (!pCaps)
-		return TVI_CONTROL_FALSE;
-	    if (height < pCaps->MinOutputSize.cy
-		|| height > pCaps->MaxOutputSize.cy)
-		return TVI_CONTROL_FALSE;
+            pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
+            if (!pCaps)
+                return TVI_CONTROL_FALSE;
+            if (height < pCaps->MinOutputSize.cy
+                || height > pCaps->MaxOutputSize.cy)
+                return TVI_CONTROL_FALSE;
 
-	    if (height % pCaps->OutputGranularityY)
-		return TVI_CONTROL_FALSE;
+            if (height % pCaps->OutputGranularityY)
+                return TVI_CONTROL_FALSE;
 
-	    if (!priv->chains[0]->pmt || !priv->chains[0]->pmt->pbFormat)
-		return TVI_CONTROL_FALSE;
-	    Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
+            if (!priv->chains[0]->pmt || !priv->chains[0]->pmt->pbFormat)
+                return TVI_CONTROL_FALSE;
+            Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
 
-	    if (Vhdr->bmiHeader.biHeight < 0)
-		Vhdr->bmiHeader.biHeight = -height;
-	    else
-		Vhdr->bmiHeader.biHeight = height;
-	    priv->chains[0]->pmt->lSampleSize = Vhdr->bmiHeader.biSizeImage =
-		labs(Vhdr->bmiHeader.biBitCount * Vhdr->bmiHeader.biWidth *
-		     Vhdr->bmiHeader.biHeight) >> 3;
+            if (Vhdr->bmiHeader.biHeight < 0)
+                Vhdr->bmiHeader.biHeight = -height;
+            else
+                Vhdr->bmiHeader.biHeight = height;
+            priv->chains[0]->pmt->lSampleSize = Vhdr->bmiHeader.biSizeImage =
+                labs(Vhdr->bmiHeader.biBitCount * Vhdr->bmiHeader.biWidth *
+                     Vhdr->bmiHeader.biHeight) >> 3;
 
-	    priv->height = height;
-	    return TVI_CONTROL_TRUE;
-	}
+            priv->height = height;
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_VID_GET_HEIGHT:
-	{
-	    if (priv->height) {
-		*(int *) arg = priv->height;
-		return TVI_CONTROL_TRUE;
-	    } else
-		return TVI_CONTROL_FALSE;
-	}
+        {
+            if (priv->height) {
+                *(int *) arg = priv->height;
+                return TVI_CONTROL_TRUE;
+            } else
+                return TVI_CONTROL_FALSE;
+        }
     case TVI_CONTROL_VID_CHK_HEIGHT:
-	{
-	    VIDEO_STREAM_CONFIG_CAPS *pCaps;
-	    int height = *(int *) arg;
-	    pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
-	    if (!pCaps)
-		return TVI_CONTROL_FALSE;
-	    if (height < pCaps->MinOutputSize.cy
-		|| height > pCaps->MaxOutputSize.cy)
-		return TVI_CONTROL_FALSE;
+        {
+            VIDEO_STREAM_CONFIG_CAPS *pCaps;
+            int height = *(int *) arg;
+            pCaps = priv->chains[0]->arStreamCaps[priv->chains[0]->nFormatUsed];
+            if (!pCaps)
+                return TVI_CONTROL_FALSE;
+            if (height < pCaps->MinOutputSize.cy
+                || height > pCaps->MaxOutputSize.cy)
+                return TVI_CONTROL_FALSE;
 
-	    if (height % pCaps->OutputGranularityY)
-		return TVI_CONTROL_FALSE;
+            if (height % pCaps->OutputGranularityY)
+                return TVI_CONTROL_FALSE;
 
-	    return TVI_CONTROL_TRUE;
-	}
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_IS_AUDIO:
-	if (!priv->chains[1]->pmt)
-	    return TVI_CONTROL_FALSE;
-	else
-	    return TVI_CONTROL_TRUE;
+        if (!priv->chains[1]->pmt)
+            return TVI_CONTROL_FALSE;
+        else
+            return TVI_CONTROL_TRUE;
     case TVI_CONTROL_IS_VIDEO:
-	return TVI_CONTROL_TRUE;
+        return TVI_CONTROL_TRUE;
     case TVI_CONTROL_AUD_GET_FORMAT:
-	{
-	    *(int *) arg = AF_FORMAT_S16_LE;
-	    if (!priv->chains[1]->pmt)
-		return TVI_CONTROL_FALSE;
-	    else
-		return TVI_CONTROL_TRUE;
-	}
+        {
+            *(int *) arg = AF_FORMAT_S16_LE;
+            if (!priv->chains[1]->pmt)
+                return TVI_CONTROL_FALSE;
+            else
+                return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_AUD_GET_CHANNELS:
-	{
-	    *(int *) arg = priv->channels;
-	    if (!priv->chains[1]->pmt)
-		return TVI_CONTROL_FALSE;
-	    else
-		return TVI_CONTROL_TRUE;
-	}
+        {
+            *(int *) arg = priv->channels;
+            if (!priv->chains[1]->pmt)
+                return TVI_CONTROL_FALSE;
+            else
+                return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_AUD_SET_SAMPLERATE:
-	{
-	    int i, samplerate;
-	    if (priv->state)
-		return TVI_CONTROL_FALSE;
-	    if (!priv->chains[1]->arpmt[0])
-		return TVI_CONTROL_FALSE;
+        {
+            int i, samplerate;
+            if (priv->state)
+                return TVI_CONTROL_FALSE;
+            if (!priv->chains[1]->arpmt[0])
+                return TVI_CONTROL_FALSE;
 
-	    samplerate = *(int *) arg;
+            samplerate = *(int *) arg;
 
-	    for (i = 0; priv->chains[1]->arpmt[i]; i++)
-		if (check_audio_format
-		    (priv->chains[1]->arpmt[i], samplerate, 16, priv->channels))
-		    break;
-	    if (!priv->chains[1]->arpmt[i]) {
+            for (i = 0; priv->chains[1]->arpmt[i]; i++)
+                if (check_audio_format
+                    (priv->chains[1]->arpmt[i], samplerate, 16, priv->channels))
+                    break;
+            if (!priv->chains[1]->arpmt[i]) {
                 //request not found. failing back to first available
-		mp_msg(MSGT_TV, MSGL_WARN, MSGTR_TVI_DS_SamplerateNotsupported, samplerate);
-		i = 0;
-	    }
-	    if (priv->chains[1]->pmt)
-		DeleteMediaType(priv->chains[1]->pmt);
-	    priv->chains[1]->pmt = CreateMediaType(priv->chains[1]->arpmt[i]);
-	    extract_audio_format(priv->chains[1]->arpmt[i], &(priv->samplerate),
-				 NULL, &(priv->channels));
-	    return TVI_CONTROL_TRUE;
-	}
+                mp_msg(MSGT_TV, MSGL_WARN, MSGTR_TVI_DS_SamplerateNotsupported, samplerate);
+                i = 0;
+            }
+            if (priv->chains[1]->pmt)
+                DeleteMediaType(priv->chains[1]->pmt);
+            priv->chains[1]->pmt = CreateMediaType(priv->chains[1]->arpmt[i]);
+            extract_audio_format(priv->chains[1]->arpmt[i], &(priv->samplerate),
+                                 NULL, &(priv->channels));
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_AUD_GET_SAMPLERATE:
-	{
-	    *(int *) arg = priv->samplerate;
-	    if (!priv->samplerate)
-		return TVI_CONTROL_FALSE;
-	    if (!priv->chains[1]->pmt)
-		return TVI_CONTROL_FALSE;
-	    else
-		return TVI_CONTROL_TRUE;
-	}
+        {
+            *(int *) arg = priv->samplerate;
+            if (!priv->samplerate)
+                return TVI_CONTROL_FALSE;
+            if (!priv->chains[1]->pmt)
+                return TVI_CONTROL_FALSE;
+            else
+                return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_AUD_GET_SAMPLESIZE:
-	{
-	    WAVEFORMATEX *pWF;
-	    if (!priv->chains[1]->pmt)
-		return TVI_CONTROL_FALSE;
-	    if (!priv->chains[1]->pmt->pbFormat)
-		return TVI_CONTROL_FALSE;
-	    pWF = (WAVEFORMATEX *) priv->chains[1]->pmt->pbFormat;
-	    *(int *) arg = pWF->wBitsPerSample / 8;
-	    return TVI_CONTROL_TRUE;
-	}
+        {
+            WAVEFORMATEX *pWF;
+            if (!priv->chains[1]->pmt)
+                return TVI_CONTROL_FALSE;
+            if (!priv->chains[1]->pmt->pbFormat)
+                return TVI_CONTROL_FALSE;
+            pWF = (WAVEFORMATEX *) priv->chains[1]->pmt->pbFormat;
+            *(int *) arg = pWF->wBitsPerSample / 8;
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_IS_TUNER:
-	{
-	    if (!priv->pTVTuner)
-		return TVI_CONTROL_FALSE;
+        {
+            if (!priv->pTVTuner)
+                return TVI_CONTROL_FALSE;
 
-	    return TVI_CONTROL_TRUE;
-	}
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_TUN_SET_NORM:
-	{
-	    IAMAnalogVideoDecoder *pVD;
-	    long lAnalogFormat;
-	    int i;
-	    HRESULT hr;
+        {
+            IAMAnalogVideoDecoder *pVD;
+            long lAnalogFormat;
+            int i;
+            HRESULT hr;
 
-	    i = *(int *) arg;
-	    i--;
-	    if (i < 0 || i >= tv_available_norms_count)
-		return TVI_CONTROL_FALSE;
-	    lAnalogFormat = tv_norms[tv_available_norms[i]].index;
+            i = *(int *) arg;
+            i--;
+            if (i < 0 || i >= tv_available_norms_count)
+                return TVI_CONTROL_FALSE;
+            lAnalogFormat = tv_norms[tv_available_norms[i]].index;
 
-	    hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter,IID_IAMAnalogVideoDecoder, pVD);
-	    if (hr != S_OK)
-		return TVI_CONTROL_FALSE;
-	    hr = OLE_CALL_ARGS(pVD, put_TVFormat, lAnalogFormat);
-	    OLE_RELEASE_SAFE(pVD);
-	    if (FAILED(hr))
-		return TVI_CONTROL_FALSE;
-	    else
-		return TVI_CONTROL_TRUE;
-	}
+            hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter,IID_IAMAnalogVideoDecoder, pVD);
+            if (hr != S_OK)
+                return TVI_CONTROL_FALSE;
+            hr = OLE_CALL_ARGS(pVD, put_TVFormat, lAnalogFormat);
+            OLE_RELEASE_SAFE(pVD);
+            if (FAILED(hr))
+                return TVI_CONTROL_FALSE;
+            else
+                return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_TUN_GET_NORM:
-	{
-	    long lAnalogFormat;
-	    int i;
-	    HRESULT hr;
-	    IAMAnalogVideoDecoder *pVD;
+        {
+            long lAnalogFormat;
+            int i;
+            HRESULT hr;
+            IAMAnalogVideoDecoder *pVD;
 
-	    hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter,IID_IAMAnalogVideoDecoder, pVD);
-	    if (hr == S_OK) {
-		hr = OLE_CALL_ARGS(pVD, get_TVFormat, &lAnalogFormat);
-		OLE_RELEASE_SAFE(pVD);
-	    }
+            hr = OLE_QUERYINTERFACE(priv->chains[0]->pCaptureFilter,IID_IAMAnalogVideoDecoder, pVD);
+            if (hr == S_OK) {
+                hr = OLE_CALL_ARGS(pVD, get_TVFormat, &lAnalogFormat);
+                OLE_RELEASE_SAFE(pVD);
+            }
 
-	    if (FAILED(hr)) {	//trying another method
-		if (!priv->pTVTuner)
-		    return TVI_CONTROL_FALSE;
+            if (FAILED(hr)) {   //trying another method
+                if (!priv->pTVTuner)
+                    return TVI_CONTROL_FALSE;
                 hr=OLE_CALL_ARGS(priv->pTVTuner, get_TVFormat, &lAnalogFormat);
-		if (FAILED(hr))
-		    return TVI_CONTROL_FALSE;
-	    }
-	    for (i = 0; i < tv_available_norms_count; i++) {
-		if (tv_norms[tv_available_norms[i]].index == lAnalogFormat) {
-		    *(int *) arg = i + 1;
-		    return TVI_CONTROL_TRUE;
-		}
-	    }
-	    return TVI_CONTROL_FALSE;
-	}
+                if (FAILED(hr))
+                    return TVI_CONTROL_FALSE;
+            }
+            for (i = 0; i < tv_available_norms_count; i++) {
+                if (tv_norms[tv_available_norms[i]].index == lAnalogFormat) {
+                    *(int *) arg = i + 1;
+                    return TVI_CONTROL_TRUE;
+                }
+            }
+            return TVI_CONTROL_FALSE;
+        }
     case TVI_CONTROL_SPC_GET_NORMID:
-	{
-	    int i;
-	    if (!priv->pTVTuner)
-		return TVI_CONTROL_FALSE;
-	    for (i = 0; i < tv_available_norms_count; i++) {
-		if (!strcasecmp
-		    (tv_norms[tv_available_norms[i]].name, (char *) arg)) {
-		    *(int *) arg = i + 1;
-		    return TVI_CONTROL_TRUE;
-		}
-	    }
-	    return TVI_CONTROL_FALSE;
-	}
+        {
+            int i;
+            if (!priv->pTVTuner)
+                return TVI_CONTROL_FALSE;
+            for (i = 0; i < tv_available_norms_count; i++) {
+                if (!strcasecmp
+                    (tv_norms[tv_available_norms[i]].name, (char *) arg)) {
+                    *(int *) arg = i + 1;
+                    return TVI_CONTROL_TRUE;
+                }
+            }
+            return TVI_CONTROL_FALSE;
+        }
     case TVI_CONTROL_SPC_SET_INPUT:
-	{
-	    return set_crossbar_input(priv, *(int *) arg);
-	}
+        {
+            return set_crossbar_input(priv, *(int *) arg);
+        }
     case TVI_CONTROL_TUN_GET_FREQ:
-	{
-	    unsigned long lFreq;
-	    int ret;
-	    if (!priv->pTVTuner)
-		return TVI_CONTROL_FALSE;
+        {
+            unsigned long lFreq;
+            int ret;
+            if (!priv->pTVTuner)
+                return TVI_CONTROL_FALSE;
 
-	    ret = get_frequency(priv, &lFreq);
-	    lFreq = lFreq / (1000000/16);	//convert from Hz to 1/16 MHz units
+            ret = get_frequency(priv, &lFreq);
+            lFreq = lFreq / (1000000/16);       //convert from Hz to 1/16 MHz units
 
-	    *(unsigned long *) arg = lFreq;
-	    return ret;
-	}
+            *(unsigned long *) arg = lFreq;
+            return ret;
+        }
     case TVI_CONTROL_TUN_SET_FREQ:
-	{
-	    unsigned long nFreq = *(unsigned long *) arg;
-	    if (!priv->pTVTuner)
-		return TVI_CONTROL_FALSE;
-	    //convert to Hz
-	    nFreq = (1000000/16) * nFreq;	//convert from 1/16 MHz units to Hz
-	    return set_frequency(priv, nFreq);
-	}
+        {
+            unsigned long nFreq = *(unsigned long *) arg;
+            if (!priv->pTVTuner)
+                return TVI_CONTROL_FALSE;
+            //convert to Hz
+            nFreq = (1000000/16) * nFreq;       //convert from 1/16 MHz units to Hz
+            return set_frequency(priv, nFreq);
+        }
     case TVI_CONTROL_VID_SET_HUE:
-	return set_control(priv, VideoProcAmp_Hue, *(int *) arg);
+        return set_control(priv, VideoProcAmp_Hue, *(int *) arg);
     case TVI_CONTROL_VID_GET_HUE:
-	return get_control(priv, VideoProcAmp_Hue, (int *) arg);
+        return get_control(priv, VideoProcAmp_Hue, (int *) arg);
     case TVI_CONTROL_VID_SET_CONTRAST:
-	return set_control(priv, VideoProcAmp_Contrast, *(int *) arg);
+        return set_control(priv, VideoProcAmp_Contrast, *(int *) arg);
     case TVI_CONTROL_VID_GET_CONTRAST:
-	return get_control(priv, VideoProcAmp_Contrast, (int *) arg);
+        return get_control(priv, VideoProcAmp_Contrast, (int *) arg);
     case TVI_CONTROL_VID_SET_SATURATION:
-	return set_control(priv, VideoProcAmp_Saturation, *(int *) arg);
+        return set_control(priv, VideoProcAmp_Saturation, *(int *) arg);
     case TVI_CONTROL_VID_GET_SATURATION:
-	return get_control(priv, VideoProcAmp_Saturation, (int *) arg);
+        return get_control(priv, VideoProcAmp_Saturation, (int *) arg);
     case TVI_CONTROL_VID_SET_BRIGHTNESS:
-	return set_control(priv, VideoProcAmp_Brightness, *(int *) arg);
+        return set_control(priv, VideoProcAmp_Brightness, *(int *) arg);
     case TVI_CONTROL_VID_GET_BRIGHTNESS:
-	return get_control(priv, VideoProcAmp_Brightness, (int *) arg);
+        return get_control(priv, VideoProcAmp_Brightness, (int *) arg);
 
     case TVI_CONTROL_VID_GET_FPS:
-	{
-	    VIDEOINFOHEADER *Vhdr;
-	    if (!priv->chains[0]->pmt)
-		return TVI_CONTROL_FALSE;
-	    if (!priv->chains[0]->pmt->pbFormat)
-		return TVI_CONTROL_FALSE;
-	    Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
-	    *(float *) arg =
-		(1.0 * Vhdr->dwBitRate) / (Vhdr->bmiHeader.biSizeImage * 8);
-	    return TVI_CONTROL_TRUE;
-	}
+        {
+            VIDEOINFOHEADER *Vhdr;
+            if (!priv->chains[0]->pmt)
+                return TVI_CONTROL_FALSE;
+            if (!priv->chains[0]->pmt->pbFormat)
+                return TVI_CONTROL_FALSE;
+            Vhdr = (VIDEOINFOHEADER *) priv->chains[0]->pmt->pbFormat;
+            *(float *) arg =
+                (1.0 * Vhdr->dwBitRate) / (Vhdr->bmiHeader.biSizeImage * 8);
+            return TVI_CONTROL_TRUE;
+        }
     case TVI_CONTROL_IMMEDIATE:
-	priv->immediate_mode = 1;
-	return TVI_CONTROL_TRUE;
+        priv->immediate_mode = 1;
+        return TVI_CONTROL_TRUE;
     case TVI_CONTROL_VBI_INIT:
     {
         void* ptr;

@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 #ifndef _FRIBIDI_CHAR_SETS_H
@@ -63,10 +63,10 @@ FriBidiCharSet;
  * Returns: The length of the new string.
  */
 FRIBIDI_ENTRY FriBidiStrIndex fribidi_charset_to_unicode (
-  FriBidiCharSet char_set,	/* character set to convert from */
-  const char *s,		/* input string encoded in char_set */
-  FriBidiStrIndex len,		/* input string length */
-  FriBidiChar *us		/* output Unicode string */
+  FriBidiCharSet char_set,      /* character set to convert from */
+  const char *s,                /* input string encoded in char_set */
+  FriBidiStrIndex len,          /* input string length */
+  FriBidiChar *us               /* output Unicode string */
 );
 
 #define fribidi_unicode_to_charset FRIBIDI_NAMESPACE(unicode_to_charset)
@@ -78,10 +78,10 @@ FRIBIDI_ENTRY FriBidiStrIndex fribidi_charset_to_unicode (
  * Returns: The length of the new string.
  */
 FRIBIDI_ENTRY FriBidiStrIndex fribidi_unicode_to_charset (
-  FriBidiCharSet char_set,	/* character set to conver to */
-  const FriBidiChar *us,	/* input Unicode string */
-  FriBidiStrIndex len,		/* input string length */
-  char *s			/* output string encoded in char_set */
+  FriBidiCharSet char_set,      /* character set to conver to */
+  const FriBidiChar *us,        /* input Unicode string */
+  FriBidiStrIndex len,          /* input string length */
+  char *s                       /* output string encoded in char_set */
 );
 
 #define fribidi_parse_charset FRIBIDI_NAMESPACE(parse_charset)
@@ -91,7 +91,7 @@ FRIBIDI_ENTRY FriBidiStrIndex fribidi_unicode_to_charset (
  * character set is not available.
  */
 FRIBIDI_ENTRY FriBidiCharSet fribidi_parse_charset (
-  const char *s			/* input name of the character set */
+  const char *s                 /* input name of the character set */
 );
 
 

@@ -184,7 +184,7 @@ static void asmrp_identifier (asmrp_t *p) {
   l = 0;
 
   while ( ((p->ch>='A') && (p->ch<='z'))
-	  || ((p->ch>='0') && (p->ch<='9'))) {
+          || ((p->ch>='0') && (p->ch<='9'))) {
 
     if(l < ASMRP_MAX_ID - 1)
       p->str[l++] = p->ch;
@@ -483,10 +483,10 @@ static int asmrp_comp_expression (asmrp_t *p) {
   a = asmrp_operand (p);
 
   while ( (p->sym == ASMRP_SYM_LESS)
-	  || (p->sym == ASMRP_SYM_LEQ)
-	  || (p->sym == ASMRP_SYM_EQUALS)
-	  || (p->sym == ASMRP_SYM_GEQ)
-	  || (p->sym == ASMRP_SYM_GREATER) ) {
+          || (p->sym == ASMRP_SYM_LEQ)
+          || (p->sym == ASMRP_SYM_EQUALS)
+          || (p->sym == ASMRP_SYM_GEQ)
+          || (p->sym == ASMRP_SYM_GREATER) ) {
     int op = p->sym;
     int b;
 
@@ -660,7 +660,7 @@ static int asmrp_eval (asmrp_t *p, int *matches) {
         matches[num_matches++] = rule_num;
       else
         mp_msg(MSGT_STREAM, MSGL_ERR,
-	  "Ignoring matched asm rule %d, too many matched rules.\n", rule_num);
+          "Ignoring matched asm rule %d, too many matched rules.\n", rule_num);
     }
 
     rule_num++;

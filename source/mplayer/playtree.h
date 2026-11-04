@@ -64,7 +64,7 @@ struct m_config;
 #ifdef GEKKO
 /// start denper's changes
 /// \defgroup PlaytreeParams Playtree prams
-/// \ingroup PlaytreeParams 
+/// \ingroup PlaytreeParams
 ///@{
 #define PLAY_TREE_PARAM_PRETTYFORMAT_TITLE "pt_prettyformat_title"
 ///@}

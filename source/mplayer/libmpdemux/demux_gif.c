@@ -130,19 +130,19 @@ static int demux_gif_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
         }
         priv->current_pts += frametime;
       } else if ((code == 0xFE) && (verbose)) { // comment extension
-	// print iff verbose
-	printf("GIF comment: ");
+        // print iff verbose
+        printf("GIF comment: ");
         while (p != NULL) {
           int length = p[0];
-	  char *comments = p + 1;
-	  comments[length] = 0;
-	  printf("%s", comments);
+          char *comments = p + 1;
+          comments[length] = 0;
+          printf("%s", comments);
           if (DGifGetExtensionNext(gif, &p) == GIF_ERROR) {
             PrintGifError();
             return 0; // oops
           }
-	}
-	printf("\n");
+        }
+        printf("\n");
       }
       while (p != NULL) {
         if (DGifGetExtensionNext(gif, &p) == GIF_ERROR) {

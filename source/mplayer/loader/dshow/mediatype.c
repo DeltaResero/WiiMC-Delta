@@ -54,21 +54,21 @@ void DisplayMediaType(const char * label,const AM_MEDIA_TYPE* pmt){
     Debug mp_msg(MSGT_LOADER,MSGL_DBG4,"-----------------------\n");
     iid=(GUID*)&(pmt->subtype);
     Debug mp_msg(MSGT_LOADER,MSGL_DBG4,"Subtype:     %08x-%04x-%04x-%02x%02x-"
-		 "%02x%02x%02x%02x%02x%02x\n",
-		 iid->f1,  iid->f2,  iid->f3,
-		 (unsigned char)iid->f4[1], (unsigned char)iid->f4[0],
-		 (unsigned char)iid->f4[2], (unsigned char)iid->f4[3],
-		 (unsigned char)iid->f4[4], (unsigned char)iid->f4[5],
-		 (unsigned char)iid->f4[6], (unsigned char)iid->f4[7]);
+                 "%02x%02x%02x%02x%02x%02x\n",
+                 iid->f1,  iid->f2,  iid->f3,
+                 (unsigned char)iid->f4[1], (unsigned char)iid->f4[0],
+                 (unsigned char)iid->f4[2], (unsigned char)iid->f4[3],
+                 (unsigned char)iid->f4[4], (unsigned char)iid->f4[5],
+                 (unsigned char)iid->f4[6], (unsigned char)iid->f4[7]);
 
     iid=(GUID*)&(pmt->formattype);
     Debug mp_msg(MSGT_LOADER,MSGL_DBG4,"Format type: %08x-%04x-%04x-%02x%02x-"
-		 "%02x%02x%02x%02x%02x%02x\n",
-		 iid->f1,  iid->f2,  iid->f3,
-		 (unsigned char)iid->f4[1], (unsigned char)iid->f4[0],
-		 (unsigned char)iid->f4[2], (unsigned char)iid->f4[3],
-		 (unsigned char)iid->f4[4], (unsigned char)iid->f4[5],
-		 (unsigned char)iid->f4[6], (unsigned char)iid->f4[7]);
+                 "%02x%02x%02x%02x%02x%02x\n",
+                 iid->f1,  iid->f2,  iid->f3,
+                 (unsigned char)iid->f4[1], (unsigned char)iid->f4[0],
+                 (unsigned char)iid->f4[2], (unsigned char)iid->f4[3],
+                 (unsigned char)iid->f4[4], (unsigned char)iid->f4[5],
+                 (unsigned char)iid->f4[6], (unsigned char)iid->f4[7]);
     if(pmt && memcmp(&pmt->formattype,&FORMAT_WaveFormatEx,16)==0 && pmt->pbFormat){
     pWF=(WAVEFORMATEX*)pmt->pbFormat;
     Debug mp_msg(MSGT_LOADER,MSGL_DBG4,"PMT: nChannels %d\n",pWF->nChannels);

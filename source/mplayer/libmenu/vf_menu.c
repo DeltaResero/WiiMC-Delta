@@ -157,7 +157,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     // Try to capture the last frame before pause, or fallback to use
     // last captured frame.
     if(pause_mpi && (mpi->w != pause_mpi->w || mpi->h != pause_mpi->h ||
-		     mpi->imgfmt != pause_mpi->imgfmt)) {
+                     mpi->imgfmt != pause_mpi->imgfmt)) {
       free_mp_image(pause_mpi);
       pause_mpi = NULL;
     }
@@ -176,8 +176,8 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     dmpi = mpi->priv;
   else {
     dmpi = vf_get_image(vf->next,mpi->imgfmt,
-			MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
-			mpi->w,mpi->h);
+                        MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
+                        mpi->w,mpi->h);
     copy_mpi(dmpi,mpi);
   }
   menu_draw(vf->priv->current,dmpi);
@@ -214,7 +214,7 @@ static void uninit(vf_instance_t *vf) {
 }
 
 static int config(struct vf_instance *vf, int width, int height, int d_width, int d_height,
-		  unsigned int flags, unsigned int outfmt) {
+                  unsigned int flags, unsigned int outfmt) {
 #ifdef CONFIG_FREETYPE
   // here is the right place to get screen dimensions
   if (force_load_font) {

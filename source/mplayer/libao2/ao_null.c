@@ -29,16 +29,16 @@
 
 static const ao_info_t info =
 {
-	"Null audio output",
-	"null",
-	"Tobias Diedrich <ranma+mplayer@tdiedrich.de>",
-	""
+    "Null audio output",
+    "null",
+    "Tobias Diedrich <ranma+mplayer@tdiedrich.de>",
+    ""
 };
 
 LIBAO_EXTERN(null)
 
-static struct	timeval last_tv;
-static int	buffer;
+static struct   timeval last_tv;
+static int  buffer;
 
 static void drain(void){
 

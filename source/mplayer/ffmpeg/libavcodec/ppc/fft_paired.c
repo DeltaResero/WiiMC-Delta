@@ -29,7 +29,7 @@ void ff_imdct_half_paired(FFTContext *s, FFTSample *output, const FFTSample *inp
 av_cold void ff_fft_init_paired(FFTContext *s)
 {
 #if CONFIG_MDCT
-	s->imdct_calc = ff_imdct_calc_paired;
-	s->imdct_half = ff_imdct_half_paired;
+    s->imdct_calc = ff_imdct_calc_paired;
+    s->imdct_half = ff_imdct_half_paired;
 #endif
 }

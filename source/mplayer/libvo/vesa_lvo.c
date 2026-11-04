@@ -60,86 +60,86 @@ uint32_t vlvo_control(uint32_t request, void *data);
 #define IMAGE_LINE_SIZE(pixel_size) (image_width*(pixel_size))
 
 int      vlvo_init(unsigned src_width,unsigned src_height,
-		   unsigned x_org,unsigned y_org,unsigned dst_width,
-		   unsigned dst_height,unsigned format,unsigned dest_bpp)
+                   unsigned x_org,unsigned y_org,unsigned dst_width,
+                   unsigned dst_height,unsigned format,unsigned dest_bpp)
 {
   size_t i,awidth;
   mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_ThisBranchIsNoLongerSupported);
   return -1;
   if( mp_msg_test(MSGT_VO,MSGL_DBG2) ) {
     mp_msg(MSGT_VO,MSGL_DBG2, "vesa_lvo: vlvo_init() was called\n");}
-	image_width = src_width;
-	image_height = src_height;
-	mga_vid_config.version=MGA_VID_VERSION;
+        image_width = src_width;
+        image_height = src_height;
+        mga_vid_config.version=MGA_VID_VERSION;
         src_format = mga_vid_config.format=format;
         awidth = (src_width + (WIDTH_ALIGN-1)) & ~(WIDTH_ALIGN-1);
         switch(format){
         case IMGFMT_YV12:
         case IMGFMT_I420:
         case IMGFMT_IYUV:
-	    image_bpp=16;
-	    mga_vid_config.frame_size = awidth*src_height+(awidth*src_height)/2;
-	    break;
+            image_bpp=16;
+            mga_vid_config.frame_size = awidth*src_height+(awidth*src_height)/2;
+            break;
         case IMGFMT_YUY2:
         case IMGFMT_UYVY:
-	    image_bpp=16;
-	    mga_vid_config.frame_size = awidth*src_height*2;
-	    break;
+            image_bpp=16;
+            mga_vid_config.frame_size = awidth*src_height*2;
+            break;
         case IMGFMT_RGB15:
         case IMGFMT_BGR15:
         case IMGFMT_RGB16:
         case IMGFMT_BGR16:
-	    image_bpp=16;
-	    mga_vid_config.frame_size = awidth*src_height*2;
-	    break;
+            image_bpp=16;
+            mga_vid_config.frame_size = awidth*src_height*2;
+            break;
         case IMGFMT_RGB24:
         case IMGFMT_BGR24:
-	    image_bpp=24;
-	    mga_vid_config.frame_size = awidth*src_height*3;
-	    break;
+            image_bpp=24;
+            mga_vid_config.frame_size = awidth*src_height*3;
+            break;
         case IMGFMT_RGB32:
         case IMGFMT_BGR32:
-	    image_bpp=32;
-	    mga_vid_config.frame_size = awidth*src_height*4;
-	    break;
+            image_bpp=32;
+            mga_vid_config.frame_size = awidth*src_height*4;
+            break;
         default:
             mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_InvalidOutputFormat,vo_format_name(format),format);
             return -1;
         }
         mga_vid_config.colkey_on=0;
-	mga_vid_config.src_width = src_width;
-	mga_vid_config.src_height= src_height;
-	mga_vid_config.dest_width = dst_width;
-	mga_vid_config.dest_height= dst_height;
-	mga_vid_config.x_org=x_org;
-	mga_vid_config.y_org=y_org;
-	mga_vid_config.num_frames=NUM_FRAMES;
-	if (ioctl(lvo_handler,MGA_VID_CONFIG,&mga_vid_config))
-	{
-		perror("vesa_lvo: Error in mga_vid_config ioctl()");
+        mga_vid_config.src_width = src_width;
+        mga_vid_config.src_height= src_height;
+        mga_vid_config.dest_width = dst_width;
+        mga_vid_config.dest_height= dst_height;
+        mga_vid_config.x_org=x_org;
+        mga_vid_config.y_org=y_org;
+        mga_vid_config.num_frames=NUM_FRAMES;
+        if (ioctl(lvo_handler,MGA_VID_CONFIG,&mga_vid_config))
+        {
+                perror("vesa_lvo: Error in mga_vid_config ioctl()");
                 mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_IncompatibleDriverVersion);
-		return -1;
-	}
-	ioctl(lvo_handler,MGA_VID_ON,0);
+                return -1;
+        }
+        ioctl(lvo_handler,MGA_VID_ON,0);
 
-	frames[0] = (char*)mmap(0,mga_vid_config.frame_size*mga_vid_config.num_frames,PROT_WRITE,MAP_SHARED,lvo_handler,0);
-	for(i=1;i<NUM_FRAMES;i++)
-		frames[i] = frames[i-1] + mga_vid_config.frame_size;
-	next_frame = 0;
-	lvo_mem = frames[next_frame];
+        frames[0] = (char*)mmap(0,mga_vid_config.frame_size*mga_vid_config.num_frames,PROT_WRITE,MAP_SHARED,lvo_handler,0);
+        for(i=1;i<NUM_FRAMES;i++)
+                frames[i] = frames[i-1] + mga_vid_config.frame_size;
+        next_frame = 0;
+        lvo_mem = frames[next_frame];
 
-	/*clear the buffer*/
-	memset(frames[0],0x80,mga_vid_config.frame_size*mga_vid_config.num_frames);
-	return 0;
+        /*clear the buffer*/
+        memset(frames[0],0x80,mga_vid_config.frame_size*mga_vid_config.num_frames);
+        return 0;
 }
 
 void vlvo_term( void )
 {
   if( mp_msg_test(MSGT_VO,MSGL_DBG2) ) {
     mp_msg(MSGT_VO,MSGL_DBG2, "vesa_lvo: vlvo_term() was called\n");}
-	ioctl( lvo_handler,MGA_VID_OFF,0 );
-	munmap(frames[0],mga_vid_config.frame_size*mga_vid_config.num_frames);
-	if(lvo_handler != -1) close(lvo_handler);
+        ioctl( lvo_handler,MGA_VID_OFF,0 );
+        munmap(frames[0],mga_vid_config.frame_size*mga_vid_config.num_frames);
+        if(lvo_handler != -1) close(lvo_handler);
 }
 
 static uint32_t vlvo_draw_slice_420(uint8_t *image[], int stride[],
@@ -189,15 +189,15 @@ static uint32_t vlvo_draw_slice(uint8_t *image[], int stride[],
  if( mp_msg_test(MSGT_VO,MSGL_DBG2) ) {
    mp_msg(MSGT_VO,MSGL_DBG2, "vesa_lvo: vlvo_draw_slice() was called\n");}
     if(src_format == IMGFMT_YV12 || src_format == IMGFMT_I420 || src_format == IMGFMT_IYUV)
-	vlvo_draw_slice_420(image,stride,w,h,x,y);
+        vlvo_draw_slice_420(image,stride,w,h,x,y);
     else
     {
-	uint8_t *dst;
-	uint8_t bytpp;
-	bytpp = (image_bpp+7)/8;
-	dst = lvo_mem + (image_width * y + x)*bytpp;
-	/* vlvo_draw_slice_422(image,stride,w,h,x,y); just for speed */
-	fast_memcpy(dst,image[0],mga_vid_config.frame_size);
+        uint8_t *dst;
+        uint8_t bytpp;
+        bytpp = (image_bpp+7)/8;
+        dst = lvo_mem + (image_width * y + x)*bytpp;
+        /* vlvo_draw_slice_422(image,stride,w,h,x,y); just for speed */
+        fast_memcpy(dst,image[0],mga_vid_config.frame_size);
     }
  return 0;
 }
@@ -217,9 +217,9 @@ static void vlvo_flip_page(void)
     mp_msg(MSGT_VO,MSGL_DBG2, "vesa_lvo: vlvo_draw_osd() was called\n");}
   if(vo_doublebuffering)
   {
-	ioctl(lvo_handler,MGA_VID_FSEL,&next_frame);
-	next_frame=(next_frame+1)%mga_vid_config.num_frames;
-	lvo_mem=frames[next_frame];
+        ioctl(lvo_handler,MGA_VID_FSEL,&next_frame);
+        next_frame=(next_frame+1)%mga_vid_config.num_frames;
+        lvo_mem=frames[next_frame];
   }
 }
 
@@ -234,20 +234,20 @@ static void draw_alpha(int x0,int y0, int w,int h, unsigned char* src, unsigned 
     switch(mga_vid_config.format){
     case IMGFMT_BGR15:
     case IMGFMT_RGB15:
-	vo_draw_alpha_rgb15(w,h,src,srca,stride,lvo_mem+2*(y0*bespitch+x0),2*bespitch);
-	break;
+        vo_draw_alpha_rgb15(w,h,src,srca,stride,lvo_mem+2*(y0*bespitch+x0),2*bespitch);
+        break;
     case IMGFMT_BGR16:
     case IMGFMT_RGB16:
-	vo_draw_alpha_rgb16(w,h,src,srca,stride,lvo_mem+2*(y0*bespitch+x0),2*bespitch);
-	break;
+        vo_draw_alpha_rgb16(w,h,src,srca,stride,lvo_mem+2*(y0*bespitch+x0),2*bespitch);
+        break;
     case IMGFMT_BGR24:
     case IMGFMT_RGB24:
-	vo_draw_alpha_rgb24(w,h,src,srca,stride,lvo_mem+3*(y0*bespitch+x0),3*bespitch);
-	break;
+        vo_draw_alpha_rgb24(w,h,src,srca,stride,lvo_mem+3*(y0*bespitch+x0),3*bespitch);
+        break;
     case IMGFMT_BGR32:
     case IMGFMT_RGB32:
-	vo_draw_alpha_rgb32(w,h,src,srca,stride,lvo_mem+4*(y0*bespitch+x0),4*bespitch);
-	break;
+        vo_draw_alpha_rgb32(w,h,src,srca,stride,lvo_mem+4*(y0*bespitch+x0),4*bespitch);
+        break;
     case IMGFMT_YV12:
     case IMGFMT_IYUV:
     case IMGFMT_I420:

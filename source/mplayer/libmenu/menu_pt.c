@@ -85,21 +85,21 @@ static void read_cmd(menu_t* menu,int cmd) {
       snprintf(str,15,"pt_up_step 1");
     else {
       for(i = playtree_iter->tree->next; i != NULL ; i = i->next) {
-	if(i == mpriv->p.current->pt)
-	  break;
-	d++;
+        if(i == mpriv->p.current->pt)
+          break;
+        d++;
       }
       if(i == NULL) {
-	d = -1;
-	for(i = playtree_iter->tree->prev; i != NULL ; i = i->prev) {
-	  if(i == mpriv->p.current->pt)
-	    break;
-	  d--;
-	}
-	if(i == NULL) {
-	  mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_CantfindTheTargetItem);
-	  break;
-	}
+        d = -1;
+        for(i = playtree_iter->tree->prev; i != NULL ; i = i->prev) {
+          if(i == mpriv->p.current->pt)
+            break;
+          d--;
+        }
+        if(i == NULL) {
+          mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_CantfindTheTargetItem);
+          break;
+        }
       }
       snprintf(str,15,"pt_step %d",d);
     }

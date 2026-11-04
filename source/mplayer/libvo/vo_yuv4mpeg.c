@@ -59,10 +59,10 @@
 
 static const vo_info_t info =
 {
-	"yuv4mpeg output for mjpegtools",
-	"yuv4mpeg",
-	"Robert Kesterson <robertk@robertk.com>",
-	""
+    "yuv4mpeg output for mjpegtools",
+    "yuv4mpeg",
+    "Robert Kesterson <robertk@robertk.com>",
+    ""
 };
 
 const LIBVO_EXTERN (yuv4mpeg)
@@ -94,70 +94,70 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
        uint32_t d_height, uint32_t flags, char *title,
        uint32_t format)
 {
-	AVRational pixelaspect = av_div_q((AVRational){d_width, d_height},
-	                                  (AVRational){width, height});
-	AVRational fps_frac = av_d2q(vo_fps, vo_fps * 1001 + 2);
-	if (image_width == width && image_height == height &&
-	     image_fps == vo_fps && vo_config_count)
-	  return 0;
-	if (vo_config_count) {
-	  mp_msg(MSGT_VO, MSGL_WARN,
-	    "Video formats differ (w:%i=>%i, h:%i=>%i, fps:%f=>%f), "
-	    "restarting output.\n",
-	    image_width, width, image_height, height, image_fps, vo_fps);
-	}
-	image_height = height;
-	image_width = width;
-	image_fps = vo_fps;
-	using_format = format;
+    AVRational pixelaspect = av_div_q((AVRational){d_width, d_height},
+                                      (AVRational){width, height});
+    AVRational fps_frac = av_d2q(vo_fps, vo_fps * 1001 + 2);
+    if (image_width == width && image_height == height &&
+         image_fps == vo_fps && vo_config_count)
+      return 0;
+    if (vo_config_count) {
+      mp_msg(MSGT_VO, MSGL_WARN,
+        "Video formats differ (w:%i=>%i, h:%i=>%i, fps:%f=>%f), "
+        "restarting output.\n",
+        image_width, width, image_height, height, image_fps, vo_fps);
+    }
+    image_height = height;
+    image_width = width;
+    image_fps = vo_fps;
+    using_format = format;
 
-	if (Y4M_IS_INTERLACED)
-	{
-		if (height % 4)
-		{
-			mp_msg(MSGT_VO,MSGL_FATAL,
-				MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4);
-			return -1;
-		}
-	}
+    if (Y4M_IS_INTERLACED)
+    {
+        if (height % 4)
+        {
+            mp_msg(MSGT_VO,MSGL_FATAL,
+                MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4);
+            return -1;
+        }
+    }
 
-	if (width % 2)
-	{
-		mp_msg(MSGT_VO,MSGL_FATAL,
-			MSGTR_VO_YUV4MPEG_WidthDivisibleBy2);
-		return -1;
-	}
+    if (width % 2)
+    {
+        mp_msg(MSGT_VO,MSGL_FATAL,
+            MSGTR_VO_YUV4MPEG_WidthDivisibleBy2);
+        return -1;
+    }
 
-	write_bytes = image_width * image_height * 3 / 2;
-	free(image);
-	image = malloc(write_bytes);
+    write_bytes = image_width * image_height * 3 / 2;
+    free(image);
+    image = malloc(write_bytes);
 
-	if (!yuv_out)
-		yuv_out = strcmp(yuv_filename, "-") ? fopen(yuv_filename, "wb") : stdout;
-	if (!yuv_out || image == 0)
-	{
-		mp_msg(MSGT_VO,MSGL_FATAL,
-			MSGTR_VO_YUV4MPEG_OutFileOpenError,
-			yuv_filename);
-		return -1;
-	}
-	image_y = image;
-	image_u = image_y + image_width * image_height;
-	image_v = image_u + image_width * image_height / 4;
+    if (!yuv_out)
+        yuv_out = strcmp(yuv_filename, "-") ? fopen(yuv_filename, "wb") : stdout;
+    if (!yuv_out || image == 0)
+    {
+        mp_msg(MSGT_VO,MSGL_FATAL,
+            MSGTR_VO_YUV4MPEG_OutFileOpenError,
+            yuv_filename);
+        return -1;
+    }
+    image_y = image;
+    image_u = image_y + image_width * image_height;
+    image_v = image_u + image_width * image_height / 4;
 
-	fprintf(yuv_out, "YUV4MPEG2 W%d H%d F%d:%d I%c A%d:%d\n",
-			image_width, image_height, fps_frac.num, fps_frac.den,
-			config_interlace,
-			pixelaspect.num, pixelaspect.den);
+    fprintf(yuv_out, "YUV4MPEG2 W%d H%d F%d:%d I%c A%d:%d\n",
+            image_width, image_height, fps_frac.num, fps_frac.den,
+            config_interlace,
+            pixelaspect.num, pixelaspect.den);
 
-	fflush(yuv_out);
-	return 0;
+    fflush(yuv_out);
+    return 0;
 }
 
 static void draw_alpha(int x0, int y0, int w, int h, unsigned char *src,
                        unsigned char *srca, int stride) {
-	    	vo_draw_alpha_yv12(w, h, src, srca, stride,
-				       image + y0 * image_width + x0, image_width);
+            vo_draw_alpha_yv12(w, h, src, srca, stride,
+                       image + y0 * image_width + x0, image_width);
 }
 
 static void draw_osd(void)
@@ -167,10 +167,10 @@ static void draw_osd(void)
 
 static void vo_y4m_write(const void *ptr, const size_t num_bytes)
 {
-	if (fwrite(ptr, 1, num_bytes, yuv_out) != num_bytes)
-		mp_msg(MSGT_VO,MSGL_ERR,
-			MSGTR_VO_YUV4MPEG_OutFileWriteError);
-	fflush(yuv_out);
+    if (fwrite(ptr, 1, num_bytes, yuv_out) != num_bytes)
+        mp_msg(MSGT_VO,MSGL_ERR,
+            MSGTR_VO_YUV4MPEG_OutFileWriteError);
+    fflush(yuv_out);
 }
 
 static int write_last_frame(void)
@@ -183,72 +183,72 @@ static int write_last_frame(void)
 
 static void flip_page (void)
 {
-	fprintf(yuv_out, "FRAME\n");
+    fprintf(yuv_out, "FRAME\n");
 
-	vo_y4m_write(image, write_bytes);
+    vo_y4m_write(image, write_bytes);
 }
 
 static int draw_slice(uint8_t *srcimg[], int stride[], int w,int h,int x,int y)
 {
-	int i;
-	uint8_t *dst, *src = srcimg[0];
+    int i;
+    uint8_t *dst, *src = srcimg[0];
 
-		// copy Y:
-		dst = image_y + image_width * y + x;
-		for (i = 0; i < h; i++)
-		{
-			fast_memcpy(dst, src, w);
-			src += stride[0];
-			dst += image_width;
-		}
-		{
-			// copy U + V:
-			int imgstride = image_width >> 1;
-			uint8_t *src1 = srcimg[1];
-			uint8_t *src2 = srcimg[2];
-			uint8_t *dstu = image_u + imgstride * (y >> 1) + (x >> 1);
-			uint8_t *dstv = image_v + imgstride * (y >> 1) + (x >> 1);
-			for (i = 0; i < h / 2; i++)
-			{
-				fast_memcpy(dstu, src1 , w >> 1);
-				fast_memcpy(dstv, src2, w >> 1);
-				src1 += stride[1];
-				src2 += stride[2];
-				dstu += imgstride;
-				dstv += imgstride;
-			}
-		}
-	return 0;
+        // copy Y:
+        dst = image_y + image_width * y + x;
+        for (i = 0; i < h; i++)
+        {
+            fast_memcpy(dst, src, w);
+            src += stride[0];
+            dst += image_width;
+        }
+        {
+            // copy U + V:
+            int imgstride = image_width >> 1;
+            uint8_t *src1 = srcimg[1];
+            uint8_t *src2 = srcimg[2];
+            uint8_t *dstu = image_u + imgstride * (y >> 1) + (x >> 1);
+            uint8_t *dstv = image_v + imgstride * (y >> 1) + (x >> 1);
+            for (i = 0; i < h / 2; i++)
+            {
+                fast_memcpy(dstu, src1 , w >> 1);
+                fast_memcpy(dstv, src2, w >> 1);
+                src1 += stride[1];
+                src2 += stride[2];
+                dstu += imgstride;
+                dstv += imgstride;
+            }
+        }
+    return 0;
 }
 
 static int draw_frame(uint8_t * src[])
 {
-			// gets done in draw_slice
+            // gets done in draw_slice
     return 0;
 }
 
 static int query_format(uint32_t format)
 {
-	if (format == IMGFMT_YV12)
-		return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_OSD|VFCAP_ACCEPT_STRIDE;
-	return 0;
+    if (format == IMGFMT_YV12)
+        return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_OSD|VFCAP_ACCEPT_STRIDE;
+    return 0;
 }
 
 // WARNING: config(...) also uses this
 static void uninit(void)
 {
-	free(image);
-	image = NULL;
+    free(image);
+    image = NULL;
 
-	if(yuv_out && yuv_out != stdout)
-		fclose(yuv_out);
-	yuv_out = NULL;
+    if(yuv_out && yuv_out != stdout)
+        fclose(yuv_out);
+    yuv_out = NULL;
 
-	free(yuv_filename);
-	yuv_filename = NULL;
-	image_width = 0;
-	image_height = 0;
-	image_fps = 0;
+    free(yuv_filename);
+    yuv_filename = NULL;
+    image_width = 0;
+    image_height = 0;
+    image_fps = 0;
 }
 
 
@@ -284,16 +284,16 @@ static int preinit(const char *arg)
     switch (config_interlace)
     {
         case Y4M_ILACE_TOP_FIRST:
-	    mp_msg(MSGT_VO,MSGL_STATUS,
-	    	    MSGTR_VO_YUV4MPEG_InterlacedTFFMode);
+        mp_msg(MSGT_VO,MSGL_STATUS,
+                MSGTR_VO_YUV4MPEG_InterlacedTFFMode);
             break;
         case Y4M_ILACE_BOTTOM_FIRST:
-	    mp_msg(MSGT_VO,MSGL_STATUS,
-	    	    MSGTR_VO_YUV4MPEG_InterlacedBFFMode);
+        mp_msg(MSGT_VO,MSGL_STATUS,
+                MSGTR_VO_YUV4MPEG_InterlacedBFFMode);
             break;
         default:
-	    mp_msg(MSGT_VO,MSGL_STATUS,
-	    	    MSGTR_VO_YUV4MPEG_ProgressiveMode);
+        mp_msg(MSGT_VO,MSGL_STATUS,
+                MSGTR_VO_YUV4MPEG_ProgressiveMode);
             break;
     }
     return 0;

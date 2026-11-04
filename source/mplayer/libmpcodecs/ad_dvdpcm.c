@@ -27,11 +27,11 @@
 
 static const ad_info_t info =
 {
-	"Uncompressed DVD/VOB LPCM audio decoder",
-	"dvdpcm",
-	"Nick Kurshev",
-	"A'rpi",
-	""
+        "Uncompressed DVD/VOB LPCM audio decoder",
+        "dvdpcm",
+        "Nick Kurshev",
+        "A'rpi",
+        ""
 };
 
 LIBAD_EXTERN(dvdpcm)
@@ -41,37 +41,37 @@ static int init(sh_audio_t *sh)
 /* DVD PCM Audio:*/
     sh->i_bps = 0;
     if(sh->codecdata_len==3){
-	// we have LPCM header:
-	unsigned char h=sh->codecdata[1];
-	sh->channels=1+(h&7);
-	switch((h>>4)&3){
-	case 0: sh->samplerate=48000;break;
-	case 1: sh->samplerate=96000;break;
-	case 2: sh->samplerate=44100;break;
-	case 3: sh->samplerate=32000;break;
-	}
-	switch ((h >> 6) & 3) {
-	  case 0:
-	    sh->sample_format = AF_FORMAT_S16_BE;
-	    sh->samplesize = 2;
-	    break;
-	  case 1:
-	    mp_msg(MSGT_DECAUDIO, MSGL_INFO, MSGTR_SamplesWanted);
-	    sh->i_bps = sh->channels * sh->samplerate * 5 / 2;
-	  case 2:
-	    sh->sample_format = AF_FORMAT_S24_BE;
-	    sh->samplesize = 3;
-	    break;
-	  default:
-	    sh->sample_format = AF_FORMAT_S16_BE;
-	    sh->samplesize = 2;
-	}
+        // we have LPCM header:
+        unsigned char h=sh->codecdata[1];
+        sh->channels=1+(h&7);
+        switch((h>>4)&3){
+        case 0: sh->samplerate=48000;break;
+        case 1: sh->samplerate=96000;break;
+        case 2: sh->samplerate=44100;break;
+        case 3: sh->samplerate=32000;break;
+        }
+        switch ((h >> 6) & 3) {
+          case 0:
+            sh->sample_format = AF_FORMAT_S16_BE;
+            sh->samplesize = 2;
+            break;
+          case 1:
+            mp_msg(MSGT_DECAUDIO, MSGL_INFO, MSGTR_SamplesWanted);
+            sh->i_bps = sh->channels * sh->samplerate * 5 / 2;
+          case 2:
+            sh->sample_format = AF_FORMAT_S24_BE;
+            sh->samplesize = 3;
+            break;
+          default:
+            sh->sample_format = AF_FORMAT_S16_BE;
+            sh->samplesize = 2;
+        }
     } else {
-	// use defaults:
-	sh->channels=2;
-	sh->samplerate=48000;
-	sh->sample_format = AF_FORMAT_S16_BE;
-	sh->samplesize = 2;
+        // use defaults:
+        sh->channels=2;
+        sh->samplerate=48000;
+        sh->sample_format = AF_FORMAT_S16_BE;
+        sh->samplesize = 2;
     }
     if (!sh->i_bps)
     sh->i_bps = sh->samplesize * sh->channels * sh->samplerate;
@@ -94,10 +94,10 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
     switch(cmd)
     {
       case ADCTRL_SKIP_FRAME:
-	skip=sh->i_bps/16;
-	skip=skip&(~3);
-	demux_read_data(sh->ds,NULL,skip);
-	return CONTROL_TRUE;
+        skip=sh->i_bps/16;
+        skip=skip&(~3);
+        demux_read_data(sh->ds,NULL,skip);
+        return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }

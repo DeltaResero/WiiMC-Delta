@@ -50,14 +50,14 @@ mp_input_lirc_init(void) {
   mode = fcntl(lirc_sock, F_GETFL);
   if (mode < 0 || fcntl(lirc_sock, F_SETFL, mode | O_NONBLOCK) < 0) {
     mp_msg(MSGT_LIRC, MSGL_ERR, "setting non-blocking mode failed: %s\n",
-	strerror(errno));
+        strerror(errno));
     lirc_deinit();
     return -1;
   }
 
   if(lirc_readconfig( lirc_configfile,&lirc_config,NULL )!=0 ){
     mp_msg(MSGT_LIRC,MSGL_ERR,MSGTR_LIRCcfgerr,
-		    lirc_configfile == NULL ? "~/.lircrc" : lirc_configfile);
+                    lirc_configfile == NULL ? "~/.lircrc" : lirc_configfile);
     lirc_deinit();
     return -1;
   }

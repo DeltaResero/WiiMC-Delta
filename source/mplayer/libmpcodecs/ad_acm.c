@@ -31,11 +31,11 @@
 
 static const ad_info_t info =
 {
-	"Win32/ACM decoders",
-	"acm",
-	"A'rpi",
-	"A'rpi & Alex",
-	""
+        "Win32/ACM decoders",
+        "acm",
+        "A'rpi",
+        "A'rpi & Alex",
+        ""
 };
 
 LIBAD_EXTERN(acm)
@@ -65,7 +65,7 @@ static int preinit(sh_audio_t *sh_audio)
 
     priv = malloc(sizeof(acm_context_t));
     if (!priv)
-	return 0;
+        return 0;
     sh_audio->context = priv;
 
     mp_msg(MSGT_WIN32, MSGL_V, "======= Win32 (ACM) AUDIO Codec init =======\n");
@@ -75,8 +75,8 @@ static int preinit(sh_audio_t *sh_audio)
     priv->o_wf = malloc(sizeof(*priv->o_wf));
     if (!priv->o_wf)
     {
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_ACMiniterror);
-	return 0;
+        mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_ACMiniterror);
+        return 0;
     }
 
     priv->o_wf->nChannels = in_fmt->nChannels;
@@ -90,24 +90,24 @@ static int preinit(sh_audio_t *sh_audio)
 
     if ( mp_msg_test(MSGT_DECAUDIO,MSGL_V) )
     {
-	mp_msg(MSGT_DECAUDIO, MSGL_V, "Input format:\n");
-	print_wave_header(in_fmt, MSGL_V);
-	mp_msg(MSGT_DECAUDIO, MSGL_V, "Output format:\n");
-	print_wave_header(priv->o_wf, MSGL_V);
+        mp_msg(MSGT_DECAUDIO, MSGL_V, "Input format:\n");
+        print_wave_header(in_fmt, MSGL_V);
+        mp_msg(MSGT_DECAUDIO, MSGL_V, "Output format:\n");
+        print_wave_header(priv->o_wf, MSGL_V);
     }
 
     MSACM_RegisterDriver((const char *)sh_audio->codec->dll, in_fmt->wFormatTag, 0);
     ret = acmStreamOpen(&priv->handle, (HACMDRIVER)NULL, in_fmt,
-			priv->o_wf, NULL, 0, 0, 0);
+                        priv->o_wf, NULL, 0, 0, 0);
     if (ret)
     {
-	if (ret == ACMERR_NOTPOSSIBLE)
-	    mp_msg(MSGT_WIN32, MSGL_ERR, "ACM_Decoder: Unappropriate audio format\n");
-	else
-	    mp_msg(MSGT_WIN32, MSGL_ERR, "ACM_Decoder: acmStreamOpen error: %d\n",
-		(int)ret);
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_ACMiniterror);
-	return 0;
+        if (ret == ACMERR_NOTPOSSIBLE)
+            mp_msg(MSGT_WIN32, MSGL_ERR, "ACM_Decoder: Unappropriate audio format\n");
+        else
+            mp_msg(MSGT_WIN32, MSGL_ERR, "ACM_Decoder: acmStreamOpen error: %d\n",
+                (int)ret);
+        mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_ACMiniterror);
+        return 0;
     }
     mp_msg(MSGT_WIN32, MSGL_V, "Audio codec opened OK! ;-)\n");
 
@@ -117,8 +117,8 @@ static int preinit(sh_audio_t *sh_audio)
     //if (srcsize < MAX_OUTBURST) srcsize = MAX_OUTBURST;
     if (!srcsize)
     {
-	mp_msg(MSGT_WIN32, MSGL_WARN, "Warning! ACM codec reports srcsize=0\n");
-	srcsize = 16384;
+        mp_msg(MSGT_WIN32, MSGL_WARN, "Warning! ACM codec reports srcsize=0\n");
+        srcsize = 16384;
     }
     // limit srcsize to 4-16kb
     //while(srcsize && srcsize<4096) srcsize*=2;
@@ -131,8 +131,8 @@ static int preinit(sh_audio_t *sh_audio)
 
     if (!srcsize)
     {
-	mp_msg(MSGT_WIN32, MSGL_WARN, "Warning! ACM codec reports srcsize=0\n");
-	srcsize = 2*in_fmt->nBlockAlign;
+        mp_msg(MSGT_WIN32, MSGL_WARN, "Warning! ACM codec reports srcsize=0\n");
+        srcsize = 2*in_fmt->nBlockAlign;
     }
 
     mp_msg(MSGT_WIN32,MSGL_V,"Audio ACM input buffer min. size: %ld\n",srcsize);
@@ -159,17 +159,17 @@ retry:
     if (ret)
     switch(ret)
     {
-	case ACMERR_BUSY:
-	case ACMERR_CANCELED:
-	    mp_msg(MSGT_WIN32, MSGL_DBG2, "ACM_Decoder: stream busy, waiting..\n");
-	    usec_sleep(100000000);
-	    goto retry;
-	case ACMERR_UNPREPARED:
-	case ACMERR_NOTPOSSIBLE:
-	    return;
-	default:
-	    mp_msg(MSGT_WIN32, MSGL_WARN, "ACM_Decoder: unknown error occurred: %ld\n", ret);
-	    return;
+        case ACMERR_BUSY:
+        case ACMERR_CANCELED:
+            mp_msg(MSGT_WIN32, MSGL_DBG2, "ACM_Decoder: stream busy, waiting..\n");
+            usec_sleep(100000000);
+            goto retry;
+        case ACMERR_UNPREPARED:
+        case ACMERR_NOTPOSSIBLE:
+            return;
+        default:
+            mp_msg(MSGT_WIN32, MSGL_WARN, "ACM_Decoder: unknown error occurred: %ld\n", ret);
+            return;
     }
 
     MSACM_UnregisterAllDrivers();
@@ -184,13 +184,13 @@ static int control(sh_audio_t *sh_audio,int cmd,void* arg, ...)
     switch(cmd)
     {
       case ADCTRL_SKIP_FRAME:
-		    skip=sh_audio->wf->nBlockAlign;
-		    if(skip<16){
-		      skip=(sh_audio->wf->nAvgBytesPerSec/16)&(~7);
-		      if(skip<16) skip=16;
-		    }
-		    demux_read_data(sh_audio->ds,NULL,skip);
-	  return CONTROL_TRUE;
+                    skip=sh_audio->wf->nBlockAlign;
+                    if(skip<16){
+                      skip=(sh_audio->wf->nAvgBytesPerSec/16)&(~7);
+                      if(skip<16) skip=16;
+                    }
+                    demux_read_data(sh_audio->ds,NULL,skip);
+          return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }
@@ -238,9 +238,9 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
       mp_msg(MSGT_WIN32,MSGL_DBG2,"ACM_Decoder: acmStreamConvert error %d\n",(int)hr);
       switch(hr)
       {
-	case ACMERR_NOTPOSSIBLE:
-	case ACMERR_UNPREPARED:
-	    mp_msg(MSGT_WIN32, MSGL_DBG2, "ACM_Decoder: acmStreamConvert error: probarly not initialized!\n");
+        case ACMERR_NOTPOSSIBLE:
+        case ACMERR_UNPREPARED:
+            mp_msg(MSGT_WIN32, MSGL_DBG2, "ACM_Decoder: acmStreamConvert error: probarly not initialized!\n");
       }
 //      return -1;
     }

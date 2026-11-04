@@ -18,7 +18,7 @@ BuiltinParams::BuiltinParams(PresetInputs & presetInputs, PresetOutputs & preset
   int ret;
   if ((ret = init_builtin_param_db(presetInputs, presetOutputs)) != 0)
   {
-	std::cout << "failed to allocate builtin parameter database with error " << ret << std::endl;;
+        std::cout << "failed to allocate builtin parameter database with error " << ret << std::endl;;
         throw ret;
   }
 
@@ -197,15 +197,15 @@ int BuiltinParams::load_builtin_param_int(const std::string & name, void * engin
 
 int BuiltinParams::load_builtin_param_string( const std::string & name, std::string * engine_val, short int flags) {
 
-	/* Creates a new parameter of type string */
-	Param * param = Param::new_param_string(name.c_str(), flags, engine_val);
+        /* Creates a new parameter of type string */
+        Param * param = Param::new_param_string(name.c_str(), flags, engine_val);
 
-	if (insert_builtin_param( param ) < 0)
-	{
-		delete param;
-		return -1;
-	}
-	return 0;
+        if (insert_builtin_param( param ) < 0)
+        {
+                delete param;
+                return -1;
+        }
+        return 0;
 }
 
 /* Loads a boolean parameter */
@@ -394,9 +394,9 @@ int BuiltinParams::load_all_builtin_param(const PresetInputs & presetInputs, Pre
                            0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, "");
 
   for (unsigned int i = 0; i < NUM_Q_VARIABLES;i++) {
-	std::ostringstream os;
-	os << "q" << i;
-	load_builtin_param_float(os.str().c_str(), (void*)&presetOutputs.q[i],  NULL, P_FLAG_PER_PIXEL |P_FLAG_QVAR, 0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, "");
+        std::ostringstream os;
+        os << "q" << i;
+        load_builtin_param_float(os.str().c_str(), (void*)&presetOutputs.q[i],  NULL, P_FLAG_PER_PIXEL |P_FLAG_QVAR, 0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, "");
 
   }
 

@@ -27,7 +27,7 @@
 
 #define S3_SAVAGE3D_SERIES(chip) ((chip>=S3_SAVAGE3D) && (chip<=S3_SAVAGE_MX))
 #define S3_SAVAGE4_SERIES(chip) ((chip==S3_SAVAGE4) || (chip==S3_PROSAVAGE))
-#define	S3_SAVAGE_MOBILE_SERIES(chip) ((chip==S3_SAVAGE_MX) || (chip==S3_SUPERSAVAGE))
+#define S3_SAVAGE_MOBILE_SERIES(chip) ((chip==S3_SAVAGE_MX) || (chip==S3_SUPERSAVAGE))
 #define S3_SAVAGE_SERIES(chip) ((chip>=S3_SAVAGE3D) && (chip<=S3_SAVAGE2000))
 
 /*
@@ -47,14 +47,14 @@ enum S3CHIPTAGS {
     S3_LAST
 };
 
-#define BIOS_BSIZE			1024
-#define BIOS_BASE			0xc0000
+#define BIOS_BSIZE          1024
+#define BIOS_BASE           0xc0000
 
-#define S3_NEWMMIO_REGBASE		0x1000000	/* 16MB */
-#define S3_NEWMMIO_REGSIZE		0x0010000	/* 64KB */
-#define S3_NEWMMIO_REGSIZE_SAVAGE	0x0080000	/* 512KB */
+#define S3_NEWMMIO_REGBASE      0x1000000   /* 16MB */
+#define S3_NEWMMIO_REGSIZE      0x0010000   /* 64KB */
+#define S3_NEWMMIO_REGSIZE_SAVAGE   0x0080000   /* 512KB */
 
-#define BASE_FREQ			14.31818
+#define BASE_FREQ           14.31818
 
 /*
  * There are two different streams engines used in the S3 line.
@@ -153,14 +153,14 @@ enum S3CHIPTAGS {
 
 #define VerticalRetraceWait() \
 do { \
-	VGAIN8(0x3d4); \
-	VGAOUT8(0x3d4, 0x17); \
-	if (VGAIN8(0x3d5) & 0x80) { \
-		int i = 0x10000; \
-		while ((VGAIN8(0x3da) & 0x08) == 0x08 && i--) ; \
-		i = 0x10000; \
-		while ((VGAIN8(0x3da) & 0x08) == 0x00 && i--) ; \
-	} \
+    VGAIN8(0x3d4); \
+    VGAOUT8(0x3d4, 0x17); \
+    if (VGAIN8(0x3d5) & 0x80) { \
+        int i = 0x10000; \
+        while ((VGAIN8(0x3da) & 0x08) == 0x08 && i--) ; \
+        i = 0x10000; \
+        while ((VGAIN8(0x3da) & 0x08) == 0x00 && i--) ; \
+    } \
 } while (0)
 
 /* Scaling operations */

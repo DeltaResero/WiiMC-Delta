@@ -37,18 +37,18 @@
 /* Evaluate an equation */
 void PerFrameEqn::evaluate() {
 
-     if (PER_FRAME_EQN_DEBUG) { 
-		 printf("per_frame_%d=%s= ", index, param->name.c_str());
-		 fflush(stdout); 
+     if (PER_FRAME_EQN_DEBUG) {
+         printf("per_frame_%d=%s= ", index, param->name.c_str());
+         fflush(stdout);
      }
-	 
-    //*((float*)per_frame_eqn->param->engine_val) = eval_gen_expr(per_frame_eqn->gen_expr);
-	assert(gen_expr);
-	assert(param);
-	param->set_param(gen_expr->eval_gen_expr(-1,-1));
 
-     if (PER_FRAME_EQN_DEBUG) printf(" = %.4f\n", *((float*)param->engine_val)); 
-		 
+    //*((float*)per_frame_eqn->param->engine_val) = eval_gen_expr(per_frame_eqn->gen_expr);
+    assert(gen_expr);
+    assert(param);
+    param->set_param(gen_expr->eval_gen_expr(-1,-1));
+
+     if (PER_FRAME_EQN_DEBUG) printf(" = %.4f\n", *((float*)param->engine_val));
+
 }
 
 
@@ -63,4 +63,4 @@ PerFrameEqn::~PerFrameEqn() {
 
 /* Create a new per frame equation */
 PerFrameEqn::PerFrameEqn(int _index, Param * _param, GenExpr * _gen_expr) :
-	index(_index), param(_param), gen_expr(_gen_expr) {}
+    index(_index), param(_param), gen_expr(_gen_expr) {}

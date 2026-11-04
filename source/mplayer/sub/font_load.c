@@ -48,7 +48,7 @@ raw_file* load_raw(char *name,int verbose){
     raw->h=head[10]*256+head[11];
     raw->c=head[12]*256+head[13];
     if(raw->w == 0) // 2 bytes were not enough for the width... read 4 bytes from the end of the header
-    	raw->w = ((head[28]*0x100 + head[29])*0x100 + head[30])*0x100 + head[31];
+        raw->w = ((head[28]*0x100 + head[29])*0x100 + head[30])*0x100 + head[31];
     if(raw->c>256) goto err_out;                 // too many colors!?
     mp_msg(MSGT_OSD, MSGL_DBG2, "RAW: %s  %d x %d, %d colors\n",name,raw->w,raw->h,raw->c);
     if(raw->c){
@@ -195,45 +195,45 @@ while(fgets(sor,1020,f)){
       char *default_dir=MPLAYER_DATADIR FONT_PATH_SEP "font";
 #endif
       if(pdb==2 && strcmp(p[0],"alpha")==0){
-    	  char *cp;
-	  if (!(cp=malloc(strlen(desc->fpath)+strlen(p[1])+2))) goto fail_out;
+          char *cp;
+          if (!(cp=malloc(strlen(desc->fpath)+strlen(p[1])+2))) goto fail_out;
 
-	  snprintf(cp,strlen(desc->fpath)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
-		desc->fpath,p[1]);
+          snprintf(cp,strlen(desc->fpath)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
+                desc->fpath,p[1]);
           if(!((desc->pic_a[fontdb]=load_raw(cp,verbose)))){
-		free(cp);
-		if (!(cp=malloc(strlen(default_dir)+strlen(p[1])+2)))
-		   goto fail_out;
-		snprintf(cp,strlen(default_dir)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
-			 default_dir,p[1]);
-		if (!((desc->pic_a[fontdb]=load_raw(cp,verbose)))){
-		   mp_msg(MSGT_OSD, MSGL_ERR, "Can't load font bitmap: %s\n",p[1]);
-		   free(cp);
-		   goto fail_out;
-		}
+                free(cp);
+                if (!(cp=malloc(strlen(default_dir)+strlen(p[1])+2)))
+                   goto fail_out;
+                snprintf(cp,strlen(default_dir)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
+                         default_dir,p[1]);
+                if (!((desc->pic_a[fontdb]=load_raw(cp,verbose)))){
+                   mp_msg(MSGT_OSD, MSGL_ERR, "Can't load font bitmap: %s\n",p[1]);
+                   free(cp);
+                   goto fail_out;
+                }
           }
-	  free(cp);
+          free(cp);
           continue;
       }
       if(pdb==2 && strcmp(p[0],"bitmap")==0){
-    	  char *cp;
-	  if (!(cp=malloc(strlen(desc->fpath)+strlen(p[1])+2))) goto fail_out;
+          char *cp;
+          if (!(cp=malloc(strlen(desc->fpath)+strlen(p[1])+2))) goto fail_out;
 
-	  snprintf(cp,strlen(desc->fpath)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
-		desc->fpath,p[1]);
+          snprintf(cp,strlen(desc->fpath)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
+                desc->fpath,p[1]);
           if(!((desc->pic_b[fontdb]=load_raw(cp,verbose)))){
-		free(cp);
-		if (!(cp=malloc(strlen(default_dir)+strlen(p[1])+2)))
-		   goto fail_out;
-		snprintf(cp,strlen(default_dir)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
-			 default_dir,p[1]);
-		if (!((desc->pic_b[fontdb]=load_raw(cp,verbose)))){
-		   mp_msg(MSGT_OSD, MSGL_ERR, "Can't load font bitmap: %s\n",p[1]);
-		   free(cp);
-		   goto fail_out;
-		}
+                free(cp);
+                if (!(cp=malloc(strlen(default_dir)+strlen(p[1])+2)))
+                   goto fail_out;
+                snprintf(cp,strlen(default_dir)+strlen(p[1])+2,"%s" FONT_PATH_SEP "%s",
+                         default_dir,p[1]);
+                if (!((desc->pic_b[fontdb]=load_raw(cp,verbose)))){
+                   mp_msg(MSGT_OSD, MSGL_ERR, "Can't load font bitmap: %s\n",p[1]);
+                   free(cp);
+                   goto fail_out;
+                }
           }
-	  free(cp);
+          free(cp);
           continue;
       }
   } else
@@ -309,20 +309,20 @@ for(i=0;i<=fontdb;i++){
         int j;
         mp_msg(MSGT_OSD, MSGL_DBG2, "font: resampling alpha by factor %5.3f (%d) ",factor,f);fflush(stdout);
         for(j=0;j<size;j++){
-            int x=desc->pic_a[i]->bmp[j];	// alpha
-            int y=desc->pic_b[i]->bmp[j];	// bitmap
+            int x=desc->pic_a[i]->bmp[j];       // alpha
+            int y=desc->pic_b[i]->bmp[j];       // bitmap
 
 #ifdef FAST_OSD
-	    x=(x<(255-f))?0:1;
+            x=(x<(255-f))?0:1;
 #else
 
-	    x=255-((x*f)>>8); // scale
-	    //if(x<0) x=0; else if(x>255) x=255;
-	    //x^=255; // invert
+            x=255-((x*f)>>8); // scale
+            //if(x<0) x=0; else if(x>255) x=255;
+            //x^=255; // invert
 
-	    if(x+y>255) x=255-y; // to avoid overflows
+            if(x+y>255) x=255-y; // to avoid overflows
 
-	    //x=0;
+            //x=0;
             //x=((x*f*(255-y))>>16);
             //x=((x*f*(255-y))>>16)+y;
             //x=(x*f)>>8;if(x<y) x=y;

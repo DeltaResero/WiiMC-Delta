@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 
@@ -37,25 +37,25 @@
 
 #include <fribidi-char-sets-cp1255.h>
 
-#define ISO_ALEF		0xE0
-#define ISO_TAV			0xFA
-#define CP1255_SHEVA		0xC0
-#define CP1255_SOF_PASUQ	0xD3
-#define CP1255_DOUBLE_VAV	0xD4
-#define CP1255_GERSHAYIM	0xD8
-#define CP1255_LRM		0xFD
-#define CP1255_RLM		0xFE
+#define ISO_ALEF                0xE0
+#define ISO_TAV                 0xFA
+#define CP1255_SHEVA            0xC0
+#define CP1255_SOF_PASUQ        0xD3
+#define CP1255_DOUBLE_VAV       0xD4
+#define CP1255_GERSHAYIM        0xD8
+#define CP1255_LRM              0xFD
+#define CP1255_RLM              0xFE
 
-#define UNI_ALEF		0x05D0
-#define UNI_TAV			0x05EA
-#define UNI_SHEVA		0x05B0
-#define UNI_SOF_PASUQ		0x05C3
-#define UNI_DOUBLE_VAV		0x05F0
-#define UNI_GERSHAYIM		0x05F4
-#define UNI_LRM			0x200E
-#define UNI_RLM			0x200F
+#define UNI_ALEF                0x05D0
+#define UNI_TAV                 0x05EA
+#define UNI_SHEVA               0x05B0
+#define UNI_SOF_PASUQ           0x05C3
+#define UNI_DOUBLE_VAV          0x05F0
+#define UNI_GERSHAYIM           0x05F4
+#define UNI_LRM                 0x200E
+#define UNI_RLM                 0x200F
 
-static FriBidiChar fribidi_cp1255_to_unicode_tab[] = {	/* 0x80-0xBF */
+static FriBidiChar fribidi_cp1255_to_unicode_tab[] = {  /* 0x80-0xBF */
   0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
   0x02C6, 0x2030, 0x008a, 0x2039, 0x008c, 0x008d, 0x008e, 0x008f,
   0x0090, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
@@ -82,10 +82,10 @@ fribidi_cp1255_to_unicode_c (
   /* cp1256 specific chars */
   else if (ch >= 0x80 && ch <= 0xbf)
     return fribidi_cp1255_to_unicode_tab[ch - 0x80];
-  else if (ch == CP1255_LRM || ch == CP1255_RLM) 
+  else if (ch == CP1255_LRM || ch == CP1255_RLM)
     return ch - CP1255_LRM + UNI_LRM;
     /* treat LRM/LRM charrectes correctly */
-  else 
+  else
     return ch;
 }
 

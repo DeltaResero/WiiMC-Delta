@@ -149,40 +149,40 @@ static void prefetch_ppc(void *mem, int stride, int h)
 #if defined(GEKKO)
 static void fill_block16_gekko(uint8_t *block, uint8_t value, int line_size, int h)
 {
-	uint32_t word = value;
-	word |= (word << 8);
-	word |= (word << 16);
-	
-	block -= line_size;
-	
-	do {
-		__asm__ volatile (
-			"stwux	%2,%0,%1\n"
-			"stw	%2,4(%0)\n"
-			"stw	%2,8(%0)\n"
-			"stw	%2,12(%0)\n"
-			: "+b"(block)
-			: "r"(line_size), "r"(word)
-		);
-	} while (--h);
+    uint32_t word = value;
+    word |= (word << 8);
+    word |= (word << 16);
+
+    block -= line_size;
+
+    do {
+        __asm__ volatile (
+            "stwux\t%2,%0,%1\n"
+            "stw\t%2,4(%0)\n"
+            "stw\t%2,8(%0)\n"
+            "stw\t%2,12(%0)\n"
+            : "+b"(block)
+            : "r"(line_size), "r"(word)
+        );
+    } while (--h);
 }
 
 static void fill_block8_gekko(uint8_t *block, uint8_t value, int line_size, int h)
 {
-	uint32_t word = value;
-	word |= (word << 8);
-	word |= (word << 16);
-	
-	block -= line_size;
-	
-	do {
-		__asm__ volatile (
-			"stwux	%2,%0,%1\n"
-			"stw	%2,4(%0)\n"
-			: "+b"(block)
-			: "r"(line_size), "r"(word)
-		);
-	} while (--h);
+    uint32_t word = value;
+    word |= (word << 8);
+    word |= (word << 16);
+
+    block -= line_size;
+
+    do {
+        __asm__ volatile (
+            "stwux\t%2,%0,%1\n"
+            "stw\t%2,4(%0)\n"
+            : "+b"(block)
+            : "r"(line_size), "r"(word)
+        );
+    } while (--h);
 }
 #endif /* GEKKO */
 

@@ -25,7 +25,7 @@
 
 int ff_flac_parse_picture(AVFormatContext *s, uint8_t *buf, int buf_size)
 {
-	return 0;
+    return 0;
 #if 0
     const CodecMime *mime = ff_id3v2_mime_tags;
     enum CodecID id = CODEC_ID_NONE;

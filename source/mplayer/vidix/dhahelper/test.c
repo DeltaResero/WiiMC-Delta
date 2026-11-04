@@ -41,41 +41,41 @@ int main(int argc, char *argv[])
 
     printf("api version: %d\n", ret);
     if (ret != API_VERSION)
-	printf("incompatible api!\n");
+        printf("incompatible api!\n");
 
     {
- 	dhahelper_memory_t mem;
+        dhahelper_memory_t mem;
 
-	mem.operation = MEMORY_OP_MAP;
-	//mem.start = 0xe0000000;
-	mem.start = 0xe4000008;
- 	mem.offset = 0;
- 	mem.size = 0x4000;
-	mem.ret = 0;
+        mem.operation = MEMORY_OP_MAP;
+        //mem.start = 0xe0000000;
+        mem.start = 0xe4000008;
+        mem.offset = 0;
+        mem.size = 0x4000;
+        mem.ret = 0;
 
-	ret = ioctl(fd, DHAHELPER_MEMORY, &mem);
+        ret = ioctl(fd, DHAHELPER_MEMORY, &mem);
 
-	printf("ret: %s\n", strerror(errno));
+        printf("ret: %s\n", strerror(errno));
 
-	mem.ret = (int)mmap(NULL, (size_t)mem.size, PROT_READ, MAP_SHARED, fd, (off_t)0);
-	printf("allocated to %x\n", mem.ret);
+        mem.ret = (int)mmap(NULL, (size_t)mem.size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+        printf("allocated to %x\n", mem.ret);
 
-	if (argc > 1)
-	    if (mem.ret != 0)
-	    {
- 		int i;
+        if (argc > 1)
+            if (mem.ret != 0)
+            {
+                int i;
 
-		for (i = 0; i < 256; i++)
-		    printf("[%x] ", *(int *)(mem.ret+i));
-		printf("\n");
-	    }
+                for (i = 0; i < 256; i++)
+                    printf("[%x] ", *(int *)(mem.ret+i));
+                printf("\n");
+            }
 
-	munmap((void *)mem.ret, mem.size);
+        munmap((void *)mem.ret, mem.size);
 
-	mem.operation = MEMORY_OP_UNMAP;
-	mem.start = mem.ret;
+        mem.operation = MEMORY_OP_UNMAP;
+        mem.start = mem.ret;
 
-	ioctl(fd, DHAHELPER_MEMORY, &mem);
+        ioctl(fd, DHAHELPER_MEMORY, &mem);
     }
 
     return 0;

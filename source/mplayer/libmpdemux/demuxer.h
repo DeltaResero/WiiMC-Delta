@@ -139,7 +139,7 @@ typedef struct {
   int eof;                 // end of demuxed stream? (true if all buffer empty)
   off_t pos;                 // position in the input stream (file)
   off_t dpos;                // position in the demuxed stream
-  int pack_no;		   // serial number of packet
+  int pack_no;             // serial number of packet
   int flags;               // flags of current packet (keyframe etc)
   int non_interleaved;     // 1 if this stream is not properly interleaved,
                            // so e.g. subtitle handling must do explicit reads.

@@ -39,7 +39,7 @@
 #include "mp_msg.h"
 #include "video_out.h"
 #include "video_out_internal.h"
-#include "mp_core.h"			/* for exit_player() */
+#include "mp_core.h"            /* for exit_player() */
 #include "help_mp.h"
 
 /* ------------------------------------------------------------------------- */
@@ -66,10 +66,10 @@
 
 static const vo_info_t info=
 {
-	"PPM/PGM/PGMYUV file",
-	"pnm",
-	"Ivo van Poorten (ivop@euronet.nl)",
-	""
+    "PPM/PGM/PGMYUV file",
+    "pnm",
+    "Ivo van Poorten (ivop@euronet.nl)",
+    ""
 };
 
 const LIBVO_EXTERN (pnm)

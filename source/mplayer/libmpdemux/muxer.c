@@ -40,27 +40,27 @@ muxer_t *muxer_new_muxer(int type,stream_t *stream){
     muxer->stream = stream;
     switch (type) {
       case MUXER_TYPE_MPEG:
-	if(! muxer_init_muxer_mpeg(muxer))
-	  goto fail;
-	break;
+        if(! muxer_init_muxer_mpeg(muxer))
+          goto fail;
+        break;
       case MUXER_TYPE_RAWVIDEO:
         if(! muxer_init_muxer_rawvideo(muxer))
-	  goto fail;
-	break;
+          goto fail;
+        break;
       case MUXER_TYPE_RAWAUDIO:
         if(! muxer_init_muxer_rawaudio(muxer))
-	  goto fail;
+          goto fail;
         break;
 #ifdef CONFIG_FFMPEG
       case MUXER_TYPE_LAVF:
         if(! muxer_init_muxer_lavf(muxer))
-	  goto fail;
+          goto fail;
         break;
 #endif
       case MUXER_TYPE_AVI:
       default:
-	if(! muxer_init_muxer_avi(muxer))
-	  goto fail;
+        if(! muxer_init_muxer_avi(muxer))
+          goto fail;
     }
     return muxer;
 

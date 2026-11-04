@@ -29,7 +29,7 @@
 #include "Func.hpp"
 #include <map>
 
-Func::Func (const std::string & _name, float (*_func_ptr)(float*), int _num_args) : 
+Func::Func (const std::string & _name, float (*_func_ptr)(float*), int _num_args) :
 func_ptr(_func_ptr), name(_name), num_args(_num_args) {}
 
 /* Frees a function type, real complicated... */

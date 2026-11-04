@@ -134,7 +134,7 @@ public:
   std::map<std::string,Param*> user_param_tree; /* user parameter splay tree */
 
 
-  PresetOutputs & pipeline() { return _presetOutputs; } 
+  PresetOutputs & pipeline() { return _presetOutputs; }
 
   void Render(const BeatDetect &music, const PipelineContext &context);
 
@@ -183,14 +183,14 @@ void transfer_q_variables(std::vector<CustomObject*> & customObjects);
 template <class CustomObject>
 void MilkdropPreset::transfer_q_variables(std::vector<CustomObject*> & customObjects)
 {
- 	CustomObject * custom_object;
+        CustomObject * custom_object;
 
-	for (typename std::vector<CustomObject*>::iterator pos = customObjects.begin(); pos != customObjects.end();++pos) {
+        for (typename std::vector<CustomObject*>::iterator pos = customObjects.begin(); pos != customObjects.end();++pos) {
 
-		custom_object = *pos;
-		for (unsigned int i = 0; i < NUM_Q_VARIABLES; i++)
-			custom_object->q[i] = _presetOutputs.q[i];
-	}
+                custom_object = *pos;
+                for (unsigned int i = 0; i < NUM_Q_VARIABLES; i++)
+                        custom_object->q[i] = _presetOutputs.q[i];
+        }
 
 
 }
@@ -203,10 +203,10 @@ CustomObject * MilkdropPreset::find_custom_object(int id, std::vector<CustomObje
 
 
   for (typename std::vector<CustomObject*>::iterator pos = customObjects.begin(); pos != customObjects.end();++pos) {
-	if ((*pos)->id == id) {
-		custom_object = *pos;
-		break;
-	}
+        if ((*pos)->id == id) {
+                custom_object = *pos;
+                break;
+        }
   }
 
   if (custom_object == NULL)

@@ -55,23 +55,23 @@ static uint8_t *uc_mem;
 static uint8_t mclk_save[3];
 static uint8_t hwrev;
 
-#define VIA_OUT(hwregs, reg, val)	*(volatile uint32_t *)((hwregs) + (reg)) = (val)
-#define VIA_IN(hwregs, reg)		*(volatile uint32_t *)((hwregs) + (reg))
-#define VGA_OUT8(hwregs, reg, val)	*(volatile uint8_t *)((hwregs) + (reg) + 0x8000) = (val)
-#define VGA_IN8(hwregs, reg)		*(volatile uint8_t *)((hwregs) + (reg) + 0x8000)
-#define VIDEO_OUT(hwregs, reg, val)	VIA_OUT((hwregs)+0x200, reg, val)
-#define VIDEO_IN(hwregs, reg)		VIA_IN((hwregs)+0x200, reg)
+#define VIA_OUT(hwregs, reg, val)       *(volatile uint32_t *)((hwregs) + (reg)) = (val)
+#define VIA_IN(hwregs, reg)             *(volatile uint32_t *)((hwregs) + (reg))
+#define VGA_OUT8(hwregs, reg, val)      *(volatile uint8_t *)((hwregs) + (reg) + 0x8000) = (val)
+#define VGA_IN8(hwregs, reg)            *(volatile uint8_t *)((hwregs) + (reg) + 0x8000)
+#define VIDEO_OUT(hwregs, reg, val)     VIA_OUT((hwregs)+0x200, reg, val)
+#define VIDEO_IN(hwregs, reg)           VIA_IN((hwregs)+0x200, reg)
 
-#define outb(val,reg)	OUTPORT8(reg,val)
-#define inb(reg)	INPORT8(reg)
+#define outb(val,reg)   OUTPORT8(reg,val)
+#define inb(reg)        INPORT8(reg)
 
 #define ALIGN_TO(v, n) (((v) + (n-1)) & ~(n-1))
 #define UC_MAP_V1_FIFO_CONTROL(depth, pre_thr, thr) \
     (((depth)-1) | ((thr) << 8) | ((pre_thr) << 24))
 
-#define VIDEOMEMORY_SIZE	(8 * 1024 * 1024)
-#define FRAMEBUFFER_SIZE	0x200000
-#define FRAMEBUFFER_START	(VIDEOMEMORY_SIZE - FRAMEBUFFER_SIZE)
+#define VIDEOMEMORY_SIZE        (8 * 1024 * 1024)
+#define FRAMEBUFFER_SIZE        0x200000
+#define FRAMEBUFFER_START       (VIDEOMEMORY_SIZE - FRAMEBUFFER_SIZE)
 
 #ifdef DEBUG_LOGFILE
 static FILE *logfile = 0;
@@ -122,7 +122,7 @@ find_chip (unsigned chip_id)
   for (i = 0; i < sizeof (uc_card_ids) / sizeof (unsigned short); i++)
     {
       if (chip_id == uc_card_ids[i])
-	return i;
+        return i;
     }
   return -1;
 }
@@ -164,26 +164,26 @@ uc_ovl_map_vzoom (uint32_t sh, uint32_t dh, uint32_t * zoom, uint32_t * mini)
       /* Find a suitable divider (1 << d) = {2, 4, 8 or 16} */
       sh1 = sh;
       for (d = 1; d < 5; d++)
-	{
-	  sh1 >>= 1;
-	  if (sh1 <= dh)
-	    break;
-	}
+        {
+          sh1 >>= 1;
+          if (sh1 <= dh)
+            break;
+        }
       if (d == 5) /* too small */
-	{
-	  d = 4;
-	  zoom_ok = 0;
-	}
+        {
+          d = 4;
+          zoom_ok = 0;
+        }
 
-      *mini |= ((d << 1) - 1) << 16;	/* <= {1,3,5,7} << 16 */
+      *mini |= ((d << 1) - 1) << 16;    /* <= {1,3,5,7} << 16 */
 
       /* Add scaling */
       if (sh1 < dh)
-	{
-	  tmp = (sh1 * 0x400) / dh;
-	  *zoom |= ((tmp & 0x3ff) | V1_Y_ZOOM_ENABLE);
-	  *mini |= V1_Y_INTERPOLY | V1_YCBCR_INTERPOLY;
-	}
+        {
+          tmp = (sh1 * 0x400) / dh;
+          *zoom |= ((tmp & 0x3ff) | V1_Y_ZOOM_ENABLE);
+          *mini |= V1_Y_INTERPOLY | V1_YCBCR_INTERPOLY;
+        }
     }
 
   return zoom_ok;
@@ -207,7 +207,7 @@ uc_ovl_map_vzoom (uint32_t sh, uint32_t dh, uint32_t * zoom, uint32_t * mini)
  */
 static int
 uc_ovl_map_hzoom (uint32_t sw, uint32_t dw, uint32_t * zoom, uint32_t * mini,
-		  int *falign, int *dcount)
+                  int *falign, int *dcount)
 {
   uint32_t tmp, sw1, d;
   int md; /* Minify-divider */
@@ -233,16 +233,16 @@ uc_ovl_map_hzoom (uint32_t sw, uint32_t dw, uint32_t * zoom, uint32_t * mini,
       /* Find a suitable divider (1 << d) = {2, 4, 8 or 16} */
       sw1 = sw;
       for (d = 1; d < 5; d++)
-	{
-	  sw1 >>= 1;
-	  if (sw1 <= dw)
-	    break;
-	}
+        {
+          sw1 >>= 1;
+          if (sw1 <= dw)
+            break;
+        }
       if (d == 5) /* too small */
-	{
-	  d = 4;
-	  zoom_ok = 0;
-	}
+        {
+          d = 4;
+          zoom_ok = 0;
+        }
 
       md = 1 << d; /* <= {2,4,8,16} */
       *falign = ((md << 1) - 1) & 0xf; /* <= {3,7,15,15} */
@@ -251,12 +251,12 @@ uc_ovl_map_hzoom (uint32_t sw, uint32_t dw, uint32_t * zoom, uint32_t * mini,
 
       /* Add scaling */
       if (sw1 < dw)
-	{
-	  /* CLE bug */
-	  /* tmp = sw1*0x0800 / dw; */
-	  tmp = (sw1 - 2) * 0x0800 / dw;
-	  *zoom |= ((tmp & 0x7ff) << 16) | V1_X_ZOOM_ENABLE;
-	}
+        {
+          /* CLE bug */
+          /* tmp = sw1*0x0800 / dw; */
+          tmp = (sw1 - 2) * 0x0800 / dw;
+          *zoom |= ((tmp & 0x7ff) << 16) | V1_X_ZOOM_ENABLE;
+        }
     }
 
   *dcount = sw - md;
@@ -355,8 +355,8 @@ uc_ovl_map_format (uint32_t format)
  */
 static void
 uc_ovl_map_v1_control (uint32_t format, int sw,
-		       int hwrev, int extfifo_on,
-		       uint32_t * control, uint32_t * fifo)
+                       int hwrev, int extfifo_on,
+                       uint32_t * control, uint32_t * fifo)
 {
   *control = V1_BOB_ENABLE | uc_ovl_map_format (format);
 
@@ -367,43 +367,43 @@ uc_ovl_map_v1_control (uint32_t format, int sw,
   else
     {
       if (extfifo_on)
-	{
-	  *control |= V1_EXPIRE_NUM_A | V1_FIFO_EXTENDED;
-	}
+        {
+          *control |= V1_EXPIRE_NUM_A | V1_FIFO_EXTENDED;
+        }
       else
-	{
-	  *control |= V1_EXPIRE_NUM;
-	}
+        {
+          *control |= V1_EXPIRE_NUM;
+        }
     }
 
   if ((format == IMGFMT_YV12) || (format == IMGFMT_I420))
     {
       /* Minified video will be skewed without this workaround. */
       if (sw <= 80) /* Fetch count <= 5 */
-	{
-	  *fifo = UC_MAP_V1_FIFO_CONTROL (16, 0, 0);
-	}
+        {
+          *fifo = UC_MAP_V1_FIFO_CONTROL (16, 0, 0);
+        }
       else
-	{
-	  if (hwrev == 0x10)
-	    *fifo = UC_MAP_V1_FIFO_CONTROL (64, 56, 56);
-	  else
-	    *fifo = UC_MAP_V1_FIFO_CONTROL (16, 12, 8);
-	}
+        {
+          if (hwrev == 0x10)
+            *fifo = UC_MAP_V1_FIFO_CONTROL (64, 56, 56);
+          else
+            *fifo = UC_MAP_V1_FIFO_CONTROL (16, 12, 8);
+        }
     }
   else
     {
       if (hwrev == 0x10)
-	{
-	  *fifo = UC_MAP_V1_FIFO_CONTROL (64, 56, 56); /* Default rev 0x10 */
-	}
+        {
+          *fifo = UC_MAP_V1_FIFO_CONTROL (64, 56, 56); /* Default rev 0x10 */
+        }
       else
-	{
-	  if (extfifo_on)
-	    *fifo = UC_MAP_V1_FIFO_CONTROL (48, 40, 40);
-	  else
-	    *fifo = UC_MAP_V1_FIFO_CONTROL (32, 29, 16); /* Default */
-	}
+        {
+          if (extfifo_on)
+            *fifo = UC_MAP_V1_FIFO_CONTROL (48, 40, 40);
+          else
+            *fifo = UC_MAP_V1_FIFO_CONTROL (32, 29, 16); /* Default */
+        }
     }
 }
 
@@ -442,7 +442,7 @@ static void
 uc_ovl_vcmd_wait (volatile uint8_t * vio)
 {
   while ((VIDEO_IN (vio, V_COMPOSE_MODE)
-	  & (V1_COMMAND_FIRE | V3_COMMAND_FIRE)));
+          & (V1_COMMAND_FIRE | V3_COMMAND_FIRE)));
 }
 
 /**
@@ -465,35 +465,35 @@ unichrome_probe (int verbose, int force)
   if (err)
     {
       printf ("[unichrome] Error occurred during pci scan: %s\n",
-	      strerror (err));
+              strerror (err));
       return err;
     }
   else
     {
       err = ENXIO;
       for (i = 0; i < num_pci; i++)
-	{
-	  if (lst[i].vendor == VENDOR_VIA2)
-	    {
-	      int idx;
-	      const char *dname;
-	      idx = find_chip (lst[i].device);
-	      if (idx == -1)
-		continue;
-	      dname = pci_device_name (VENDOR_VIA2, lst[i].device);
-	      dname = dname ? dname : "Unknown chip";
-	      printf ("[unichrome] Found chip: %s\n", dname);
-	      if ((lst[i].command & PCI_COMMAND_IO) == 0)
-		{
-		  printf ("[unichrome] Device is disabled, ignoring\n");
-		  continue;
-		}
-	      uc_cap.device_id = lst[i].device;
-	      err = 0;
-	      memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
-	      break;
-	    }
-	}
+        {
+          if (lst[i].vendor == VENDOR_VIA2)
+            {
+              int idx;
+              const char *dname;
+              idx = find_chip (lst[i].device);
+              if (idx == -1)
+                continue;
+              dname = pci_device_name (VENDOR_VIA2, lst[i].device);
+              dname = dname ? dname : "Unknown chip";
+              printf ("[unichrome] Found chip: %s\n", dname);
+              if ((lst[i].command & PCI_COMMAND_IO) == 0)
+                {
+                  printf ("[unichrome] Device is disabled, ignoring\n");
+                  continue;
+                }
+              uc_cap.device_id = lst[i].device;
+              err = 0;
+              memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
+              break;
+            }
+        }
     }
 
   if (err && verbose)
@@ -670,16 +670,16 @@ unichrome_set_gkey (const vidix_grkey_t * grkey)
       /* Set colorkey (how do I detect BPP in hardware ??) */
       unsigned long ckey;
       if (1) /* Assume 16-bit graphics */
-	{
-	  ckey = (grkey->ckey.blue & 0x1f)
-	    | ((grkey->ckey.green & 0x3f) << 5)
-	    | ((grkey->ckey.red & 0x1f) << 11);
-	}
+        {
+          ckey = (grkey->ckey.blue & 0x1f)
+            | ((grkey->ckey.green & 0x3f) << 5)
+            | ((grkey->ckey.red & 0x1f) << 11);
+        }
       else
-	{
-	  ckey = (grkey->ckey.blue)
-	    | (grkey->ckey.green << 8) | (grkey->ckey.red << 16);
-	}
+        {
+          ckey = (grkey->ckey.blue)
+            | (grkey->ckey.green << 8) | (grkey->ckey.red << 16);
+        }
       VIDEO_OUT (vio, V_COLOR_KEY, ckey);
       dwCompose |= SELECT_VIDEO_IF_COLOR_KEY;
     }
@@ -770,7 +770,7 @@ unichrome_config_playback (vidix_playback_t * info)
 
   /* Get image format, FIFO size, etc. */
   uc_ovl_map_v1_control (info->fourcc, src_w, hwrev, extfifo_on,
-			 &v_ctrl, &fifo_ctrl);
+                         &v_ctrl, &fifo_ctrl);
 
   /* Setup layer window */
   win_start = (info->dest.x << 16) | info->dest.y;
@@ -849,12 +849,12 @@ unichrome_config_playback (vidix_playback_t * info)
   if (v_ctrl & V1_COLORSPACE_SIGN)
     {
       if (hwrev >= 0x10)
-	{
-	  VIDEO_OUT (vio, V1_ColorSpaceReg_2, ColorSpaceValue_2_3123C0);
-	  VIDEO_OUT (vio, V1_ColorSpaceReg_1, ColorSpaceValue_1_3123C0);
-	}
+        {
+          VIDEO_OUT (vio, V1_ColorSpaceReg_2, ColorSpaceValue_2_3123C0);
+          VIDEO_OUT (vio, V1_ColorSpaceReg_1, ColorSpaceValue_1_3123C0);
+        }
       else
-	{
+        {
       VIDEO_OUT (vio, V1_ColorSpaceReg_2, ColorSpaceValue_2);
       VIDEO_OUT (vio, V1_ColorSpaceReg_1, ColorSpaceValue_1);
     }
@@ -895,7 +895,7 @@ unichrome_playback_on (void)
 
   /* Execute the changes */
   VIDEO_OUT (vio, V_COMPOSE_MODE,
-	     VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
+             VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
 
   return 0;
 }
@@ -920,7 +920,7 @@ unichrome_playback_off (void)
 
   /* Execute the changes */
   VIDEO_OUT (vio, V_COMPOSE_MODE,
-	     VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
+             VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
 
   return 0;
 }
@@ -949,7 +949,7 @@ unichrome_frame_select (unsigned int frame)
 
   /* Execute the changes */
   VIDEO_OUT (vio, V_COMPOSE_MODE,
-	     VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
+             VIDEO_IN (vio, V_COMPOSE_MODE) | V1_COMMAND_FIRE);
 
   return 0;
 }

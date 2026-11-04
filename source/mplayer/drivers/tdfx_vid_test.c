@@ -34,11 +34,11 @@
 
 static void print_tdfd_vid_cfg(tdfx_vid_config_t* cfg) {
      printf("tdfx_vid version %d\n"
-	    "  Ram: %d\n"
-	    "  Screen: %d x %d\n",
-	    cfg->version,
-	    cfg->ram_size,
-	    cfg->screen_width, cfg->screen_height);
+            "  Ram: %d\n"
+            "  Screen: %d x %d\n",
+            cfg->version,
+            cfg->ram_size,
+            cfg->screen_width, cfg->screen_height);
 }
 
 
@@ -67,7 +67,7 @@ int main(void) {
   print_tdfd_vid_cfg(&cfg);
 
   mem = mmap( NULL, 640*480*2, PROT_READ | PROT_WRITE, MAP_SHARED,
-	      fd, 0);
+              fd, 0);
 
   if(mem == MAP_FAILED) {
     printf("Memmap failed !!!!!\n");

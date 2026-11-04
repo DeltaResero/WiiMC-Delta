@@ -144,41 +144,41 @@ inline std::auto_ptr<Preset> PresetIterator::allocate() {
 
 inline void PresetChooser::nextPreset(PresetIterator & presetPos) {
 
-		if (this->empty()) {
-			return;
-		}
+        if (this->empty()) {
+            return;
+        }
 
-		// Case: idle preset currently running, selected first preset of chooser
-		else if (presetPos == this->end())
-			presetPos = this->begin();
-		else
-			++(presetPos);
+        // Case: idle preset currently running, selected first preset of chooser
+        else if (presetPos == this->end())
+            presetPos = this->begin();
+        else
+            ++(presetPos);
 
-		// Case: already at last preset, loop to beginning
-		if (((presetPos) == this->end())) {
-			presetPos = this->begin();
-		}
+        // Case: already at last preset, loop to beginning
+        if (((presetPos) == this->end())) {
+            presetPos = this->begin();
+        }
 
 }
 
 
 inline void PresetChooser::previousPreset(PresetIterator & presetPos) {
-		if (this->empty())
-			return;
+        if (this->empty())
+            return;
 
-		// Case: idle preset currently running, selected last preset of chooser
-		else if (presetPos == this->end()) {
-			--(presetPos);
-		}
+        // Case: idle preset currently running, selected last preset of chooser
+        else if (presetPos == this->end()) {
+            --(presetPos);
+        }
 
-		else if (presetPos != this->begin()) {
-			--(presetPos);
-		}
+        else if (presetPos != this->begin()) {
+            --(presetPos);
+        }
 
-		else {
-		   presetPos = this->end();
-		   --(presetPos);
-		}
+        else {
+           presetPos = this->end();
+           --(presetPos);
+        }
 }
 
 inline PresetIterator PresetChooser::begin() {
@@ -201,19 +201,19 @@ inline PresetIterator PresetChooser::end() const {
 
 
 inline bool PresetChooser::empty() const {
-	return _presetLoader->size() == 0;
+    return _presetLoader->size() == 0;
 }
 
 inline std::auto_ptr<Preset> PresetChooser::directoryIndex(std::size_t index) const {
 
-	return _presetLoader->loadPreset(index);
+    return _presetLoader->loadPreset(index);
 }
 
 
 inline PresetChooser::iterator PresetChooser::weightedRandom() const {
-	std::size_t index = RandomNumberGenerators::weightedRandom
-		(_presetLoader->getPresetRatings(), _presetLoader->getPresetRatingsSum());
-	return begin(index);
+    std::size_t index = RandomNumberGenerators::weightedRandom
+        (_presetLoader->getPresetRatings(), _presetLoader->getPresetRatingsSum());
+    return begin(index);
 }
 
 #endif

@@ -106,7 +106,7 @@ static int read_header(AVFormatContext *s)
     int64_t h1offset, pos, toffset;
     uint32_t size, asize, start = 0;
     AVStream *st;
-	int ret = AVERROR_EOF;
+    int ret = AVERROR_EOF;
     int loop = 0;
     int bfstm = !strcmp("bfstm", s->iformat->name);
 
@@ -217,7 +217,7 @@ static int read_header(AVFormatContext *s)
         return AVERROR_INVALIDDATA;
 
     avio_skip(s->pb, 1); // padding
-	st->codec->sample_rate = bfstm ? read32(s) : read16(s);
+    st->codec->sample_rate = bfstm ? read32(s) : read16(s);
     if (st->codec->sample_rate <= 0)
         return AVERROR_INVALIDDATA;
 
@@ -301,7 +301,7 @@ static int read_header(AVFormatContext *s)
     }
     //avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
 
-	avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
+    avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
 
     while (!url_feof(s->pb)) {
         chunk = avio_rl32(s->pb);
@@ -354,9 +354,9 @@ static int read_header(AVFormatContext *s)
                 ret = AVERROR_INVALIDDATA;
                 goto fail;
             }
-			avio_skip(s->pb, start - avio_tell(s->pb));
+            avio_skip(s->pb, start - avio_tell(s->pb));
 
-			if (bfstm && (codec == CODEC_ID_ADPCM_THP ||
+            if (bfstm && (codec == CODEC_ID_ADPCM_THP ||
                           codec == CODEC_ID_ADPCM_THP_LE))
                 avio_skip(s->pb, 24);
 
@@ -455,8 +455,8 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
     pkt->stream_index = 0;
 
-	if (ret != size)
-		ret = AVERROR(EIO);
+    if (ret != size)
+        ret = AVERROR(EIO);
 
     return ret;
 }

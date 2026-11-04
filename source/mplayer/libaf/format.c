@@ -83,11 +83,11 @@ int af_fmt2bits(int format)
 #if 0
     switch(format & AF_FORMAT_BITS_MASK)
     {
-	case AF_FORMAT_8BIT: return 8;
-	case AF_FORMAT_16BIT: return 16;
-	case AF_FORMAT_24BIT: return 24;
-	case AF_FORMAT_32BIT: return 32;
-	case AF_FORMAT_48BIT: return 48;
+        case AF_FORMAT_8BIT: return 8;
+        case AF_FORMAT_16BIT: return 16;
+        case AF_FORMAT_24BIT: return 24;
+        case AF_FORMAT_32BIT: return 32;
+        case AF_FORMAT_48BIT: return 48;
     }
 #endif
     return -1;
@@ -142,9 +142,9 @@ char* af_fmt2str(int format, char* str, int size)
     else{
       // Sign
       if(AF_FORMAT_US == (format & AF_FORMAT_SIGN_MASK))
-	i+=snprintf(&str[i],size-i,"unsigned ");
+        i+=snprintf(&str[i],size-i,"unsigned ");
       else
-	i+=snprintf(&str[i],size-i,"signed ");
+        i+=snprintf(&str[i],size-i,"signed ");
 
       i+=snprintf(&str[i],size-i,"int ");
     }
@@ -203,8 +203,8 @@ const char *af_fmt2str_short(int format)
     int i;
 
     for (i = 0; af_fmtstr_table[i].name; i++)
-	if (af_fmtstr_table[i].format == format)
-	    return af_fmtstr_table[i].name;
+        if (af_fmtstr_table[i].format == format)
+            return af_fmtstr_table[i].name;
 
     return "??";
 }
@@ -214,8 +214,8 @@ int af_str2fmt_short(const char* str)
     int i;
 
     for (i = 0; af_fmtstr_table[i].name; i++)
-	if (!strcasecmp(str, af_fmtstr_table[i].name))
-	    return af_fmtstr_table[i].format;
+        if (!strcasecmp(str, af_fmtstr_table[i].name))
+            return af_fmtstr_table[i].format;
 
     return -1;
 }

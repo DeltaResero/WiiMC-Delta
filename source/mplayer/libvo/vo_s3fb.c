@@ -141,7 +141,7 @@ static int enable(void)
           writecrtc(0x39, 0xa5);
           writecrtc(0x53, 0x08);
           return 1;
-	}
+        }
       }
       iopl(0);
     }

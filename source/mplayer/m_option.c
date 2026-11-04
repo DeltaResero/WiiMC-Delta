@@ -48,7 +48,7 @@ const m_option_t* m_option_list_find(const m_option_t* list,const char* name) {
     if((list[i].type->flags & M_OPT_TYPE_ALLOW_WILDCARD) &&
        (l > 0) && (list[i].name[l] == '*')) {
       if(strncasecmp(list[i].name,name,l) == 0)
-	return &list[i];
+        return &list[i];
     } else if(strcasecmp(list[i].name,name) == 0)
       return &list[i];
   }
@@ -96,29 +96,29 @@ static char* dup_printf(const char *fmt, ...) {
 static int parse_flag(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
   if (src == M_CONFIG_FILE) {
     if(!param) return M_OPT_MISSING_PARAM;
-    if (!strcasecmp(param, "yes") ||	/* any other language? */
-	!strcasecmp(param, "on") ||
-	!strcasecmp(param, "ja") ||
-	!strcasecmp(param, "si") ||
-	!strcasecmp(param, "igen") ||
-	!strcasecmp(param, "y") ||
-	!strcasecmp(param, "j") ||
-	!strcasecmp(param, "i") ||
-	!strcasecmp(param, "tak") ||
-	!strcasecmp(param, "ja") ||
-	!strcasecmp(param, "true") ||
-	!strcmp(param, "1")) {
+    if (!strcasecmp(param, "yes") ||    /* any other language? */
+        !strcasecmp(param, "on") ||
+        !strcasecmp(param, "ja") ||
+        !strcasecmp(param, "si") ||
+        !strcasecmp(param, "igen") ||
+        !strcasecmp(param, "y") ||
+        !strcasecmp(param, "j") ||
+        !strcasecmp(param, "i") ||
+        !strcasecmp(param, "tak") ||
+        !strcasecmp(param, "ja") ||
+        !strcasecmp(param, "true") ||
+        !strcmp(param, "1")) {
       if(dst) VAL(dst) = opt->max;
     } else if (!strcasecmp(param, "no") ||
-	       !strcasecmp(param, "off") ||
-	       !strcasecmp(param, "nein") ||
-	       !strcasecmp(param, "nicht") ||
-	       !strcasecmp(param, "nem") ||
-	       !strcasecmp(param, "n") ||
-	       !strcasecmp(param, "nie") ||
-	       !strcasecmp(param, "nej") ||
-	       !strcasecmp(param, "false") ||
-	       !strcmp(param, "0")) {
+               !strcasecmp(param, "off") ||
+               !strcasecmp(param, "nein") ||
+               !strcasecmp(param, "nicht") ||
+               !strcasecmp(param, "nem") ||
+               !strcasecmp(param, "n") ||
+               !strcasecmp(param, "nie") ||
+               !strcasecmp(param, "nej") ||
+               !strcasecmp(param, "false") ||
+               !strcmp(param, "0")) {
       if(dst) VAL(dst) = opt->min;
     } else {
       mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Invalid parameter for %s flag: %s\n",name, param);
@@ -255,7 +255,7 @@ static int parse_double(const m_option_t* opt,const char *name, const char *para
 
   if (*endptr) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "The %s option must be a floating point "
-	   "number or a ratio (numerator[:/]denominator): %s\n",name, param);
+           "number or a ratio (numerator[:/]denominator): %s\n",name, param);
     return M_OPT_INVALID;
   }
 
@@ -332,7 +332,7 @@ static int parse_position(const m_option_t* opt,const char *name, const char *pa
   if (param == NULL)
     return M_OPT_MISSING_PARAM;
   if (sscanf(param, sizeof(off_t) == sizeof(int) ?
-	     "%d%c" : "%"PRId64"%c", &tmp_off, &dummy) != 1) {
+             "%d%c" : "%"PRId64"%c", &tmp_off, &dummy) != 1) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "The %s option must be an integer: %s\n",opt->name,param);
     return M_OPT_INVALID;
   }
@@ -340,16 +340,16 @@ static int parse_position(const m_option_t* opt,const char *name, const char *pa
   if (opt->flags & M_OPT_MIN)
     if (tmp_off < opt->min) {
       mp_msg(MSGT_CFGPARSER, MSGL_ERR,
-	      "The %s option must be >= %"PRId64": %s\n",
-	     name, (int64_t) opt->min, param);
+              "The %s option must be >= %"PRId64": %s\n",
+             name, (int64_t) opt->min, param);
       return M_OPT_OUT_OF_RANGE;
     }
 
   if (opt->flags & M_OPT_MAX)
     if (tmp_off > opt->max) {
       mp_msg(MSGT_CFGPARSER, MSGL_ERR,
-	      "The %s option must be <= %"PRId64": %s\n",
-	     name, (int64_t) opt->max, param);
+              "The %s option must be <= %"PRId64": %s\n",
+             name, (int64_t) opt->max, param);
       return M_OPT_OUT_OF_RANGE;
     }
 
@@ -389,13 +389,13 @@ static int parse_str(const m_option_t* opt,const char *name, const char *param, 
 
   if ((opt->flags & M_OPT_MIN) && (strlen(param) < opt->min)) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Parameter must be >= %d chars: %s\n",
-	   (int) opt->min, param);
+           (int) opt->min, param);
     return M_OPT_OUT_OF_RANGE;
   }
 
   if ((opt->flags & M_OPT_MAX) && (strlen(param) > opt->max)) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Parameter must be <= %d chars: %s\n",
-	   (int) opt->max, param);
+           (int) opt->max, param);
     return M_OPT_OUT_OF_RANGE;
   }
 
@@ -1021,29 +1021,29 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
       }
 
       switch(sscanf_ret)
-	{
-	case 1:
-	  subparam[0] = 0;
-	case 2:
-	  for(i = 0 ; subopts[i].name ; i++) {
-	    if(!strcmp(subopts[i].name,subopt)) break;
-	  }
-	  if(!subopts[i].name) {
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
-	    return M_OPT_UNKNOWN;
-	  }
-	  r = m_option_parse(&subopts[i],subopt,
-			     subparam[0] == 0 ? NULL : subparam,NULL,src);
-	  if(r < 0) return r;
-	  if(dst) {
-	    lst = realloc(lst,2 * (nr+2) * sizeof(char*));
-	    lst[2*nr] = strdup(subopt);
-	    lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
-	    memset(&lst[2*(nr+1)],0,2*sizeof(char*));
-	    nr++;
-	  }
-	  break;
-	}
+        {
+        case 1:
+          subparam[0] = 0;
+        case 2:
+          for(i = 0 ; subopts[i].name ; i++) {
+            if(!strcmp(subopts[i].name,subopt)) break;
+          }
+          if(!subopts[i].name) {
+            mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
+            return M_OPT_UNKNOWN;
+          }
+          r = m_option_parse(&subopts[i],subopt,
+                             subparam[0] == 0 ? NULL : subparam,NULL,src);
+          if(r < 0) return r;
+          if(dst) {
+            lst = realloc(lst,2 * (nr+2) * sizeof(char*));
+            lst[2*nr] = strdup(subopt);
+            lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
+            memset(&lst[2*(nr+1)],0,2*sizeof(char*));
+            nr++;
+          }
+          break;
+        }
     }
 
   free(subparam);
@@ -1425,7 +1425,7 @@ static int find_obj_desc(const char* name,const m_obj_list_t* l,const m_struct_t
 }
 
 static int get_obj_param(const char* opt_name,const char* obj_name, const m_struct_t* desc,
-			 char* str,int* nold,int oldmax,char** dst) {
+                         char* str,int* nold,int oldmax,char** dst) {
   char* eq;
   const m_option_t* opt;
   int r;
@@ -1458,7 +1458,7 @@ static int get_obj_param(const char* opt_name,const char* obj_name, const m_stru
   } else {
     if((*nold) >= oldmax) {
       mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: %s has only %d params, so you can't give more than %d unnamed params.\n",
-	     opt_name,obj_name,oldmax,oldmax);
+             opt_name,obj_name,oldmax,oldmax);
       return M_OPT_OUT_OF_RANGE;
     }
     opt = &desc->fields[(*nold)];
@@ -1478,7 +1478,7 @@ static int get_obj_param(const char* opt_name,const char* obj_name, const m_stru
 }
 
 static int get_obj_params(const char* opt_name, const char* name,char* params,
-			  const m_struct_t* desc,char separator, char*** _ret) {
+                          const m_struct_t* desc,char separator, char*** _ret) {
   int n = 0,nold = 0, nopts,r;
   char* ptr,*last_ptr = params;
   char** ret;
@@ -1494,18 +1494,18 @@ static int get_obj_params(const char* opt_name, const char* name,char* params,
       const m_option_t* opt = &desc->fields[n];
       if(opt->type->flags & M_OPT_TYPE_HAS_CHILD) continue;
       if(opt->flags & M_OPT_MIN)
-	sprintf(min,"%-8.0f",opt->min);
+        sprintf(min,"%-8.0f",opt->min);
       else
-	strcpy(min,"No");
+        strcpy(min,"No");
       if(opt->flags & M_OPT_MAX)
-	sprintf(max,"%-8.0f",opt->max);
+        sprintf(max,"%-8.0f",opt->max);
       else
-	strcpy(max,"No");
+        strcpy(max,"No");
       printf(" %-20.20s %-15.15s %-10.10s %-10.10s\n",
-	     opt->name,
-	     opt->type->name,
-	     min,
-	     max);
+             opt->name,
+             opt->type->name,
+             min,
+             max);
     }
     printf("\n");
     return M_OPT_EXIT - 1;
@@ -1575,7 +1575,7 @@ static int get_obj_params(const char* opt_name, const char* name,char* params,
 }
 
 static int parse_obj_params(const m_option_t* opt,const char *name,
-			    const char *param, void* dst, int src) {
+                            const char *param, void* dst, int src) {
   char** opts;
   int r;
   m_obj_params_t* p = opt->priv;
@@ -1638,7 +1638,7 @@ const m_obj_params_t m_span_params_def = {
 };
 
 static int parse_obj_settings(const char* opt,char* str,const m_obj_list_t* list,
-			      m_obj_settings_t **_ret, int ret_n) {
+                              m_obj_settings_t **_ret, int ret_n) {
   int r;
   char *param,**plist = NULL;
   const m_struct_t* desc;
@@ -1672,7 +1672,7 @@ static int parse_obj_settings(const char* opt,char* str,const m_obj_list_t* list
     } else if(desc) {
       r = get_obj_params(opt,str,param,desc,':',_ret ? &plist : NULL);
       if(r < 0)
-	return r;
+        return r;
     }
   }
   if(!_ret)
@@ -1692,7 +1692,7 @@ static int obj_settings_list_del(const char *opt_name,const char *param,void* ds
   int r,i,idx_max = 0;
   char* rem_id = "_removed_marker_";
   const m_option_t list_opt = {opt_name , NULL, CONF_TYPE_STRING_LIST,
-			   0, 0, 0, NULL };
+                           0, 0, 0, NULL };
   m_obj_settings_t* obj_list = dst ? VAL(dst) : NULL;
 
   if(dst && !obj_list) {
@@ -1763,7 +1763,7 @@ static void free_obj_settings_list(void* dst) {
 }
 
 static int parse_obj_settings_list(const m_option_t* opt,const char *name,
-				   const char *param, void* dst, int src) {
+                                   const char *param, void* dst, int src) {
   int n = 0,r,len = strlen(opt->name);
   char *str;
   char *ptr, *last_ptr;
@@ -1789,16 +1789,16 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
       strncpy(prefix,opt->name,len-1);
       prefix[len-1] = '\0';
       mp_msg(MSGT_VFILTER,MSGL_ERR, "Option %s: unknown postfix %s\n"
-	     "Supported postfixes are:\n"
-	     "  %s-add\n"
-	     " Append the given list to the current list\n\n"
-	     "  %s-pre\n"
-	     " Prepend the given list to the current list\n\n"
-	     "  %s-del x,y,...\n"
-	     " Remove the given elements. Take the list element index (starting from 0).\n"
-	     " Negative index can be used (i.e. -1 is the last element)\n\n"
-	     "  %s-clr\n"
-	     " Clear the current list.\n",name,n,prefix,prefix,prefix,prefix);
+             "Supported postfixes are:\n"
+             "  %s-add\n"
+             " Append the given list to the current list\n\n"
+             "  %s-pre\n"
+             " Prepend the given list to the current list\n\n"
+             "  %s-del x,y,...\n"
+             " Remove the given elements. Take the list element index (starting from 0).\n"
+             " Negative index can be used (i.e. -1 is the last element)\n\n"
+             "  %s-clr\n"
+             " Clear the current list.\n",name,n,prefix,prefix,prefix,prefix);
 
       return M_OPT_UNKNOWN;
     }
@@ -1838,8 +1838,8 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_FILTERS\n");
     for(n = 0 ; ol->list[n] ; n++)
       mp_msg(MSGT_VFILTER,MSGL_INFO,"  %-15s: %s\n",
-	     M_ST_MB(char*,ol->list[n],ol->name_off),
-	     M_ST_MB(char*,ol->list[n],ol->info_off));
+             M_ST_MB(char*,ol->list[n],ol->name_off),
+             M_ST_MB(char*,ol->list[n],ol->info_off));
     mp_msg(MSGT_VFILTER,MSGL_INFO,"\n");
     return M_OPT_EXIT - 1;
   }
@@ -1852,8 +1852,8 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
     if(!ptr) {
       r = parse_obj_settings(name,last_ptr,opt->priv,dst ? &res : NULL,n);
       if(r < 0) {
-	free(str);
-	return r;
+        free(str);
+        return r;
       }
       n++;
       break;
@@ -1879,7 +1879,7 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
     if(queue) {
       int qsize;
       for(qsize = 0 ; queue[qsize].name ; qsize++)
-	/* NOP */;
+        /* NOP */;
       res = realloc(res,(qsize+n+1)*sizeof(m_obj_settings_t));
       memcpy(&res[n],queue,(qsize+1)*sizeof(m_obj_settings_t));
       n += qsize;
@@ -1888,7 +1888,7 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
     if(head) {
       int hsize;
       for(hsize = 0 ; head[hsize].name ; hsize++)
-	/* NOP */;
+        /* NOP */;
       head = realloc(head,(hsize+n+1)*sizeof(m_obj_settings_t));
       memcpy(&head[hsize],res,(n+1)*sizeof(m_obj_settings_t));
       free(res);
@@ -1943,7 +1943,7 @@ const m_option_type_t m_option_type_obj_settings_list = {
 
 
 static int parse_obj_presets(const m_option_t* opt,const char *name,
-			    const char *param, void* dst, int src) {
+                            const char *param, void* dst, int src) {
   m_obj_presets_t* obj_p = (m_obj_presets_t*)opt->priv;
   m_struct_t *in_desc,*out_desc;
   int s,i;
@@ -1966,7 +1966,7 @@ static int parse_obj_presets(const m_option_t* opt,const char *name,
   if(!strcmp(param,"help")) {
     mp_msg(MSGT_CFGPARSER, MSGL_INFO, "Available presets for %s->%s:",out_desc->name,name);
     for(pre = obj_p->presets;(pre_name = M_ST_MB(char*,pre,obj_p->name_off)) ;
-	pre +=  s)
+        pre +=  s)
       mp_msg(MSGT_CFGPARSER, MSGL_ERR, " %s",pre_name);
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "\n");
     return M_OPT_EXIT - 1;
@@ -1978,9 +1978,9 @@ static int parse_obj_presets(const m_option_t* opt,const char *name,
   }
   if(!pre_name) {
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: There is no preset named %s\n"
-	   "Available presets are:",name,param);
+           "Available presets are:",name,param);
     for(pre = obj_p->presets;(pre_name = M_ST_MB(char*,pre,obj_p->name_off)) ;
-	pre +=  s)
+        pre +=  s)
       mp_msg(MSGT_CFGPARSER, MSGL_ERR, " %s",pre_name);
     mp_msg(MSGT_CFGPARSER, MSGL_ERR, "\n");
     return M_OPT_INVALID;
@@ -1990,7 +1990,7 @@ static int parse_obj_presets(const m_option_t* opt,const char *name,
 
   for(i = 0 ; in_desc->fields[i].name ; i++) {
     const m_option_t* out_opt = m_option_list_find(out_desc->fields,
-					     in_desc->fields[i].name);
+                                             in_desc->fields[i].name);
     if(!out_opt) {
       mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unable to find the target option for field %s.\nPlease report this to the developers.\n",name,in_desc->fields[i].name);
       return M_OPT_PARSER_ERR;
@@ -2015,7 +2015,7 @@ const m_option_type_t m_option_type_obj_presets = {
 };
 
 static int parse_custom_url(const m_option_t* opt,const char *name,
-			    const char *url, void* dst, int src) {
+                            const char *url, void* dst, int src) {
   int pos1, pos2, r, v6addr = 0;
   char *ptr1=NULL, *ptr2=NULL, *ptr3=NULL, *ptr4=NULL;
   m_struct_t* desc = opt->priv;
@@ -2073,36 +2073,36 @@ static int parse_custom_url(const m_option_t* opt,const char *name,
     } else {
       ptr3 = strstr(ptr1, ":");
       if( ptr3!=NULL && ptr3<ptr2 ) {
-	// We also have a password
-	if(!m_option_list_find(desc->fields,"password")) {
-	  mp_msg(MSGT_CFGPARSER, MSGL_WARN, "Option %s: This URL doesn't have a password part.\n",name);
-	  // skip
-	} else { // Username and password
-	  if(dst) {
-	    ptr3[0] = '\0';
-	    r = m_struct_set(desc,dst,"username",ptr1);
-	    ptr3[0] = ':';
-	    if(r < 0) {
-	      mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting username.\n",name);
-	      return r;
-	    }
-	    ptr2[0] = '\0';
-	    r = m_struct_set(desc,dst,"password",ptr3+1);
-	    ptr2[0] = '@';
-	    if(r < 0) {
-	      mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting password.\n",name);
-	      return r;
-	    }
-	  }
-	}
+        // We also have a password
+        if(!m_option_list_find(desc->fields,"password")) {
+          mp_msg(MSGT_CFGPARSER, MSGL_WARN, "Option %s: This URL doesn't have a password part.\n",name);
+          // skip
+        } else { // Username and password
+          if(dst) {
+            ptr3[0] = '\0';
+            r = m_struct_set(desc,dst,"username",ptr1);
+            ptr3[0] = ':';
+            if(r < 0) {
+              mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting username.\n",name);
+              return r;
+            }
+            ptr2[0] = '\0';
+            r = m_struct_set(desc,dst,"password",ptr3+1);
+            ptr2[0] = '@';
+            if(r < 0) {
+              mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting password.\n",name);
+              return r;
+            }
+          }
+        }
       } else { // User name only
-	ptr2[0] = '\0';
-	r = m_struct_set(desc,dst,"username",ptr1);
-	ptr2[0] = '@';
-	if(r < 0) {
-	  mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting username.\n",name);
-	  return r;
-	}
+        ptr2[0] = '\0';
+        r = m_struct_set(desc,dst,"username",ptr1);
+        ptr2[0] = '@';
+        if(r < 0) {
+          mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting username.\n",name);
+          return r;
+        }
       }
     }
     ptr1 = ptr2+1;
@@ -2149,14 +2149,14 @@ static int parse_custom_url(const m_option_t* opt,const char *name,
       // skip
     } else {
       if(dst) {
-	int p = atoi(ptr2+1);
-	char tmp[100];
-	snprintf(tmp,99,"%d",p);
-	r = m_struct_set(desc,dst,"port",tmp);
-	if(r < 0) {
-	  mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting port.\n",name);
-	  return r;
-	}
+        int p = atoi(ptr2+1);
+        char tmp[100];
+        snprintf(tmp,99,"%d",p);
+        r = m_struct_set(desc,dst,"port",tmp);
+        if(r < 0) {
+          mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting port.\n",name);
+          return r;
+        }
       }
     }
     pos2 = ptr2-url;
@@ -2173,8 +2173,8 @@ static int parse_custom_url(const m_option_t* opt,const char *name,
       tmp[pos2-pos1] = '\0';
       r = m_struct_set(desc,dst,"hostname",tmp);
       if(r < 0) {
-	mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting hostname.\n",name);
-	return r;
+        mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting hostname.\n",name);
+        return r;
       }
     }
   }
@@ -2186,24 +2186,24 @@ static int parse_custom_url(const m_option_t* opt,const char *name,
     if( strlen(ptr2)>1 ) {
       // copy the path/filename in the URL container
       if(!m_option_list_find(desc->fields,"filename")) {
-	mp_msg(MSGT_CFGPARSER, MSGL_WARN, "Option %s: This URL doesn't have a hostname part.\n",name);
-	// skip
+        mp_msg(MSGT_CFGPARSER, MSGL_WARN, "Option %s: This URL doesn't have a hostname part.\n",name);
+        // skip
       } else {
-	if(dst) {
-	  int l = strlen(ptr2+1) + 1;
-	  char* fname = ptr2+1;
-	  if(l > 1) {
-	    fname = malloc(l);
-	    url_unescape_string(fname,ptr2+1);
-	  }
-	  r = m_struct_set(desc,dst,"filename",fname);
-	  if(fname != ptr2+1)
-	    free(fname);
-	  if(r < 0) {
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting filename.\n",name);
-	    return r;
-	  }
-	}
+        if(dst) {
+          int l = strlen(ptr2+1) + 1;
+          char* fname = ptr2+1;
+          if(l > 1) {
+            fname = malloc(l);
+            url_unescape_string(fname,ptr2+1);
+          }
+          r = m_struct_set(desc,dst,"filename",fname);
+          if(fname != ptr2+1)
+            free(fname);
+          if(r < 0) {
+            mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting filename.\n",name);
+            return r;
+          }
+        }
       }
     }
   }

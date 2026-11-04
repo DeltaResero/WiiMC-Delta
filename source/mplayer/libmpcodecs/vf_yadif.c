@@ -378,7 +378,7 @@ static void filter(struct vf_priv_s *p, uint8_t *dst[3], int dst_stride[3], int 
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+    unsigned int flags, unsigned int outfmt){
         int i, j;
 
         for(i=0; i<3; i++){
@@ -391,7 +391,7 @@ static int config(struct vf_instance *vf,
                 vf->priv->ref[j][i]= (uint8_t *)malloc(w*h*sizeof(uint8_t))+3*w;
         }
 
-	return vf_next_config(vf,width,height,d_width,d_height,flags,outfmt);
+    return vf_next_config(vf,width,height,d_width,d_height,flags,outfmt);
 }
 
 static int continue_buffered_image(struct vf_instance *vf);
@@ -469,12 +469,12 @@ static void uninit(struct vf_instance *vf){
 //===========================================================================//
 static int query_format(struct vf_instance *vf, unsigned int fmt){
     switch(fmt){
-	case IMGFMT_YV12:
-	case IMGFMT_I420:
-	case IMGFMT_IYUV:
-	case IMGFMT_Y800:
-	case IMGFMT_Y8:
-	    return vf_next_query_format(vf,fmt);
+    case IMGFMT_YV12:
+    case IMGFMT_I420:
+    case IMGFMT_IYUV:
+    case IMGFMT_Y800:
+    case IMGFMT_Y8:
+        return vf_next_query_format(vf,fmt);
     }
     return 0;
 }

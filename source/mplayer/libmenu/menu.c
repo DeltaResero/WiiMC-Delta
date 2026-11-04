@@ -192,8 +192,8 @@ static int menu_parse_config(char* buffer) {
     // Try to find this menu type in our list
     for(i = 0, minfo = NULL ; menu_info_list[i] ; i++) {
       if(strcasecmp(element,menu_info_list[i]->name) == 0) {
-	minfo = menu_info_list[i];
-	break;
+        minfo = menu_info_list[i];
+        break;
       }
     }
     // Got it : add this to our list
@@ -205,10 +205,10 @@ static int menu_parse_config(char* buffer) {
       menu_list[menu_count].args = body;
       // Setup the attribs
       for(i = 0 ; attribs[2*i] ; i++) {
-	if(strcasecmp(attribs[2*i],"name") == 0) continue;
-	if(!m_struct_set(&minfo->priv_st,menu_list[menu_count].cfg,attribs[2*i], attribs[2*i+1]))
-	  mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_BadAttrib,attribs[2*i],attribs[2*i+1],
-		 name,parser->line);
+        if(strcasecmp(attribs[2*i],"name") == 0) continue;
+        if(!m_struct_set(&minfo->priv_st,menu_list[menu_count].cfg,attribs[2*i], attribs[2*i+1]))
+          mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_BadAttrib,attribs[2*i],attribs[2*i+1],
+                 name,parser->line);
       }
       menu_count++;
       memset(&menu_list[menu_count],0,sizeof(menu_def_t));
@@ -247,10 +247,10 @@ int menu_init(struct MPContext *mpctx, char* cfg_file) {
     int r;
     if(bl - br < BUF_MIN) {
       if(bl >= BUF_MAX) {
-	mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_ConfigFileIsTooBig,BUF_MAX/1024);
-	close(fd);
-	free(buffer);
-	return 0;
+        mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_ConfigFileIsTooBig,BUF_MAX/1024);
+        close(fd);
+        free(buffer);
+        return 0;
       }
       bl += BUF_STEP;
       buffer = realloc(buffer,bl);
@@ -412,7 +412,7 @@ static inline draw_alpha_f get_draw_alpha(uint32_t fmt) {
 static inline int get_height(int c,int h){
     int font;
     if ((font=vo_font->font[c])>=0)
-	if(h<vo_font->pic_a[font]->h) h=vo_font->pic_a[font]->h;
+        if(h<vo_font->pic_a[font]->h) h=vo_font->pic_a[font]->h;
     return h;
 }
 
@@ -484,19 +484,19 @@ void menu_draw_text(mp_image_t* mpi,char* txt, int x, int y) {
     int c=utf8_get_char((const char**)&txt);
     if ((font=vo_font->font[c])>=0 && (x + vo_font->width[c] <= mpi->w) && (y + vo_font->pic_a[font]->h <= mpi->h))
       draw_alpha(vo_font->width[c], vo_font->pic_a[font]->h,
-		 vo_font->pic_b[font]->bmp+vo_font->start[c],
-		 vo_font->pic_a[font]->bmp+vo_font->start[c],
-		 vo_font->pic_a[font]->w,
-		 mpi->planes[0] + y * mpi->stride[0] + x * (mpi->bpp>>3),
-		 mpi->stride[0]);
+                 vo_font->pic_b[font]->bmp+vo_font->start[c],
+                 vo_font->pic_a[font]->bmp+vo_font->start[c],
+                 vo_font->pic_a[font]->w,
+                 mpi->planes[0] + y * mpi->stride[0] + x * (mpi->bpp>>3),
+                 mpi->stride[0]);
     x+=vo_font->width[c]+vo_font->charspace;
   }
 
 }
 
 void menu_draw_text_full(mp_image_t* mpi,char* txt,
-			 int x, int y,int w, int h,
-			 int vspace, int warp, int align, int anchor) {
+                         int x, int y,int w, int h,
+                         int vspace, int warp, int align, int anchor) {
   int need_w,need_h;
   int sy, ymin, ymax;
   int sx, xmin, xmax, xmid, xrmin;
@@ -608,42 +608,42 @@ void menu_draw_text_full(mp_image_t* mpi,char* txt,
     if(align & (MENU_TEXT_HCENTER|MENU_TEXT_RIGHT)) {
       // Too long line
       if(ll > xmax-xmin) {
-	if(align & MENU_TEXT_HCENTER) {
-	  int mid = ll/2;
-	  // Find the middle point
-	  for(n--, ll = 0 ; n <= 0 ; n--) {
-	    ll += vo_font->width[(int)txt[n]]+vo_font->charspace;
-	    if(ll - vo_font->charspace > mid) break;
-	  }
-	  ll -= vo_font->charspace;
-	  sx = xmid + mid - ll;
-	} else// MENU_TEXT_RIGHT)
-	  sx = xmax + vo_font->charspace;
+        if(align & MENU_TEXT_HCENTER) {
+          int mid = ll/2;
+          // Find the middle point
+          for(n--, ll = 0 ; n <= 0 ; n--) {
+            ll += vo_font->width[(int)txt[n]]+vo_font->charspace;
+            if(ll - vo_font->charspace > mid) break;
+          }
+          ll -= vo_font->charspace;
+          sx = xmid + mid - ll;
+        } else// MENU_TEXT_RIGHT)
+          sx = xmax + vo_font->charspace;
 
-	// We are after the start point -> go back
-	if(sx > xmin) {
-	  for(n-- ; n <= 0 ; n--) {
-	    unsigned char c = txt[n];
-	    if(sx - vo_font->width[c] - vo_font->charspace < xmin) break;
-	    sx -= vo_font->width[c]+vo_font->charspace;
-	  }
-	} else { // We are before the start point -> go forward
-	  for( ; sx < xmin && (&txt[n]) != line_end ; n++) {
-	    unsigned char c = txt[n];
-	    sx += vo_font->width[c]+vo_font->charspace;
-	  }
-	}
-	txt = &txt[n]; // Jump to the new start char
+        // We are after the start point -> go back
+        if(sx > xmin) {
+          for(n-- ; n <= 0 ; n--) {
+            unsigned char c = txt[n];
+            if(sx - vo_font->width[c] - vo_font->charspace < xmin) break;
+            sx -= vo_font->width[c]+vo_font->charspace;
+          }
+        } else { // We are before the start point -> go forward
+          for( ; sx < xmin && (&txt[n]) != line_end ; n++) {
+            unsigned char c = txt[n];
+            sx += vo_font->width[c]+vo_font->charspace;
+          }
+        }
+        txt = &txt[n]; // Jump to the new start char
       } else {
-	if(align & MENU_TEXT_HCENTER)
-	  sx = xmid - ll/2;
-	else
-	  sx = xmax - 1 - ll;
+        if(align & MENU_TEXT_HCENTER)
+          sx = xmid - ll/2;
+        else
+          sx = xmax - 1 - ll;
       }
     } else {
       for(sx = xrmin ;  sx < xmin && txt != line_end ; txt++) {
-	unsigned char c = txt[n];
-	sx += vo_font->width[c]+vo_font->charspace;
+        unsigned char c = txt[n];
+        sx += vo_font->width[c]+vo_font->charspace;
       }
     }
 
@@ -651,18 +651,18 @@ void menu_draw_text_full(mp_image_t* mpi,char* txt,
       int c=utf8_get_char((const char**)&txt);
       font = vo_font->font[c];
       if(font >= 0) {
- 	int cs = (vo_font->pic_a[font]->h - vo_font->height) / 2;
-	if ((sx + vo_font->width[c] <= xmax) && (sy + vo_font->height <= ymax) )
-	  draw_alpha(vo_font->width[c], vo_font->height,
-		     vo_font->pic_b[font]->bmp+vo_font->start[c] +
-		     cs * vo_font->pic_a[font]->w,
-		     vo_font->pic_a[font]->bmp+vo_font->start[c] +
-		     cs * vo_font->pic_a[font]->w,
-		     vo_font->pic_a[font]->w,
-		     mpi->planes[0] + sy * mpi->stride[0] + sx * (mpi->bpp>>3),
-		     mpi->stride[0]);
-	//	else
-	//printf("Can't draw '%c'\n",c);
+        int cs = (vo_font->pic_a[font]->h - vo_font->height) / 2;
+        if ((sx + vo_font->width[c] <= xmax) && (sy + vo_font->height <= ymax) )
+          draw_alpha(vo_font->width[c], vo_font->height,
+                     vo_font->pic_b[font]->bmp+vo_font->start[c] +
+                     cs * vo_font->pic_a[font]->w,
+                     vo_font->pic_a[font]->bmp+vo_font->start[c] +
+                     cs * vo_font->pic_a[font]->w,
+                     vo_font->pic_a[font]->w,
+                     mpi->planes[0] + sy * mpi->stride[0] + sx * (mpi->bpp>>3),
+                     mpi->stride[0]);
+        //      else
+        //printf("Can't draw '%c'\n",c);
       }
       sx+=vo_font->width[c]+vo_font->charspace;
     }
@@ -693,7 +693,7 @@ void menu_text_size(char* txt,int max_width, int vspace, int warp, int* _w, int*
       i -= vo_font->charspace;
       if (i > w) w = i;
       if(*txt)
-	l++;
+        l++;
       i = 0;
       if(c == '\n') continue;
     }

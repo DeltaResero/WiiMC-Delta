@@ -112,11 +112,11 @@ static int read_header(AVFormatContext *s)
     int64_t h1offset, pos, toffset;
     uint32_t size, asize, start = 0;
     AVStream *st;
-	int ret = AVERROR_EOF;
+    int ret = AVERROR_EOF;
     int loop = 0;
     int bfstm = !strcmp("bfstm", s->iformat->name);
-	
-	citra = 0;
+
+    citra = 0;
 
     st = avformat_new_stream(s, NULL);
     if (!st)
@@ -133,12 +133,12 @@ static int read_header(AVFormatContext *s)
 
     if (bom == 0xFFFE)
         b->little_endian = 1;
-	
-	if(b->little_endian == 1) {
-		b->little_endian = 0;
-		citra = 1; //also Switch
-		//now what...
-	}
+
+    if(b->little_endian == 1) {
+        b->little_endian = 0;
+        citra = 1; //also Switch
+        //now what...
+    }
 
     if (!bfstm) {
         major = avio_r8(s->pb);
@@ -208,20 +208,20 @@ static int read_header(AVFormatContext *s)
     if (toffset > size)
         return AVERROR_INVALIDDATA;
 
-	
+
     avio_skip(s->pb, pos + h1offset + 8 - avio_tell(s->pb));
-	
-	//mine
-	//valSTM = avio_rb32(s->pb);
-	//avio_skip(s->pb, pos + h1offset + 8 - avio_tell(s->pb));
-	
+
+    //mine
+    //valSTM = avio_rb32(s->pb);
+    //avio_skip(s->pb, pos + h1offset + 8 - avio_tell(s->pb));
+
     codec = avio_r8(s->pb);
-	
-	//hack for pcm16
-	if(codec == 1 && citra == 1) {
-		b->little_endian = 1;
-		citra = 0;
-	}
+
+    //hack for pcm16
+    if(codec == 1 && citra == 1) {
+        b->little_endian = 1;
+        citra = 0;
+    }
 
     switch (codec) {
     case 0: codec = CODEC_ID_PCM_S8;    break;
@@ -239,34 +239,34 @@ static int read_header(AVFormatContext *s)
     loop = avio_r8(s->pb); // loop flag
     st->codec->codec_id = codec;
     st->codec->channels = avio_r8(s->pb);
-	
-	if(st->codec->channels == 1)
-		useMono = 1;
-	else
-		useMono = 0;
-	
+
+    if(st->codec->channels == 1)
+        useMono = 1;
+    else
+        useMono = 0;
+
     if (!st->codec->channels)
         return AVERROR_INVALIDDATA;
 
     avio_skip(s->pb, 1); // padding
-	st->codec->sample_rate = bfstm ? read32(s) : read16(s);
+    st->codec->sample_rate = bfstm ? read32(s) : read16(s);
     if (st->codec->sample_rate <= 0)
         return AVERROR_INVALIDDATA;
 
-	//valSTM = avio_rb32(s->pb);
-	//valSTM = st->codec->sample_rate;
-	
+    //valSTM = avio_rb32(s->pb);
+    //valSTM = st->codec->sample_rate;
+
     if (!bfstm)
         avio_skip(s->pb, 2); // padding
 
     if (loop) {
-		loop_st_point = read32(s);
+        loop_st_point = read32(s);
         if (av_dict_set_int(&s->metadata, "loop_start",
                             av_rescale(loop_st_point, AV_TIME_BASE,
                                        st->codec->sample_rate),
                             0) < 0)
             return AVERROR(ENOMEM);
-		loop_st_point /= st->codec->sample_rate;
+        loop_st_point /= st->codec->sample_rate;
     } else {
         avio_skip(s->pb, 4);
     }
@@ -321,12 +321,12 @@ static int read_header(AVFormatContext *s)
         }
 
         avio_skip(s->pb, pos + toffset - avio_tell(s->pb));
-		
-		//valSTM = avio_rb32(s->pb);
-		//avio_skip(s->pb, pos + toffset - avio_tell(s->pb));
 
-		//gal_main_save->starbits = (gal_main_save->starbits>>8) | (gal_main_save->starbits<<8);
-		//16 le this for citra
+        //valSTM = avio_rb32(s->pb);
+        //avio_skip(s->pb, pos + toffset - avio_tell(s->pb));
+
+        //gal_main_save->starbits = (gal_main_save->starbits>>8) | (gal_main_save->starbits<<8);
+        //16 le this for citra
         for (ch = 0; ch < st->codec->channels; ch++) {
             if (avio_read(s->pb, b->table + ch * 32, 32) != 32) {
                 ret = AVERROR_INVALIDDATA;
@@ -335,16 +335,16 @@ static int read_header(AVFormatContext *s)
            // avio_skip(s->pb, 24);
             avio_skip(s->pb, bfstm ? 14 : 24);
         }
-		//swapping the info channel tables fixes LE adpcm playback
-		if(citra == 1) {
-			int i = 0;
-			for (i = 0; i < (32*st->codec->channels); i+=2) {
-				int bk1 = b->table[i+1];
-				int bk2 = b->table[i];
-				b->table[i+1] = bk2;
-				b->table[i]   = bk1;
-			}
-		}
+        //swapping the info channel tables fixes LE adpcm playback
+        if(citra == 1) {
+            int i = 0;
+            for (i = 0; i < (32*st->codec->channels); i+=2) {
+                int bk1 = b->table[i+1];
+                int bk2 = b->table[i];
+                b->table[i+1] = bk2;
+                b->table[i]   = bk1;
+            }
+        }
     }
 
     if (size < (avio_tell(s->pb) - pos)) {
@@ -353,11 +353,11 @@ static int read_header(AVFormatContext *s)
     }
     //avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
 
-	avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
-	
-	//valSTM = avio_rb32(s->pb);
-	//avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
-	//jumps to SEEK
+    avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
+
+    //valSTM = avio_rb32(s->pb);
+    //avio_skip(s->pb, size - (avio_tell(s->pb) - pos));
+    //jumps to SEEK
 
     while (!url_feof(s->pb)) {
         chunk = avio_rl32(s->pb);
@@ -375,8 +375,8 @@ static int read_header(AVFormatContext *s)
                 goto skip;
 
 
-		//	valSTM = b->block_count * st->codec->channels * 4;
-			
+        //  valSTM = b->block_count * st->codec->channels * 4;
+
             asize = b->block_count * st->codec->channels * 4;
             if (size < asize) {
                 ret = AVERROR_INVALIDDATA;
@@ -399,20 +399,20 @@ static int read_header(AVFormatContext *s)
                         b->adpc[i+1] = avio_r8(s->pb);
                         b->adpc[i]   = avio_r8(s->pb);
                     }*/
-					
-					//now I need this for the LE hack
-					if(citra == 1) {
-						int i;
+
+                    //now I need this for the LE hack
+                    if(citra == 1) {
+                        int i;
                         for (i = 0; i < asize; i += 2) {
                             b->adpc[i+1] = avio_r8(s->pb);
                             b->adpc[i]   = avio_r8(s->pb);
                         }
-					} else
-					
-					//Super confused, but adding this fixes the constant pops
-					avio_read(s->pb, b->adpc, asize);
+                    } else
+
+                    //Super confused, but adding this fixes the constant pops
+                    avio_read(s->pb, b->adpc, asize);
                 } else {
-					avio_read(s->pb, b->adpc, asize);
+                    avio_read(s->pb, b->adpc, asize);
                 }
                 avio_skip(s->pb, size - asize);
             }
@@ -425,16 +425,16 @@ static int read_header(AVFormatContext *s)
                 ret = AVERROR_INVALIDDATA;
                 goto fail;
             }
-			avio_skip(s->pb, start - avio_tell(s->pb));
+            avio_skip(s->pb, start - avio_tell(s->pb));
 
-			if (bfstm && (codec == CODEC_ID_ADPCM_THP ||
+            if (bfstm && (codec == CODEC_ID_ADPCM_THP ||
                           codec == CODEC_ID_ADPCM_THP_LE))
                 avio_skip(s->pb, 24);
 
-			//codec = CODEC_ID_ADPCM_THP;
-			//valSTM = avio_rb32(s->pb);
-			//something that I know for certain, both cstm and fstm end up in the same pos
-			//when it's the same data order, so, something else is the problem.
+            //codec = CODEC_ID_ADPCM_THP;
+            //valSTM = avio_rb32(s->pb);
+            //something that I know for certain, both cstm and fstm end up in the same pos
+            //when it's the same data order, so, something else is the problem.
 
             b->data_start = avio_tell(s->pb);
 
@@ -531,8 +531,8 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
     pkt->stream_index = 0;
 
-	if (ret != size)
-		ret = AVERROR(EIO);
+    if (ret != size)
+        ret = AVERROR(EIO);
 
     return ret;
 }

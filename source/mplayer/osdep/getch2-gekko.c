@@ -48,6 +48,6 @@ void getch2(void)
 
 
 char* get_term_charset(void) {
-	return "ASCII";
+    return "ASCII";
 }
 

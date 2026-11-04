@@ -205,7 +205,7 @@ static int rm_write(int s, const char *buf, int len) {
       total += n;
     else if (n < 0) {
 #ifdef GEKKO
-	if (timeout>0 && (n == -EAGAIN)) {
+        if (timeout>0 && (n == -EAGAIN)) {
 #elif !HAVE_WINSOCK2_H
       if (timeout>0 && (errno == EAGAIN || errno == EINPROGRESS)) {
 #else
@@ -243,8 +243,8 @@ static ssize_t rm_read(int fd, void *buf, size_t count) {
 
     ret=recv (fd, ((uint8_t*)buf)+total, count-total, 0);
 
-#ifdef GEKKO   
-	if (ret == -EAGAIN) continue;
+#ifdef GEKKO
+        if (ret == -EAGAIN) continue;
 #endif
 
     if (ret<=0) {
@@ -326,52 +326,52 @@ static int pnm_get_chunk(pnm_t *p,
       *need_response=0;
       ptr=data+PREAMBLE_SIZE;
       if (max < 1)
-	return -1;
+        return -1;
       rm_read (p->s, ptr++, 1);
       max -= 1;
 
       while(1) {
-	/* expecting following chunk format: 0x4f <chunk size> <data...> */
+        /* expecting following chunk format: 0x4f <chunk size> <data...> */
 
         if (max < 2)
           return -1;
         rm_read (p->s, ptr, 2);
         max -= 2;
-	if (*ptr == 'X') /* checking for server message */
-	{
-	  mp_msg(MSGT_OPEN, MSGL_WARN, "input_pnm: got a message from server:\n");
-	  if (max < 1)
-	    return -1;
-	  rm_read (p->s, ptr+2, 1);
-	  max = -1;
-	  n=AV_RB16(ptr+1);
-	  if (max < n)
-	    return -1;
-	  rm_read (p->s, ptr+3, n);
-	  max -= n;
-	  ptr[3+n]=0;
-	  mp_msg(MSGT_OPEN, MSGL_WARN, "%s\n",ptr+3);
-	  return -1;
-	}
+        if (*ptr == 'X') /* checking for server message */
+        {
+          mp_msg(MSGT_OPEN, MSGL_WARN, "input_pnm: got a message from server:\n");
+          if (max < 1)
+            return -1;
+          rm_read (p->s, ptr+2, 1);
+          max = -1;
+          n=AV_RB16(ptr+1);
+          if (max < n)
+            return -1;
+          rm_read (p->s, ptr+3, n);
+          max -= n;
+          ptr[3+n]=0;
+          mp_msg(MSGT_OPEN, MSGL_WARN, "%s\n",ptr+3);
+          return -1;
+        }
 
-	if (*ptr == 'F') /* checking for server error */
-	{
-	  mp_msg(MSGT_OPEN, MSGL_ERR, "input_pnm: server error.\n");
-	  return -1;
-	}
-	if (*ptr == 'i')
-	{
-	  ptr+=2;
-	  *need_response=1;
-	  continue;
-	}
-	if (*ptr != 0x4f) break;
-	n=ptr[1];
-	if (max < n)
-	  return -1;
-	rm_read (p->s, ptr+2, n);
-	max -= n;
-	ptr+=(n+2);
+        if (*ptr == 'F') /* checking for server error */
+        {
+          mp_msg(MSGT_OPEN, MSGL_ERR, "input_pnm: server error.\n");
+          return -1;
+        }
+        if (*ptr == 'i')
+        {
+          ptr+=2;
+          *need_response=1;
+          continue;
+        }
+        if (*ptr != 0x4f) break;
+        n=ptr[1];
+        if (max < n)
+          return -1;
+        rm_read (p->s, ptr+2, n);
+        max -= n;
+        ptr+=(n+2);
       }
       /* the checksum of the next chunk is ignored here */
       if (max < 1)
@@ -823,7 +823,7 @@ static int pnm_read (pnm_t *this, char *data, int len) {
 }
 
 static int pnm_streaming_read( int fd, char *buffer, int size, streaming_ctrl_t *stream_ctrl ) {
-	return pnm_read(stream_ctrl->data, buffer, size);
+        return pnm_read(stream_ctrl->data, buffer, size);
 }
 
 static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
@@ -875,7 +875,7 @@ const stream_info_t stream_info_pnm = {
   "Arpi, xine team",
   "ported from xine",
   open_s,
-  {"pnm", NULL},	//pnm as fallback
+  {"pnm", NULL},        //pnm as fallback
   NULL,
   0 // Urls are an option string
 };

@@ -252,39 +252,39 @@ static int numpad2align(int val)
 }
 
 #define NEXT(str,token) \
-	token = next_token(&str); \
-	if (!token) break;
+    token = next_token(&str); \
+    if (!token) break;
 
 #define ANYVAL(name,func) \
-	} else if (strcasecmp(tname, #name) == 0) { \
-		target->name = func(token); \
-		ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
+    } else if (strcasecmp(tname, #name) == 0) { \
+        target->name = func(token); \
+        ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
 
 #define STRVAL(name) \
-	} else if (strcasecmp(tname, #name) == 0) { \
-		if (target->name != NULL) free(target->name); \
-		target->name = strdup(token); \
-		ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
+    } else if (strcasecmp(tname, #name) == 0) { \
+        if (target->name != NULL) free(target->name); \
+        target->name = strdup(token); \
+        ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
 
 #define COLORVAL(name) \
-	} else if (strcasecmp(tname, #name) == 0) { \
-		target->name = string2color(track->library, token); \
-		ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
+    } else if (strcasecmp(tname, #name) == 0) { \
+        target->name = string2color(track->library, token); \
+        ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
 
 #define INTVAL(name) ANYVAL(name,atoi)
 #define FPVAL(name) ANYVAL(name,ass_atof)
 #define TIMEVAL(name) \
-	} else if (strcasecmp(tname, #name) == 0) { \
-		target->name = string2timecode(track->library, token); \
-		ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
+    } else if (strcasecmp(tname, #name) == 0) { \
+        target->name = string2timecode(track->library, token); \
+        ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
 
 #define STYLEVAL(name) \
-	} else if (strcasecmp(tname, #name) == 0) { \
-		target->name = lookup_style(track, token); \
-		ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
+    } else if (strcasecmp(tname, #name) == 0) { \
+        target->name = lookup_style(track, token); \
+        ass_msg(track->library, MSGL_DBG2, "%s = %s", #name, token);
 
 #define ALIAS(alias,name) \
-	if (strcasecmp(tname, #alias) == 0) {tname = #name;}
+    if (strcasecmp(tname, #alias) == 0) {tname = #name;}
 
 static char *next_token(char **str)
 {
@@ -574,7 +574,7 @@ static int process_styles_line(ASS_Track *track, char *str)
     if (!strncmp(str, "Format:", 7)) {
         char *p = str + 7;
         skip_spaces(&p);
-		free(track->style_format);
+        free(track->style_format);
         track->style_format = strdup(p);
         ass_msg(track->library, MSGL_DBG2, "Style format: %s",
                track->style_format);
@@ -598,7 +598,7 @@ static int process_info_line(ASS_Track *track, char *str)
         track->WrapStyle = atoi(str + 10);
     } else if (!strncmp(str, "ScaledBorderAndShadow:", 22)) {
         track->ScaledBorderAndShadow = parse_bool(str + 22);
-	} else if (!strncmp(str, "CorrectPAR:", 11)) {
+    } else if (!strncmp(str, "CorrectPAR:", 11)) {
         track->CorrectPAR = parse_bool(str + 11);
     } else if (!strncmp(str, "Kerning:", 8)) {
         track->Kerning = parse_bool(str + 8);
@@ -1279,7 +1279,7 @@ ASS_Track *ass_new_track(ASS_Library *library)
     ASS_Track *track = calloc(1, sizeof(ASS_Track));
     track->library = library;
     track->ScaledBorderAndShadow = 0;
-	track->CorrectPAR = 0;
+    track->CorrectPAR = 0;
     track->parser_priv = calloc(1, sizeof(ASS_ParserPriv));
     return track;
 }

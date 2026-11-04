@@ -53,7 +53,7 @@ static void GetRoundedConstants(GTF_constants *c)
     }
 
 void GTF_calcTimings(double X,double Y,double freq, int type,
-		     int want_margins, int want_interlace,struct VesaCRTCInfoBlock *result )
+                     int want_margins, int want_interlace,struct VesaCRTCInfoBlock *result )
 {
     GTF_constants   c;
     double RR, margin_top, margin_bottom, margin_left, margin_right;
@@ -94,9 +94,9 @@ void GTF_calcTimings(double X,double Y,double freq, int type,
     margin_top = margin_bottom = 0;
 
     if (want_margins) {
-	margin_top = margin_bottom = (c.margin_width / 100) * Y;
+        margin_top = margin_bottom = (c.margin_width / 100) * Y;
         margin_left = round(( X* c.margin_width/100)/c.char_cell_granularity) \
-		    * c.char_cell_granularity;
+                    * c.char_cell_granularity;
     margin_right = margin_left;
     DEBUG_PRINTF("margin_left_right : %f\n",margin_right)
     DEBUG_PRINTF("margin_top_bottom : %f\n",margin_top)
@@ -120,8 +120,8 @@ void GTF_calcTimings(double X,double Y,double freq, int type,
     /* FIND BLANKING TIME (TO NEAREST CHAR CELL) [pixels] */
 
     blanking_time = round(total_active_pixels * ideal_duty_cycle \
-		    / (100-ideal_duty_cycle) / (2*c.char_cell_granularity))  \
-		    * (2*c.char_cell_granularity);
+                    / (100-ideal_duty_cycle) / (2*c.char_cell_granularity))  \
+                    * (2*c.char_cell_granularity);
     DEBUG_PRINTF("blanking_time : %f\n",blanking_time )
 
     /* FIND TOTAL NUMBER OF PIXELS IN A LINE [pixels] */
@@ -197,8 +197,8 @@ void GTF_calcTimings(double X,double Y,double freq, int type,
     if (!(type == GTF_PF))
     {
     blanking_time = round(total_active_pixels * ideal_duty_cycle \
-		    / (100-ideal_duty_cycle) / (2*c.char_cell_granularity))  \
-		    * (2*c.char_cell_granularity);
+                    / (100-ideal_duty_cycle) / (2*c.char_cell_granularity))  \
+                    * (2*c.char_cell_granularity);
     DEBUG_PRINTF("blanking_time : %f\n",blanking_time )
     }
     else
@@ -232,22 +232,22 @@ void GTF_calcTimings(double X,double Y,double freq, int type,
     H_total_pixels = total_active_pixels + blanking_time ;
     DEBUG_PRINTF("H_total_pixels: %f\n",H_total_pixels)
         if (type == GTF_VF)
-	{
-	/* FIND PIXEL FREQUENCY [Mhz] */
-	pixel_freq = H_total_pixels / actual_H_period ;
-	DEBUG_PRINTF("pixel_freq: %f\n",pixel_freq)
-	} else if (type == GTF_HF)
-	{
-	/* FIND PIXEL FREQUENCY [Mhz] */
-	pixel_freq = H_total_pixels * freq / 1000 ;
-	DEBUG_PRINTF("pixel_freq: %f\n",pixel_freq)
-	actual_H_period = 1000/freq;
-	}
+        {
+        /* FIND PIXEL FREQUENCY [Mhz] */
+        pixel_freq = H_total_pixels / actual_H_period ;
+        DEBUG_PRINTF("pixel_freq: %f\n",pixel_freq)
+        } else if (type == GTF_HF)
+        {
+        /* FIND PIXEL FREQUENCY [Mhz] */
+        pixel_freq = H_total_pixels * freq / 1000 ;
+        DEBUG_PRINTF("pixel_freq: %f\n",pixel_freq)
+        actual_H_period = 1000/freq;
+        }
 
         /* FIND ACTUAL HORIZONTAL FREQUENCY [KHz] */
 
         H_freq = 1000 / actual_H_period;
-	DEBUG_PRINTF("H_freq %f\n",H_freq)
+        DEBUG_PRINTF("H_freq %f\n",H_freq)
 
 
     }

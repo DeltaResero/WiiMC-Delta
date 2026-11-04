@@ -26,9 +26,9 @@
 #include "help_mp.h"
 
 // mga_vid drawing functions
-static void set_window( void );		/* forward declaration to kill warnings */
+static void set_window( void );         /* forward declaration to kill warnings */
 #ifdef VO_XMGA
-static void mDrawColorKey( void );	/* forward declaration to kill warnings */
+static void mDrawColorKey( void );      /* forward declaration to kill warnings */
 #endif
 
 static int mga_next_frame=0;
@@ -70,14 +70,14 @@ static void draw_osd(void)
 static void
 draw_slice_g200(uint8_t *image[], int stride[], int width,int height,int x,int y)
 {
-	uint32_t bespitch = FFALIGN(mga_vid_config.src_width, 32);
-	int dst_stride[4] = { bespitch, bespitch };
-	uint8_t *dst[4];
+        uint32_t bespitch = FFALIGN(mga_vid_config.src_width, 32);
+        int dst_stride[4] = { bespitch, bespitch };
+        uint8_t *dst[4];
 
-	av_image_fill_pointers(dst, PIX_FMT_NV12, mga_vid_config.src_height,
-	                       vid_data, dst_stride);
+        av_image_fill_pointers(dst, PIX_FMT_NV12, mga_vid_config.src_height,
+                               vid_data, dst_stride);
 
-	sws_scale(sws_ctx, image, stride, y, height, dst, dst_stride);
+        sws_scale(sws_ctx, image, stride, y, height, dst, dst_stride);
 }
 
 static void
@@ -114,18 +114,18 @@ draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
 {
 
 #if 0
-	printf("vo: %p/%d %p/%d %p/%d  %dx%d/%d;%d  \n",
-	    src[0],stride[0],
-	    src[1],stride[1],
-	    src[2],stride[2],
-	    w,h,x,y);
+        printf("vo: %p/%d %p/%d %p/%d  %dx%d/%d;%d  \n",
+            src[0],stride[0],
+            src[1],stride[1],
+            src[2],stride[2],
+            w,h,x,y);
 #endif
 
-	if (mga_vid_config.card_type == MGA_G200)
+        if (mga_vid_config.card_type == MGA_G200)
             draw_slice_g200(src,stride,w,h,x,y);
-	else
+        else
             draw_slice_g400(src,stride,w,h,x,y);
-	return 0;
+        return 0;
 }
 
 static void
@@ -134,9 +134,9 @@ vo_mga_flip_page(void)
 
 //    printf("-- flip to %d --\n",mga_next_frame);
 
-	ioctl(f,MGA_VID_FSEL,&mga_next_frame);
-	mga_next_frame=(mga_next_frame+1)%mga_vid_config.num_frames;
-	vid_data=frames[mga_next_frame];
+        ioctl(f,MGA_VID_FSEL,&mga_next_frame);
+        mga_next_frame=(mga_next_frame+1)%mga_vid_config.num_frames;
+        vid_data=frames[mga_next_frame];
 
 }
 
@@ -159,23 +159,23 @@ static uint32_t get_image(mp_image_t *mpi){
        (mpi->flags&(MP_IMGFLAG_ACCEPT_STRIDE|MP_IMGFLAG_ACCEPT_WIDTH))){
        // we're lucky or codec accepts stride => ok, let's go!
        if(mpi->flags&MP_IMGFLAG_PLANAR){
-	   mpi->planes[0]=vid_data;
-	   if(mpi->flags&MP_IMGFLAG_SWAPPED){
-	       mpi->planes[1]=vid_data + bespitch*mga_vid_config.src_height;
-	       mpi->planes[2]=mpi->planes[1] + bespitch2*mga_vid_config.src_height/2;
-	   } else {
-	       mpi->planes[2]=vid_data + bespitch*mga_vid_config.src_height;
-	       mpi->planes[1]=mpi->planes[2] + bespitch2*mga_vid_config.src_height/2;
-	   }
-	   mpi->width=mpi->stride[0]=bespitch;
-	   mpi->stride[1]=mpi->stride[2]=bespitch2;
+           mpi->planes[0]=vid_data;
+           if(mpi->flags&MP_IMGFLAG_SWAPPED){
+               mpi->planes[1]=vid_data + bespitch*mga_vid_config.src_height;
+               mpi->planes[2]=mpi->planes[1] + bespitch2*mga_vid_config.src_height/2;
+           } else {
+               mpi->planes[2]=vid_data + bespitch*mga_vid_config.src_height;
+               mpi->planes[1]=mpi->planes[2] + bespitch2*mga_vid_config.src_height/2;
+           }
+           mpi->width=mpi->stride[0]=bespitch;
+           mpi->stride[1]=mpi->stride[2]=bespitch2;
        } else {
            mpi->planes[0]=vid_data;
-	   mpi->width=bespitch;
-	   mpi->stride[0]=mpi->width*(mpi->bpp/8);
+           mpi->width=bespitch;
+           mpi->stride[0]=mpi->width*(mpi->bpp/8);
        }
        mpi->flags|=MP_IMGFLAG_DIRECT;
-//	printf("mga: get_image() SUCCESS -> Direct Rendering ENABLED\n");
+//      printf("mga: get_image() SUCCESS -> Direct Rendering ENABLED\n");
        return VO_TRUE;
     }
     return VO_FALSE;
@@ -189,13 +189,13 @@ draw_image(mp_image_t *mpi){
     if(mpi->flags&(MP_IMGFLAG_DIRECT|MP_IMGFLAG_DRAW_CALLBACK)) return VO_TRUE;
 
     if(mpi->flags&MP_IMGFLAG_PLANAR){
-	// copy planar:
+        // copy planar:
         draw_slice(mpi->planes,mpi->stride,mpi->w,mpi->h,mpi->x,mpi->y);
     } else {
-	// copy packed:
-	mem2agpcpy_pic(vid_data, mpi->planes[0],	// dst,src
-		    mpi->w*(mpi->bpp/8), mpi->h,	// w,h
-		    bespitch*2, mpi->stride[0]);	// dstride,sstride
+        // copy packed:
+        mem2agpcpy_pic(vid_data, mpi->planes[0],        // dst,src
+                    mpi->w*(mpi->bpp/8), mpi->h,        // w,h
+                    bespitch*2, mpi->stride[0]);        // dstride,sstride
     }
     return VO_TRUE;
 }
@@ -217,22 +217,22 @@ query_format(uint32_t format)
 #ifndef VO_XMGA
 static void mga_fullscreen(void)
 {
-	uint32_t w,h;
-	if ( !vo_fs ) {
-		vo_fs=VO_TRUE;
-		w=vo_screenwidth; h=vo_screenheight;
-		aspect(&w,&h,A_ZOOM);
-	} else {
-		vo_fs=VO_FALSE;
-		w=vo_dwidth; h=vo_dheight;
-		aspect(&w,&h,A_NOZOOM);
-	}
-	mga_vid_config.dest_width = w;
-	mga_vid_config.dest_height= h;
-	mga_vid_config.x_org=(vo_screenwidth-w)/2;
-	mga_vid_config.y_org=(vo_screenheight-h)/2;
-	if ( ioctl( f,MGA_VID_CONFIG,&mga_vid_config ) )
-		mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_ErrorInConfigIoctl );
+        uint32_t w,h;
+        if ( !vo_fs ) {
+                vo_fs=VO_TRUE;
+                w=vo_screenwidth; h=vo_screenheight;
+                aspect(&w,&h,A_ZOOM);
+        } else {
+                vo_fs=VO_FALSE;
+                w=vo_dwidth; h=vo_dheight;
+                aspect(&w,&h,A_NOZOOM);
+        }
+        mga_vid_config.dest_width = w;
+        mga_vid_config.dest_height= h;
+        mga_vid_config.x_org=(vo_screenwidth-w)/2;
+        mga_vid_config.y_org=(vo_screenheight-h)/2;
+        if ( ioctl( f,MGA_VID_CONFIG,&mga_vid_config ) )
+                mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_ErrorInConfigIoctl );
 }
 #endif
 
@@ -254,9 +254,9 @@ static int control(uint32_t request, void *data)
      if ( strcmp( eq->item,"brightness" ) && strcmp( eq->item,"contrast" ) ) return VO_FALSE;
 
      if (ioctl(f,MGA_VID_GET_LUMA,&prev)) {
-	perror("Error in mga_vid_config ioctl()");
+        perror("Error in mga_vid_config ioctl()");
     mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_CouldNotGetLumaValuesFromTheKernelModule);
-	return VO_FALSE;
+        return VO_FALSE;
      }
 
 //     printf("GET: 0x%4X 0x%4X  \n",(prev>>16),(prev&0xffff));
@@ -271,9 +271,9 @@ static int control(uint32_t request, void *data)
          luma = (prev&0xFFFF)|(value<<16);
 
      if (ioctl(f,MGA_VID_SET_LUMA,luma)) {
-	perror("Error in mga_vid_config ioctl()");
+        perror("Error in mga_vid_config ioctl()");
         mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_CouldNotSetLumaValuesFromTheKernelModule);
-	return VO_FALSE;
+        return VO_FALSE;
      }
 
      return VO_TRUE;
@@ -288,15 +288,15 @@ static int control(uint32_t request, void *data)
      if ( strcmp( eq->item,"brightness" ) && strcmp( eq->item,"contrast" ) ) return VO_FALSE;
 
      if (ioctl(f,MGA_VID_GET_LUMA,&luma)) {
-	perror("Error in mga_vid_config ioctl()");
+        perror("Error in mga_vid_config ioctl()");
         mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_CouldNotGetLumaValuesFromTheKernelModule);
-	return VO_FALSE;
+        return VO_FALSE;
      }
 
      if ( !strcmp( eq->item,"contrast" ) )
-	 val=(luma & 0xFFFF);
+         val=(luma & 0xFFFF);
      else
-	 val=(luma >> 16);
+         val=(luma >> 16);
 
      eq->value = (val*200)/255;
 
@@ -306,9 +306,9 @@ static int control(uint32_t request, void *data)
 #ifndef VO_XMGA
   case VOCTRL_FULLSCREEN:
     if (vo_screenwidth && vo_screenheight)
-	mga_fullscreen();
+        mga_fullscreen();
     else
-	mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_ScreenWidthHeightUnknown);
+        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_ScreenWidthHeightUnknown);
     return VO_TRUE;
   case VOCTRL_GET_PANSCAN:
       if ( !vo_fs ) return VO_FALSE;
@@ -336,9 +336,9 @@ static int control(uint32_t request, void *data)
       if ( vo_fs && ( vo_panscan != vo_panscan_amount ) ) // || ( !vo_fs && vo_panscan_amount ) )
        {
 //        int old_y = vo_panscan_y;
-	panscan_calc();
+        panscan_calc();
 //        if ( old_y != vo_panscan_y )
-	set_window();
+        set_window();
        }
       return VO_TRUE;
   case VOCTRL_UPDATE_SCREENINFO:
@@ -379,79 +379,79 @@ static int mga_init(int width,int height,unsigned int format){
             return -1;
         }
 
-	mga_vid_config.src_width = width;
-	mga_vid_config.src_height= height;
-	if(!mga_vid_config.dest_width)
-	    mga_vid_config.dest_width = width;
-	if(!mga_vid_config.dest_height)
-	    mga_vid_config.dest_height= height;
+        mga_vid_config.src_width = width;
+        mga_vid_config.src_height= height;
+        if(!mga_vid_config.dest_width)
+            mga_vid_config.dest_width = width;
+        if(!mga_vid_config.dest_height)
+            mga_vid_config.dest_height= height;
 
-	mga_vid_config.colkey_on=0;
+        mga_vid_config.colkey_on=0;
 
-	mga_vid_config.num_frames=(vo_directrendering && !vo_doublebuffering)?1:3;
-	mga_vid_config.version=MGA_VID_VERSION;
+        mga_vid_config.num_frames=(vo_directrendering && !vo_doublebuffering)?1:3;
+        mga_vid_config.version=MGA_VID_VERSION;
 
-	if(width > 1024 && height > 1024)
-	{
-		mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_MGA_ResolutionTooHigh);
-		return -1;
-	} else if(height <= 1024)
-	{
-		// try whether we have a G550
-		int ret;
-		if ((ret = ioctl(f,MGA_VID_CONFIG,&mga_vid_config)))
-		{
-			if(mga_vid_config.card_type != MGA_G550)
-			{
-				// we don't have a G550, so our resolution is too high
-				mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_MGA_ResolutionTooHigh);
-				return -1;
-			} else {
-				// there is a deeper problem
-				// we have a G550, but still couldn't configure mga_vid
-				perror("Error in mga_vid_config ioctl()");
-				mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_IncompatibleDriverVersion);
-				return -1;
-			}
-			// if we arrived here, then we could successfully configure mga_vid
-			// at this high resolution
-		}
-	} else {
-		// configure mga_vid in case resolution is < 1024x1024 too
-		if (ioctl(f,MGA_VID_CONFIG,&mga_vid_config))
-		{
-			perror("Error in mga_vid_config ioctl()");
-			mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_IncompatibleDriverVersion);
-			return -1;
-		}
-	}
-	if (mga_vid_config.card_type == MGA_G200) {
-		sws_ctx = sws_getContext(width, height, PIX_FMT_YUV420P,
-		                         width, height, PIX_FMT_NV12,
-		                         SWS_BILINEAR, NULL, NULL, NULL);
-		if (!sws_ctx) {
-			mp_msg(MSGT_VO, MSGL_FATAL,
-			       "Could not get swscale context to scale for G200.\n");
-			return -1;
-		}
-		mp_msg(MSGT_VO, MSGL_WARN, "G200 cards support is untested. "
-		                           "Please report whether it works.\n");
-	}
+        if(width > 1024 && height > 1024)
+        {
+                mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_MGA_ResolutionTooHigh);
+                return -1;
+        } else if(height <= 1024)
+        {
+                // try whether we have a G550
+                int ret;
+                if ((ret = ioctl(f,MGA_VID_CONFIG,&mga_vid_config)))
+                {
+                        if(mga_vid_config.card_type != MGA_G550)
+                        {
+                                // we don't have a G550, so our resolution is too high
+                                mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_MGA_ResolutionTooHigh);
+                                return -1;
+                        } else {
+                                // there is a deeper problem
+                                // we have a G550, but still couldn't configure mga_vid
+                                perror("Error in mga_vid_config ioctl()");
+                                mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_IncompatibleDriverVersion);
+                                return -1;
+                        }
+                        // if we arrived here, then we could successfully configure mga_vid
+                        // at this high resolution
+                }
+        } else {
+                // configure mga_vid in case resolution is < 1024x1024 too
+                if (ioctl(f,MGA_VID_CONFIG,&mga_vid_config))
+                {
+                        perror("Error in mga_vid_config ioctl()");
+                        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_IncompatibleDriverVersion);
+                        return -1;
+                }
+        }
+        if (mga_vid_config.card_type == MGA_G200) {
+                sws_ctx = sws_getContext(width, height, PIX_FMT_YUV420P,
+                                         width, height, PIX_FMT_NV12,
+                                         SWS_BILINEAR, NULL, NULL, NULL);
+                if (!sws_ctx) {
+                        mp_msg(MSGT_VO, MSGL_FATAL,
+                               "Could not get swscale context to scale for G200.\n");
+                        return -1;
+                }
+                mp_msg(MSGT_VO, MSGL_WARN, "G200 cards support is untested. "
+                                           "Please report whether it works.\n");
+        }
 
-	mp_msg(MSGT_VO,MSGL_V,"[MGA] Using %d buffers.\n",mga_vid_config.num_frames);
+        mp_msg(MSGT_VO,MSGL_V,"[MGA] Using %d buffers.\n",mga_vid_config.num_frames);
 
-	frames[0] = mmap(0,mga_vid_config.frame_size*mga_vid_config.num_frames,PROT_WRITE,MAP_SHARED,f,0);
-	frames[1] = frames[0] + 1*mga_vid_config.frame_size;
-	frames[2] = frames[0] + 2*mga_vid_config.frame_size;
-	frames[3] = frames[0] + 3*mga_vid_config.frame_size;
-	mga_next_frame = 0;
-	vid_data = frames[mga_next_frame];
+        frames[0] = mmap(0,mga_vid_config.frame_size*mga_vid_config.num_frames,PROT_WRITE,MAP_SHARED,f,0);
+        frames[1] = frames[0] + 1*mga_vid_config.frame_size;
+        frames[2] = frames[0] + 2*mga_vid_config.frame_size;
+        frames[3] = frames[0] + 3*mga_vid_config.frame_size;
+        mga_next_frame = 0;
+        vid_data = frames[mga_next_frame];
 
-	//clear the buffer
-	memset(frames[0],0x80,mga_vid_config.frame_size*mga_vid_config.num_frames);
+        //clear the buffer
+        memset(frames[0],0x80,mga_vid_config.frame_size*mga_vid_config.num_frames);
 
 #ifndef VO_XMGA
-	ioctl(f,MGA_VID_ON,0);
+        ioctl(f,MGA_VID_ON,0);
 #endif
 
   return 0;
@@ -459,39 +459,39 @@ static int mga_init(int width,int height,unsigned int format){
 
 static int mga_uninit(void){
   if(f>=0){
-	ioctl( f,MGA_VID_OFF,0 );
-	munmap(frames[0],mga_vid_config.frame_size*mga_vid_config.num_frames);
-	close(f);
-	f = -1;
+        ioctl( f,MGA_VID_OFF,0 );
+        munmap(frames[0],mga_vid_config.frame_size*mga_vid_config.num_frames);
+        close(f);
+        f = -1;
   }
   if (sws_ctx) {
-	sws_freeContext(sws_ctx);
+        sws_freeContext(sws_ctx);
   }
   return 0;
 }
 
 static int preinit(const char *vo_subdevice)
 {
-	uint32_t ver;
+        uint32_t ver;
   const char *devname=vo_subdevice?vo_subdevice:"/dev/mga_vid";
 
-	f = open(devname,O_RDWR);
-	if(f == -1)
-	{
-		perror("open");
-		mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_CouldntOpen,devname);
-		return -1;
-	}
+        f = open(devname,O_RDWR);
+        if(f == -1)
+        {
+                perror("open");
+                mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_MGA_CouldntOpen,devname);
+                return -1;
+        }
 
-	// check whether the mga_vid driver has the same
-	// version as we expect
+        // check whether the mga_vid driver has the same
+        // version as we expect
 
-	ioctl(f,MGA_VID_GET_VERSION,&ver);
-	if(MGA_VID_VERSION != ver)
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, MSGTR_LIBVO_MGA_mgavidVersionMismatch, ver, MGA_VID_VERSION);
-		return -1;
-	}
+        ioctl(f,MGA_VID_GET_VERSION,&ver);
+        if(MGA_VID_VERSION != ver)
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, MSGTR_LIBVO_MGA_mgavidVersionMismatch, ver, MGA_VID_VERSION);
+                return -1;
+        }
 
 #ifdef VO_XMGA
   if (!vo_init()) {
@@ -523,52 +523,52 @@ static void set_window( void ){
 
 #ifdef VO_XMGA
 #ifdef CONFIG_XINERAMA
-		 if(XineramaIsActive(mDisplay))
-		 {
-		 	XineramaScreenInfo *screens;
-		 	int num_screens;
-		 	int i;
+                 if(XineramaIsActive(mDisplay))
+                 {
+                        XineramaScreenInfo *screens;
+                        int num_screens;
+                        int i;
 
-		 	screens = XineramaQueryScreens(mDisplay,&num_screens);
+                        screens = XineramaQueryScreens(mDisplay,&num_screens);
 
-		 	/* find the screen we are on */
-		 	i = 0;
-		 	while(i<num_screens &&
-		 	    ((screens[i].x_org < drwcX) ||
-		 	     (screens[i].y_org < drwcY) ||
-		 	     (screens[i].x_org + screens[i].width >= drwcX) ||
-		 	     (screens[i].y_org + screens[i].height >= drwcY)))
-		 	{
-		 		i++;
-		 	}
+                        /* find the screen we are on */
+                        i = 0;
+                        while(i<num_screens &&
+                            ((screens[i].x_org < drwcX) ||
+                             (screens[i].y_org < drwcY) ||
+                             (screens[i].x_org + screens[i].width >= drwcX) ||
+                             (screens[i].y_org + screens[i].height >= drwcY)))
+                        {
+                                i++;
+                        }
 
-			if(i<num_screens)
-			{
-				/* save the screen we are on */
-				xinerama_screen = i;
-			} else {
-				/* oops.. couldnt find the screen we are on
-				 * because the upper left corner left the
-				 * visual range. assume we are still on the
-				 * same screen
-				 */
-				i = xinerama_screen;
-		 	}
+                        if(i<num_screens)
+                        {
+                                /* save the screen we are on */
+                                xinerama_screen = i;
+                        } else {
+                                /* oops.. couldnt find the screen we are on
+                                 * because the upper left corner left the
+                                 * visual range. assume we are still on the
+                                 * same screen
+                                 */
+                                i = xinerama_screen;
+                        }
 
-			if(xinerama_screen == -1)
-			{
-				// The default value of the xinerama_screen is
-				// still there. Which means we could never
-				// figure out on which screen we are.
-				// Choose the first screen as default
-				xinerama_screen = i = 0;
-			}
+                        if(xinerama_screen == -1)
+                        {
+                                // The default value of the xinerama_screen is
+                                // still there. Which means we could never
+                                // figure out on which screen we are.
+                                // Choose the first screen as default
+                                xinerama_screen = i = 0;
+                        }
 
-		 	/* set drwcX and drwcY to the right values */
-		 	drwcX = drwcX - screens[i].x_org;
-		 	drwcY = drwcY - screens[i].y_org;
-		 	XFree(screens);
-		 }
+                        /* set drwcX and drwcY to the right values */
+                        drwcX = drwcX - screens[i].x_org;
+                        drwcY = drwcY - screens[i].y_org;
+                        XFree(screens);
+                 }
 
 #endif
 
@@ -579,5 +579,5 @@ static void set_window( void ){
          mga_vid_config.y_org=drwcY;
          mga_vid_config.dest_width=drwWidth;
          mga_vid_config.dest_height=drwHeight;
-	 if ( ioctl( f,MGA_VID_CONFIG,&mga_vid_config ) ) mp_msg(MSGT_VO,MSGL_WARN,"Error in mga_vid_config ioctl (wrong mga_vid.o version?)" );
+         if ( ioctl( f,MGA_VID_CONFIG,&mga_vid_config ) ) mp_msg(MSGT_VO,MSGL_WARN,"Error in mga_vid_config ioctl (wrong mga_vid.o version?)" );
 }

@@ -84,19 +84,19 @@ faszom:
     mp_debug("%08X: %c%c%c%c\n",(int)ftell(f)-4,xx(id>>24),xx(id>>16),xx(id>>8),xx(id));
     switch(id){
     case FCC('R','I','F','F'):
-	fread(&len,4,1,f); // filesize
-	id=getid(f);  // AVI
-	mp_debug("RIFF header, filesize=0x%X  format=%c%c%c%c\n",len,xx(id>>24),xx(id>>16),xx(id>>8),xx(id));
-	break;
+    fread(&len,4,1,f); // filesize
+    id=getid(f);  // AVI
+    mp_debug("RIFF header, filesize=0x%X  format=%c%c%c%c\n",len,xx(id>>24),xx(id>>16),xx(id>>8),xx(id));
+    break;
     case FCC('L','I','S','T'):
-	fread(&len,4,1,f); // size
-	id=getid(f);  // AVI
-	mp_debug("LIST size=0x%X  format=%c%c%c%c\n",len,xx(id>>24),xx(id>>16),xx(id>>8),xx(id));
-	//case FCC('h','d','r','l'):
-	//case FCC('s','t','r','l'):
-	//case FCC('o','d','m','l'):
-	//case FCC('m','o','v','i'):
-	break;
+    fread(&len,4,1,f); // size
+    id=getid(f);  // AVI
+    mp_debug("LIST size=0x%X  format=%c%c%c%c\n",len,xx(id>>24),xx(id>>16),xx(id>>8),xx(id));
+    //case FCC('h','d','r','l'):
+    //case FCC('s','t','r','l'):
+    //case FCC('o','d','m','l'):
+    //case FCC('m','o','v','i'):
+    break;
     // legal chunk IDs:
     case FCC('a','v','i','h'): // avi header
     case FCC('s','t','r','h'): // stream header
@@ -123,32 +123,32 @@ faszom:
     case FCC('I','A','R','T'): // INFO: artist
     case FCC('I','C','O','P'): // INFO: copyright
     case FCC('I','C','M','T'): // INFO: comment
-	lastgood=ftell(f);
-	if(fixat && fix_flag){
-	    // fix last chunk's size field:
-	    fseek(f,fixat,SEEK_SET);
-	    len=lastgood-fixat-8;
-	    mp_debug("Correct len to 0x%X\n",len);
-	    fwrite(&len,4,1,f);
-	    fseek(f,lastgood,SEEK_SET);
-	    fixat=0;
-	}
-	fread(&len,4,1,f); // size
-	mp_debug("ID ok, chunk len=0x%X\n",len);
-	len+=len&1; // align at 2
-	fseek(f,len,SEEK_CUR); // skip data
-	break;
+    lastgood=ftell(f);
+    if(fixat && fix_flag){
+        // fix last chunk's size field:
+        fseek(f,fixat,SEEK_SET);
+        len=lastgood-fixat-8;
+        mp_debug("Correct len to 0x%X\n",len);
+        fwrite(&len,4,1,f);
+        fseek(f,lastgood,SEEK_SET);
+        fixat=0;
+    }
+    fread(&len,4,1,f); // size
+    mp_debug("ID ok, chunk len=0x%X\n",len);
+    len+=len&1; // align at 2
+    fseek(f,len,SEEK_CUR); // skip data
+    break;
     default:
-	if(!lastgood){
-	    ++offset;
-	    mp_debug("invalid ID, trying %d byte offset\n",offset);
-	    goto faszom; // try again @ next post
-	}
-	mp_debug("invalid ID, parsing next chunk's data at 0x%X\n",lastgood);
-	fseek(f,lastgood,SEEK_SET);
-	fixat=lastgood;
-	lastgood=0;
-	goto again;
+    if(!lastgood){
+        ++offset;
+        mp_debug("invalid ID, trying %d byte offset\n",offset);
+        goto faszom; // try again @ next post
+    }
+    mp_debug("invalid ID, parsing next chunk's data at 0x%X\n",lastgood);
+    fseek(f,lastgood,SEEK_SET);
+    fixat=lastgood;
+    lastgood=0;
+    goto again;
     }
     offset=0;
 }

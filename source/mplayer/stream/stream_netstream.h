@@ -81,7 +81,7 @@ static int net_read(int fd, char* buf, int len) {
   while(len) {
     r = recv(fd,buf,len,0);
     if(r <= 0) {
-#ifdef GEKKO      
+#ifdef GEKKO
       if (r == -EAGAIN) continue;
 #endif
       if(errno == EINTR) continue;
@@ -127,7 +127,7 @@ static mp_net_stream_packet_t* read_packet(int fd) {
     }
 #ifdef GEKKO
     if(!net_read_st(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
-#else    
+#else
     if(!net_read(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
 #endif
 
@@ -144,7 +144,7 @@ static int net_write(int fd, char* buf, int len) {
     if(w <= 0) {
       if(errno == EINTR) continue;
       if(w < 0)
-	mp_msg(MSGT_NETST,MSGL_ERR,"Write failed: %s\n",strerror(errno));
+        mp_msg(MSGT_NETST,MSGL_ERR,"Write failed: %s\n",strerror(errno));
       return 0;
     }
     len -= w;

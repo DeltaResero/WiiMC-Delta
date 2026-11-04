@@ -12,17 +12,17 @@
  *
  * Copyright (C) 2004 Sharif FarsiWeb, Inc.
  * Copyright (C) 2001,2002 Behdad Esfahbod
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -100,11 +100,11 @@ fribidi_char_from_joining_type (
 {
   /* switch left and right if on visual run */
   if (visual & ((FRIBIDI_JOINS_RIGHT (j) && !FRIBIDI_JOINS_LEFT (j)) |
-		(!FRIBIDI_JOINS_RIGHT (j) && FRIBIDI_JOINS_LEFT (j))))
+                (!FRIBIDI_JOINS_RIGHT (j) && FRIBIDI_JOINS_LEFT (j))))
     j ^= FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT;
 
-#   define _FRIBIDI_ADD_TYPE(TYPE,SYMBOL)	\
-	if (FRIBIDI_IS_JOINING_TYPE_##TYPE(j)) return SYMBOL;
+#   define _FRIBIDI_ADD_TYPE(TYPE,SYMBOL)       \
+        if (FRIBIDI_IS_JOINING_TYPE_##TYPE(j)) return SYMBOL;
 #   include "fribidi-joining-types-list.h"
 #   undef _FRIBIDI_ADD_TYPE
 

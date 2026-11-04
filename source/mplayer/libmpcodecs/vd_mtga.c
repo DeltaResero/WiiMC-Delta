@@ -1,7 +1,7 @@
 /*
- * based on:	XreaL's x_r_img_tga.* (http://www.sourceforge.net/projects/xreal/)
- *		libtarga.*
- *		xli's tga.*
+ * based on:    XreaL's x_r_img_tga.* (http://www.sourceforge.net/projects/xreal/)
+ *              libtarga.*
+ *              xli's tga.*
  *
  * Copyright (c) 2002 Tilman Sauerbeck <tsauerbeck@users.sourceforge.net>
  *
@@ -82,9 +82,9 @@ static int control(sh_video_t *sh, int cmd, void *arg, ...)
 {
     switch (cmd)
     {
-	case VDCTRL_QUERY_FORMAT:
-	    if (*((int *) arg) == out_fmt) return CONTROL_TRUE;
-	    return CONTROL_FALSE;
+        case VDCTRL_QUERY_FORMAT:
+            if (*((int *) arg) == out_fmt) return CONTROL_TRUE;
+            return CONTROL_FALSE;
     }
     return CONTROL_UNKNOWN;
 }
@@ -102,7 +102,7 @@ static int init(sh_video_t *sh)
 /* uninit driver */
 static void uninit(sh_video_t *sh)
 {
-    TGAInfo	*info = sh->context;
+    TGAInfo     *info = sh->context;
     free(info);
     return;
 }
@@ -111,41 +111,41 @@ static void uninit(sh_video_t *sh)
 /* decode a runlength-encoded tga */
 static void decode_rle_tga(TGAInfo *info, unsigned char *data, mp_image_t *mpi)
 {
-    int	    row, col, replen, i, num_bytes = info->bpp / 8;
+    int     row, col, replen, i, num_bytes = info->bpp / 8;
     unsigned char   repetitions, packet_header, *final;
 
     /* see line 207 to see why this loop is set up like this */
     for (row = info->start_row; (!info->origin && row) || (info->origin && row < info->height); row += info->increment)
     {
-	final = mpi->planes[0] + mpi->stride[0] * row;
+        final = mpi->planes[0] + mpi->stride[0] * row;
 
-	for (col = 0; col < info->width; col += repetitions)
-	{
-	    packet_header = *data++;
-	    repetitions = (1 + (packet_header & 0x7f));
-	    replen = repetitions * num_bytes;
+        for (col = 0; col < info->width; col += repetitions)
+        {
+            packet_header = *data++;
+            repetitions = (1 + (packet_header & 0x7f));
+            replen = repetitions * num_bytes;
 
-	    if (packet_header & 0x80) /* runlength encoded packet */
-	    {
-		memcpy(final, data, num_bytes);
+            if (packet_header & 0x80) /* runlength encoded packet */
+            {
+                memcpy(final, data, num_bytes);
 
-		// Note: this will be slow when DR to vram!
-		i=num_bytes;
-		while(2*i<=replen){
-		    memcpy(final+i,final,i);
-		    i*=2;
-		}
-		memcpy(final+i,final,replen-i);
-		data += num_bytes;
-	    }
-	    else /* raw packet */
-	    {
-		fast_memcpy(final, data, replen);
-		data += replen;
-	    }
+                // Note: this will be slow when DR to vram!
+                i=num_bytes;
+                while(2*i<=replen){
+                    memcpy(final+i,final,i);
+                    i*=2;
+                }
+                memcpy(final+i,final,replen-i);
+                data += num_bytes;
+            }
+            else /* raw packet */
+            {
+                fast_memcpy(final, data, replen);
+                data += replen;
+            }
 
-	    final += replen;
-	}
+            final += replen;
+        }
     }
 
     return;
@@ -155,14 +155,14 @@ static void decode_rle_tga(TGAInfo *info, unsigned char *data, mp_image_t *mpi)
 static void decode_uncompressed_tga(TGAInfo *info, unsigned char *data, mp_image_t *mpi)
 {
     unsigned char   *final;
-    int	    row, num_bytes = info->bpp / 8;
+    int     row, num_bytes = info->bpp / 8;
 
     /* see line 207 to see why this loop is set up like this */
     for (row = info->start_row; (!info->origin && row) || (info->origin && row < info->height); row += info->increment)
     {
-	final = mpi->planes[0] + mpi->stride[0] * row;
-	fast_memcpy(final, data, info->width * num_bytes);
-	data += info->width * num_bytes;
+        final = mpi->planes[0] + mpi->stride[0] * row;
+        fast_memcpy(final, data, info->width * num_bytes);
+        data += info->width * num_bytes;
     }
 
     return;
@@ -192,30 +192,30 @@ static short read_tga_header(unsigned char *buf, TGAInfo *info)
 /* decode a frame */
 static mp_image_t *decode(sh_video_t *sh, void *raw, int len, int flags)
 {
-    TGAInfo	    *info = sh->context;
+    TGAInfo         *info = sh->context;
     unsigned char   *data = raw;
-    mp_image_t	    *mpi;
+    mp_image_t      *mpi;
 
 
     if (len <= 0)
-	return NULL; /* skip frame */
+        return NULL; /* skip frame */
 
     read_tga_header(data, info); /* read information about the file */
 
     if (info->bpp == 24)
-	out_fmt = IMGFMT_BGR24;
+        out_fmt = IMGFMT_BGR24;
     else if (info->bpp == 32)
-	out_fmt = IMGFMT_BGR32;
+        out_fmt = IMGFMT_BGR32;
     else
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Unsupported TGA type! depth=%d\n",info->bpp);
-	return NULL;
+        mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Unsupported TGA type! depth=%d\n",info->bpp);
+        return NULL;
     }
 
     if (info->img_type != TGA_UNCOMP_TRUECOLOR && info->img_type != TGA_RLE_TRUECOLOR) /* not a true color image */
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Unsupported TGA type: %i!\n", info->img_type);
-	return NULL;
+        mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Unsupported TGA type: %i!\n", info->img_type);
+        return NULL;
     }
 
     /* if img.origin is 0, we decode from bottom to top. if it's 1, we decode from top to bottom */
@@ -228,24 +228,24 @@ static mp_image_t *decode(sh_video_t *sh, void *raw, int len, int flags)
     /* (re)init libvo if image parameters changed (width/height/colorspace) */
     if (last_w != info->width || last_h != info->height || last_c != out_fmt)
     {
-	last_w = info->width;
-	last_h = info->height;
-	last_c = out_fmt;
+        last_w = info->width;
+        last_h = info->height;
+        last_c = out_fmt;
 
-	if (!out_fmt || !mpcodecs_config_vo(sh, info->width, info->height, out_fmt))
-	    return NULL;
+        if (!out_fmt || !mpcodecs_config_vo(sh, info->width, info->height, out_fmt))
+            return NULL;
     }
 
     if (!(mpi = mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE, info->width, info->height)))
-	return NULL;
+        return NULL;
 
     /* finally decode the image */
     if (info->img_type == TGA_UNCOMP_TRUECOLOR)
-	decode_uncompressed_tga(info, data, mpi);
+        decode_uncompressed_tga(info, data, mpi);
     else if (info->img_type == TGA_RLE_TRUECOLOR)
-	decode_rle_tga(info, data, mpi);
+        decode_rle_tga(info, data, mpi);
 //    else
-//	mpi = NULL;
+//      mpi = NULL;
 
     return mpi;
 }

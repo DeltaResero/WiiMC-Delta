@@ -716,7 +716,7 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
    // frame->reordered_opaque = avctx->reordered_opaque;
 
     //ret = avctx->get_buffer2(avctx, frame, flags);
-	ret = 1;
+        ret = 1;
 
     return ret;
 }
@@ -2049,7 +2049,7 @@ int av_get_exact_bits_per_sample(enum CodecID codec_id)
     case CODEC_ID_PCM_ZORK:
         return 8;
     case CODEC_ID_PCM_S16BE:
-	case CODEC_ID_PCM_S16BE_PLANAR:
+        case CODEC_ID_PCM_S16BE_PLANAR:
     case CODEC_ID_PCM_S16LE:
     case CODEC_ID_PCM_S16LE_PLANAR:
     case CODEC_ID_PCM_U16BE:
@@ -2199,8 +2199,8 @@ int av_get_audio_frame_duration(AVCodecContext *avctx, int frame_bytes)
                 return (frame_bytes - 4) * 2 / ch;
             case CODEC_ID_ADPCM_IMA_AMV:
                 return (frame_bytes - 8) * 2 / ch;
-			case CODEC_ID_ADPCM_THP:
-			case CODEC_ID_ADPCM_THP_LE:
+                        case CODEC_ID_ADPCM_THP:
+                        case CODEC_ID_ADPCM_THP_LE:
                 if (avctx->extradata)
                     return frame_bytes * 14LL / (8 * ch);
                 break;

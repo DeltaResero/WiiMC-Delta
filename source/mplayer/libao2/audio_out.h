@@ -34,7 +34,7 @@ typedef struct ao_info_s
 /* interface towards mplayer and */
 typedef struct ao_functions_s
 {
-	const ao_info_t *info;
+        const ao_info_t *info;
         int (*control)(int cmd,void *arg);
         int (*init)(int rate,int channels,int format,int flags);
         void (*uninit)(int immed);
@@ -86,8 +86,8 @@ void mp_ao_resume_refill(const ao_functions_t *ao, int prepause_space);
 #define AOPLAY_FINAL_CHUNK 1
 
 typedef struct ao_control_vol_s {
-	float left;
-	float right;
+        float left;
+        float right;
 } ao_control_vol_t;
 
 #endif /* MPLAYER_AUDIO_OUT_H */

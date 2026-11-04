@@ -52,17 +52,17 @@ void PerPointEqn::evaluate(int i)
     assert(param->matrix_flag == false);
     (*(float*)param->engine_val) = eqn_ptr->eval_gen_expr(i,-1);
 
-  
+
     return;
   }
 
   else
   {
     param_matrix = (float*)param->matrix;
-  
+
       // -1 is because per points only use one dimension
       param_matrix[i] = eqn_ptr->eval_gen_expr(i, -1);
-    
+
 
     /* Now that this parameter has been referenced with a per
        point equation, we let the evaluator know by setting

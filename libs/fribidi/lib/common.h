@@ -11,17 +11,17 @@
  *   Behdad Esfahbod, 2004
  *
  * Copyright (C) 2004 Sharif FarsiWeb, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -52,58 +52,58 @@
 #if FRIBIDI_USE_GLIB+0
 # ifndef SIZEOF_LONG
 #  define SIZEOF_LONG GLIB_SIZEOF_LONG
-# endif	/* !SIZEOF_LONG */
+# endif /* !SIZEOF_LONG */
 # ifndef SIZEOF_VOID_P
 #  define SIZEOF_VOID_P GLIB_SIZEOF_VOID_P
-# endif	/* !SIZEOF_VOID_P */
+# endif /* !SIZEOF_VOID_P */
 # ifndef __FRIBIDI_DOC
 #  include <glib/gmem.h>
-# endif	/* !__FRIBIDI_DOC */
+# endif /* !__FRIBIDI_DOC */
 # ifndef fribidi_malloc
 #  define fribidi_malloc g_try_malloc
 #  define fribidi_free g_free
-# endif	/* !fribidi_malloc */
+# endif /* !fribidi_malloc */
 # ifndef fribidi_assert
 #  ifndef __FRIBIDI_DOC
 #   include <glib/gmessages.h>
 #  endif /* !__FRIBIDI_DOC */
 #  define fribidi_assert g_assert
-# endif	/* !fribidi_assert */
+# endif /* !fribidi_assert */
 # ifndef __FRIBIDI_DOC
 #  include <glib/gmacros.h>
-# endif	/* !__FRIBIDI_DOC */
+# endif /* !__FRIBIDI_DOC */
 # ifndef FRIBIDI_BEGIN_STMT
 #  define FRIBIDI_BEGIN_STMT G_STMT_START {
 #  define FRIBIDI_END_STMT } G_STMT_END
-# endif	/* !FRIBIDI_BEGIN_STMT */
+# endif /* !FRIBIDI_BEGIN_STMT */
 # ifndef LIKELY
 #  define LIKELY G_LIKELY
 #  define UNLIKELY G_UNLIKELY
-# endif	/* !LIKELY */
+# endif /* !LIKELY */
 # ifndef false
 #  define false FALSE
-# endif	/* !false */
+# endif /* !false */
 # ifndef true
 #  define true TRUE
-# endif	/* !true */
+# endif /* !true */
 #endif /* FRIBIDI_USE_GLIB */
 
 #ifndef false
 # define false (0)
-# endif	/* !false */
+# endif /* !false */
 # ifndef true
 #  define true (!false)
-# endif	/* !true */
+# endif /* !true */
 
 #ifndef NULL
 #  ifdef __cplusplus
 #    define NULL        (0L)
-#  else	/* !__cplusplus */
+#  else /* !__cplusplus */
 #    define NULL        ((void*) 0)
 #  endif /* !__cplusplus */
 #endif /* !NULL */
 
-/* fribidi_malloc and fribidi_free should be used instead of malloc and free. 
+/* fribidi_malloc and fribidi_free should be used instead of malloc and free.
  * No need to include any headers. */
 #ifndef fribidi_malloc
 # if HAVE_STDLIB_H
@@ -113,12 +113,12 @@
 #  define fribidi_malloc malloc
 # else /* !HAVE_STDLIB_H */
 #  define fribidi_malloc (void *) malloc
-# endif	/* !HAVE_STDLIB_H */
+# endif /* !HAVE_STDLIB_H */
 # define fribidi_free free
 #else /* fribidi_malloc */
 # ifndef fribidi_free
 #  error You should define fribidi_free too when you define fribidi_malloc.
-# endif	/* !fribidi_free */
+# endif /* !fribidi_free */
 #endif /* fribidi_malloc */
 
 #if HAVE_STRING_H+0
@@ -141,11 +141,11 @@
 #  define FRIBIDI_CHUNK_SIZE (PAGE_SIZE - 16)
 # else /* !HAVE_ASM_PAGE_H */
 #  define FRIBIDI_CHUNK_SIZE (4096 - 16)
-# endif	/* !HAVE_ASM_PAGE_H */
+# endif /* !HAVE_ASM_PAGE_H */
 #else /* FRIBIDI_CHUNK_SIZE */
 # if FRIBIDI_CHUNK_SIZE < 256
 #  error FRIBIDI_CHUNK_SIZE now should define the size of a chunk in bytes.
-# endif	/* FRIBIDI_CHUNK_SIZE < 256 */
+# endif /* FRIBIDI_CHUNK_SIZE < 256 */
 #endif /* FRIBIDI_CHUNK_SIZE */
 
 /* FRIBIDI_BEGIN_STMT should be used at the beginning of your macro

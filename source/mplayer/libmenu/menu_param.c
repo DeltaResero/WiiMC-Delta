@@ -207,7 +207,7 @@ static void read_cmd(menu_t* menu,int cmd) {
       if(mp_property_do(e->prop,M_PROPERTY_SET,NULL,menu->ctx) < 0) return;
       // shortcut for flags
       if(e->opt->type == CONF_TYPE_FLAG) {
-	if(mp_property_do(e->prop,M_PROPERTY_STEP_UP,NULL,menu->ctx) > 0)
+        if(mp_property_do(e->prop,M_PROPERTY_STEP_UP,NULL,menu->ctx) > 0)
           update_entries(menu, 0);
         return;
       }

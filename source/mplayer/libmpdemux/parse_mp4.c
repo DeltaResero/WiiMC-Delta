@@ -77,10 +77,10 @@ int mp4_parse_esds(unsigned char *data, int datalen, esds_t *esds) {
     esds->ESId = stream_read_word(s);
     esds->streamPriority = stream_read_char(s);
     mp_msg(MSGT_DEMUX, MP4_DL,
-      	"ESDS MPEG4 ES Descriptor (%dBytes):\n"
-	" -> ESId: %d\n"
-	" -> streamPriority: %d\n",
-	len, esds->ESId, esds->streamPriority);
+        "ESDS MPEG4 ES Descriptor (%dBytes):\n"
+        " -> ESId: %d\n"
+        " -> streamPriority: %d\n",
+        len, esds->ESId, esds->streamPriority);
 
     if (len < (5 + 15)) {
       freereturn(s,1);
@@ -88,8 +88,8 @@ int mp4_parse_esds(unsigned char *data, int datalen, esds_t *esds) {
   } else {
     esds->ESId = stream_read_word(s);
     mp_msg(MSGT_DEMUX, MP4_DL,
-      	"ESDS MPEG4 ES Descriptor (%dBytes):\n"
-	" -> ESId: %d\n", 2, esds->ESId);
+        "ESDS MPEG4 ES Descriptor (%dBytes):\n"
+        " -> ESId: %d\n", 2, esds->ESId);
   }
 
   /* get and verify DecoderConfigDescrTab */

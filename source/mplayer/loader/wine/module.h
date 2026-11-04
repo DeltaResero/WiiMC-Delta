@@ -77,33 +77,33 @@ typedef struct
 
 /* internal representation of 32bit modules. per process. */
 typedef enum {
-	MODULE32_PE = 1,
-	MODULE32_ELF,
-	MODULE32_ELFDLL
+    MODULE32_PE = 1,
+    MODULE32_ELF,
+    MODULE32_ELFDLL
 } MODULE32_TYPE;
 
 typedef struct wine_modref
 {
-	struct wine_modref	*next;
-	struct wine_modref	*prev;
-	MODULE32_TYPE		type;
-	union {
-		PE_MODREF	pe;
-		ELF_MODREF	elf;
-	} binfmt;
+    struct wine_modref  *next;
+    struct wine_modref  *prev;
+    MODULE32_TYPE       type;
+    union {
+        PE_MODREF   pe;
+        ELF_MODREF  elf;
+    } binfmt;
 
-	HMODULE			module;
+    HMODULE         module;
 
-	int			nDeps;
-	struct wine_modref	**deps;
+    int         nDeps;
+    struct wine_modref  **deps;
 
-	int			flags;
-	int			refCount;
+    int         flags;
+    int         refCount;
 
-	char			*filename;
-	char			*modname;
-	char			*short_filename;
-	char			*short_modname;
+    char            *filename;
+    char            *modname;
+    char            *short_filename;
+    char            *short_modname;
 } WINE_MODREF;
 
 #define WINE_MODREF_INTERNAL              0x00000001

@@ -43,12 +43,12 @@ static void draw_slice(struct vf_instance *vf, unsigned char** src, int* stride,
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
 
     if ((width <= 0) || (height <= 0) || (d_width <= 0) || (d_height <= 0))
     {
-	mp_msg(MSGT_CPLAYER, MSGL_ERR, "VO: invalid dimensions!\n");
-	return 0;
+        mp_msg(MSGT_CPLAYER, MSGL_ERR, "VO: invalid dimensions!\n");
+        return 0;
     }
 
   if(video_out->info)
@@ -56,7 +56,7 @@ static int config(struct vf_instance *vf,
     mp_msg(MSGT_CPLAYER,MSGL_INFO,"VO: [%s] %dx%d => %dx%d %s %s%s%s%s\n",info->short_name,
          width, height,
          d_width, d_height,
-	 vo_format_name(outfmt),
+         vo_format_name(outfmt),
          (flags&VOFLAG_FULLSCREEN)?" [fs]":"",
          (flags&VOFLAG_MODESWITCHING)?" [vm]":"",
          (flags&VOFLAG_SWSCALE)?" [zoom]":"",
@@ -72,7 +72,7 @@ static int config(struct vf_instance *vf,
     vf->draw_slice = (vf->default_caps & VOCAP_NOSLICES) ? NULL : draw_slice;
 
     if(config_video_out(video_out,width,height,d_width,d_height,flags,"MPlayer",outfmt))
-	return 0;
+        return 0;
 
     ++vo_config_count;
     return 1;
@@ -94,24 +94,24 @@ static int control(struct vf_instance *vf, int request, void* data)
                 == VO_TRUE) ? CONTROL_TRUE : CONTROL_FALSE;
     }
     case VFCTRL_DRAW_OSD:
-	if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
-	video_out->draw_osd();
-	return CONTROL_TRUE;
+        if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
+        video_out->draw_osd();
+        return CONTROL_TRUE;
     case VFCTRL_FLIP_PAGE:
     {
-	if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
-	video_out->flip_page();
-	return CONTROL_TRUE;
+        if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
+        video_out->flip_page();
+        return CONTROL_TRUE;
     }
     case VFCTRL_SET_EQUALIZER:
     {
-	if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
-	return (video_out->control(VOCTRL_SET_EQUALIZER, data) == VO_TRUE) ? CONTROL_TRUE : CONTROL_FALSE;
+        if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
+        return (video_out->control(VOCTRL_SET_EQUALIZER, data) == VO_TRUE) ? CONTROL_TRUE : CONTROL_FALSE;
     }
     case VFCTRL_GET_EQUALIZER:
     {
-	if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
-	return (video_out->control(VOCTRL_GET_EQUALIZER, data) == VO_TRUE) ? CONTROL_TRUE : CONTROL_FALSE;
+        if(!vo_config_count) return CONTROL_FALSE; // vo not configured?
+        return (video_out->control(VOCTRL_GET_EQUALIZER, data) == VO_TRUE) ? CONTROL_TRUE : CONTROL_FALSE;
     }
 #ifdef CONFIG_ASS
     case VFCTRL_INIT_EOSD:
@@ -133,8 +133,8 @@ static int control(struct vf_instance *vf, int request, void* data)
 #endif
     case VFCTRL_GET_PTS:
     {
-	*(double *)data = vf->priv->pts;
-	return CONTROL_TRUE;
+        *(double *)data = vf->priv->pts;
+        return CONTROL_TRUE;
     }
     }
     // return video_out->control(request,data);
@@ -145,8 +145,8 @@ static int query_format(struct vf_instance *vf, unsigned int fmt){
     int flags=video_out->control(VOCTRL_QUERY_FORMAT,&fmt);
     // draw_slice() accepts stride, draw_frame() doesn't:
     if(flags)
-	if(fmt==IMGFMT_YV12 || fmt==IMGFMT_I420 || fmt==IMGFMT_IYUV)
-	    flags|=VFCAP_ACCEPT_STRIDE;
+        if(fmt==IMGFMT_YV12 || fmt==IMGFMT_I420 || fmt==IMGFMT_IYUV)
+            flags|=VFCAP_ACCEPT_STRIDE;
     return flags;
 }
 
@@ -156,7 +156,7 @@ static void get_image(struct vf_instance *vf,
     // GET_IMAGE is required for hardware-accelerated formats
     if(vo_directrendering ||
        IMGFMT_IS_HWACCEL(mpi->imgfmt))
-	video_out->control(VOCTRL_GET_IMAGE,mpi);
+        video_out->control(VOCTRL_GET_IMAGE,mpi);
 }
 
 static int put_image(struct vf_instance *vf,
@@ -179,7 +179,7 @@ static int put_image(struct vf_instance *vf,
 }
 
 static void start_slice(struct vf_instance *vf,
-		       mp_image_t *mpi) {
+                       mp_image_t *mpi) {
     if(!vo_config_count) return; // vo not configured?
     video_out->control(VOCTRL_START_SLICE,mpi);
 }

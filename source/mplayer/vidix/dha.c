@@ -129,12 +129,12 @@ dha_helper_way:
 
     if (ioctl(mem_fd, DHAHELPER_MEMORY, &mem_req) < 0)
     {
-	perror("libdha: DHA kernelhelper failed");
-	close(mem_fd);
-	goto dev_mem_way;
+        perror("libdha: DHA kernelhelper failed");
+        close(mem_fd);
+        goto dev_mem_way;
     }
     else
-	goto mmap;
+        goto mmap;
   }
 #endif
 
@@ -143,15 +143,15 @@ dev_mem_way:
 #endif
 #ifdef DEV_APERTURE
   if ((mem_fd = open(DEV_APERTURE, O_RDWR)) == -1)
-	perror("libdha: opening aperture failed");
+        perror("libdha: opening aperture failed");
   else {
-	void *p = mmap(0,size,PROT_READ|PROT_WRITE,MAP_SHARED,mem_fd,base);
+        void *p = mmap(0,size,PROT_READ|PROT_WRITE,MAP_SHARED,mem_fd,base);
 
-	if (p == MAP_FAILED) {
-	    perror("libdha: mapping aperture failed");
-	    close(mem_fd);
-	} else
-	    return p;
+        if (p == MAP_FAILED) {
+            perror("libdha: mapping aperture failed");
+            close(mem_fd);
+        } else
+            return p;
   }
 #endif
 

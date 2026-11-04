@@ -41,10 +41,10 @@
 
 static const vo_info_t info =
 {
-	"tdfx vid",
-	"tdfx_vid",
-	"Albeu",
-	""
+        "tdfx vid",
+        "tdfx_vid",
+        "Albeu",
+        ""
 };
 
 //#define VERBOSE
@@ -112,9 +112,9 @@ static int draw_slice(uint8_t *image[], int stride[], int w,int h,int x,int y)
     // copy :( to agp_mem
     // still faster than tdfxfb wich directly copy to the video mem :)
     mem2agpcpy_pic(agp_mem + current_buffer * buffer_size +
-	       y*buffer_stride[0] + x * src_bpp,
-	       image[0],
-	       src_bpp*w,h,buffer_stride[0],stride[0]);
+               y*buffer_stride[0] + x * src_bpp,
+               image[0],
+               src_bpp*w,h,buffer_stride[0],stride[0]);
     return 0;
 
   case IMGFMT_YV12:
@@ -122,13 +122,13 @@ static int draw_slice(uint8_t *image[], int stride[], int w,int h,int x,int y)
     // Copy to agp mem
     ptr[0] = agp_mem + current_buffer * buffer_size;
     mem2agpcpy_pic(ptr[0] + y * buffer_stride[0] + x,image[0],w,h,
-		   buffer_stride[0],stride[0]);
+                   buffer_stride[0],stride[0]);
     ptr[1] = ptr[0] + (src_height*src_width);
     mem2agpcpy_pic(ptr[1] + y/2 * buffer_stride[1] + x/2,image[1],w/2,h/2,
-		   buffer_stride[1],stride[1]);
+                   buffer_stride[1],stride[1]);
     ptr[2] = ptr[1] + (src_height*src_width/4);
     mem2agpcpy_pic(ptr[2] + y/2 * buffer_stride[2] + x/2,image[2],w/2,h/2,
-		   buffer_stride[2],stride[2]);
+                   buffer_stride[2],stride[2]);
     return 0;
   }
 
@@ -152,7 +152,7 @@ flip_page(void)
     // TDFX_VID_OVERLAY_ON does nothing if the overlay is already on
     if(!ioctl(tdfx_fd,TDFX_VID_OVERLAY_ON)) { // X11 killed the overlay :(
       if(ioctl(tdfx_fd,TDFX_VID_SET_OVERLAY,&tdfx_ov))
-	mp_msg(MSGT_VO, MSGL_ERR, "tdfx_vid: set_overlay failed\n");
+        mp_msg(MSGT_VO, MSGL_ERR, "tdfx_vid: set_overlay failed\n");
     }
     // These formats need conversion
     switch(src_fmt) {
@@ -176,7 +176,7 @@ flip_page(void)
       blit.dst_h = src_height;
       blit.dst_format = IMGFMT_BGR16;
       if(ioctl(tdfx_fd,TDFX_VID_BLIT,&blit))
-	mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_BlitFailed);
+        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_BlitFailed);
     }
     return;
   }
@@ -345,23 +345,23 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
     tdfx_ov = ov;
     if(use_overlay == 1) {
       if(ioctl(tdfx_fd,TDFX_VID_OVERLAY_ON)) {
-	mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_OverlayOnFailed);
-	use_overlay = 0;
-	break;
+        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_OverlayOnFailed);
+        use_overlay = 0;
+        break;
       }
       use_overlay++;
     }
 
     mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_TDFXVID_OverlayReady,
-	   src_width,src_stride,src_height,src_bpp,
-	   dst_width,dst_stride,dst_height,dst_bpp);
+           src_width,src_stride,src_height,src_bpp,
+           dst_width,dst_stride,dst_height,dst_bpp);
     break;
   }
 
   if(!use_overlay)
     mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_TDFXVID_TextureBlitReady,
-	   src_width,src_stride,src_height,src_bpp,
-	   dst_width,dst_stride,dst_height,dst_bpp);
+           src_width,src_stride,src_height,src_bpp,
+           dst_width,dst_stride,dst_height,dst_bpp);
 
   return 0;
 }
@@ -389,7 +389,7 @@ static int preinit(const char *arg)
   tdfx_fd = open(arg ? arg : "/dev/tdfx_vid", O_RDWR);
   if(tdfx_fd < 0) {
     mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_CantOpen,arg ? arg : "/dev/tdfx_vid",
-	   strerror(errno));
+           strerror(errno));
     return 1;
   }
 
@@ -399,18 +399,18 @@ static int preinit(const char *arg)
   }
 
   mp_msg(MSGT_VO,MSGL_INFO, "tdfx_vid version %d\n"
-	 "  Ram: %d\n"
-	 "  Screen: %d x %d\n"
-	 "  Format: %c%c%c%d\n",
-	 tdfx_cfg.version,
-	 tdfx_cfg.ram_size,
-	 tdfx_cfg.screen_width, tdfx_cfg.screen_height,
-	 tdfx_cfg.screen_format>>24,(tdfx_cfg.screen_format>>16)&0xFF,
-	 (tdfx_cfg.screen_format>>8)&0xFF,tdfx_cfg.screen_format&0xFF);
+         "  Ram: %d\n"
+         "  Screen: %d x %d\n"
+         "  Format: %c%c%c%d\n",
+         tdfx_cfg.version,
+         tdfx_cfg.ram_size,
+         tdfx_cfg.screen_width, tdfx_cfg.screen_height,
+         tdfx_cfg.screen_format>>24,(tdfx_cfg.screen_format>>16)&0xFF,
+         (tdfx_cfg.screen_format>>8)&0xFF,tdfx_cfg.screen_format&0xFF);
 
   // For now just allocate more than i ever need
   agp_mem = mmap( NULL, 1024*768*4, PROT_READ | PROT_WRITE, MAP_SHARED,
-		  tdfx_fd, 0);
+                  tdfx_fd, 0);
 
   if(agp_mem == MAP_FAILED) {
     mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_TDFXVID_MemmapFailed);
@@ -517,7 +517,7 @@ static uint32_t draw_image(mp_image_t *mpi){
 #endif
       planes[0] = agp_mem + buf * buffer_size;
       mem2agpcpy_pic(planes[0],mpi->planes[0],src_bpp*mpi->width,mpi->height,
-		     buffer_stride[0],mpi->stride[0]);
+                     buffer_stride[0],mpi->stride[0]);
     } else
       planes[0] = agp_mem + buf * buffer_size;
 
@@ -543,13 +543,13 @@ static uint32_t draw_image(mp_image_t *mpi){
 #endif
       planes[0] = agp_mem + buf * buffer_size;
       memcpy_pic(planes[0],mpi->planes[0],mpi->width,mpi->height,
-		 buffer_stride[0],mpi->stride[0]);
+                 buffer_stride[0],mpi->stride[0]);
       planes[1] = planes[0] + (mpi->height*mpi->stride[0]);
       memcpy_pic(planes[1],mpi->planes[1],mpi->chroma_width,mpi->chroma_height,
-		 buffer_stride[1],mpi->stride[1]);
+                 buffer_stride[1],mpi->stride[1]);
       planes[2] = planes[1] + (mpi->chroma_height*mpi->stride[1]);
       memcpy_pic(planes[2],mpi->planes[2],mpi->chroma_width,mpi->chroma_height,
-		 buffer_stride[2],mpi->stride[2]);
+                 buffer_stride[2],mpi->stride[2]);
     } else {
       planes[0] = agp_mem + buf * buffer_size;
       planes[1] = planes[0] + buffer_stride[0] * src_height;

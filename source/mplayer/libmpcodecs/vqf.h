@@ -11,13 +11,13 @@
 #include <stdio.h>
 
 #ifdef _MSC_VER
-#	ifdef DLL_MODULE
-#		define DllPort    __declspec( dllexport )
-#	else
-#		define DllPort    __declspec( dllimport )
-#	endif
+#       ifdef DLL_MODULE
+#               define DllPort    __declspec( dllexport )
+#       else
+#               define DllPort    __declspec( dllimport )
+#       endif
 #else
-#	define DllPort
+#       define DllPort
 #endif
 
 #ifdef __cplusplus
@@ -29,13 +29,13 @@ extern "C" {  // only need to import/export C interface if used by C++ source co
 /************************/
 /* Initialization error code */
 enum INIT_ERROR_CODE {
-	TVQ_NO_ERROR = 0,     // no error
-	TVQ_ERROR,            // general
-	TVQ_ERROR_VERSION,    // wrong version
-	TVQ_ERROR_CHANNEL,    // channel setting error
-	TVQ_ERROR_MODE,       // wrong coding mode
-	TVQ_ERROR_PARAM,      // inner parameter setting error
-	TVQ_ERROR_N_CAN,      // wrong number of VQ pre-selection candidates, used only in encoder
+        TVQ_NO_ERROR = 0,     // no error
+        TVQ_ERROR,            // general
+        TVQ_ERROR_VERSION,    // wrong version
+        TVQ_ERROR_CHANNEL,    // channel setting error
+        TVQ_ERROR_MODE,       // wrong coding mode
+        TVQ_ERROR_PARAM,      // inner parameter setting error
+        TVQ_ERROR_N_CAN,      // wrong number of VQ pre-selection candidates, used only in encoder
 };
 
 /* version ID */
@@ -60,10 +60,10 @@ enum WINDOW_TYPE {
 
 /* block types */
 enum BLOCK_TYPE {
-	BLK_SHORT = 0,
-	BLK_MEDIUM,
-	BLK_LONG,
-	BLK_PPC,
+        BLK_SHORT = 0,
+        BLK_MEDIUM,
+        BLK_LONG,
+        BLK_PPC,
 };
 #define N_BTYPE     3  // number of block types
 #define N_INTR_TYPE 4  // number of interleave types, enum BLOCK_TYPE is commonly used for detecting interleave types.
@@ -73,34 +73,34 @@ enum BLOCK_TYPE {
 
 /* type definition of code information interface */
 typedef struct {
-	/* block type */
+        /* block type */
     int  w_type;
     int  btype;
 
-	/* FBC info */
+        /* FBC info */
     int  *segment_sw[ N_CH_MAX ];
     int  *band_sw[ N_CH_MAX ];
-    int	 *fg_intensity[ N_CH_MAX ];
+    int  *fg_intensity[ N_CH_MAX ];
 
-	/* VQ info */
+        /* VQ info */
     int  *wvq;
 
-	/* BSE info */
+        /* BSE info */
     int  *fw;
     int  *fw_alf;
 
-	/* gain info */
+        /* gain info */
     int  *pow;
 
-	/* LSP info */
+        /* LSP info */
     int  *lsp[ N_CH_MAX ];
 
-	/* PPC info */
+        /* PPC info */
     int  pit[ N_CH_MAX ];
     int  *pls;
     int  pgain[ N_CH_MAX ];
 
-	/* EBC info */
+        /* EBC info */
     int  *bc[ N_CH_MAX ];
 
     void *manager;
@@ -111,21 +111,21 @@ typedef struct {
 /***********************************************/
 /* type definition of tvqConfInfoSubBlock */
 typedef struct {
-	int sf_sz;         // subframe size
-	int nsf;           // number of subframes
-	int ndiv;          // number of division of weighted interleave vector quantization
-	int ncrb;          // number of Bark-scale subbands
-	int fw_ndiv;       // number of division of BSE VQ
-	int fw_nbit;       // number of bits for BSE VQ
-	int nsubg;         // number of sub-blocks for gain coding
-	int ppc_enable;    // PPC switch
-	int ebc_enable;    // EBC switch
-	int ebc_crb_base;  // EBC base band
-	int ebc_bits;      // EBC bits
-	int fbc_enable;    // FBC switch
-	int fbc_n_segment; // FBC number of segments
-	int fbc_nband;     // FBC number of subbands
-	int *fbc_crb_tbl;  // FBC subband table
+        int sf_sz;         // subframe size
+        int nsf;           // number of subframes
+        int ndiv;          // number of division of weighted interleave vector quantization
+        int ncrb;          // number of Bark-scale subbands
+        int fw_ndiv;       // number of division of BSE VQ
+        int fw_nbit;       // number of bits for BSE VQ
+        int nsubg;         // number of sub-blocks for gain coding
+        int ppc_enable;    // PPC switch
+        int ebc_enable;    // EBC switch
+        int ebc_crb_base;  // EBC base band
+        int ebc_bits;      // EBC bits
+        int fbc_enable;    // FBC switch
+        int fbc_n_segment; // FBC number of segments
+        int fbc_nband;     // FBC number of subbands
+        int *fbc_crb_tbl;  // FBC subband table
 } tvqConfInfoSubBlock;
 
 /* type definition of tvqConfInfo */
@@ -159,34 +159,34 @@ typedef struct {
 /*** Definitions about TwinVQ bitstream header ***/
 /*************************************************/
 //#include "declib_src/tvq_hdr.h"
-//#ifndef	BUFSIZ
-//#define	BUFSIZ		1024
+//#ifndef       BUFSIZ
+//#define       BUFSIZ          1024
 //#endif
 
-#define	KEYWORD_BYTES	4
-#define	VERSION_BYTES	8
+#define KEYWORD_BYTES   4
+#define VERSION_BYTES   8
 #define ELEM_BYTES      sizeof(unsigned long)
 
 
 /*
  */
 typedef struct {
-	char		ID[KEYWORD_BYTES+VERSION_BYTES+1];
-	int size;
-	/* Common Chunk */
-	int channelMode;   /* channel mode (mono:0/stereo:1) */
-	int bitRate;       /* bit rate (kbit/s) */
-	int samplingRate;  /* sampling rate (44.1 kHz -> 44) */
-	int securityLevel; /* security level (always 0) */
-	/* Text Chunk */
-	char	Name[BUFSIZ];
-	char	Comt[BUFSIZ];
-	char	Auth[BUFSIZ];
-	char	Cpyr[BUFSIZ];
-	char	File[BUFSIZ];
-	char	Extr[BUFSIZ];  // add by OKAMOTO 99.12.21
-	/* Data size chunk*/
-	int		Dsiz;
+        char            ID[KEYWORD_BYTES+VERSION_BYTES+1];
+        int size;
+        /* Common Chunk */
+        int channelMode;   /* channel mode (mono:0/stereo:1) */
+        int bitRate;       /* bit rate (kbit/s) */
+        int samplingRate;  /* sampling rate (44.1 kHz -> 44) */
+        int securityLevel; /* security level (always 0) */
+        /* Text Chunk */
+        char    Name[BUFSIZ];
+        char    Comt[BUFSIZ];
+        char    Auth[BUFSIZ];
+        char    Cpyr[BUFSIZ];
+        char    File[BUFSIZ];
+        char    Extr[BUFSIZ];  // add by OKAMOTO 99.12.21
+        /* Data size chunk*/
+        int             Dsiz;
 } headerInfo;
 
 // TwinVQ decoder initialization/termination functions

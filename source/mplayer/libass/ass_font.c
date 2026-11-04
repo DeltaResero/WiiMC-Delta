@@ -160,37 +160,37 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
         }
     } else { */
         //error = FT_New_Face(font->ftlibrary, path, index, &face);
-		/* MEM FONT START */
-	/*	unsigned *fnt_buf = (unsigned *) malloc(1*1024*1024);
-		//unsigned *fnt_buffer = (unsigned *) mem2_malloc(1*1024*1024, MEM2_OTHER);
-		
-		FILE *ft = fopen("sd1:/apps/wiimc/monospace.ttf", "rb");
-		if (ft == NULL)
-			return -1;
-		fseeko(ft, 0, SEEK_END);
-		FT_Long fsize = ftello(ft);
-		//rewind(ft);
-		fseeko(ft, 0, SEEK_SET);  // The same as rewind(ft)
-		
-		//unsigned *fnt_buffer = (unsigned *) mem2_malloc(fsize, MEM2_OTHER);
-		//unsigned *fnt_buffer = (unsigned *) malloc(fsize);
+        /* MEM FONT START */
+    /*  unsigned *fnt_buf = (unsigned *) malloc(1*1024*1024);
+        //unsigned *fnt_buffer = (unsigned *) mem2_malloc(1*1024*1024, MEM2_OTHER);
 
-		fread (&fnt_buf, 1, fsize, ft);
-		fclose(ft); */
-		
-		/*int *name = (int *) 0x8076A310;
-	if(*name != 0x44696567)
-		ExitRequested = true;*/
-		
-		if (have_mono && monospaced)
-			error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)mono_mem, mono_mem_size, index, &face);
-		else if(!subtitleFontFound)
-			error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_ttf, 0x8450, 0, &face);
-		else
-			error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_mem, font_mem_size, index, &face);
+        FILE *ft = fopen("sd1:/apps/wiimc/monospace.ttf", "rb");
+        if (ft == NULL)
+            return -1;
+        fseeko(ft, 0, SEEK_END);
+        FT_Long fsize = ftello(ft);
+        //rewind(ft);
+        fseeko(ft, 0, SEEK_SET);  // The same as rewind(ft)
 
-	//	once_fnt = 1;
-		/* MEM FONT END */
+        //unsigned *fnt_buffer = (unsigned *) mem2_malloc(fsize, MEM2_OTHER);
+        //unsigned *fnt_buffer = (unsigned *) malloc(fsize);
+
+        fread (&fnt_buf, 1, fsize, ft);
+        fclose(ft); */
+
+        /*int *name = (int *) 0x8076A310;
+    if(*name != 0x44696567)
+        ExitRequested = true;*/
+
+        if (have_mono && monospaced)
+            error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)mono_mem, mono_mem_size, index, &face);
+        else if(!subtitleFontFound)
+            error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_ttf, 0x8450, 0, &face);
+        else
+            error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)font_mem, font_mem_size, index, &face);
+
+    //  once_fnt = 1;
+        /* MEM FONT END */
         if (error) {
             ass_msg(font->library, MSGL_WARN,
                     "Error opening font: '%s', %d", path, index);

@@ -38,9 +38,9 @@ static void *(*_y4m_alloc)(size_t bytes) = malloc;
 static void (*_y4m_free)(void *ptr) = free;
 
 int y4m_allow_unknown_tags(int yn) {
-	int old = _y4mparam_allow_unknown_tags;
-  	if (yn >= 0) _y4mparam_allow_unknown_tags = (yn) ? 1 : 0;
-  	return old;
+        int old = _y4mparam_allow_unknown_tags;
+        if (yn >= 0) _y4mparam_allow_unknown_tags = (yn) ? 1 : 0;
+        return old;
 }
 
 
@@ -67,9 +67,9 @@ ssize_t y4m_read(stream_t *s, char *buf, size_t len)
      if (n <= 0) {
        /* return amount left to read */
        if (n == 0)
-	 return len;  /* n == 0 --> eof */
+         return len;  /* n == 0 --> eof */
        else
-	 return -len; /* n < 0 --> error */
+         return -len; /* n < 0 --> error */
      }
      buf += n;
      len -= n;
@@ -365,7 +365,7 @@ int y4m_parse_stream_tags(char *s, y4m_stream_info_t *i)
       break;
     case 'F':  /* frame rate (fps) */
       if ((err = y4m_parse_ratio(&(i->framerate), value)) != Y4M_OK)
-	return err;
+        return err;
       if (i->framerate.n < 0) return Y4M_ERR_RANGE;
       break;
     case 'I':  /* interlacing */
@@ -375,12 +375,12 @@ int y4m_parse_stream_tags(char *s, y4m_stream_info_t *i)
       case 'b':  i->interlace = Y4M_ILACE_BOTTOM_FIRST; break;
       case '?':
       default:
-	i->interlace = Y4M_UNKNOWN; break;
+        i->interlace = Y4M_UNKNOWN; break;
       }
       break;
     case 'A':  /* sample (pixel) aspect ratio */
       if ((err = y4m_parse_ratio(&(i->sampleaspect), value)) != Y4M_OK)
-	return err;
+        return err;
       if (i->sampleaspect.n < 0) return Y4M_ERR_RANGE;
       break;
     case 'X':  /* 'X' meta-tag */
@@ -389,12 +389,12 @@ int y4m_parse_stream_tags(char *s, y4m_stream_info_t *i)
     default:
       /* possible error on unknown options */
       if (_y4mparam_allow_unknown_tags) {
-	/* unknown tags ok:  store in xtag list and warn... */
-	if ((err = y4m_xtag_add(&(i->x_tags), token)) != Y4M_OK) return err;
-	mp_msg(MSGT_DEMUX, MSGL_WARN, "Unknown stream tag encountered:  '%s'\n", token);
+        /* unknown tags ok:  store in xtag list and warn... */
+        if ((err = y4m_xtag_add(&(i->x_tags), token)) != Y4M_OK) return err;
+        mp_msg(MSGT_DEMUX, MSGL_WARN, "Unknown stream tag encountered:  '%s'\n", token);
       } else {
-	/* unknown tags are *not* ok */
-	return Y4M_ERR_BADTAG;
+        /* unknown tags are *not* ok */
+        return Y4M_ERR_BADTAG;
       }
       break;
     }
@@ -403,7 +403,7 @@ int y4m_parse_stream_tags(char *s, y4m_stream_info_t *i)
    * parse without them
    */
   if( i->width == Y4M_UNKNOWN || i->height == Y4M_UNKNOWN )
-	  return Y4M_ERR_HEADER;
+          return Y4M_ERR_HEADER;
   /* ta da!  done. */
   return Y4M_OK;
 }
@@ -430,12 +430,12 @@ static int y4m_parse_frame_tags(char *s, y4m_frame_info_t *i)
     default:
       /* possible error on unknown options */
       if (_y4mparam_allow_unknown_tags) {
-	/* unknown tags ok:  store in xtag list and warn... */
-	if ((err = y4m_xtag_add(&(i->x_tags), token)) != Y4M_OK) return err;
-	mp_msg(MSGT_DEMUX, MSGL_WARN, "Unknown frame tag encountered:  '%s'\n", token);
+        /* unknown tags ok:  store in xtag list and warn... */
+        if ((err = y4m_xtag_add(&(i->x_tags), token)) != Y4M_OK) return err;
+        mp_msg(MSGT_DEMUX, MSGL_WARN, "Unknown frame tag encountered:  '%s'\n", token);
       } else {
-	/* unknown tags are *not* ok */
-	return Y4M_ERR_BADTAG;
+        /* unknown tags are *not* ok */
+        return Y4M_ERR_BADTAG;
       }
       break;
     }
@@ -494,14 +494,14 @@ int y4m_write_stream_header(int fd, y4m_stream_info_t *i)
   y4m_ratio_reduce(&(i->framerate));
   y4m_ratio_reduce(&(i->sampleaspect));
   n = snprintf(s, sizeof(s), "%s W%d H%d F%d:%d I%s A%d:%d",
-	       Y4M_MAGIC,
-	       i->width,
-	       i->height,
-	       i->framerate.n, i->framerate.d,
-	       (i->interlace == Y4M_ILACE_NONE) ? "p" :
-	       (i->interlace == Y4M_ILACE_TOP_FIRST) ? "t" :
-	       (i->interlace == Y4M_ILACE_BOTTOM_FIRST) ? "b" : "?",
-	       i->sampleaspect.n, i->sampleaspect.d);
+               Y4M_MAGIC,
+               i->width,
+               i->height,
+               i->framerate.n, i->framerate.d,
+               (i->interlace == Y4M_ILACE_NONE) ? "p" :
+               (i->interlace == Y4M_ILACE_TOP_FIRST) ? "t" :
+               (i->interlace == Y4M_ILACE_BOTTOM_FIRST) ? "b" : "?",
+               i->sampleaspect.n, i->sampleaspect.d);
   if ((n < 0) || (n > Y4M_LINE_MAX)) return Y4M_ERR_HEADER;
   if ((err = y4m_snprint_xtags(s + n, sizeof(s) - n - 1, &(i->x_tags)))
       != Y4M_OK)
@@ -534,11 +534,11 @@ int y4m_read_frame_header(stream_t *s, y4m_frame_info_t *i)
   remain = y4m_read(s, line, sizeof(Y4M_FRAME_MAGIC));
   if (remain != 0)
   {
-	  /* A clean EOF should end exactly at a frame-boundary */
-	  if( remain == sizeof(Y4M_FRAME_MAGIC) )
-		  return Y4M_ERR_EOF;
-	  else
-		  return Y4M_ERR_SYSTEM;
+          /* A clean EOF should end exactly at a frame-boundary */
+          if( remain == sizeof(Y4M_FRAME_MAGIC) )
+                  return Y4M_ERR_EOF;
+          else
+                  return Y4M_ERR_SYSTEM;
   }
   if (strncmp(line, Y4M_FRAME_MAGIC, sizeof(Y4M_FRAME_MAGIC)-1))
     return Y4M_ERR_MAGIC;
@@ -590,7 +590,7 @@ int y4m_write_frame_header(int fd, y4m_frame_info_t *i)
  *************************************************************************/
 
 int y4m_read_frame(stream_t *s, y4m_stream_info_t *si,
-		   y4m_frame_info_t *fi, unsigned char *yuv[3])
+                   y4m_frame_info_t *fi, unsigned char *yuv[3])
 {
   int err;
   int w = si->width;
@@ -611,7 +611,7 @@ int y4m_read_frame(stream_t *s, y4m_stream_info_t *si,
 
 #if 0
 int y4m_write_frame(int fd, y4m_stream_info_t *si,
-		    y4m_frame_info_t *fi, unsigned char *yuv[3])
+                    y4m_frame_info_t *fi, unsigned char *yuv[3])
 {
   int err;
   int w = si->width;
@@ -728,18 +728,18 @@ void y4m_log_stream_info(const char *prefix, y4m_stream_info_t *i)
     mp_msg(MSGT_DEMUX, MSGL_V, "%s  frame rate:  ??? fps\n", prefix);
   else
     mp_msg(MSGT_DEMUX, MSGL_V, "%s  frame rate:  %d/%d fps (~%f)\n", prefix,
-	      i->framerate.n, i->framerate.d,
-	      (double) i->framerate.n / (double) i->framerate.d);
+              i->framerate.n, i->framerate.d,
+              (double) i->framerate.n / (double) i->framerate.d);
   mp_msg(MSGT_DEMUX, MSGL_V, "%s   interlace:  %s\n", prefix,
-	  (i->interlace == Y4M_ILACE_NONE) ? "none/progressive" :
-	  (i->interlace == Y4M_ILACE_TOP_FIRST) ? "top-field-first" :
-	  (i->interlace == Y4M_ILACE_BOTTOM_FIRST) ? "bottom-field-first" :
-	  "anyone's guess");
+          (i->interlace == Y4M_ILACE_NONE) ? "none/progressive" :
+          (i->interlace == Y4M_ILACE_TOP_FIRST) ? "top-field-first" :
+          (i->interlace == Y4M_ILACE_BOTTOM_FIRST) ? "bottom-field-first" :
+          "anyone's guess");
   if ((i->sampleaspect.n == 0) && (i->sampleaspect.d == 0))
     mp_msg(MSGT_DEMUX, MSGL_V, "%ssample aspect ratio:  ?:?\n", prefix);
   else
     mp_msg(MSGT_DEMUX, MSGL_V, "%ssample aspect ratio:  %d:%d\n", prefix,
-	      i->sampleaspect.n, i->sampleaspect.d);
+              i->sampleaspect.n, i->sampleaspect.d);
 }
 
 

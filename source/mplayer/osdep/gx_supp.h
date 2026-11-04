@@ -1,5 +1,5 @@
 /****************************************************************************
-*   gx_supp.h - Generic GX Scaler 
+*   gx_supp.h - Generic GX Scaler
 *   softdev 2007
 *   dhewg 2008
 *   sepp256 2008 - Coded YUV->RGB conversion in TEV.

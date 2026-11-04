@@ -66,7 +66,7 @@ static int check_bps(int bps)
 {
   if(bps != 4 && bps != 3 && bps != 2 && bps != 1){
     mp_msg(MSGT_AFILTER, MSGL_ERR, "[format] The number of bytes per sample"
-	   " must be 1, 2, 3 or 4. Current value is %i \n",bps);
+           " must be 1, 2, 3 or 4. Current value is %i \n",bps);
     return AF_ERROR;
   }
   return AF_OK;
@@ -81,7 +81,7 @@ static int check_format(int format)
   case(AF_FORMAT_MPEG2):
   case(AF_FORMAT_AC3):
     mp_msg(MSGT_AFILTER, MSGL_ERR, "[format] Sample format %s not yet supported \n",
-	 af_fmt2str(format,buf,256));
+         af_fmt2str(format,buf,256));
     return AF_ERROR;
   }
   return AF_OK;
@@ -111,8 +111,8 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       return AF_ERROR;
 
     mp_msg(MSGT_AFILTER, MSGL_V, "[format] Changing sample format from %s to %s\n",
-	   af_fmt2str(data->format,buf1,256),
-	   af_fmt2str(af->data->format,buf2,256));
+           af_fmt2str(data->format,buf1,256),
+           af_fmt2str(af->data->format,buf2,256));
 
     af->data->rate = data->rate;
     af->data->nch  = data->nch;
@@ -122,26 +122,26 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 
     // look whether only endianness differences are there
     if ((af->data->format & ~AF_FORMAT_END_MASK) ==
-	(data->format & ~AF_FORMAT_END_MASK))
+        (data->format & ~AF_FORMAT_END_MASK))
     {
-	mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated endianness conversion only\n");
-	af->play = play_swapendian;
+        mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated endianness conversion only\n");
+        af->play = play_swapendian;
     }
     if ((data->format == AF_FORMAT_FLOAT_NE) &&
-	(af->data->format == AF_FORMAT_S16_NE))
+        (af->data->format == AF_FORMAT_S16_NE))
     {
-	mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
-	   af_fmt2str(data->format,buf1,256),
-	   af_fmt2str(af->data->format,buf2,256));
-	af->play = play_float_s16;
+        mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
+           af_fmt2str(data->format,buf1,256),
+           af_fmt2str(af->data->format,buf2,256));
+        af->play = play_float_s16;
     }
     if ((data->format == AF_FORMAT_S16_NE) &&
-	(af->data->format == AF_FORMAT_FLOAT_NE))
+        (af->data->format == AF_FORMAT_FLOAT_NE))
     {
-	mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
-	   af_fmt2str(data->format,buf1,256),
-	   af_fmt2str(af->data->format,buf2,256));
-	af->play = play_s16_float;
+        mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
+           af_fmt2str(data->format,buf1,256),
+           af_fmt2str(af->data->format,buf2,256));
+        af->play = play_s16_float;
     }
     return AF_OK;
   }
@@ -180,9 +180,9 @@ static void uninit(struct af_instance_s* af)
 
 static af_data_t* play_swapendian(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   l   = af->data;	// Local data
-  af_data_t*   c   = data;	// Current working data
-  int 	       len = c->len/c->bps; // Length in samples of current audio block
+  af_data_t*   l   = af->data;  // Local data
+  af_data_t*   c   = data;      // Current working data
+  int          len = c->len/c->bps; // Length in samples of current audio block
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
     return NULL;
@@ -197,9 +197,9 @@ static af_data_t* play_swapendian(struct af_instance_s* af, af_data_t* data)
 
 static af_data_t* play_float_s16(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   l   = af->data;	// Local data
-  af_data_t*   c   = data;	// Current working data
-  int 	       len = c->len/4; // Length in samples of current audio block
+  af_data_t*   l   = af->data;  // Local data
+  af_data_t*   c   = data;      // Current working data
+  int          len = c->len/4; // Length in samples of current audio block
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
     return NULL;
@@ -216,9 +216,9 @@ static af_data_t* play_float_s16(struct af_instance_s* af, af_data_t* data)
 
 static af_data_t* play_s16_float(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   l   = af->data;	// Local data
-  af_data_t*   c   = data;	// Current working data
-  int 	       len = c->len/2; // Length in samples of current audio block
+  af_data_t*   l   = af->data;  // Local data
+  af_data_t*   c   = data;      // Current working data
+  int          len = c->len/2; // Length in samples of current audio block
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
     return NULL;
@@ -236,9 +236,9 @@ static af_data_t* play_s16_float(struct af_instance_s* af, af_data_t* data)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*   l   = af->data;	// Local data
-  af_data_t*   c   = data;	// Current working data
-  int 	       len = c->len/c->bps; // Length in samples of current audio block
+  af_data_t*   l   = af->data;  // Local data
+  af_data_t*   c   = data;      // Current working data
+  int          len = c->len/c->bps; // Length in samples of current audio block
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
     return NULL;
@@ -271,7 +271,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     default:
       float2int(c->audio, l->audio, len, l->bps);
       if((l->format&AF_FORMAT_SIGN_MASK) == AF_FORMAT_US)
-	si2us(l->audio,len,l->bps);
+        si2us(l->audio,len,l->bps);
       break;
     }
   } else {
@@ -295,9 +295,9 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     default:
       // Change the number of bits
       if(c->bps != l->bps)
-	change_bps(c->audio,l->audio,len,c->bps,l->bps);
+        change_bps(c->audio,l->audio,len,c->bps,l->bps);
       else
-	fast_memcpy(l->audio,c->audio,len*c->bps);
+        fast_memcpy(l->audio,c->audio,len*c->bps);
       break;
     }
   }
@@ -339,12 +339,12 @@ af_info_t af_info_format = {
 static inline uint32_t load24bit(void* data, int pos) {
 #if HAVE_BIGENDIAN
   return (((uint32_t)((uint8_t*)data)[3*pos])<<24) |
-	 (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
-	 (((uint32_t)((uint8_t*)data)[3*pos+2])<<8);
+         (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
+         (((uint32_t)((uint8_t*)data)[3*pos+2])<<8);
 #else
   return (((uint32_t)((uint8_t*)data)[3*pos])<<8) |
-	 (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
-	 (((uint32_t)((uint8_t*)data)[3*pos+2])<<24);
+         (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
+         (((uint32_t)((uint8_t*)data)[3*pos+2])<<24);
 #endif
 }
 
@@ -367,24 +367,24 @@ static void endian(void* in, void* out, int len, int bps)
   switch(bps){
     case(2):{
       for(i=0;i<len;i++){
-	((uint16_t*)out)[i]=bswap_16(((uint16_t*)in)[i]);
+        ((uint16_t*)out)[i]=bswap_16(((uint16_t*)in)[i]);
       }
       break;
     }
     case(3):{
       register uint8_t s;
       for(i=0;i<len;i++){
-	s=((uint8_t*)in)[3*i];
-	((uint8_t*)out)[3*i]=((uint8_t*)in)[3*i+2];
-	if (in != out)
-	  ((uint8_t*)out)[3*i+1]=((uint8_t*)in)[3*i+1];
-	((uint8_t*)out)[3*i+2]=s;
+        s=((uint8_t*)in)[3*i];
+        ((uint8_t*)out)[3*i]=((uint8_t*)in)[3*i+2];
+        if (in != out)
+          ((uint8_t*)out)[3*i+1]=((uint8_t*)in)[3*i+1];
+        ((uint8_t*)out)[3*i+2]=s;
       }
       break;
     }
     case(4):{
       for(i=0;i<len;i++){
-	((uint32_t*)out)[i]=bswap_32(((uint32_t*)in)[i]);
+        ((uint32_t*)out)[i]=bswap_32(((uint32_t*)in)[i]);
       }
       break;
     }
@@ -412,15 +412,15 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
     switch(outbps){
     case(2):
       for(i=0;i<len;i++)
-	((uint16_t*)out)[i]=((uint16_t)((uint8_t*)in)[i])<<8;
+        ((uint16_t*)out)[i]=((uint16_t)((uint8_t*)in)[i])<<8;
       break;
     case(3):
       for(i=0;i<len;i++)
-	store24bit(out, i, ((uint32_t)((uint8_t*)in)[i])<<24);
+        store24bit(out, i, ((uint32_t)((uint8_t*)in)[i])<<24);
       break;
     case(4):
       for(i=0;i<len;i++)
-	((uint32_t*)out)[i]=((uint32_t)((uint8_t*)in)[i])<<24;
+        ((uint32_t*)out)[i]=((uint32_t)((uint8_t*)in)[i])<<24;
       break;
     }
     break;
@@ -428,15 +428,15 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
     switch(outbps){
     case(1):
       for(i=0;i<len;i++)
-	((uint8_t*)out)[i]=(uint8_t)((((uint16_t*)in)[i])>>8);
+        ((uint8_t*)out)[i]=(uint8_t)((((uint16_t*)in)[i])>>8);
       break;
     case(3):
       for(i=0;i<len;i++)
-	store24bit(out, i, ((uint32_t)((uint16_t*)in)[i])<<16);
+        store24bit(out, i, ((uint32_t)((uint16_t*)in)[i])<<16);
       break;
     case(4):
       for(i=0;i<len;i++)
-	((uint32_t*)out)[i]=((uint32_t)((uint16_t*)in)[i])<<16;
+        ((uint32_t*)out)[i]=((uint32_t)((uint16_t*)in)[i])<<16;
       break;
     }
     break;
@@ -444,15 +444,15 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
     switch(outbps){
     case(1):
       for(i=0;i<len;i++)
-	((uint8_t*)out)[i]=(uint8_t)(load24bit(in, i)>>24);
+        ((uint8_t*)out)[i]=(uint8_t)(load24bit(in, i)>>24);
       break;
     case(2):
       for(i=0;i<len;i++)
-	((uint16_t*)out)[i]=(uint16_t)(load24bit(in, i)>>16);
+        ((uint16_t*)out)[i]=(uint16_t)(load24bit(in, i)>>16);
       break;
     case(4):
       for(i=0;i<len;i++)
-	((uint32_t*)out)[i]=(uint32_t)load24bit(in, i);
+        ((uint32_t*)out)[i]=(uint32_t)load24bit(in, i);
       break;
     }
     break;
@@ -460,11 +460,11 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
     switch(outbps){
     case(1):
       for(i=0;i<len;i++)
-	((uint8_t*)out)[i]=(uint8_t)((((uint32_t*)in)[i])>>24);
+        ((uint8_t*)out)[i]=(uint8_t)((((uint32_t*)in)[i])>>24);
       break;
     case(2):
       for(i=0;i<len;i++)
-	((uint16_t*)out)[i]=(uint16_t)((((uint32_t*)in)[i])>>16);
+        ((uint16_t*)out)[i]=(uint16_t)((((uint32_t*)in)[i])>>16);
       break;
     case(3):
       for(i=0;i<len;i++)

@@ -19,30 +19,30 @@ static GuiImageData *tooltipRight = NULL;
  */
 GuiTooltip::GuiTooltip(const char *t)
 {
-	if(tooltipLeft == NULL)
-	{
-		tooltipLeft = new GuiImageData(tooltip_left_png);
-		tooltipTile = new GuiImageData(tooltip_tile_png);
-		tooltipRight = new GuiImageData(tooltip_right_png);
-	}
+    if(tooltipLeft == NULL)
+    {
+        tooltipLeft = new GuiImageData(tooltip_left_png);
+        tooltipTile = new GuiImageData(tooltip_tile_png);
+        tooltipRight = new GuiImageData(tooltip_right_png);
+    }
 
-	leftImage.SetImage(tooltipLeft);
-	tileImage.SetImage(tooltipTile);
-	rightImage.SetImage(tooltipRight);
-	
-	height = leftImage.GetHeight();
+    leftImage.SetImage(tooltipLeft);
+    tileImage.SetImage(tooltipTile);
+    rightImage.SetImage(tooltipRight);
 
-	text = NULL;
-	if(t)
-		SetText(t);
+    height = leftImage.GetHeight();
 
-	leftImage.SetParent(this);
-	tileImage.SetParent(this);
-	rightImage.SetParent(this);
-	text->SetParent(this);
-	
-	time1 = 0;
-	time2 = 0;
+    text = NULL;
+    if(t)
+        SetText(t);
+
+    leftImage.SetParent(this);
+    tileImage.SetParent(this);
+    rightImage.SetParent(this);
+    text->SetParent(this);
+
+    time1 = 0;
+    time2 = 0;
 }
 
 /*
@@ -50,51 +50,51 @@ GuiTooltip::GuiTooltip(const char *t)
  */
 GuiTooltip::~GuiTooltip()
 {
-	if(text)
-		delete text;
+    if(text)
+        delete text;
 }
 
 // overloaded new operator
 void *GuiTooltip::operator new(size_t size)
 {
-	void *p = gui_malloc(size);
+    void *p = gui_malloc(size);
 
-	if (!p)
-	{
-		bad_alloc ba;
-		throw ba;
-	}
-	return p;
+    if (!p)
+    {
+        bad_alloc ba;
+        throw ba;
+    }
+    return p;
 }
 
 // overloaded delete operator
 void GuiTooltip::operator delete(void *p)
 {
-	gui_free(p);
+    gui_free(p);
 }
 
 // overloaded new operator for arrays
 void *GuiTooltip::operator new[](size_t size)
 {
-	void *p = gui_malloc(size);
+    void *p = gui_malloc(size);
 
-	if (!p)
-	{
-		bad_alloc ba;
-		throw ba;
-	}
-	return p;
+    if (!p)
+    {
+        bad_alloc ba;
+        throw ba;
+    }
+    return p;
 }
 
 // overloaded delete operator for arrays
 void GuiTooltip::operator delete[](void *p)
 {
-	gui_free(p);
+    gui_free(p);
 }
 
 float GuiTooltip::GetScale()
 {
-	return (xscale * scaleDyn);
+    return (xscale * scaleDyn);
 }
 
 /* !Sets the text of the GuiTooltip element
@@ -102,42 +102,42 @@ float GuiTooltip::GetScale()
  */
 void GuiTooltip::SetText(const char * t)
 {
-	if(text)
-	{
-		delete text;
-		text = NULL;
-	}
+    if(text)
+    {
+        delete text;
+        text = NULL;
+    }
 
-	if(!t)
-		return;
+    if(!t)
+        return;
 
-	text = new GuiText(t, 16, (GXColor){0, 0, 0, 255});
-	text->SetParent(this);
+    text = new GuiText(t, 16, (GXColor){0, 0, 0, 255});
+    text->SetParent(this);
 
-	int tile = ((float)text->GetTextWidth() / (float)tileImage.GetWidth()) + 1;
+    int tile = ((float)text->GetTextWidth() / (float)tileImage.GetWidth()) + 1;
 
-	if(tile < 0)
-		tile = 0;
+    if(tile < 0)
+        tile = 0;
 
-	tileImage.SetPosition(leftImage.GetWidth(), 0);
-	tileImage.SetTile(tile);
-	rightImage.SetPosition(leftImage.GetWidth() + tile * tileImage.GetWidth(), 0);
-	width = leftImage.GetWidth() + tile * tileImage.GetWidth() + rightImage.GetWidth();
+    tileImage.SetPosition(leftImage.GetWidth(), 0);
+    tileImage.SetTile(tile);
+    rightImage.SetPosition(leftImage.GetWidth() + tile * tileImage.GetWidth(), 0);
+    width = leftImage.GetWidth() + tile * tileImage.GetWidth() + rightImage.GetWidth();
 }
 
 void GuiTooltip::ResetText()
 {
-	if(text)
-		text->ResetText();
+    if(text)
+        text->ResetText();
 
-	int tile = ((float)text->GetTextWidth() / (float)tileImage.GetWidth()) + 1;
+    int tile = ((float)text->GetTextWidth() / (float)tileImage.GetWidth()) + 1;
 
-	if(tile < 0)
-		tile = 0;
+    if(tile < 0)
+        tile = 0;
 
-	tileImage.SetTile(tile);
-	rightImage.SetPosition(leftImage.GetWidth() + tile * tileImage.GetWidth(), 0);
-	width = leftImage.GetWidth() + tile * tileImage.GetWidth() + rightImage.GetWidth();
+    tileImage.SetTile(tile);
+    rightImage.SetPosition(leftImage.GetWidth() + tile * tileImage.GetWidth(), 0);
+    width = leftImage.GetWidth() + tile * tileImage.GetWidth() + rightImage.GetWidth();
 }
 
 /*
@@ -145,42 +145,42 @@ void GuiTooltip::ResetText()
  */
 void GuiTooltip::DrawTooltip()
 {
-	if(!text || !this->IsVisible() || !parentElement)
-		return;
+    if(!text || !this->IsVisible() || !parentElement)
+        return;
 
-	if(parentElement->GetState() == STATE_SELECTED)
-	{
-		if (time2 == 0)
-		{
-			time(&time1);
-			time2 = time1;
-		}
-		if(time1 != 0)
-			time(&time1);
+    if(parentElement->GetState() == STATE_SELECTED)
+    {
+        if (time2 == 0)
+        {
+            time(&time1);
+            time2 = time1;
+        }
+        if(time1 != 0)
+            time(&time1);
 
-		if(time1 == 0 || difftime(time1, time2) >= 1.0)
-		{
-			if(time1 != 0)
-				SetEffect(EFFECT_FADE, 20);
-			time1 = 0;
-			goto draw;
-		}
-	}
-	else
-	{
-		if(time2 != 0 && time1 == 0)
-			SetEffect(EFFECT_FADE, -20);
-		time2 = 0;
-	}
+        if(time1 == 0 || difftime(time1, time2) >= 1.0)
+        {
+            if(time1 != 0)
+                SetEffect(EFFECT_FADE, 20);
+            time1 = 0;
+            goto draw;
+        }
+    }
+    else
+    {
+        if(time2 != 0 && time1 == 0)
+            SetEffect(EFFECT_FADE, -20);
+        time2 = 0;
+    }
 
-	if(GetEffect())
-	{
-		draw:
-		leftImage.Draw();
-		tileImage.Draw();
-		rightImage.Draw();
-		text->Draw();
-	}
+    if(GetEffect())
+    {
+        draw:
+        leftImage.Draw();
+        tileImage.Draw();
+        rightImage.Draw();
+        text->Draw();
+    }
 
-	this->UpdateEffects();
+    this->UpdateEffects();
 }

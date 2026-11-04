@@ -315,16 +315,16 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-fribidi$(EXEEXT): $(fribidi_OBJECTS) $(fribidi_DEPENDENCIES) 
+fribidi$(EXEEXT): $(fribidi_OBJECTS) $(fribidi_DEPENDENCIES)
 	@rm -f fribidi$(EXEEXT)
 	$(LINK) $(fribidi_OBJECTS) $(fribidi_LDADD) $(LIBS)
-fribidi-benchmark$(EXEEXT): $(fribidi_benchmark_OBJECTS) $(fribidi_benchmark_DEPENDENCIES) 
+fribidi-benchmark$(EXEEXT): $(fribidi_benchmark_OBJECTS) $(fribidi_benchmark_DEPENDENCIES)
 	@rm -f fribidi-benchmark$(EXEEXT)
 	$(LINK) $(fribidi_benchmark_OBJECTS) $(fribidi_benchmark_LDADD) $(LIBS)
-fribidi-bidi-types$(EXEEXT): $(fribidi_bidi_types_OBJECTS) $(fribidi_bidi_types_DEPENDENCIES) 
+fribidi-bidi-types$(EXEEXT): $(fribidi_bidi_types_OBJECTS) $(fribidi_bidi_types_DEPENDENCIES)
 	@rm -f fribidi-bidi-types$(EXEEXT)
 	$(LINK) $(fribidi_bidi_types_OBJECTS) $(fribidi_bidi_types_LDADD) $(LIBS)
-fribidi-caprtl2utf8$(EXEEXT): $(fribidi_caprtl2utf8_OBJECTS) $(fribidi_caprtl2utf8_DEPENDENCIES) 
+fribidi-caprtl2utf8$(EXEEXT): $(fribidi_caprtl2utf8_OBJECTS) $(fribidi_caprtl2utf8_DEPENDENCIES)
 	@rm -f fribidi-caprtl2utf8$(EXEEXT)
 	$(LINK) $(fribidi_caprtl2utf8_OBJECTS) $(fribidi_caprtl2utf8_LDADD) $(LIBS)
 

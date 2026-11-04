@@ -29,11 +29,11 @@
 
 static const vd_info_t info =
 {
-	"libmpeg2 MPEG 1/2 Video decoder",
-	"libmpeg2",
-	"A'rpi & Fabian Franz",
-	"Aaron & Walken",
-	"native"
+        "libmpeg2 MPEG 1/2 Video decoder",
+        "libmpeg2",
+        "A'rpi & Fabian Franz",
+        "Aaron & Walken",
+        "native"
 };
 
 LIBVD_EXTERN(libmpeg2)
@@ -65,14 +65,14 @@ static int control(sh_video_t *sh,int cmd,void* arg,...){
     switch(cmd) {
     case VDCTRL_QUERY_FORMAT:
         if (info->sequence->width >> 1 == info->sequence->chroma_width &&
-	    info->sequence->height >> 1 == info->sequence->chroma_height &&
-	    (*((int*)arg)) == IMGFMT_YV12)
-	    return CONTROL_TRUE;
-	if (info->sequence->width >> 1 == info->sequence->chroma_width &&
-		info->sequence->height == info->sequence->chroma_height &&
-	    (*((int*)arg)) == IMGFMT_422P)
-	    return CONTROL_TRUE;
-	return CONTROL_FALSE;
+            info->sequence->height >> 1 == info->sequence->chroma_height &&
+            (*((int*)arg)) == IMGFMT_YV12)
+            return CONTROL_TRUE;
+        if (info->sequence->width >> 1 == info->sequence->chroma_width &&
+                info->sequence->height == info->sequence->chroma_height &&
+            (*((int*)arg)) == IMGFMT_422P)
+            return CONTROL_TRUE;
+        return CONTROL_FALSE;
     }
 
     return CONTROL_UNKNOWN;
@@ -130,7 +130,7 @@ static void uninit(sh_video_t *sh){
     mpeg2dec->decoder.convert_id=NULL;
     mpeg2_close (mpeg2dec);
     for (i=0; i < 3; i++)
-	free(context->quant_store[i]);
+        free(context->quant_store[i]);
     free(sh->context);
 }
 
@@ -143,10 +143,10 @@ static void draw_slice (void * _sh, uint8_t * const * src, unsigned int y){
     uint8_t *srcs[MP_MAX_PLANES] = {src[0], src[1], src[2]};
 
     mpcodecs_draw_slice(sh, srcs,
-		stride, info->sequence->picture_width,
-		(y+16<=info->sequence->picture_height) ? 16 :
-		    info->sequence->picture_height-y,
-		0, y);
+                stride, info->sequence->picture_width,
+                (y+16<=info->sequence->picture_height) ? 16 :
+                    info->sequence->picture_height-y,
+                0, y);
 }
 
 // decode a frame
@@ -170,89 +170,89 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     len+=4;
 
     if (context->pending_length) {
-	mpeg2_buffer (mpeg2dec, context->pending_buffer, context->pending_buffer + context->pending_length);
+        mpeg2_buffer (mpeg2dec, context->pending_buffer, context->pending_buffer + context->pending_length);
     } else {
         mpeg2_buffer (mpeg2dec, data, (uint8_t *)data+len);
     }
 
     while(1){
-	int state=mpeg2_parse (mpeg2dec);
-	int type, use_callback;
-	mp_image_t* mpi_new;
-	unsigned long pw, ph;
-	int imgfmt;
+        int state=mpeg2_parse (mpeg2dec);
+        int type, use_callback;
+        mp_image_t* mpi_new;
+        unsigned long pw, ph;
+        int imgfmt;
 
-	switch(state){
-	case STATE_BUFFER:
-	    if (context->pending_length) {
-		// just finished the pending data, continue with processing of the passed buffer
-		context->pending_length = 0;
-    		mpeg2_buffer (mpeg2dec, data, (uint8_t *)data+len);
-    	    } else {
-	        // parsing of the passed buffer finished, return.
-		return 0;
-	    }
-	    break;
-	case STATE_SEQUENCE:
-	    pw = info->sequence->display_width * info->sequence->pixel_width;
-	    ph = info->sequence->display_height * info->sequence->pixel_height;
-	    if(ph) sh->aspect = (float) pw / (float) ph;
-	    // video parameters initialized/changed, (re)init libvo:
-	    if (info->sequence->width >> 1 == info->sequence->chroma_width &&
-		info->sequence->height >> 1 == info->sequence->chroma_height) {
-		imgfmt = IMGFMT_YV12;
-	    } else if (info->sequence->width >> 1 == info->sequence->chroma_width &&
-		info->sequence->height == info->sequence->chroma_height) {
-		imgfmt = IMGFMT_422P;
-	    } else return 0;
-	    if (imgfmt == context->imgfmt &&
-	        info->sequence->picture_width == context->width &&
-	        info->sequence->picture_height == context->height &&
-	        sh->aspect == context->aspect)
-		break;
-	    if(!mpcodecs_config_vo(sh,
-	          info->sequence->picture_width,
-	          info->sequence->picture_height, imgfmt))
-		return 0;
-	    context->imgfmt = imgfmt;
-	    context->width = info->sequence->picture_width;
-	    context->height = info->sequence->picture_height;
-	    context->aspect = sh->aspect;
-	    break;
-	case STATE_PICTURE:
-	    type=info->current_picture->flags&PIC_MASK_CODING_TYPE;
+        switch(state){
+        case STATE_BUFFER:
+            if (context->pending_length) {
+                // just finished the pending data, continue with processing of the passed buffer
+                context->pending_length = 0;
+                mpeg2_buffer (mpeg2dec, data, (uint8_t *)data+len);
+            } else {
+                // parsing of the passed buffer finished, return.
+                return 0;
+            }
+            break;
+        case STATE_SEQUENCE:
+            pw = info->sequence->display_width * info->sequence->pixel_width;
+            ph = info->sequence->display_height * info->sequence->pixel_height;
+            if(ph) sh->aspect = (float) pw / (float) ph;
+            // video parameters initialized/changed, (re)init libvo:
+            if (info->sequence->width >> 1 == info->sequence->chroma_width &&
+                info->sequence->height >> 1 == info->sequence->chroma_height) {
+                imgfmt = IMGFMT_YV12;
+            } else if (info->sequence->width >> 1 == info->sequence->chroma_width &&
+                info->sequence->height == info->sequence->chroma_height) {
+                imgfmt = IMGFMT_422P;
+            } else return 0;
+            if (imgfmt == context->imgfmt &&
+                info->sequence->picture_width == context->width &&
+                info->sequence->picture_height == context->height &&
+                sh->aspect == context->aspect)
+                break;
+            if(!mpcodecs_config_vo(sh,
+                  info->sequence->picture_width,
+                  info->sequence->picture_height, imgfmt))
+                return 0;
+            context->imgfmt = imgfmt;
+            context->width = info->sequence->picture_width;
+            context->height = info->sequence->picture_height;
+            context->aspect = sh->aspect;
+            break;
+        case STATE_PICTURE:
+            type=info->current_picture->flags&PIC_MASK_CODING_TYPE;
 
-	    drop_frame = framedrop && (mpeg2dec->decoder.coding_type == B_TYPE);
+            drop_frame = framedrop && (mpeg2dec->decoder.coding_type == B_TYPE);
             drop_frame |= framedrop>=2; // hard drop
             if (drop_frame) {
                mpeg2_skip(mpeg2dec, 1);
-	       break;
-	    }
+               break;
+            }
             mpeg2_skip(mpeg2dec, 0); //mpeg2skip skips frames until set again to 0
 
-	    use_callback = (!framedrop && vd_use_slices &&
-	    		    (info->current_picture->flags&PIC_FLAG_PROGRESSIVE_FRAME)) ?
-			    MP_IMGFLAG_DRAW_CALLBACK:0;
+            use_callback = (!framedrop && vd_use_slices &&
+                            (info->current_picture->flags&PIC_FLAG_PROGRESSIVE_FRAME)) ?
+                            MP_IMGFLAG_DRAW_CALLBACK:0;
 
-	    // get_buffer "callback":
-	    mpi_new=mpcodecs_get_image(sh,MP_IMGTYPE_IPB,
-				       (type==PIC_FLAG_CODING_TYPE_B) ?
-					use_callback : (MP_IMGFLAG_PRESERVE|MP_IMGFLAG_READABLE),
-				       info->sequence->width,
-				       info->sequence->height);
+            // get_buffer "callback":
+            mpi_new=mpcodecs_get_image(sh,MP_IMGTYPE_IPB,
+                                       (type==PIC_FLAG_CODING_TYPE_B) ?
+                                        use_callback : (MP_IMGFLAG_PRESERVE|MP_IMGFLAG_READABLE),
+                                       info->sequence->width,
+                                       info->sequence->height);
 
-	    if(!mpi_new) return 0; // VO ERROR!!!!!!!!
-	    mpeg2_set_buf(mpeg2dec, mpi_new->planes, mpi_new);
-	    mpi_new->stride[0] = info->sequence->width;
-	    mpi_new->stride[1] = info->sequence->chroma_width;
-	    mpi_new->stride[2] = info->sequence->chroma_width;
-	    if (info->current_picture->flags&PIC_FLAG_TOP_FIELD_FIRST)
-		mpi_new->fields |= MP_IMGFIELD_TOP_FIRST;
-	    else mpi_new->fields &= ~MP_IMGFIELD_TOP_FIRST;
-	    if (info->current_picture->flags&PIC_FLAG_REPEAT_FIRST_FIELD)
-		mpi_new->fields |= MP_IMGFIELD_REPEAT_FIRST;
-	    else mpi_new->fields &= ~MP_IMGFIELD_REPEAT_FIRST;
-	    mpi_new->fields |= MP_IMGFIELD_ORDERED;
+            if(!mpi_new) return 0; // VO ERROR!!!!!!!!
+            mpeg2_set_buf(mpeg2dec, mpi_new->planes, mpi_new);
+            mpi_new->stride[0] = info->sequence->width;
+            mpi_new->stride[1] = info->sequence->chroma_width;
+            mpi_new->stride[2] = info->sequence->chroma_width;
+            if (info->current_picture->flags&PIC_FLAG_TOP_FIELD_FIRST)
+                mpi_new->fields |= MP_IMGFIELD_TOP_FIRST;
+            else mpi_new->fields &= ~MP_IMGFIELD_TOP_FIRST;
+            if (info->current_picture->flags&PIC_FLAG_REPEAT_FIRST_FIELD)
+                mpi_new->fields |= MP_IMGFIELD_REPEAT_FIRST;
+            else mpi_new->fields &= ~MP_IMGFIELD_REPEAT_FIRST;
+            mpi_new->fields |= MP_IMGFIELD_ORDERED;
             if (!(info->current_picture->flags&PIC_FLAG_PROGRESSIVE_FRAME))
                 mpi_new->fields |= MP_IMGFIELD_INTERLACED;
 /*
@@ -260,50 +260,50 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
  * we let postproc know them to fine tune it's strength
  */
 #if defined(MPEG12_POSTPROC) && defined(CONFIG_LIBMPEG2_INTERNAL)
-	    mpi_new->qstride=info->sequence->width>>4;
-	    {
-	    char **p = &context->quant_store[type==PIC_FLAG_CODING_TYPE_B ?
-					2 : (context->quant_store_idx ^= 1)];
-	    *p = realloc(*p, mpi_new->qstride*(info->sequence->height>>4));
-	    mpi_new->qscale = *p;
-	    }
-	    mpeg2dec->decoder.quant_store=mpi_new->qscale;
-	    mpeg2dec->decoder.quant_stride=mpi_new->qstride;
-	    mpi_new->pict_type=type; // 1->I, 2->P, 3->B
-	    mpi_new->qscale_type= 1;
+            mpi_new->qstride=info->sequence->width>>4;
+            {
+            char **p = &context->quant_store[type==PIC_FLAG_CODING_TYPE_B ?
+                                        2 : (context->quant_store_idx ^= 1)];
+            *p = realloc(*p, mpi_new->qstride*(info->sequence->height>>4));
+            mpi_new->qscale = *p;
+            }
+            mpeg2dec->decoder.quant_store=mpi_new->qscale;
+            mpeg2dec->decoder.quant_stride=mpi_new->qstride;
+            mpi_new->pict_type=type; // 1->I, 2->P, 3->B
+            mpi_new->qscale_type= 1;
 #endif
 
-	    if (mpi_new->flags&MP_IMGFLAG_DRAW_CALLBACK
-	        && !(mpi_new->flags&MP_IMGFLAG_DIRECT)) {
-		// nice, filter/vo likes draw_callback :)
-		mpeg2dec->decoder.convert=draw_slice;
-		mpeg2dec->decoder.convert_id=sh;
-	    } else {
-	        mpeg2dec->decoder.convert=NULL;
-	        mpeg2dec->decoder.convert_id=NULL;
-	    }
+            if (mpi_new->flags&MP_IMGFLAG_DRAW_CALLBACK
+                && !(mpi_new->flags&MP_IMGFLAG_DIRECT)) {
+                // nice, filter/vo likes draw_callback :)
+                mpeg2dec->decoder.convert=draw_slice;
+                mpeg2dec->decoder.convert_id=sh;
+            } else {
+                mpeg2dec->decoder.convert=NULL;
+                mpeg2dec->decoder.convert_id=NULL;
+            }
 
-	    break;
-	case STATE_SLICE:
-	case STATE_END:
-	case STATE_INVALID_END:
-	    // decoding done:
-	    if(info->display_fbuf) {
-		mp_image_t* mpi = info->display_fbuf->id;
-		if (context->pending_length == 0) {
-		    context->pending_length = mpeg2dec->buf_end - mpeg2dec->buf_start;
-		    context->pending_buffer = realloc(context->pending_buffer, context->pending_length);
-		    memcpy(context->pending_buffer, mpeg2dec->buf_start, context->pending_length);
-		} else {
-		    // still some data in the pending buffer, shouldn't happen
-		    context->pending_length = mpeg2dec->buf_end - mpeg2dec->buf_start;
-		    memmove(context->pending_buffer, mpeg2dec->buf_start, context->pending_length);
-		    context->pending_buffer = realloc(context->pending_buffer, context->pending_length + len);
-		    memcpy(context->pending_buffer+context->pending_length, data, len);
-		    context->pending_length += len;
-		}
-		return mpi;
-	    }
-	}
+            break;
+        case STATE_SLICE:
+        case STATE_END:
+        case STATE_INVALID_END:
+            // decoding done:
+            if(info->display_fbuf) {
+                mp_image_t* mpi = info->display_fbuf->id;
+                if (context->pending_length == 0) {
+                    context->pending_length = mpeg2dec->buf_end - mpeg2dec->buf_start;
+                    context->pending_buffer = realloc(context->pending_buffer, context->pending_length);
+                    memcpy(context->pending_buffer, mpeg2dec->buf_start, context->pending_length);
+                } else {
+                    // still some data in the pending buffer, shouldn't happen
+                    context->pending_length = mpeg2dec->buf_end - mpeg2dec->buf_start;
+                    memmove(context->pending_buffer, mpeg2dec->buf_start, context->pending_length);
+                    context->pending_buffer = realloc(context->pending_buffer, context->pending_length + len);
+                    memcpy(context->pending_buffer+context->pending_length, data, len);
+                    context->pending_length += len;
+                }
+                return mpi;
+            }
+        }
     }
 }

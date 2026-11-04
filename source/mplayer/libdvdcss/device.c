@@ -1143,87 +1143,87 @@ static int aspi_read_internal( int i_fd, void *p_data, int i_blocks )
 #ifdef GEKKO
 static int di_open(dvdcss_t dvdcss, char const * psz_device) {
 
-	if (strcmp(psz_device, "/dev/di")) {
-		print_debug(dvdcss, "DI: unknown device '%s'", psz_device);
-		return -1;
-	}
+    if (strcmp(psz_device, "/dev/di")) {
+        print_debug(dvdcss, "DI: unknown device '%s'", psz_device);
+        return -1;
+    }
 
-	if(!StartDVDMotor())
-		return -1;
+    if(!StartDVDMotor())
+        return -1;
 
-	dvdcss->i_pos = 0;
-	return 0;
+    dvdcss->i_pos = 0;
+    return 0;
 }
 
 static int di_seek(dvdcss_t dvdcss, int i_blocks) {
-	if (dvdcss->i_pos == i_blocks )
-		return i_blocks;
+    if (dvdcss->i_pos == i_blocks )
+        return i_blocks;
 
-	//TODO check this against the disc's max lba
-	dvdcss->i_pos = i_blocks;
-	return dvdcss->i_pos;
+    //TODO check this against the disc's max lba
+    dvdcss->i_pos = i_blocks;
+    return dvdcss->i_pos;
 }
 
 static int di_read(dvdcss_t dvdcss, void *buffer, int blocks) {
-	void *bfr;
-	int ret;
+    void *bfr;
+    int ret;
 
-	bfr = memalign(32, blocks * DVDCSS_BLOCK_SIZE);
-	if (bfr == NULL) {
-		print_debug(dvdcss, "DI: can't allocate %d bytes",
-					blocks * DVDCSS_BLOCK_SIZE);
-		return -1;
-	}
+    bfr = memalign(32, blocks * DVDCSS_BLOCK_SIZE);
+    if (bfr == NULL) {
+        print_debug(dvdcss, "DI: can't allocate %d bytes",
+                    blocks * DVDCSS_BLOCK_SIZE);
+        return -1;
+    }
 
-	ret = DI_ReadDVD(bfr, blocks, dvdcss->i_pos);
+    ret = DI_ReadDVD(bfr, blocks, dvdcss->i_pos);
 
-	if (ret < 0) {
-		print_debug(dvdcss, "DI: read failed with %d", ret);
-		free(bfr);
-		return -1;
-	}
+    if (ret < 0) {
+        print_debug(dvdcss, "DI: read failed with %d", ret);
+        free(bfr);
+        return -1;
+    }
 
-	dvdcss->i_pos += blocks;
-	memcpy(buffer, bfr, blocks * DVDCSS_BLOCK_SIZE);
-	free(bfr);
+    dvdcss->i_pos += blocks;
+    memcpy(buffer, bfr, blocks * DVDCSS_BLOCK_SIZE);
+    free(bfr);
 
-	return blocks;
+    return blocks;
 }
 
 static int di_readv(dvdcss_t dvdcss, struct iovec *iov, int iovcnt) {
-	int len;
-	int i;
-	int ret;
-	void *bfr, *ptr;
+    int len;
+    int i;
+    int ret;
+    void *bfr, *ptr;
 
-	len = 0;
-	for (i = 0; i < iovcnt; ++i)
-		len += iov[i].iov_len;
+    len = 0;
+    for (i = 0; i < iovcnt; ++i)
+        len += iov[i].iov_len;
 
-	bfr = memalign(32, len);
-	if (bfr == NULL) {
-		print_debug(dvdcss, "DI: can't allocate %d bytes",
-					len * DVDCSS_BLOCK_SIZE);
-		return -1;
-	}
+    bfr = memalign(32, len);
+    if (bfr == NULL) {
+        print_debug(dvdcss, "DI: can't allocate %d bytes",
+                    len * DVDCSS_BLOCK_SIZE);
+        return -1;
+    }
 
-	ret = DI_ReadDVD(bfr, len / DVDCSS_BLOCK_SIZE, dvdcss->i_pos);
-	if (ret < 0) {
-		print_debug( dvdcss, "DI: readv failed with %d", ret);
-		free(bfr);
-		return -1;
-	}
+    ret = DI_ReadDVD(bfr, len / DVDCSS_BLOCK_SIZE, dvdcss->i_pos);
+    if (ret < 0) {
+        print_debug( dvdcss, "DI: readv failed with %d", ret);
+        free(bfr);
+        return -1;
+    }
 
-	ptr = bfr;
-	for (i = 0; i < iovcnt; ++i) {
-		memcpy(iov[i].iov_base, ptr, iov[i].iov_len);
-		ptr += iov[i].iov_len;
-	}
+    ptr = bfr;
+    for (i = 0; i < iovcnt; ++i) {
+        memcpy(iov[i].iov_base, ptr, iov[i].iov_len);
+        ptr += iov[i].iov_len;
+    }
 
-	dvdcss->i_pos += len / DVDCSS_BLOCK_SIZE;
-	free(bfr);
+    dvdcss->i_pos += len / DVDCSS_BLOCK_SIZE;
+    free(bfr);
 
-	return len;
+    return len;
 }
 
 #ifdef GEKKO
@@ -1235,116 +1235,116 @@ static int cache_sectors;
 
 static int usb_open(dvdcss_t dvdcss, char const * psz_device)
 {
-	if (strcmp(psz_device, "/dev/usb")) {
-		print_debug(dvdcss, "USB: unknown device '%s'", psz_device);
-		return -1;
-	}
+    if (strcmp(psz_device, "/dev/usb")) {
+        print_debug(dvdcss, "USB: unknown device '%s'", psz_device);
+        return -1;
+    }
 
-	if (usb->isInserted() == 0 || USBStorage_IsDVD() == 0)
-		return -1;
+    if (usb->isInserted() == 0 || USBStorage_IsDVD() == 0)
+        return -1;
 
-	if(!read_buffer)
-		read_buffer = mem2_memalign(32, BUFFER_SECTOR_SIZE*DVDCSS_BLOCK_SIZE, MEM2_OTHER);
+    if(!read_buffer)
+        read_buffer = mem2_memalign(32, BUFFER_SECTOR_SIZE*DVDCSS_BLOCK_SIZE, MEM2_OTHER);
 
-	dvdcss->i_pos = 0;	
-	cache_sectors = 0;
-	return 0;
+    dvdcss->i_pos = 0;
+    cache_sectors = 0;
+    return 0;
 }
 
 static int usb_seek(dvdcss_t dvdcss, int i_blocks)
 {
-	dvdcss->i_pos = i_blocks;
-	return dvdcss->i_pos;
+    dvdcss->i_pos = i_blocks;
+    return dvdcss->i_pos;
 }
 
 static int __read(dvdcss_t dvdcss, void *ptr, int start, int sectors)
 {
-	sectors = (BUFFER_SECTOR_SIZE < sectors) ? BUFFER_SECTOR_SIZE : sectors;
-	if (cache_sectors && start >= cache_start && (start + sectors) <= (cache_start + cache_sectors))
-	{
-		memcpy(ptr, read_buffer+(start-cache_start)*DVDCSS_BLOCK_SIZE, sectors*DVDCSS_BLOCK_SIZE);
-		return sectors;
-	}
+    sectors = (BUFFER_SECTOR_SIZE < sectors) ? BUFFER_SECTOR_SIZE : sectors;
+    if (cache_sectors && start >= cache_start && (start + sectors) <= (cache_start + cache_sectors))
+    {
+        memcpy(ptr, read_buffer+(start-cache_start)*DVDCSS_BLOCK_SIZE, sectors*DVDCSS_BLOCK_SIZE);
+        return sectors;
+    }
 
-	if (!usb->readSectors(start, BUFFER_SECTOR_SIZE, read_buffer))
-	{
-		cache_sectors = 0;
-		return -1;
-	}
+    if (!usb->readSectors(start, BUFFER_SECTOR_SIZE, read_buffer))
+    {
+        cache_sectors = 0;
+        return -1;
+    }
 
-	cache_start = start;
-	cache_sectors = BUFFER_SECTOR_SIZE;
-	memcpy(ptr, read_buffer, sectors*DVDCSS_BLOCK_SIZE);
+    cache_start = start;
+    cache_sectors = BUFFER_SECTOR_SIZE;
+    memcpy(ptr, read_buffer, sectors*DVDCSS_BLOCK_SIZE);
 
-	return sectors;
+    return sectors;
 }
 
 static int _read(dvdcss_t dvdcss, void *ptr, int start, int sectors)
 {
-	int ret, done = 0;
-	char *cptr = ptr;
-	while (done < sectors)
-	{
-		ret = __read(dvdcss, cptr+done*DVDCSS_BLOCK_SIZE, start+done, sectors-done);
-		if (ret > 0) {
-			done += ret;
-		}
-		else if (ret == 0)
-			break;
-		else
-			return -1;
-	}
-	return done;
+    int ret, done = 0;
+    char *cptr = ptr;
+    while (done < sectors)
+    {
+        ret = __read(dvdcss, cptr+done*DVDCSS_BLOCK_SIZE, start+done, sectors-done);
+        if (ret > 0) {
+            done += ret;
+        }
+        else if (ret == 0)
+            break;
+        else
+            return -1;
+    }
+    return done;
 }
 
 static int usb_read(dvdcss_t dvdcss, void *buffer, int blocks)
 {
-	int ret;
+    int ret;
 
     ret = _read(dvdcss, buffer, dvdcss->i_pos, blocks);
-	if (ret < 0) {
-		print_debug(dvdcss, "USB: read failed with %d", ret);
-		return -1;
-	}
+    if (ret < 0) {
+        print_debug(dvdcss, "USB: read failed with %d", ret);
+        return -1;
+    }
 
-	dvdcss->i_pos += ret;
-	return ret;
+    dvdcss->i_pos += ret;
+    return ret;
 }
 
 static int usb_readv(dvdcss_t dvdcss, struct iovec *iov, int iovcnt)
 {
-	int len;
-	int i;
-	void *bfr, *ptr;
-	int ret;
+    int len;
+    int i;
+    void *bfr, *ptr;
+    int ret;
 
-	len = 0;
-	for (i = 0; i < iovcnt; ++i)
-		len += iov[i].iov_len;
+    len = 0;
+    for (i = 0; i < iovcnt; ++i)
+        len += iov[i].iov_len;
 
-	bfr = memalign(32, len);
-	if (bfr == NULL) {
-		print_debug(dvdcss, "USB: can't allocate %d bytes", len);
-		return -1;
-	}
+    bfr = memalign(32, len);
+    if (bfr == NULL) {
+        print_debug(dvdcss, "USB: can't allocate %d bytes", len);
+        return -1;
+    }
 
     ret = _read(dvdcss, bfr, dvdcss->i_pos, len/DVDCSS_BLOCK_SIZE);
-	if (ret < 0) {
-		print_debug(dvdcss, "USB: read failed with %d", ret);
-		free(bfr);
-		return -1;
-	}
+    if (ret < 0) {
+        print_debug(dvdcss, "USB: read failed with %d", ret);
+        free(bfr);
+        return -1;
+    }
 
-	ptr = bfr;
-	for (i = 0; i < iovcnt; ++i) {
-		memcpy(iov[i].iov_base, ptr, iov[i].iov_len);
-		ptr += iov[i].iov_len;
-	}
+    ptr = bfr;
+    for (i = 0; i < iovcnt; ++i) {
+        memcpy(iov[i].iov_base, ptr, iov[i].iov_len);
+        ptr += iov[i].iov_len;
+    }
 
-	dvdcss->i_pos += len/DVDCSS_BLOCK_SIZE;
-	free(bfr);
+    dvdcss->i_pos += len/DVDCSS_BLOCK_SIZE;
+    free(bfr);
 
-	return len;
+    return len;
 }
 #endif
 

@@ -31,11 +31,11 @@
 #include "loader/dshow/DS_VideoDecoder.h"
 
 static const vd_info_t info = {
-	"DirectShow video codecs",
-	"dshow",
-	"A'rpi",
-	"based on http://avifile.sf.net",
-	"win32 codecs"
+        "DirectShow video codecs",
+        "dshow",
+        "A'rpi",
+        "based on http://avifile.sf.net",
+        "win32 codecs"
 };
 
 LIBVD_EXTERN(dshow)
@@ -44,21 +44,21 @@ LIBVD_EXTERN(dshow)
 static int control(sh_video_t *sh,int cmd,void* arg,...){
     switch(cmd){
     case VDCTRL_QUERY_MAX_PP_LEVEL:
-	return 4;
+        return 4;
     case VDCTRL_SET_PP_LEVEL:
-	if(!sh->context) return CONTROL_ERROR;
-	DS_VideoDecoder_SetValue(sh->context,"Quality",*((int*)arg));
-	return CONTROL_OK;
+        if(!sh->context) return CONTROL_ERROR;
+        DS_VideoDecoder_SetValue(sh->context,"Quality",*((int*)arg));
+        return CONTROL_OK;
 
     case VDCTRL_SET_EQUALIZER: {
-	va_list ap;
-	int value;
-	va_start(ap, arg);
-	value=va_arg(ap, int);
-	va_end(ap);
-	if(DS_VideoDecoder_SetValue(sh->context,arg,50+value/2)==0)
-	    return CONTROL_OK;
-	return CONTROL_FALSE;
+        va_list ap;
+        int value;
+        va_start(ap, arg);
+        value=va_arg(ap, int);
+        va_end(ap);
+        if(DS_VideoDecoder_SetValue(sh->context,arg,50+value/2)==0)
+            return CONTROL_OK;
+        return CONTROL_FALSE;
     }
 
     }
@@ -79,7 +79,7 @@ static int init(sh_video_t *sh){
     if(!(sh->context=DS_VideoDecoder_Open(sh->codec->dll,&sh->codec->guid, sh->bih, 0, 0))){
         mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,sh->codec->dll);
         mp_msg(MSGT_DECVIDEO,MSGL_HINT,MSGTR_DownloadCodecPackage);
-	return 0;
+        return 0;
     }
     if(!mpcodecs_config_vo(sh,sh->disp_w,sh->disp_h,out_fmt)) return 0;
     // mpcodecs_config_vo can change the format
@@ -87,15 +87,15 @@ static int init(sh_video_t *sh){
     switch(out_fmt){
     case IMGFMT_YUY2:
     case IMGFMT_UYVY:
-	DS_VideoDecoder_SetDestFmt(sh->context,16,out_fmt);break; // packed YUV
+        DS_VideoDecoder_SetDestFmt(sh->context,16,out_fmt);break; // packed YUV
     case IMGFMT_YV12:
     case IMGFMT_I420:
     case IMGFMT_IYUV:
-	DS_VideoDecoder_SetDestFmt(sh->context,12,out_fmt);break; // planar YUV
+        DS_VideoDecoder_SetDestFmt(sh->context,12,out_fmt);break; // planar YUV
     case IMGFMT_YVU9:
         DS_VideoDecoder_SetDestFmt(sh->context,9,out_fmt);break;
     default:
-	DS_VideoDecoder_SetDestFmt(sh->context,out_fmt&255,0);    // RGB/BGR
+        DS_VideoDecoder_SetDestFmt(sh->context,out_fmt&255,0);    // RGB/BGR
     }
     DS_SetAttr_DivX("Quality",divx_quality);
     DS_VideoDecoder_StartInternal(sh->context);
@@ -116,17 +116,17 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     if(len<=0) return NULL; // skipped frame
 
     if(flags&3){
-	// framedrop:
+        // framedrop:
         DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, 0);
-	return NULL;
+        return NULL;
     }
 
     mpi=mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_COMMON_PLANE,
-	sh->disp_w, sh->disp_h);
+        sh->disp_w, sh->disp_h);
 
-    if(!mpi){	// temporary!
-	mp_msg(MSGT_DECVIDEO,MSGL_WARN,MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec);
-	return NULL;
+    if(!mpi){   // temporary!
+        mp_msg(MSGT_DECVIDEO,MSGL_WARN,MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec);
+        return NULL;
     }
 
     DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, mpi->planes[0]);

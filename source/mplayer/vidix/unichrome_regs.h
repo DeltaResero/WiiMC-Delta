@@ -77,7 +77,7 @@
 /*
  *      video registers
  */
-#define V_FLAGS				    0x00
+#define V_FLAGS                             0x00
 #define V_CAP_STATUS            0x04
 #define V_FLIP_STATUS           0x04
 #define V_ALPHA_WIN_START       0x08
@@ -397,42 +397,42 @@
 #define RAM_TABLE_RGB_ENABLE        0x00000007
 
 /* CAPTURE0_CONTROL                  0x310 */
-#define C0_ENABLE           		0x00000001
-#define BUFFER_2_MODE       		0x00000000
-#define BUFFER_3_MODE       		0x00000004
-#define BUFFER_4_MODE       		0x00000006
-#define SWAP_YUYV           		0x00000000
-#define SWAP_UYVY           		0x00000100
-#define SWAP_YVYU           		0x00000200
-#define SWAP_VYUY           		0x00000300
-#define IN_601_8            		0x00000000
-#define IN_656_8            		0x00000010
-#define IN_601_16           		0x00000020
-#define IN_656_16           		0x00000030
-#define DEINTER_ODD         		0x00000000
-#define DEINTER_EVEN        		0x00001000
-#define DEINTER_ODD_EVEN    		0x00002000
-#define DEINTER_FRAME       		0x00003000
-#define VIP_1               		0x00000000
-#define VIP_2               		0x00000400
-#define H_FILTER_2          		0x00010000
-#define H_FILTER_4          		0x00020000
-#define H_FILTER_8_1331     		0x00030000
-#define H_FILTER_8_12221    		0x00040000
-#define VIP_ENABLE          		0x00000008
-#define EN_FIELD_SIG        		0x00000800
-#define VREF_INVERT         		0x00100000
-#define FIELD_INPUT_INVERSE    		0x00400000
-#define FIELD_INVERSE       		0x40000000
+#define C0_ENABLE                       0x00000001
+#define BUFFER_2_MODE                   0x00000000
+#define BUFFER_3_MODE                   0x00000004
+#define BUFFER_4_MODE                   0x00000006
+#define SWAP_YUYV                       0x00000000
+#define SWAP_UYVY                       0x00000100
+#define SWAP_YVYU                       0x00000200
+#define SWAP_VYUY                       0x00000300
+#define IN_601_8                        0x00000000
+#define IN_656_8                        0x00000010
+#define IN_601_16                       0x00000020
+#define IN_656_16                       0x00000030
+#define DEINTER_ODD                     0x00000000
+#define DEINTER_EVEN                    0x00001000
+#define DEINTER_ODD_EVEN                0x00002000
+#define DEINTER_FRAME                   0x00003000
+#define VIP_1                           0x00000000
+#define VIP_2                           0x00000400
+#define H_FILTER_2                      0x00010000
+#define H_FILTER_4                      0x00020000
+#define H_FILTER_8_1331                 0x00030000
+#define H_FILTER_8_12221                0x00040000
+#define VIP_ENABLE                      0x00000008
+#define EN_FIELD_SIG                    0x00000800
+#define VREF_INVERT                     0x00100000
+#define FIELD_INPUT_INVERSE             0x00400000
+#define FIELD_INVERSE                   0x40000000
 
-#define C1_H_MINI_EN        		0x00000800
-#define C0_H_MINI_EN        		0x00000800
-#define C1_V_MINI_EN        		0x04000000
-#define C0_V_MINI_EN        		0x04000000
-#define C1_H_MINI_2         		0x00000400
+#define C1_H_MINI_EN                    0x00000800
+#define C0_H_MINI_EN                    0x00000800
+#define C1_V_MINI_EN                    0x04000000
+#define C0_V_MINI_EN                    0x04000000
+#define C1_H_MINI_2                     0x00000400
 
 /* CAPTURE1_CONTROL                  0x354 */
-#define C1_ENABLE           		0x00000001
+#define C1_ENABLE                       0x00000001
 
 /* V3_CONTROL                   0x2A0 */
 #define V3_ENABLE               0x00000001
@@ -576,59 +576,59 @@
 #define GEOutD(port, data)      *((volatile CARD32 *)(lpGEMMIO + (port))) = (data)
 
 /*
- *	MPEG 1/2 Slice Engine (at 0xC00 relative to base)
+ *      MPEG 1/2 Slice Engine (at 0xC00 relative to base)
  */
 
-#define MPG_CONTROL		0x00
-#define 	MPG_CONTROL_STRUCT	0x03
-#define			MPG_CONTROL_STRUCT_TOP		0x01
-#define			MPG_CONTROL_STRUCT_BOTTOM	0x02
-#define			MPG_CONTROL_STRUCT_FRAME	0x03
-		/* Use TOP if interlaced */
-#define		MPG_CONTROL_TYPE	0x3C
-#define			MPG_CONTROL_TYPE_I	(0x01 << 2)
-#define			MPG_CONTROL_TYPE_B	(0x02 << 2)
-#define			MPG_CONTROL_TYPE_P	(0x03 << 3)
-#define		MPG_CONTROL_ALTSCAN	0x40
-#define MPG_BLOCK		0x08		/* Unsure */
-#define MPG_COMMAND		0x0C
-#define MPG_DATA1		0x10
-#define MPG_DATA2		0x14
-#define MPG_DATA3		0x18
-#define MPG_DATA4		0x1C
+#define MPG_CONTROL             0x00
+#define         MPG_CONTROL_STRUCT      0x03
+#define                 MPG_CONTROL_STRUCT_TOP          0x01
+#define                 MPG_CONTROL_STRUCT_BOTTOM       0x02
+#define                 MPG_CONTROL_STRUCT_FRAME        0x03
+                /* Use TOP if interlaced */
+#define         MPG_CONTROL_TYPE        0x3C
+#define                 MPG_CONTROL_TYPE_I      (0x01 << 2)
+#define                 MPG_CONTROL_TYPE_B      (0x02 << 2)
+#define                 MPG_CONTROL_TYPE_P      (0x03 << 3)
+#define         MPG_CONTROL_ALTSCAN     0x40
+#define MPG_BLOCK               0x08            /* Unsure */
+#define MPG_COMMAND             0x0C
+#define MPG_DATA1               0x10
+#define MPG_DATA2               0x14
+#define MPG_DATA3               0x18
+#define MPG_DATA4               0x1C
 
-#define MPG_YPHYSICAL(x)	(0x20 + 12*(x))
-#define MPG_CbPHYSICAL(x)	(0x24 + 12*(x))
-#define MPG_CrPHYSICAL(x)	(0x28 + 12*(x))
+#define MPG_YPHYSICAL(x)        (0x20 + 12*(x))
+#define MPG_CbPHYSICAL(x)       (0x24 + 12*(x))
+#define MPG_CrPHYSICAL(x)       (0x28 + 12*(x))
 
-#define MPG_PITCH		0x50
-#define MPG_STATUS		0x54
+#define MPG_PITCH               0x50
+#define MPG_STATUS              0x54
 
-#define MPG_MATRIX_IDX		0x5C
-#define		MPG_MATRIX_IDX_INTRA	0x00
-#define		MPG_MATRIX_IDX_NON	0x01
-#define MPG_MATRIX_DATA		0x60
+#define MPG_MATRIX_IDX          0x5C
+#define         MPG_MATRIX_IDX_INTRA    0x00
+#define         MPG_MATRIX_IDX_NON      0x01
+#define MPG_MATRIX_DATA         0x60
 
-#define MPG_SLICE_CTRL_1	0x90
-#define		MPG_SLICE_MBAMAX		0x2FFF
-#define		MPG_SLICE_PREDICTIVE_DCT	0x4000
-#define		MPG_SLICE_TOP_FIRST		0x8000
-#define 	MPG_SLICE_MACROBLOCK_WIDTH(x)	((x)<<18)	/* in 64's */
-#define	MPG_SLICE_CTRL_2	0x94
-#define		MPG_SLICE_CONCEAL_MVEC		0x0000001
-#define		MPG_SLICE_QSCALE_TYPE		0x0000002
-#define		MPG_SLICE_DCPRECISION		0x000000C
-#define		MPG_SLICE_MACROBQUOT		0x0FFFFF0
-#define		MPG_SLICE_INTRAVLC		0x1000000
-#define	MPG_SLICE_CTRL_3	0x98
-#define		MPG_SLICE_FHMVR			0x0000003
-#define		MPG_SLICE_FVMVR			0x000000C
-#define		MPG_SLICE_BHMVR			0x0000030
-#define		MPG_SLICE_BVMVR			0x00000C0
-#define		MPG_SLICE_SECOND_FIELD		0x0100000
-#define		MPG_SLICE_RESET			0x0400000
-#define MPG_SLICE_LENGTH	0x9C
-#define	MPG_SLICE_DATA		0xA0
+#define MPG_SLICE_CTRL_1        0x90
+#define         MPG_SLICE_MBAMAX                0x2FFF
+#define         MPG_SLICE_PREDICTIVE_DCT        0x4000
+#define         MPG_SLICE_TOP_FIRST             0x8000
+#define         MPG_SLICE_MACROBLOCK_WIDTH(x)   ((x)<<18)       /* in 64's */
+#define MPG_SLICE_CTRL_2        0x94
+#define         MPG_SLICE_CONCEAL_MVEC          0x0000001
+#define         MPG_SLICE_QSCALE_TYPE           0x0000002
+#define         MPG_SLICE_DCPRECISION           0x000000C
+#define         MPG_SLICE_MACROBQUOT            0x0FFFFF0
+#define         MPG_SLICE_INTRAVLC              0x1000000
+#define MPG_SLICE_CTRL_3        0x98
+#define         MPG_SLICE_FHMVR                 0x0000003
+#define         MPG_SLICE_FVMVR                 0x000000C
+#define         MPG_SLICE_BHMVR                 0x0000030
+#define         MPG_SLICE_BVMVR                 0x00000C0
+#define         MPG_SLICE_SECOND_FIELD          0x0100000
+#define         MPG_SLICE_RESET                 0x0400000
+#define MPG_SLICE_LENGTH        0x9C
+#define MPG_SLICE_DATA          0xA0
 
 
 

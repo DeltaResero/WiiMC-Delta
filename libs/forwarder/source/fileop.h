@@ -19,11 +19,11 @@
 
 typedef struct
 {
-	char name[100];
-	char mount[10];
-	int type;
-	DISC_INTERFACE* interface;
-	sec_t sector;
+    char name[100];
+    char mount[10];
+    int type;
+    DISC_INTERFACE* interface;
+    sec_t sector;
 } DEVICE_STRUCT;
 
 extern DEVICE_STRUCT part[2][MAX_DEVICES];

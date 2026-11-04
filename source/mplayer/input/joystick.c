@@ -64,21 +64,21 @@ int mp_input_joystick_init(char* dev) {
     while((unsigned int)l < sizeof(struct js_event)) {
       int r = read(fd,((char*)&ev)+l,sizeof(struct js_event)-l);
       if(r < 0) {
-	if(errno == EINTR)
-	  continue;
-	else if(errno == EAGAIN) {
-	  initialized = 1;
-	  break;
-	}
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,strerror(errno));
-	close(fd);
-	return -1;
+        if(errno == EINTR)
+          continue;
+        else if(errno == EAGAIN) {
+          initialized = 1;
+          break;
+        }
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,strerror(errno));
+        close(fd);
+        return -1;
       }
       l += r;
     }
     if((unsigned int)l < sizeof(struct js_event)) {
       if(l > 0)
-	mp_msg(MSGT_INPUT,MSGL_WARN,MSGTR_INPUT_JOYSTICK_LoosingBytes,l);
+        mp_msg(MSGT_INPUT,MSGL_WARN,MSGTR_INPUT_JOYSTICK_LoosingBytes,l);
       break;
     }
     if(ev.type == JS_EVENT_BUTTON)
@@ -98,13 +98,13 @@ int mp_input_joystick_read(int fd) {
     int r = read(fd,&ev+l,sizeof(struct js_event)-l);
     if(r <= 0) {
       if(errno == EINTR)
-	continue;
+        continue;
       else if(errno == EAGAIN)
-	return MP_INPUT_NOTHING;
+        return MP_INPUT_NOTHING;
       if( r < 0)
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,strerror(errno));
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,strerror(errno));
       else
-	mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,"EOF");
+        mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_JOYSTICK_ErrReading,"EOF");
       return MP_INPUT_DEAD;
     }
     l += r;
@@ -122,14 +122,14 @@ int mp_input_joystick_read(int fd) {
     if(ev.type == JS_EVENT_BUTTON) {
       int s = (btns >> ev.number) & 1;
       if(s == ev.value) // State is the same : ignore
-	return MP_INPUT_NOTHING;
+        return MP_INPUT_NOTHING;
     }
     if(ev.type == JS_EVENT_AXIS) {
       if( ( axis[ev.number] == 1 && ev.value > JOY_AXIS_DELTA) ||
-	  (axis[ev.number] == -1 && ev.value < -JOY_AXIS_DELTA) ||
-	  (axis[ev.number] == 0 && ev.value >= -JOY_AXIS_DELTA && ev.value <= JOY_AXIS_DELTA)
-	  ) // State is the same : ignore
-	return MP_INPUT_NOTHING;
+          (axis[ev.number] == -1 && ev.value < -JOY_AXIS_DELTA) ||
+          (axis[ev.number] == 0 && ev.value >= -JOY_AXIS_DELTA && ev.value <= JOY_AXIS_DELTA)
+          ) // State is the same : ignore
+        return MP_INPUT_NOTHING;
     }
   }
 

@@ -33,7 +33,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   case AF_CONTROL_REINIT:
     memcpy(af->data,(af_data_t*)arg,sizeof(af_data_t));
     mp_msg(MSGT_AFILTER, MSGL_V, "[dummy] Was reinitialized: %iHz/%ich/%s\n",
-	af->data->rate,af->data->nch,af_fmt2str_short(af->data->format));
+        af->data->rate,af->data->nch,af_fmt2str_short(af->data->format));
     return AF_OK;
   }
   return AF_UNKNOWN;

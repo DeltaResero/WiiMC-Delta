@@ -51,14 +51,14 @@ void avcodec_thread_free(AVCodecContext *s)
     int i;
 
     for(i=0; i<s->thread_count; i++)
-	{
+    {
         c[i].func= NULL;
         LWP_SemPost(c[i].work_sem);
         LWP_JoinThread(c[i].thread, NULL);
         LWP_SemDestroy(c[i].work_sem);
         LWP_SemDestroy(c[i].done_sem);
     }
-    av_freep(&s->thread_opaque);  
+    av_freep(&s->thread_opaque);
 }
 
 int avcodec_thread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void *arg, int *ret, int count, int size){
@@ -93,7 +93,7 @@ int avcodec_thread_init(AVCodecContext *s, int thread_count){
     ThreadContext *c;
     s->thread_count = thread_count;
 
-    assert(!s->thread_opaque); 
+    assert(!s->thread_opaque);
     c= av_mallocz(sizeof(ThreadContext)*thread_count);
     s->thread_opaque= c;
 
@@ -104,7 +104,7 @@ int avcodec_thread_init(AVCodecContext *s, int thread_count){
         if(LWP_SemInit(&c[i].done_sem,0,1)==-1) goto fail;
 
         //mp_msg(MSGT_VO, MSGL_ERR,"avcodec_thread_init lock %i %i \n",c[i].work_sem,c[i].done_sem);
-      	if(LWP_CreateThread(&c[i].thread, thread_func, &c[i], NULL, 0, 80)==-1) goto fail;
+          if(LWP_CreateThread(&c[i].thread, thread_func, &c[i], NULL, 0, 80)==-1) goto fail;
     }
 
     s->execute= avcodec_thread_execute;

@@ -285,7 +285,7 @@ LIBRARIES = $(noinst_LIBRARIES)
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
-am__v_AR_1 = 
+am__v_AR_1 =
 libicrt_a_AR = $(AR) $(ARFLAGS)
 libicrt_a_RANLIB = $(RANLIB)
 am__DEPENDENCIES_1 =
@@ -389,18 +389,18 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/lib
 depcomp =
 am__maybe_remake_depfiles =
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 = 
+am__v_lt_1 =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -410,7 +410,7 @@ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
+am__v_CC_1 =
 CCLD = $(CC)
 LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -418,7 +418,7 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
+am__v_CCLD_1 =
 SOURCES = $(libicrt_a_SOURCES) $(EXTRA_libicrt_a_SOURCES)
 DIST_SOURCES = $(am__libicrt_a_SOURCES_DIST) \
 	$(EXTRA_libicrt_a_SOURCES)
@@ -1908,7 +1908,7 @@ uniwidth/$(am__dirstamp):
 	@: >>uniwidth/$(am__dirstamp)
 uniwidth/libicrt_a-width.$(OBJEXT): uniwidth/$(am__dirstamp)
 
-libicrt.a: $(libicrt_a_OBJECTS) $(libicrt_a_DEPENDENCIES) $(EXTRA_libicrt_a_DEPENDENCIES) 
+libicrt.a: $(libicrt_a_OBJECTS) $(libicrt_a_DEPENDENCIES) $(EXTRA_libicrt_a_DEPENDENCIES)
 	$(AM_V_at)-rm -f libicrt.a
 	$(AM_V_AR)$(libicrt_a_AR) libicrt.a $(libicrt_a_OBJECTS) $(libicrt_a_LIBADD)
 	$(AM_V_at)$(libicrt_a_RANLIB) libicrt.a

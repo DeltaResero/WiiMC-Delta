@@ -305,8 +305,8 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
 
       if(demuxer->audio->id<-1){
           mp_msg(MSGT_DECVIDEO, MSGL_INFO,"chunk size = 0x%X \n",chunk_size);
-	stream_skip(demuxer->stream, chunk_size-12-8);
-	break; // audio disabled (or no soundcard)
+        stream_skip(demuxer->stream, chunk_size-12-8);
+        break; // audio disabled (or no soundcard)
       }
 
       // skip over unknown byte, but only if file had non-NULL version
@@ -422,7 +422,7 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
         // precalculate PTS
         if (film_chunk.syncinfo1 == 0xFFFFFFFF)
         {
-	  if(demuxer->audio->id>=-1)
+          if(demuxer->audio->id>=-1)
           film_chunk.pts =
             (float)total_audio_bytes / (float)sh_audio->wf->nAvgBytesPerSec;
           total_audio_bytes += film_chunk.chunk_size;

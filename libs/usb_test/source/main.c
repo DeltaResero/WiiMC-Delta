@@ -47,7 +47,7 @@ void reset_usb_log();
 static void *xfb = NULL;
 static GXRModeObj *rmode = NULL;
 
-static void initialise_video() 
+static void initialise_video()
 {
     VIDEO_Init();
     rmode = VIDEO_GetPreferredMode(NULL);
@@ -57,8 +57,8 @@ static void initialise_video()
     VIDEO_SetNextFramebuffer(xfb);
     VIDEO_SetBlack(FALSE);
     VIDEO_Flush();
-    VIDEO_WaitVSync(); 
-    if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync(); 
+    VIDEO_WaitVSync();
+    if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
     printf("\x1b[2;0H");
     VIDEO_WaitVSync();
 }
@@ -71,22 +71,22 @@ static void showdir(char *path)
 
   dp = diropen(path);
 
-  if(dp==NULL) 
+  if(dp==NULL)
   {
     printf("Error diropen\n");
     return;
   }
   else printf("Ok diropen\n");
-  
+
   int cnt=0;
   while( dirnext( dp, filename, &fstat ) == 0 )
   {
     //if(cnt==20) break;
     cnt++;
 
-    if( fstat.st_mode & S_IFDIR ) printf("/"); 
-    printf("%s\n",filename);	  
-    	
+    if( fstat.st_mode & S_IFDIR ) printf("/");
+    printf("%s\n",filename);
+
   }
   dirclose(dp);
   printf("\nEnd show dirrectory (%d).\n",cnt);
@@ -94,56 +94,56 @@ static void showdir(char *path)
 
 static void dump_hex(char *ptr, int len)
 {
-	int i,pos=0;
-	char c;
-	do
-	{
-		for(i=0;(i<16)&&(pos<len);i++)
-		{
-			c=ptr[pos];
-			if(c<' ')c='.';
-			//printf(" %02X (%c)",ptr[pos],c);
-			printf("%c",c);
-			pos++;
-		}
-		printf("\n");
-	}
-	while(pos<len);
-	printf("----------------------------------------------------\n");
+    int i,pos=0;
+    char c;
+    do
+    {
+        for(i=0;(i<16)&&(pos<len);i++)
+        {
+            c=ptr[pos];
+            if(c<' ')c='.';
+            //printf(" %02X (%c)",ptr[pos],c);
+            printf("%c",c);
+            pos++;
+        }
+        printf("\n");
+    }
+    while(pos<len);
+    printf("----------------------------------------------------\n");
 }
 */
 
 static void reset_cb (void) {
-	reset_pressed = true;
+    reset_pressed = true;
 }
 
 static void power_cb (void) {
-	power_pressed = true;
+    power_pressed = true;
 }
 
 void writelog()
 {
-	FILE *fp;
-	char *log;
-	char * getusblog();
+    FILE *fp;
+    char *log;
+    char * getusblog();
 
 
-	
-	log=getusblog();
-	
-	
 
-		fp=fopen("sd:/log_usb.txt","wb");
+    log=getusblog();
 
-		if(fp!=0)
-		{
-			fprintf(fp,"USB2 device test version: %s\n",USB_TEST_VERSION);
-			fprintf(fp,"=============================\n");		
-			fwrite(log,1, strlen(log) ,fp);
-				
-			fclose(fp);
-		}
-	
+
+
+        fp=fopen("sd:/log_usb.txt","wb");
+
+        if(fp!=0)
+        {
+            fprintf(fp,"USB2 device test version: %s\n",USB_TEST_VERSION);
+            fprintf(fp,"=============================\n");
+            fwrite(log,1, strlen(log) ,fp);
+
+            fclose(fp);
+        }
+
 
 }
 
@@ -152,219 +152,219 @@ static bool device_ok;
 
 void test(int _method)
 {
-	printf("Testing...\n");
-	usleep(5000000);
-	
-	void set_usb_method(int _method);
+    printf("Testing...\n");
+    usleep(5000000);
 
-	if(timer_init>0)
-	{
-		printf ("\x1b[%d;%dH", 15, 1 );
-		
-		printf("Wake up test aborted\n");
-	}
+    void set_usb_method(int _method);
 
-	timer_init=0;
+    if(timer_init>0)
+    {
+        printf ("\x1b[%d;%dH", 15, 1 );
 
-	method=_method;
+        printf("Wake up test aborted\n");
+    }
 
-	set_usb_method(method);
+    timer_init=0;
 
-	usb_log("USB2 device test method: %i\n------------------------------\n",method);
-	
+    method=_method;
 
-	if(usb->isInserted())
-	{
-		usb_log("USB Device Compatible!!!\n");
-		device_ok=true;
-	}
-	else
-	{
-		usb_log("USB Device NOT Compatible!!!\n");
-		device_ok=false;
-	}
+    set_usb_method(method);
+
+    usb_log("USB2 device test method: %i\n------------------------------\n",method);
+
+
+    if(usb->isInserted())
+    {
+        usb_log("USB Device Compatible!!!\n");
+        device_ok=true;
+    }
+    else
+    {
+        usb_log("USB Device NOT Compatible!!!\n");
+        device_ok=false;
+    }
 }
 
 void InitialScreen()
 {
-	printf ("\x1b[2J"); //clear screen
-	
-	printf("\n");
-	printf("USB2 device test version: %s\n",USB_TEST_VERSION);
-	printf("=============================\n");
+    printf ("\x1b[2J"); //clear screen
 
-	printf("8 tests will be run.\n");
-	printf("After each test, please unplug and replug your device when requested.\n");
-	printf("The final one tests wakeup and will take 20 minutes to run.\n");
-	printf("On exit application log will be saved to sd:/log_usb.txt\n");
-	printf("Please upload this file to wiimc.org\n");
+    printf("\n");
+    printf("USB2 device test version: %s\n",USB_TEST_VERSION);
+    printf("=============================\n");
+
+    printf("8 tests will be run.\n");
+    printf("After each test, please unplug and replug your device when requested.\n");
+    printf("The final one tests wakeup and will take 20 minutes to run.\n");
+    printf("On exit application log will be saved to sd:/log_usb.txt\n");
+    printf("Please upload this file to wiimc.org\n");
 }
 
 void enable_wakeup()
 {
-	timer_init=gettime();
-	printf ("\x1b[2J"); //clear screen
-	printf("\n\n\n\nWake up test in progress - press HOME to cancel test.\n\n");
+    timer_init=gettime();
+    printf ("\x1b[2J"); //clear screen
+    printf("\n\n\n\nWake up test in progress - press HOME to cancel test.\n\n");
 }
 
 void check_wakeup()
 {
-	if(timer_init==0) return;
-	if(ticks_to_secs(gettime() - timer_init) > 20*60) //20 mins
-	{
-		char buf[2048];
+    if(timer_init==0) return;
+    if(ticks_to_secs(gettime() - timer_init) > 20*60) //20 mins
+    {
+        char buf[2048];
 
-		timer_init=0;
-		printf("\n\nTesting wake up\n");
-	
-		if(usb->readSectors(512,1,buf)==false)
-			usb_log("Error reading sector. Device wake up fail!!\n");
-		else
-			usb_log("OK reading sector. Device wake up OK!!\n");
-		
-	}
-	else 
-	{		
-		printf ("\x1b[%d;%dH", 15, 1 ); //cursor position 
-		printf("Wake up counter: %i                           ", (20*60)-(int)ticks_to_secs(gettime() - timer_init));
-		fflush(stdout);
-	}
+        timer_init=0;
+        printf("\n\nTesting wake up\n");
+
+        if(usb->readSectors(512,1,buf)==false)
+            usb_log("Error reading sector. Device wake up fail!!\n");
+        else
+            usb_log("OK reading sector. Device wake up OK!!\n");
+
+    }
+    else
+    {
+        printf ("\x1b[%d;%dH", 15, 1 ); //cursor position
+        printf("Wake up counter: %i                           ", (20*60)-(int)ticks_to_secs(gettime() - timer_init));
+        fflush(stdout);
+    }
 
 }
 
 void wait_a()
 {
-	u32 pressed = 0;
-	
-	while(!pressed && !reset_pressed)
-	{	
-		WPAD_ScanPads();
-		pressed = WPAD_ButtonsDown(0);
+    u32 pressed = 0;
 
-		if ( (pressed & WPAD_BUTTON_A)) return;
+    while(!pressed && !reset_pressed)
+    {
+        WPAD_ScanPads();
+        pressed = WPAD_ButtonsDown(0);
 
-		usleep(5000);		
-	}
-	reset_pressed=false;
+        if ( (pressed & WPAD_BUTTON_A)) return;
+
+        usleep(5000);
+    }
+    reset_pressed=false;
 }
 
 void change_dev()
 {
-	printf("Unplug your USB device now. Press A when ready.\n");
-	wait_a();
-	printf("Plug in your USB device now. Press A when ready.\n");
-	wait_a();
+    printf("Unplug your USB device now. Press A when ready.\n");
+    wait_a();
+    printf("Plug in your USB device now. Press A when ready.\n");
+    wait_a();
 }
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
-	void __exception_setreload(int t);	
+    void __exception_setreload(int t);
 
-	__exception_setreload(1);
-	if(IOS_GetVersion()!=58) IOS_ReloadIOS(58);
-	usleep(50000);
-	
-	initialise_video(); 
-	
-	CON_EnableGecko(1,0);
-	SYS_SetResetCallback (reset_cb);
-	SYS_SetPowerCallback(power_cb);
+    __exception_setreload(1);
+    if(IOS_GetVersion()!=58) IOS_ReloadIOS(58);
+    usleep(50000);
 
-	if(IOS_GetVersion()!=58) 
-	{
-		printf("\n\nYou need ios58 installed.");
-		sleep(4);
-		return 0;
-	}
+    initialise_video();
 
-	sd->startup();
-	if(!fatMount("sd",sd,0,2,128) )
-	{
-		printf("\n\nYou need an SD card to run this test.");
-		sleep(4);
-		return 0;
-	}
+    CON_EnableGecko(1,0);
+    SYS_SetResetCallback (reset_cb);
+    SYS_SetPowerCallback(power_cb);
 
-	WPAD_Init();
-	
-	InitialScreen();
+    if(IOS_GetVersion()!=58)
+    {
+        printf("\n\nYou need ios58 installed.");
+        sleep(4);
+        return 0;
+    }
 
-	usleep(1000000);
-	reset_usb_log();
-	usb->startup();
-		
-	usleep(1000000);
-	
-	printf("Plug in your USB device now. Press A when ready.\n");
-	wait_a();
-	test(0);
-	
-	change_dev();
-	test(1);
-	
-	change_dev();
-	test(2);
-	
-	change_dev();
-	test(3);
-	
-	change_dev();
-	test(4);
+    sd->startup();
+    if(!fatMount("sd",sd,0,2,128) )
+    {
+        printf("\n\nYou need an SD card to run this test.");
+        sleep(4);
+        return 0;
+    }
 
-	change_dev();
-	test(5);
-	
-	change_dev();
+    WPAD_Init();
+
+    InitialScreen();
+
+    usleep(1000000);
+    reset_usb_log();
+    usb->startup();
+
+    usleep(1000000);
+
+    printf("Plug in your USB device now. Press A when ready.\n");
+    wait_a();
+    test(0);
+
+    change_dev();
+    test(1);
+
+    change_dev();
+    test(2);
+
+    change_dev();
+    test(3);
+
+    change_dev();
+    test(4);
+
+    change_dev();
+    test(5);
+
+    change_dev();
 #if 1
 {
-	void USBStorage_Deinitialize();
-	usb_log("Doing IOSReload.\n");
-	fatUnmount("sd");
-	__io_wiisd.shutdown();
-	__io_wiisd.shutdown();
-	__io_usbstorage.shutdown();
-	USBStorage_Deinitialize();
-		
-	WPAD_Shutdown();
-	usleep(500*1000);
-	USB_Deinitialize();
-	usleep(50*1000);
-	IOS_ReloadIOS(58);
-	sleep(1);
-	WPAD_Init();
+    void USBStorage_Deinitialize();
+    usb_log("Doing IOSReload.\n");
+    fatUnmount("sd");
+    __io_wiisd.shutdown();
+    __io_wiisd.shutdown();
+    __io_usbstorage.shutdown();
+    USBStorage_Deinitialize();
 
-	sd->startup();
+    WPAD_Shutdown();
+    usleep(500*1000);
+    USB_Deinitialize();
+    usleep(50*1000);
+    IOS_ReloadIOS(58);
+    sleep(1);
+    WPAD_Init();
 
-	fatMount("sd",sd,0,2,128);
-	usb->startup();
-	usleep(500*1000);
+    sd->startup();
+
+    fatMount("sd",sd,0,2,128);
+    usb->startup();
+    usleep(500*1000);
 }
 #endif
-	
-	test(6);
 
-	if(device_ok)
-	{
-		printf("DONT unplug your USB device. Press A when ready.\n");
-		wait_a();
-		enable_wakeup();
-	}
-	else printf("\nWake up test cancelled, device not compatible. Press HOME to exit.\n");
-	while(!reset_pressed)
-	{	
-		WPAD_ScanPads();
-		u32 pressed = WPAD_ButtonsDown(0);
+    test(6);
 
-		if ( pressed & WPAD_BUTTON_HOME ) break;
+    if(device_ok)
+    {
+        printf("DONT unplug your USB device. Press A when ready.\n");
+        wait_a();
+        enable_wakeup();
+    }
+    else printf("\nWake up test cancelled, device not compatible. Press HOME to exit.\n");
+    while(!reset_pressed)
+    {
+        WPAD_ScanPads();
+        u32 pressed = WPAD_ButtonsDown(0);
 
-		check_wakeup();
+        if ( pressed & WPAD_BUTTON_HOME ) break;
 
-		usleep(5000);
-	}
-	writelog();
-	fatUnmount("sd:");
-	printf("Exiting...\n");
-	usleep(5000);
+        check_wakeup();
 
-	return 0;
+        usleep(5000);
+    }
+    writelog();
+    fatUnmount("sd:");
+    printf("Exiting...\n");
+    usleep(5000);
+
+    return 0;
 }

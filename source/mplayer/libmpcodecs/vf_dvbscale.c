@@ -36,7 +36,7 @@ struct vf_priv_s {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+    unsigned int flags, unsigned int outfmt){
 
     int scaled_y=vf->priv->aspect*d_height/d_width;
 

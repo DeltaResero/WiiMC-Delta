@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 #ifndef _RUN_H
@@ -97,50 +97,50 @@ new_run (
 
 
 #define swap(a,b) \
-	FRIBIDI_BEGIN_STMT \
-	void *t; \
-	(t) = (a); \
-	(a) = (b); \
-	(b) = (t); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        void *t; \
+        (t) = (a); \
+        (a) = (b); \
+        (b) = (t); \
+        FRIBIDI_END_STMT
 
 #define merge_lists(a,b) \
-	FRIBIDI_BEGIN_STMT \
-	swap((a)->prev->next, (b)->prev->next); \
-	swap((a)->prev, (b)->prev); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        swap((a)->prev->next, (b)->prev->next); \
+        swap((a)->prev, (b)->prev); \
+        FRIBIDI_END_STMT
 
 #define delete_node(x) \
-	FRIBIDI_BEGIN_STMT \
-	(x)->prev->next = (x)->next; \
-	(x)->next->prev = (x)->prev; \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        (x)->prev->next = (x)->next; \
+        (x)->next->prev = (x)->prev; \
+        FRIBIDI_END_STMT
 
 #define insert_node_before(x, list) \
-	FRIBIDI_BEGIN_STMT \
-	(x)->prev = (list)->prev; \
-	(list)->prev->next = (x); \
-	(x)->next = (list); \
-	(list)->prev = (x); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        (x)->prev = (list)->prev; \
+        (list)->prev->next = (x); \
+        (x)->next = (list); \
+        (list)->prev = (x); \
+        FRIBIDI_END_STMT
 
 #define move_node_before(x, list) \
-	FRIBIDI_BEGIN_STMT \
-	if ((x)->prev) { \
-	  delete_node(x); \
-	} \
-	insert_node_before((x), (list)); \
-	FRIBIDI_END_STMT
+        FRIBIDI_BEGIN_STMT \
+        if ((x)->prev) { \
+          delete_node(x); \
+        } \
+        insert_node_before((x), (list)); \
+        FRIBIDI_END_STMT
 
 #define for_run_list(x, list) \
-	for ((x) = (list)->next; (x)->type != FRIBIDI_TYPE_SENTINEL; (x) = (x)->next)
+        for ((x) = (list)->next; (x)->type != FRIBIDI_TYPE_SENTINEL; (x) = (x)->next)
 
 
 #if DEBUG+0
 
 #define fribidi_validate_run_list FRIBIDI_PRIVATESPACE(validate_run_list)
      void fribidi_validate_run_list (
-  FriBidiRun *run_list		/* input run list */
+  FriBidiRun *run_list          /* input run list */
 ) FRIBIDI_GNUC_HIDDEN;
 
 #else /* !DEBUG */

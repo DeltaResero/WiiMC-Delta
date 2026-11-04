@@ -73,7 +73,7 @@ the same result as the Reference Code.
 The library uses Unicode (UTF32) entirely. The character properties are
 automatically extracted from the Unicode data files, available from:
 
-	http://www.unicode.org/Public/UNIDATA/
+    http://www.unicode.org/Public/UNIDATA/
 
 This means that every Unicode character is treated in strict accordance
 with the Unicode specification.
@@ -85,31 +85,31 @@ may find that the character sets conversion code is typically turned off on
 POSIX machines.
 
 The reordering of characters is typically done through the function:
-      
+
      fribidi_boolean
      fribidi_log2vis(/* input */
-		     FriBidiChar *str,
-		     FriBidiStrIndex len,
-		     FriBidiCharType *pbase_dir,
-		     /* output */
-		     FriBidiChar *visual_str,
-		     FriBidiStrIndex *position_L_to_V_list,
-		     FriBidiStrIndex *position_V_to_L_list,
-		     FriBidiLevel    *embedding_level_list
-		     )
-    
+             FriBidiChar *str,
+             FriBidiStrIndex len,
+             FriBidiCharType *pbase_dir,
+             /* output */
+             FriBidiChar *visual_str,
+             FriBidiStrIndex *position_L_to_V_list,
+             FriBidiStrIndex *position_V_to_L_list,
+             FriBidiLevel    *embedding_level_list
+             )
+
 
 where
      str                    is the Unicode input string
      len                    is the length of the unicode string
-     pbase_dir              is the input and output base direction. If 
-                            base == FRIBIDI_TYPE_ON then fribidi_log2vis 
+     pbase_dir              is the input and output base direction. If
+                            base == FRIBIDI_TYPE_ON then fribidi_log2vis
                             calculates the base direction on its own
                             according to the BiDi algorithm.
      visual_str             The reordered output unicode string.
-     position_L_to_V_list   Maps the positions in the logical string to 
+     position_L_to_V_list   Maps the positions in the logical string to
                             positions in the visual string.
-     position_V_to_L_list   Maps the positions in the visual string to 
+     position_V_to_L_list   Maps the positions in the visual string to
                             the positions in the logical string.
      embedding_level_list   Returns the classification of each character. Even
                             levels indicate LTR characters, and odd levels
@@ -117,7 +117,7 @@ where
                             list is in interactive applications when the
                             embedding e.g. level determines cursor display.
 
-In any of the output pointers == NULL, then that information is not 
+In any of the output pointers == NULL, then that information is not
 calculated.
 
 How it looks like
@@ -142,11 +142,11 @@ Bugs and comments
 
 Report GNU FriBidi bugs at:
 
-	http://fribidi.org/bug
+    http://fribidi.org/bug
 
 And send your comments to:
 
-	fribidi@freedesktop.org
+    fribidi@freedesktop.org
 
 
 Behdad Esfahbod

@@ -40,15 +40,15 @@
 
 struct _Pfunc
 {
-	static unsigned Pfunc()
-	{
-		#ifdef _OPENMP
-		assert(omp_get_max_threads() > 0);
-		return omp_get_max_threads();
-		#else
-		return 0;
-		#endif
-	}
+        static unsigned Pfunc()
+        {
+                #ifdef _OPENMP
+                assert(omp_get_max_threads() > 0);
+                return omp_get_max_threads();
+                #else
+                return 0;
+                #endif
+        }
 };
 
 #endif /* OMPTL */

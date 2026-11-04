@@ -44,14 +44,14 @@ typedef struct IEnumMediaTypes_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *Next )(IEnumMediaTypes* This,
-			      /* [in] */ unsigned long cMediaTypes,
-			      /* [size_is][out] */ AM_MEDIA_TYPE** ppMediaTypes,
-			      /* [out] */ unsigned long* pcFetched);
+                  /* [in] */ unsigned long cMediaTypes,
+                  /* [size_is][out] */ AM_MEDIA_TYPE** ppMediaTypes,
+                  /* [out] */ unsigned long* pcFetched);
     HRESULT STDCALL ( *Skip )(IEnumMediaTypes* This,
-			      /* [in] */ unsigned long cMediaTypes);
+                  /* [in] */ unsigned long cMediaTypes);
     HRESULT STDCALL ( *Reset )(IEnumMediaTypes* This);
     HRESULT STDCALL ( *Clone )(IEnumMediaTypes* This,
-			       /* [out] */ IEnumMediaTypes** ppEnum);
+                   /* [out] */ IEnumMediaTypes** ppEnum);
 } IEnumMediaTypes_vt;
 struct IEnumMediaTypes { IEnumMediaTypes_vt* vt; };
 
@@ -63,33 +63,33 @@ typedef struct IPin_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *Connect )(IPin * This,
-				 /* [in] */ IPin *pReceivePin,
-				 /* [in] */ /*const*/ AM_MEDIA_TYPE *pmt);
+                 /* [in] */ IPin *pReceivePin,
+                 /* [in] */ /*const*/ AM_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *ReceiveConnection )(IPin * This,
-					   /* [in] */ IPin *pConnector,
-					   /* [in] */ const AM_MEDIA_TYPE *pmt);
+                       /* [in] */ IPin *pConnector,
+                       /* [in] */ const AM_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *Disconnect )(IPin * This);
     HRESULT STDCALL ( *ConnectedTo )(IPin * This, /* [out] */ IPin **pPin);
     HRESULT STDCALL ( *ConnectionMediaType )(IPin * This,
-					     /* [out] */ AM_MEDIA_TYPE *pmt);
+                         /* [out] */ AM_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *QueryPinInfo )(IPin * This, /* [out] */ PIN_INFO *pInfo);
     HRESULT STDCALL ( *QueryDirection )(IPin * This,
-					/* [out] */ PIN_DIRECTION *pPinDir);
+                    /* [out] */ PIN_DIRECTION *pPinDir);
     HRESULT STDCALL ( *QueryId )(IPin * This, /* [out] */ unsigned short* *Id);
     HRESULT STDCALL ( *QueryAccept )(IPin * This,
-				     /* [in] */ const AM_MEDIA_TYPE *pmt);
+                     /* [in] */ const AM_MEDIA_TYPE *pmt);
     HRESULT STDCALL ( *EnumMediaTypes )(IPin * This,
-					/* [out] */ IEnumMediaTypes **ppEnum);
+                    /* [out] */ IEnumMediaTypes **ppEnum);
     HRESULT STDCALL ( *QueryInternalConnections )(IPin * This,
-						  /* [out] */ IPin **apPin,
-						  /* [out][in] */ unsigned long *nPin);
+                          /* [out] */ IPin **apPin,
+                          /* [out][in] */ unsigned long *nPin);
     HRESULT STDCALL ( *EndOfStream )(IPin * This);
     HRESULT STDCALL ( *BeginFlush )(IPin * This);
     HRESULT STDCALL ( *EndFlush )(IPin * This);
     HRESULT STDCALL ( *NewSegment )(IPin * This,
-				    /* [in] */ REFERENCE_TIME tStart,
-				    /* [in] */ REFERENCE_TIME tStop,
-				    /* [in] */ double dRate);
+                    /* [in] */ REFERENCE_TIME tStart,
+                    /* [in] */ REFERENCE_TIME tStop,
+                    /* [in] */ double dRate);
 } IPin_vt;
 struct IPin { IPin_vt *vt; };
 
@@ -101,17 +101,17 @@ typedef struct IEnumPins_vt
 
     // retrieves a specified number of pins in the enumeration sequence..
     HRESULT STDCALL ( *Next )(IEnumPins* This,
-			      /* [in] */ unsigned long cPins,
-			      /* [size_is][out] */ IPin** ppPins,
-			      /* [out] */ unsigned long* pcFetched);
+                  /* [in] */ unsigned long cPins,
+                  /* [size_is][out] */ IPin** ppPins,
+                  /* [out] */ unsigned long* pcFetched);
     // skips over a specified number of pins.
     HRESULT STDCALL ( *Skip )(IEnumPins* This,
-			      /* [in] */ unsigned long cPins);
+                  /* [in] */ unsigned long cPins);
     // resets the enumeration sequence to the beginning.
     HRESULT STDCALL ( *Reset )(IEnumPins* This);
     // makes a copy of the enumerator with the same enumeration state.
     HRESULT STDCALL ( *Clone )(IEnumPins* This,
-			       /* [out] */ IEnumPins** ppEnum);
+                   /* [out] */ IEnumPins** ppEnum);
 } IEnumPins_vt;
 struct IEnumPins { struct IEnumPins_vt* vt; };
 
@@ -122,14 +122,14 @@ typedef struct IMediaSample_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *GetPointer )(IMediaSample* This,
-				    /* [out] */ unsigned char** ppBuffer);
+                    /* [out] */ unsigned char** ppBuffer);
     LONG    STDCALL ( *GetSize )(IMediaSample* This);
     HRESULT STDCALL ( *GetTime )(IMediaSample* This,
-				 /* [out] */ REFERENCE_TIME* pTimeStart,
-				 /* [out] */ REFERENCE_TIME* pTimeEnd);
+                 /* [out] */ REFERENCE_TIME* pTimeStart,
+                 /* [out] */ REFERENCE_TIME* pTimeEnd);
     HRESULT STDCALL ( *SetTime )(IMediaSample* This,
-				 /* [in] */ REFERENCE_TIME* pTimeStart,
-				 /* [in] */ REFERENCE_TIME* pTimeEnd);
+                 /* [in] */ REFERENCE_TIME* pTimeStart,
+                 /* [in] */ REFERENCE_TIME* pTimeEnd);
 
     // sync-point property. If true, then the beginning of this
     // sample is a sync-point. (note that if AM_MEDIA_TYPE.bTemporalCompression
@@ -137,42 +137,42 @@ typedef struct IMediaSample_vt
     // a stream at any sync point.  S_FALSE if not sync-point, S_OK if true.
     HRESULT STDCALL ( *IsSyncPoint )(IMediaSample* This);
     HRESULT STDCALL ( *SetSyncPoint )(IMediaSample* This,
-				      long bIsSyncPoint);
+                      long bIsSyncPoint);
 
     // preroll property.  If true, this sample is for preroll only and
     // shouldn't be displayed.
     HRESULT STDCALL ( *IsPreroll )(IMediaSample* This);
     HRESULT STDCALL ( *SetPreroll )(IMediaSample* This,
-				    long bIsPreroll);
+                    long bIsPreroll);
 
     LONG    STDCALL ( *GetActualDataLength )(IMediaSample* This);
     HRESULT STDCALL ( *SetActualDataLength )(IMediaSample* This,
-					     long __MIDL_0010);
+                         long __MIDL_0010);
 
     // these allow for limited format changes in band - if no format change
     // has been made when you receive a sample GetMediaType will return S_FALSE
     HRESULT STDCALL ( *GetMediaType )(IMediaSample* This,
-				      AM_MEDIA_TYPE** ppMediaType);
+                      AM_MEDIA_TYPE** ppMediaType);
     HRESULT STDCALL ( *SetMediaType )(IMediaSample* This,
-				      AM_MEDIA_TYPE* pMediaType);
+                      AM_MEDIA_TYPE* pMediaType);
 
     // returns S_OK if there is a discontinuity in the data (this frame is
     // not a continuation of the previous stream of data
     // - there has been a seek or some dropped samples).
     HRESULT STDCALL ( *IsDiscontinuity )(IMediaSample* This);
     HRESULT STDCALL ( *SetDiscontinuity )(IMediaSample* This,
-					  long bDiscontinuity);
+                      long bDiscontinuity);
 
     // get the media times for this sample
     HRESULT STDCALL ( *GetMediaTime )(IMediaSample* This,
-				      /* [out] */ long long* pTimeStart,
-				      /* [out] */ long long* pTimeEnd);
+                      /* [out] */ long long* pTimeStart,
+                      /* [out] */ long long* pTimeEnd);
     // Set the media times for this sample
     // pTimeStart==pTimeEnd==NULL will invalidate the media time stamps in
     // this sample
     HRESULT STDCALL ( *SetMediaTime )(IMediaSample* This,
-				      /* [in] */ long long* pTimeStart,
-				      /* [in] */ long long* pTimeEnd);
+                      /* [in] */ long long* pTimeStart,
+                      /* [in] */ long long* pTimeEnd);
 } IMediaSample_vt;
 struct IMediaSample { struct IMediaSample_vt* vt; };
 
@@ -184,32 +184,32 @@ typedef struct IBaseFilter_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *GetClassID )(IBaseFilter * This,
-				    /* [out] */ CLSID *pClassID);
+                    /* [out] */ CLSID *pClassID);
     HRESULT STDCALL ( *Stop )(IBaseFilter * This);
     HRESULT STDCALL ( *Pause )(IBaseFilter * This);
     HRESULT STDCALL ( *Run )(IBaseFilter * This,
-			     REFERENCE_TIME tStart);
+                 REFERENCE_TIME tStart);
     HRESULT STDCALL ( *GetState )(IBaseFilter * This,
-				  /* [in] */ unsigned long dwMilliSecsTimeout,
-				  ///* [out] */ FILTER_STATE *State);
-				  void* State);
+                  /* [in] */ unsigned long dwMilliSecsTimeout,
+                  ///* [out] */ FILTER_STATE *State);
+                  void* State);
     HRESULT STDCALL ( *SetSyncSource )(IBaseFilter* This,
-				       /* [in] */ IReferenceClock *pClock);
+                       /* [in] */ IReferenceClock *pClock);
     HRESULT STDCALL ( *GetSyncSource )(IBaseFilter* This,
-				       /* [out] */ IReferenceClock **pClock);
+                       /* [out] */ IReferenceClock **pClock);
     HRESULT STDCALL ( *EnumPins )(IBaseFilter* This,
-				  /* [out] */ IEnumPins **ppEnum);
+                  /* [out] */ IEnumPins **ppEnum);
     HRESULT STDCALL ( *FindPin )(IBaseFilter* This,
-				 /* [string][in] */ const unsigned short* Id,
-				 /* [out] */ IPin** ppPin);
+                 /* [string][in] */ const unsigned short* Id,
+                 /* [out] */ IPin** ppPin);
     HRESULT STDCALL ( *QueryFilterInfo )(IBaseFilter* This,
-					 // /* [out] */ FILTER_INFO *pInfo);
-					 void* pInfo);
+                     // /* [out] */ FILTER_INFO *pInfo);
+                     void* pInfo);
     HRESULT STDCALL ( *JoinFilterGraph )(IBaseFilter* This,
-					 /* [in] */ IFilterGraph* pGraph,
-					 /* [string][in] */ const unsigned short* pName);
+                     /* [in] */ IFilterGraph* pGraph,
+                     /* [string][in] */ const unsigned short* pName);
     HRESULT STDCALL ( *QueryVendorInfo )(IBaseFilter* This,
-					 /* [string][out] */ unsigned short** pVendorInfo);
+                     /* [string][out] */ unsigned short** pVendorInfo);
 } IBaseFilter_vt;
 struct IBaseFilter { struct IBaseFilter_vt* vt; };
 
@@ -222,24 +222,24 @@ typedef struct IMemAllocator_vt
 
     // specifies the number of buffers to allocate and the size of each buffer.
     HRESULT STDCALL ( *SetProperties )(IMemAllocator* This,
-				       /* [in] */ ALLOCATOR_PROPERTIES *pRequest,
-				       /* [out] */ ALLOCATOR_PROPERTIES *pActual);
+                       /* [in] */ ALLOCATOR_PROPERTIES *pRequest,
+                       /* [out] */ ALLOCATOR_PROPERTIES *pActual);
     // retrieves the number of buffers that the allocator will create, and the buffer properties.
     HRESULT STDCALL ( *GetProperties )(IMemAllocator* This,
-				       /* [out] */ ALLOCATOR_PROPERTIES *pProps);
+                       /* [out] */ ALLOCATOR_PROPERTIES *pProps);
     // allocates the buffer memory.
     HRESULT STDCALL ( *Commit )(IMemAllocator* This);
     // releases the memory for the buffers.
     HRESULT STDCALL ( *Decommit )(IMemAllocator* This);
     // retrieves a media sample that contains an empty buffer.
     HRESULT STDCALL ( *GetBuffer )(IMemAllocator* This,
-				   /* [out] */ IMediaSample** ppBuffer,
-				   /* [in] */ REFERENCE_TIME* pStartTime,
-				   /* [in] */ REFERENCE_TIME* pEndTime,
-				   /* [in] */ unsigned long dwFlags);
+                   /* [out] */ IMediaSample** ppBuffer,
+                   /* [in] */ REFERENCE_TIME* pStartTime,
+                   /* [in] */ REFERENCE_TIME* pEndTime,
+                   /* [in] */ unsigned long dwFlags);
     // releases a media sample.
     HRESULT STDCALL ( *ReleaseBuffer )(IMemAllocator* This,
-				       /* [in] */ IMediaSample* pBuffer);
+                       /* [in] */ IMediaSample* pBuffer);
 } IMemAllocator_vt;
 struct IMemAllocator { IMemAllocator_vt* vt; };
 
@@ -251,18 +251,18 @@ typedef struct IMemInputPin_vt
     INHERIT_IUNKNOWN();
 
     HRESULT STDCALL ( *GetAllocator )(IMemInputPin * This,
-				      /* [out] */ IMemAllocator **ppAllocator);
+                      /* [out] */ IMemAllocator **ppAllocator);
     HRESULT STDCALL ( *NotifyAllocator )(IMemInputPin * This,
-					 /* [in] */ IMemAllocator *pAllocator,
-					 /* [in] */ int bReadOnly);
+                     /* [in] */ IMemAllocator *pAllocator,
+                     /* [in] */ int bReadOnly);
     HRESULT STDCALL ( *GetAllocatorRequirements )(IMemInputPin * This,
-						  /* [out] */ ALLOCATOR_PROPERTIES *pProps);
+                          /* [out] */ ALLOCATOR_PROPERTIES *pProps);
     HRESULT STDCALL ( *Receive )(IMemInputPin * This,
-				 /* [in] */ IMediaSample *pSample);
+                 /* [in] */ IMediaSample *pSample);
     HRESULT STDCALL ( *ReceiveMultiple )(IMemInputPin * This,
-					 /* [size_is][in] */ IMediaSample **pSamples,
-					 /* [in] */ long nSamples,
-					 /* [out] */ long *nSamplesProcessed);
+                     /* [size_is][in] */ IMediaSample **pSamples,
+                     /* [in] */ long nSamples,
+                     /* [out] */ long *nSamplesProcessed);
     HRESULT STDCALL ( *ReceiveCanBlock )(IMemInputPin * This);
 } IMemInputPin_vt;
 struct IMemInputPin { IMemInputPin_vt* vt; };

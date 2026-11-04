@@ -3,23 +3,23 @@
  * Copyright (C) 2004  Sharif FarsiWeb, Inc
  * Copyright (C) 2001, 2002, 2004  Behdad Esfahbod
  * Copyright (C) 1999, 2000  Dov Grobgeld
- * 
+ *
  * This file is part of GNU FriBidi.
- * 
+ *
  * GNU FriBidi is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation; either version 2.1
  * of the License, or (at your option) any later version.
- * 
+ *
  * GNU FriBidi is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with GNU FriBidi; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info> or write to
  * Sharif FarsiWeb, Inc., PO Box 13445-389, Tehran, Iran.
  */
@@ -58,8 +58,8 @@
  * Returns: if the character has a mirroring equivalent or not.
  */
 FRIBIDI_ENTRY fribidi_boolean fribidi_get_mirror_char (
-  FriBidiChar ch,		/* input character */
-  FriBidiChar *mirrored_ch	/* output mirrored character */
+  FriBidiChar ch,               /* input character */
+  FriBidiChar *mirrored_ch      /* output mirrored character */
 );
 
 #define fribidi_shape_mirroring FRIBIDI_NAMESPACE(shape_mirroring)
@@ -73,11 +73,11 @@ FRIBIDI_ENTRY fribidi_boolean fribidi_get_mirror_char (
  * available at http://www.unicode.org/reports/tr9/#L4.
  */
 FRIBIDI_ENTRY void fribidi_shape_mirroring (
-  const FriBidiLevel *embedding_levels,	/* input list of embedding
-					   levels, as returned by
-					   fribidi_get_par_embedding_levels */
-  const FriBidiStrIndex len,	/* input string length */
-  FriBidiChar *str		/* string to shape */
+  const FriBidiLevel *embedding_levels, /* input list of embedding
+                                           levels, as returned by
+                                           fribidi_get_par_embedding_levels */
+  const FriBidiStrIndex len,    /* input string length */
+  FriBidiChar *str              /* string to shape */
 );
 
 #include "fribidi-enddecls.h"

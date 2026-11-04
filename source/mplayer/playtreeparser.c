@@ -98,11 +98,11 @@ play_tree_parser_get_line(play_tree_parser_t* p) {
     if(p->buffer_size - p->buffer_end > 1 && ! p->stream->eof) {
       r = stream_read(p->stream,p->buffer + p->buffer_end,p->buffer_size - p->buffer_end - 1);
       if(r > 0) {
-	p->buffer_end += r;
-	assert(p->buffer_end < p->buffer_size);
-	p->buffer[p->buffer_end] = '\0';
-	while(strlen(p->buffer + p->buffer_end - r) != r)
-	  p->buffer[p->buffer_end - r + strlen(p->buffer + p->buffer_end - r)] = '\n';
+        p->buffer_end += r;
+        assert(p->buffer_end < p->buffer_size);
+        p->buffer[p->buffer_end] = '\0';
+        while(strlen(p->buffer + p->buffer_end - r) != r)
+          p->buffer[p->buffer_end - r + strlen(p->buffer + p->buffer_end - r)] = '\n';
       }
       assert(!p->buffer[p->buffer_end]);
     }
@@ -110,8 +110,8 @@ play_tree_parser_get_line(play_tree_parser_t* p) {
     end = strchr(p->iter,'\n');
     if(!end) {
       if(p->stream->eof) {
-	end = p->buffer + p->buffer_end;
-	break;
+        end = p->buffer + p->buffer_end;
+        break;
       }
       resize = 1;
       continue;
@@ -173,44 +173,44 @@ parse_asx(play_tree_parser_t* p) {
     if(get_line) {
       line = play_tree_parser_get_line(p);
       if(!line)
-	return NULL;
+        return NULL;
       strstrip(line);
       if(line[0] == '\0')
-	continue;
+        continue;
     }
     if(!comments) {
       if(line[0] != '<') {
-	mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"First char isn't '<' but '%c'\n",line[0]);
-	mp_msg(MSGT_PLAYTREE,MSGL_DBG3,"Buffer = [%s]\n",p->buffer);
-	return NULL;
+        mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"First char isn't '<' but '%c'\n",line[0]);
+        mp_msg(MSGT_PLAYTREE,MSGL_DBG3,"Buffer = [%s]\n",p->buffer);
+        return NULL;
       } else if(strncmp(line,"<!--",4) == 0) { // Comments
-	comments = 1;
-	line += 4;
-	if(line[0] != '\0' && strlen(line) > 0)
-	  get_line = 0;
+        comments = 1;
+        line += 4;
+        if(line[0] != '\0' && strlen(line) > 0)
+          get_line = 0;
       } else if(strncasecmp(line,"<ASX",4) == 0) // We got an asx element
-	break;
+        break;
       else // We don't get an asx
-	return NULL;
+        return NULL;
     } else { // Comments
       char* c;
       c = strchr(line,'-');
       if(c) {
-	if (strncmp(c,"--!>",4) == 0) { // End of comments
-	  comments = 0;
-	  line = c+4;
-	  if(line[0] != '\0') // There is some more data on this line : keep it
-	    get_line = 0;
+        if (strncmp(c,"--!>",4) == 0) { // End of comments
+          comments = 0;
+          line = c+4;
+          if(line[0] != '\0') // There is some more data on this line : keep it
+            get_line = 0;
 
-	} else {
-	  line = c+1; // Jump the -
-	  if(line[0] != '\0') // Some more data
-	    get_line = 0;
-	  else  // End of line
-	    get_line = 1;
-	}
+        } else {
+          line = c+1; // Jump the -
+          if(line[0] != '\0') // Some more data
+            get_line = 0;
+          else  // End of line
+            get_line = 1;
+        }
       } else // No - on this line (or rest of line) : get next one
-	get_line = 1;
+        get_line = 1;
     }
   }
 
@@ -321,19 +321,19 @@ parse_pls(play_tree_parser_t* p) {
     if(strncasecmp(line,"File",4) == 0) {
       num = pls_read_entry(line+4,&entries,&max_entry,&v);
       if(num < 0)
-	mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
+        mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
       else
-	entries[num-1].file = strdup(v);
+        entries[num-1].file = strdup(v);
     } else if(strncasecmp(line,"Title",5) == 0) {
       num = pls_read_entry(line+5,&entries,&max_entry,&v);
       if(num < 0)
-	mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
+        mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
       else
-	entries[num-1].title = strdup(v);
+        entries[num-1].title = strdup(v);
     } else if(strncasecmp(line,"Length",6) == 0) {
       num = pls_read_entry(line+6,&entries,&max_entry,&v);
       if(num < 0)
-	mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
+        mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
       else {
         char *end;
         long val = strtol(v, &end, 10);
@@ -354,17 +354,17 @@ parse_pls(play_tree_parser_t* p) {
       mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Adding entry %s\n",entries[num].file);
       entry = play_tree_new();
 #ifdef GEKKO
-	  // Get the title of .pls entry
-	  if(entries[num].title != NULL && entries[num].title[0] != 0) play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, entries[num].title, NULL);
+          // Get the title of .pls entry
+          if(entries[num].title != NULL && entries[num].title[0] != 0) play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, entries[num].title, NULL);
 #endif
       play_tree_add_file(entry,entries[num].file);
       if (entries[num].length)
         play_tree_set_param(entry, "endpos", entries[num].length, NULL);
       free(entries[num].file);
       if(list)
-	play_tree_append_entry(last_entry,entry);
+        play_tree_append_entry(last_entry,entry);
       else
-	list = entry;
+        list = entry;
       last_entry = entry;
     }
     // When we have info in playtree we add these info
@@ -406,17 +406,17 @@ parse_ref_ini(play_tree_parser_t* p) {
     if(strncasecmp(line,"Ref",3) == 0) {
       v = pls_entry_get_value(line+3);
       if(!v)
-	mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
+        mp_msg(MSGT_PLAYTREE,MSGL_ERR,"No value in entry %s\n",line);
       else
       {
         mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Adding entry %s\n",v);
         entry = play_tree_new();
         play_tree_add_file(entry,v);
         if(list)
-  	  play_tree_append_entry(last_entry,entry);
+          play_tree_append_entry(last_entry,entry);
         else
-  	  list = entry;
-	last_entry = entry;
+          list = entry;
+        last_entry = entry;
       }
     }
     line = play_tree_parser_get_line(p);
@@ -466,16 +466,16 @@ parse_m3u(play_tree_parser_t* p) {
 #ifdef GEKKO
       if(strncasecmp(line,"#EXTINF:",8) == 0) {
         char *eq = strchr(line, '=');
-	    // Get the title of .m3u entry
+            // Get the title of .m3u entry
         char *comma = strchr(line, ',');
         if(comma) snprintf(title, 256, "%s", comma+1);
-		
+
         if(eq) snprintf(logo, 256, "%s", eq+2);
-		//static const u16 twobyte[1] = { 0x222C };
-		//strtok(logo, twobyte);
-		strtok(logo, "\",");
-		
-		//printf("check thumb: %s", logo);
+                //static const u16 twobyte[1] = { 0x222C };
+                //strtok(logo, twobyte);
+                strtok(logo, "\",");
+
+                //printf("check thumb: %s", logo);
       }
 #endif
       continue;
@@ -483,12 +483,12 @@ parse_m3u(play_tree_parser_t* p) {
     entry = play_tree_new();
     play_tree_add_file(entry,line);
 #ifdef GEKKO
-	// Add the title parameter if it exists
+        // Add the title parameter if it exists
     if(title[0])
     {
-    	play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, title, logo);
-    	title[0] = 0;
-		logo[0] = 0;
+        play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, title, logo);
+        title[0] = 0;
+                logo[0] = 0;
     }
 #endif
     if(!list)
@@ -607,32 +607,32 @@ parse_smil(play_tree_parser_t* p) {
      }
     }
     if (entrymode) { //Entry found but not yet filled
-#ifdef GEKKO 
-	  // Get the title of .smi entry
-	  exists_title = 0;
-	  pos1 = strstr(pos,"title=");
-	  if (pos1 != NULL) {
-		while(1) {
-			if (pos1[6] != '"' && pos1[6] != '\'') {
-			  mp_msg(MSGT_PLAYTREE,MSGL_V,"Unknown delimiter %c in source line %s\n", pos1[6], line);
-			  break;
-			}
-			s_start=pos1+7;
-			s_end=strchr(s_start,pos1[6]);
-			if (s_end == NULL) {
-			  mp_msg(MSGT_PLAYTREE,MSGL_V,"Error parsing this source line %s\n",line);
-			  break;
-			}
-			if (s_end-s_start> 127) {
-			  mp_msg(MSGT_PLAYTREE,MSGL_V,"Cannot store such a large source %s\n",line);
-			  break;
-			}
-			strncpy(title,s_start,s_end-s_start);
-			title[(s_end-s_start)]='\0'; // Null terminate
-			exists_title = 1;
-			break;
-		}
-		
+#ifdef GEKKO
+          // Get the title of .smi entry
+          exists_title = 0;
+          pos1 = strstr(pos,"title=");
+          if (pos1 != NULL) {
+                while(1) {
+                        if (pos1[6] != '"' && pos1[6] != '\'') {
+                          mp_msg(MSGT_PLAYTREE,MSGL_V,"Unknown delimiter %c in source line %s\n", pos1[6], line);
+                          break;
+                        }
+                        s_start=pos1+7;
+                        s_end=strchr(s_start,pos1[6]);
+                        if (s_end == NULL) {
+                          mp_msg(MSGT_PLAYTREE,MSGL_V,"Error parsing this source line %s\n",line);
+                          break;
+                        }
+                        if (s_end-s_start> 127) {
+                          mp_msg(MSGT_PLAYTREE,MSGL_V,"Cannot store such a large source %s\n",line);
+                          break;
+                        }
+                        strncpy(title,s_start,s_end-s_start);
+                        title[(s_end-s_start)]='\0'; // Null terminate
+                        exists_title = 1;
+                        break;
+                }
+
       }
 #endif
       pos = strstr(pos,"src=");   // Is source present on this line
@@ -657,9 +657,9 @@ parse_smil(play_tree_parser_t* p) {
         entry = play_tree_new();
         play_tree_add_file(entry,source);
 #ifdef GEKKO
-		// Add the title parameter if it exists
-		if(exists_title)
-			play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, title, NULL);
+                // Add the title parameter if it exists
+                if(exists_title)
+                        play_tree_set_param(entry, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, title, NULL);
 #endif
         if(!list)  //Insert new entry
           list = entry;
@@ -723,17 +723,17 @@ parse_textplain(play_tree_parser_t* p) {
   while((line = play_tree_parser_get_line(p)) != NULL) {
     strstrip(line);
 #ifdef GEKKO
-	linenum++;
-	linelen = strlen(line);
-	
-	if(linenum > 10 && !list)
-		return NULL; // abort - this might be a stream
-	
-	if(linelen > 1024 || linenum > 500)
-	{
-		if(list) play_tree_free(list, 1);
-		return NULL; // abort - this might be a stream
-	}
+        linenum++;
+        linelen = strlen(line);
+
+        if(linenum > 10 && !list)
+                return NULL; // abort - this might be a stream
+
+        if(linelen > 1024 || linenum > 500)
+        {
+                if(list) play_tree_free(list, 1);
+                return NULL; // abort - this might be a stream
+        }
 #endif
     if(line[0] == '\0' || line[0] == '#' || (line[0] == '/' && line[1] == '/'))
       continue;

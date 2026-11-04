@@ -37,25 +37,25 @@ typedef WCHAR * PWCHAR;
  */
 
 typedef struct STRING {
-	USHORT	Length;
-	USHORT	MaximumLength;
-	PSTR	Buffer;
+    USHORT  Length;
+    USHORT  MaximumLength;
+    PSTR    Buffer;
 } STRING,*PSTRING,ANSI_STRING,*PANSI_STRING;
 
 typedef struct CSTRING {
-	USHORT	Length;
-	USHORT	MaximumLength;
-	PCSTR	Buffer;
+    USHORT  Length;
+    USHORT  MaximumLength;
+    PCSTR   Buffer;
 } CSTRING,*PCSTRING;
 
 typedef struct UNICODE_STRING {
-	USHORT	Length;		/* bytes */
-	USHORT	MaximumLength;	/* bytes */
-	PWSTR	Buffer;
+    USHORT  Length;     /* bytes */
+    USHORT  MaximumLength;  /* bytes */
+    PWSTR   Buffer;
 } UNICODE_STRING,*PUNICODE_STRING;
 
 /*
-	Objects
+    Objects
 */
 
 #define OBJ_INHERIT             0x00000002L
@@ -79,12 +79,12 @@ typedef struct OBJECT_ATTRIBUTES
 typedef OBJECT_ATTRIBUTES *POBJECT_ATTRIBUTES;
 
 #define InitializeObjectAttributes(p,n,a,r,s) \
-{	(p)->Length = sizeof(OBJECT_ATTRIBUTES); \
-	(p)->RootDirectory = r; \
-	(p)->Attributes = a; \
-	(p)->ObjectName = n; \
-	(p)->SecurityDescriptor = s; \
-	(p)->SecurityQualityOfService = NULL; \
+{   (p)->Length = sizeof(OBJECT_ATTRIBUTES); \
+    (p)->RootDirectory = r; \
+    (p)->Attributes = a; \
+    (p)->ObjectName = n; \
+    (p)->SecurityDescriptor = s; \
+    (p)->SecurityQualityOfService = NULL; \
 }
 
 

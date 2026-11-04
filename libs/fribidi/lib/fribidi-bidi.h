@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 #ifndef _FRIBIDI_BIDI_H
@@ -63,9 +63,9 @@
  * only LTR, RTL, or ON.
  */
 FRIBIDI_ENTRY FriBidiParType fribidi_get_par_direction (
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len	/* input string length */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len     /* input string length */
 );
 
 #define fribidi_get_par_embedding_levels FRIBIDI_NAMESPACE(get_par_embedding_levels)
@@ -86,12 +86,12 @@ FRIBIDI_ENTRY FriBidiParType fribidi_get_par_direction (
  */
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_get_par_embedding_levels (
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len,	/* input string length of the paragraph */
-  FriBidiParType *pbase_dir,	/* requested and resolved paragraph
-				 * base direction */
-  FriBidiLevel *embedding_levels	/* output list of embedding levels */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len,    /* input string length of the paragraph */
+  FriBidiParType *pbase_dir,    /* requested and resolved paragraph
+                                 * base direction */
+  FriBidiLevel *embedding_levels        /* output list of embedding levels */
 ) FRIBIDI_GNUC_WARN_UNUSED;
 
 #define fribidi_reorder_line FRIBIDI_NAMESPACE(reorder_line)
@@ -127,18 +127,18 @@ fribidi_get_par_embedding_levels (
  */
      FRIBIDI_ENTRY FriBidiLevel fribidi_reorder_line (
   FriBidiFlags flags, /* reorder flags */
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len,	/* input length of the line */
-  const FriBidiStrIndex off,	/* input offset of the beginning of the line
-				   in the paragraph */
-  const FriBidiParType base_dir,	/* resolved paragraph base direction */
-  FriBidiLevel *embedding_levels,	/* input list of embedding levels,
-					   as returned by
-					   fribidi_get_par_embedding_levels */
-  FriBidiChar *visual_str,	/* visual string to reorder */
-  FriBidiStrIndex *map		/* a map of string indices which is reordered
-				 * to reflect where each glyph ends up. */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len,    /* input length of the line */
+  const FriBidiStrIndex off,    /* input offset of the beginning of the line
+                                   in the paragraph */
+  const FriBidiParType base_dir,        /* resolved paragraph base direction */
+  FriBidiLevel *embedding_levels,       /* input list of embedding levels,
+                                           as returned by
+                                           fribidi_get_par_embedding_levels */
+  FriBidiChar *visual_str,      /* visual string to reorder */
+  FriBidiStrIndex *map          /* a map of string indices which is reordered
+                                 * to reflect where each glyph ends up. */
 ) FRIBIDI_GNUC_WARN_UNUSED;
 
 #include "fribidi-enddecls.h"

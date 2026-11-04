@@ -166,7 +166,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   device[4] = p->device[0];
   /* open() can't be used for devices so do it the complicated way */
   hd = CreateFile(device, GENERIC_READ, FILE_SHARE_READ, NULL,
-	  OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+          OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
   f = _open_osfhandle((long)hd, _O_RDONLY);
 #elif defined(__OS2__)
   device[0] = p->device[0];

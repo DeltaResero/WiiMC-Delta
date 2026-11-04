@@ -65,9 +65,9 @@
 
 static const vo_info_t info =
 {
-	"VESA VBE 2.0 video output",
-	"vesa",
-	"Nick Kurshev <nickols_k@mail.ru>",
+        "VESA VBE 2.0 video output",
+        "vesa",
+        "Nick Kurshev <nickols_k@mail.ru>",
         "Requires ROOT privileges"
 };
 
@@ -82,7 +82,7 @@ struct win_frame
   uint32_t   high;  /* highest boundary of frame */
   char       idx;   /* indicates index of relocatable frame (A=0 or B=1)
                        special case for DGA: idx=-1
-		       idx=-2 indicates invalid frame, exists only in init() */
+                       idx=-2 indicates invalid frame, exists only in init() */
 };
 
 static void (*cpy_blk_fnc)(unsigned long,uint8_t *,unsigned long) = NULL;
@@ -192,24 +192,24 @@ static inline void vbeSwitchBank(unsigned long offset)
 
 static void vbeSetPixel(int x, int y, int r, int g, int b)
 {
-	int x_res = video_mode_info.XResolution;
-	int y_res = video_mode_info.YResolution;
-	int shift_r = video_mode_info.RedFieldPosition;
-	int shift_g = video_mode_info.GreenFieldPosition;
-	int shift_b = video_mode_info.BlueFieldPosition;
-	int pixel_size = (dstBpp+7)/8;
-	int bpl = video_mode_info.BytesPerScanLine;
-	int color;
-	unsigned offset;
+        int x_res = video_mode_info.XResolution;
+        int y_res = video_mode_info.YResolution;
+        int shift_r = video_mode_info.RedFieldPosition;
+        int shift_g = video_mode_info.GreenFieldPosition;
+        int shift_b = video_mode_info.BlueFieldPosition;
+        int pixel_size = (dstBpp+7)/8;
+        int bpl = video_mode_info.BytesPerScanLine;
+        int color;
+        unsigned offset;
 
-	if (x < 0 || x >= x_res || y < 0 || y >= y_res)	return;
-	r >>= 8 - video_mode_info.RedMaskSize;
-	g >>= 8 - video_mode_info.GreenMaskSize;
-	b >>= 8 - video_mode_info.BlueMaskSize;
-	color = (r << shift_r) | (g << shift_g) | (b << shift_b);
-	offset = y * bpl + (x * pixel_size);
+        if (x < 0 || x >= x_res || y < 0 || y >= y_res) return;
+        r >>= 8 - video_mode_info.RedMaskSize;
+        g >>= 8 - video_mode_info.GreenMaskSize;
+        b >>= 8 - video_mode_info.BlueMaskSize;
+        color = (r << shift_r) | (g << shift_g) | (b << shift_b);
+        offset = y * bpl + (x * pixel_size);
         if(!VALID_WIN_FRAME(offset)) vbeSwitchBank(offset);
-	memcpy(VIDEO_PTR(offset), &color, pixel_size);
+        memcpy(VIDEO_PTR(offset), &color, pixel_size);
 }
 
 /*
@@ -226,12 +226,12 @@ static void vbeCopyBlock(unsigned long offset,uint8_t *image,unsigned long size)
    unsigned long delta,src_idx = 0;
    while(size)
    {
-	if(!VALID_WIN_FRAME(offset)) vbeSwitchBank(offset);
-	delta = FFMIN(size, win.high - offset);
-	fast_memcpy(VIDEO_PTR(offset),&image[src_idx],delta);
-	src_idx += delta;
-	offset += delta;
-	size -= delta;
+        if(!VALID_WIN_FRAME(offset)) vbeSwitchBank(offset);
+        delta = FFMIN(size, win.high - offset);
+        fast_memcpy(VIDEO_PTR(offset),&image[src_idx],delta);
+        src_idx += delta;
+        offset += delta;
+        size -= delta;
    }
 }
 
@@ -275,7 +275,7 @@ static int draw_slice(uint8_t *image[], int stride[], int w,int h,int x,int y)
     uint8_t *dst[MP_MAX_PLANES]={dga_buffer};
     int dstStride[MP_MAX_PLANES]={0};
     if( mp_msg_test(MSGT_VO,MSGL_DBG3) )
-	mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: draw_slice was called: w=%u h=%u x=%u y=%u\n",w,h,x,y);
+        mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: draw_slice was called: w=%u h=%u x=%u y=%u\n",w,h,x,y);
     dstStride[0]=dstride*((dstBpp+7)/8);
     dstStride[1]=
     dstStride[2]=dstStride[0]>>1;
@@ -294,8 +294,8 @@ static void draw_alpha_32(int x0,int y0, int w,int h, unsigned char* src, unsign
 #ifndef OSD_OUTSIDE_MOVIE
    if(HAS_DGA())
    {
-	x0 += x_offset;
-	y0 += y_offset;
+        x0 += x_offset;
+        y0 += y_offset;
    }
 #endif
    vo_draw_alpha_rgb32(w,h,src,srca,stride,dga_buffer+4*(y0*dstride+x0),4*dstride);
@@ -307,8 +307,8 @@ static void draw_alpha_24(int x0,int y0, int w,int h, unsigned char* src, unsign
 #ifndef OSD_OUTSIDE_MOVIE
    if(HAS_DGA())
    {
-	x0 += x_offset;
-	y0 += y_offset;
+        x0 += x_offset;
+        y0 += y_offset;
    }
 #endif
    vo_draw_alpha_rgb24(w,h,src,srca,stride,dga_buffer+3*(y0*dstride+x0),3*dstride);
@@ -320,8 +320,8 @@ static void draw_alpha_16(int x0,int y0, int w,int h, unsigned char* src, unsign
 #ifndef OSD_OUTSIDE_MOVIE
    if(HAS_DGA())
    {
-	x0 += x_offset;
-	y0 += y_offset;
+        x0 += x_offset;
+        y0 += y_offset;
    }
 #endif
    vo_draw_alpha_rgb16(w,h,src,srca,stride,dga_buffer+2*(y0*dstride+x0),2*dstride);
@@ -333,8 +333,8 @@ static void draw_alpha_15(int x0,int y0, int w,int h, unsigned char* src, unsign
 #ifndef OSD_OUTSIDE_MOVIE
    if(HAS_DGA())
    {
-	x0 += x_offset;
-	y0 += y_offset;
+        x0 += x_offset;
+        y0 += y_offset;
    }
 #endif
    vo_draw_alpha_rgb15(w,h,src,srca,stride,dga_buffer+2*(y0*dstride+x0),2*dstride);
@@ -349,7 +349,7 @@ static void draw_osd(void)
 {
  uint32_t w,h;
  if( mp_msg_test(MSGT_VO,MSGL_DBG3) )
-	mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: draw_osd was called\n");
+        mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: draw_osd was called\n");
  {
 #ifdef OSD_OUTSIDE_MOVIE
    w = HAS_DGA()?video_mode_info.XResolution:dstW;
@@ -365,7 +365,7 @@ static void draw_osd(void)
 static void flip_page(void)
 {
   if( mp_msg_test(MSGT_VO,MSGL_DBG3) )
-	mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: flip_page was called\n");
+        mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: flip_page was called\n");
   if(flip_trigger)
   {
     if(!HAS_DGA()) vbeCopyData(dga_buffer);
@@ -403,23 +403,23 @@ static int draw_frame(uint8_t *src[])
         mp_msg(MSGT_VO,MSGL_DBG3, "vo_vesa: draw_frame was called\n");
     if(sws)
     {
-	int dstride=HAS_DGA()?video_mode_info.XResolution:dstW;
-	int srcStride[1];
-	uint8_t *dst[MP_MAX_PLANES]={dga_buffer};
-	int dstStride[MP_MAX_PLANES]={0};
-	dstStride[0]=dstride*((dstBpp+7)/8);
-	dstStride[1]=
-	dstStride[2]=dstStride[0]>>1;
-	if(srcFourcc == IMGFMT_RGB32 || srcFourcc == IMGFMT_BGR32)
-	    srcStride[0] = srcW*4;
-	else
-	if(srcFourcc == IMGFMT_RGB24 || srcFourcc == IMGFMT_BGR24)
-	    srcStride[0] = srcW*3;
-	else
-	    srcStride[0] = srcW*2;
-	if(HAS_DGA()) dst[0] += y_offset*SCREEN_LINE_SIZE(PIXEL_SIZE())+x_offset*PIXEL_SIZE();
-	sws_scale(sws,src,srcStride,0,srcH,dst,dstStride);
-	flip_trigger=1;
+        int dstride=HAS_DGA()?video_mode_info.XResolution:dstW;
+        int srcStride[1];
+        uint8_t *dst[MP_MAX_PLANES]={dga_buffer};
+        int dstStride[MP_MAX_PLANES]={0};
+        dstStride[0]=dstride*((dstBpp+7)/8);
+        dstStride[1]=
+        dstStride[2]=dstStride[0]>>1;
+        if(srcFourcc == IMGFMT_RGB32 || srcFourcc == IMGFMT_BGR32)
+            srcStride[0] = srcW*4;
+        else
+        if(srcFourcc == IMGFMT_RGB24 || srcFourcc == IMGFMT_BGR24)
+            srcStride[0] = srcW*3;
+        else
+            srcStride[0] = srcW*2;
+        if(HAS_DGA()) dst[0] += y_offset*SCREEN_LINE_SIZE(PIXEL_SIZE())+x_offset*PIXEL_SIZE();
+        sws_scale(sws,src,srcStride,0,srcH,dst,dstStride);
+        flip_trigger=1;
     }
     return 0;
 }
@@ -456,7 +456,7 @@ static int query_format(uint32_t format)
     if(vidix_name) return vidix_query_fourcc(format);
 #endif
     if (format == IMGFMT_MPEGPES)
-	return 0;
+        return 0;
     // FIXME: this is just broken...
     return VFCAP_CSP_SUPPORTED | VFCAP_OSD | VFCAP_SWSCALE | VFCAP_ACCEPT_STRIDE; /* due new SwScale code */
 }
@@ -469,23 +469,23 @@ static void paintBkGnd( void )
 
     for (y = 0; y < y_res; ++y)
     {
-	for (x = 0; x < x_res; ++x)
-	{
-	    int r, g, b;
-	    if ((x & 16) ^ (y & 16))
-	    {
-		r = x * 255 / x_res;
-		g = y * 255 / y_res;
-		b = 255 - x * 255 / x_res;
-	    }
-	    else
-	    {
-		r = 255 - x * 255 / x_res;
-		g = y * 255 / y_res;
-		b = 255 - y * 255 / y_res;
-	    }
-	    vbeSetPixel(x, y, r, g, b);
-	}
+        for (x = 0; x < x_res; ++x)
+        {
+            int r, g, b;
+            if ((x & 16) ^ (y & 16))
+            {
+                r = x * 255 / x_res;
+                g = y * 255 / y_res;
+                b = 255 - x * 255 / x_res;
+            }
+            else
+            {
+                r = 255 - x * 255 / x_res;
+                g = y * 255 / y_res;
+                b = 255 - y * 255 / y_res;
+            }
+            vbeSetPixel(x, y, r, g, b);
+        }
     }
 }
 
@@ -496,8 +496,8 @@ static void clear_screen( void )
     int x, y;
 
     for (y = 0; y < y_res; ++y)
-	for (x = 0; x < x_res; ++x)
-	    vbeSetPixel(x, y, 0, 0, 0);
+        for (x = 0; x < x_res; ++x)
+            vbeSetPixel(x, y, 0, 0, 0);
 }
 
 static char *model2str(unsigned char type)
@@ -550,10 +550,10 @@ static int set_refresh(unsigned x, unsigned y, unsigned mode,struct VesaCRTCInfo
     monitor_vfreq = str2range(monitor_vfreq_str);
     monitor_dotclock = str2range(monitor_dotclock_str);
 
-		if (!monitor_hfreq || !monitor_vfreq || !monitor_dotclock) {
-			mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_YouHaveToSpecifyTheCapabilitiesOfTheMonitor);
-			return 0;
-		}
+                if (!monitor_hfreq || !monitor_vfreq || !monitor_dotclock) {
+                        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_YouHaveToSpecifyTheCapabilitiesOfTheMonitor);
+                        return 0;
+                }
 
     H_freq = range_max(monitor_hfreq)/1000;
 
@@ -566,7 +566,7 @@ static int set_refresh(unsigned x, unsigned y, unsigned mode,struct VesaCRTCInfo
 //    printf("PixelCLK %d\n",(unsigned)crtc_pass->PixelClock);
     }
     while ( (!in_range(monitor_vfreq,crtc_pass->RefreshRate/100)||
-	    !in_range(monitor_hfreq,H_freq*1000))&&(H_freq>0));
+            !in_range(monitor_hfreq,H_freq*1000))&&(H_freq>0));
 
     pixclk = crtc_pass->PixelClock;
 //    printf("PIXclk before %d\n",pixclk);
@@ -587,9 +587,9 @@ static int set_refresh(unsigned x, unsigned y, unsigned mode,struct VesaCRTCInfo
     printf("PixelCLK %d\n",(unsigned)crtc_pass->PixelClock);*/
 
     if (!in_range(monitor_vfreq,crtc_pass->RefreshRate/100)||
-	!in_range(monitor_hfreq,H_freq*1000)) {
+        !in_range(monitor_hfreq,H_freq*1000)) {
         mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_UnableToFitTheMode);
-	return 0;
+        return 0;
     }
 
     return 1;
@@ -614,426 +614,426 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
   unsigned short *mode_ptr,win_seg;
   unsigned bpp,best_x = UINT_MAX,best_y=UINT_MAX,best_mode_idx = UINT_MAX;
   int err,fs_mode,use_scaler=0;
-	srcW = dstW = width;
-	srcH = dstH = height;
-	fs_mode = 0;
+        srcW = dstW = width;
+        srcH = dstH = height;
+        fs_mode = 0;
         if(subdev_flags == 0xFFFFFFFEUL)
-	{
-	  mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_DetectedInternalFatalError);
-	  return -1;
-	}
-	if(subdev_flags == 0xFFFFFFFFUL) return -1;
-	if(flags & VOFLAG_FLIPPING)
-	{
-	  mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_SwitchFlipIsNotSupported);
-	}
-	if(flags & VOFLAG_SWSCALE) use_scaler = 1;
-	if(flags & VOFLAG_FULLSCREEN)
-	{
-	  if(use_scaler) use_scaler = 2;
-	  else          fs_mode = 1;
-	}
-	if((err=vbeInit()) != VBE_OK) { PRINT_VBE_ERR("vbeInit",err); return -1; }
-	memcpy(vib.VESASignature,"VBE2",4);
-	if(!vib_set && (err=vbeGetControllerInfo(&vib)) != VBE_OK)
-	{
-	  PRINT_VBE_ERR("vbeGetControllerInfo",err);
-	  mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_PossibleReasonNoVbe2BiosFound);
-	  return -1;
-	}
-	vib_set = 1;
-	/* Print general info here */
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_FoundVesaVbeBiosVersion,
-		(int)(vib.VESAVersion >> 8) & 0xff,
-		(int)(vib.VESAVersion & 0xff),
-		(int)(vib.OemSoftwareRev & 0xffff));
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_VideoMemory,vib.TotalMemory*64);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_Capabilites
-		,vib.Capabilities & VBE_DAC_8BIT ? "8-bit DAC," : "6-bit DAC,"
-		,vib.Capabilities & VBE_NONVGA_CRTC ? "non-VGA CRTC,":"VGA CRTC,"
-		,vib.Capabilities & VBE_SNOWED_RAMDAC ? "snowed RAMDAC,":"normal RAMDAC,"
-		,vib.Capabilities & VBE_STEREOSCOPIC ? "stereoscopic,":"no stereoscopic,"
-		,vib.Capabilities & VBE_STEREO_EVC ? "Stereo EVC":"no stereo");
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_BelowWillBePrintedOemInfo);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_YouShouldSee5OemRelatedLines);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemInfo,vib.OemStringPtr);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemRevision,vib.OemSoftwareRev);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemVendor,vib.OemVendorNamePtr);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemProductName,vib.OemProductNamePtr);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemProductRev,vib.OemProductRevPtr);
-	mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_Hint);
-	/* Find best mode here */
-	num_modes = 0;
-	mode_ptr = vib.VideoModePtr;
-	while(*mode_ptr++ != 0xffff) num_modes++;
-	switch(format)
-	{
-		case IMGFMT_BGR8:
-		case IMGFMT_RGB8:  bpp = 8; break;
-		case IMGFMT_BGR15:
+        {
+          mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_DetectedInternalFatalError);
+          return -1;
+        }
+        if(subdev_flags == 0xFFFFFFFFUL) return -1;
+        if(flags & VOFLAG_FLIPPING)
+        {
+          mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_SwitchFlipIsNotSupported);
+        }
+        if(flags & VOFLAG_SWSCALE) use_scaler = 1;
+        if(flags & VOFLAG_FULLSCREEN)
+        {
+          if(use_scaler) use_scaler = 2;
+          else          fs_mode = 1;
+        }
+        if((err=vbeInit()) != VBE_OK) { PRINT_VBE_ERR("vbeInit",err); return -1; }
+        memcpy(vib.VESASignature,"VBE2",4);
+        if(!vib_set && (err=vbeGetControllerInfo(&vib)) != VBE_OK)
+        {
+          PRINT_VBE_ERR("vbeGetControllerInfo",err);
+          mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_PossibleReasonNoVbe2BiosFound);
+          return -1;
+        }
+        vib_set = 1;
+        /* Print general info here */
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_FoundVesaVbeBiosVersion,
+                (int)(vib.VESAVersion >> 8) & 0xff,
+                (int)(vib.VESAVersion & 0xff),
+                (int)(vib.OemSoftwareRev & 0xffff));
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_VideoMemory,vib.TotalMemory*64);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_Capabilites
+                ,vib.Capabilities & VBE_DAC_8BIT ? "8-bit DAC," : "6-bit DAC,"
+                ,vib.Capabilities & VBE_NONVGA_CRTC ? "non-VGA CRTC,":"VGA CRTC,"
+                ,vib.Capabilities & VBE_SNOWED_RAMDAC ? "snowed RAMDAC,":"normal RAMDAC,"
+                ,vib.Capabilities & VBE_STEREOSCOPIC ? "stereoscopic,":"no stereoscopic,"
+                ,vib.Capabilities & VBE_STEREO_EVC ? "Stereo EVC":"no stereo");
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_BelowWillBePrintedOemInfo);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_YouShouldSee5OemRelatedLines);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemInfo,vib.OemStringPtr);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemRevision,vib.OemSoftwareRev);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemVendor,vib.OemVendorNamePtr);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemProductName,vib.OemProductNamePtr);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OemProductRev,vib.OemProductRevPtr);
+        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_Hint);
+        /* Find best mode here */
+        num_modes = 0;
+        mode_ptr = vib.VideoModePtr;
+        while(*mode_ptr++ != 0xffff) num_modes++;
+        switch(format)
+        {
+                case IMGFMT_BGR8:
+                case IMGFMT_RGB8:  bpp = 8; break;
+                case IMGFMT_BGR15:
                 case IMGFMT_RGB15: bpp = 15; break;
-		case IMGFMT_BGR16:
-		case IMGFMT_RGB16: bpp = 16; break;
-		case IMGFMT_BGR24:
-		case IMGFMT_RGB24: bpp = 24; break;
-		case IMGFMT_BGR32:
-		case IMGFMT_RGB32: bpp = 32; break;
-		default:	   bpp = 16; break;
-	}
-	srcBpp = bpp;
-	srcFourcc = format;
-	if(vo_dbpp) bpp = vo_dbpp;
-	switch(bpp)
-	{
-	  case 15: draw_alpha_fnc = draw_alpha_15;
-		   dstFourcc = IMGFMT_BGR15;
-		   break;
-	  case 16: draw_alpha_fnc = draw_alpha_16;
-		   dstFourcc = IMGFMT_BGR16;
-		   break;
-	  case 24: draw_alpha_fnc = draw_alpha_24;
-		   dstFourcc = IMGFMT_BGR24;
-		   break;
-	  case 32: draw_alpha_fnc = draw_alpha_32;
-		   dstFourcc = IMGFMT_BGR32;
-		   break;
-	  default: draw_alpha_fnc = draw_alpha_null;
-		   dstFourcc = IMGFMT_BGR16;
-		   break;
-	}
-	if( mp_msg_test(MSGT_VO,MSGL_V) )
-	{
-	  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Requested mode: %ux%u@%u (%s)\n",width,height,bpp,vo_format_name(format));
-	  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Total modes found: %u\n",num_modes);
-	  mode_ptr = vib.VideoModePtr;
-	  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Mode list:");
-	  for(i = 0;i < num_modes;i++)
-	  {
-	    mp_msg(MSGT_VO,MSGL_V, " %04X",mode_ptr[i]);
-	  }
-	  mp_msg(MSGT_VO,MSGL_V, "\nvo_vesa: Modes in detail:\n");
-	}
-	mode_ptr = vib.VideoModePtr;
-	if(use_scaler)
-	{
-	    dstW = d_width;
-	    dstH = d_height;
-	}
-	if(vo_screenwidth) w = vo_screenwidth;
-	else w = FFMAX(dstW, width);
-	if(vo_screenheight) h = vo_screenheight;
-	else h = FFMAX(dstH, height);
+                case IMGFMT_BGR16:
+                case IMGFMT_RGB16: bpp = 16; break;
+                case IMGFMT_BGR24:
+                case IMGFMT_RGB24: bpp = 24; break;
+                case IMGFMT_BGR32:
+                case IMGFMT_RGB32: bpp = 32; break;
+                default:           bpp = 16; break;
+        }
+        srcBpp = bpp;
+        srcFourcc = format;
+        if(vo_dbpp) bpp = vo_dbpp;
+        switch(bpp)
+        {
+          case 15: draw_alpha_fnc = draw_alpha_15;
+                   dstFourcc = IMGFMT_BGR15;
+                   break;
+          case 16: draw_alpha_fnc = draw_alpha_16;
+                   dstFourcc = IMGFMT_BGR16;
+                   break;
+          case 24: draw_alpha_fnc = draw_alpha_24;
+                   dstFourcc = IMGFMT_BGR24;
+                   break;
+          case 32: draw_alpha_fnc = draw_alpha_32;
+                   dstFourcc = IMGFMT_BGR32;
+                   break;
+          default: draw_alpha_fnc = draw_alpha_null;
+                   dstFourcc = IMGFMT_BGR16;
+                   break;
+        }
+        if( mp_msg_test(MSGT_VO,MSGL_V) )
+        {
+          mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Requested mode: %ux%u@%u (%s)\n",width,height,bpp,vo_format_name(format));
+          mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Total modes found: %u\n",num_modes);
+          mode_ptr = vib.VideoModePtr;
+          mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Mode list:");
+          for(i = 0;i < num_modes;i++)
+          {
+            mp_msg(MSGT_VO,MSGL_V, " %04X",mode_ptr[i]);
+          }
+          mp_msg(MSGT_VO,MSGL_V, "\nvo_vesa: Modes in detail:\n");
+        }
+        mode_ptr = vib.VideoModePtr;
+        if(use_scaler)
+        {
+            dstW = d_width;
+            dstH = d_height;
+        }
+        if(vo_screenwidth) w = vo_screenwidth;
+        else w = FFMAX(dstW, width);
+        if(vo_screenheight) h = vo_screenheight;
+        else h = FFMAX(dstH, height);
         for(i=0;i < num_modes;i++)
-	{
-		if((err=vbeGetModeInfo(mode_ptr[i],&vmib)) != VBE_OK)
-		{
-			PRINT_VBE_ERR("vbeGetModeInfo",err);
-			continue;
-		}
-		if(vmib.XResolution >= w &&
-		   vmib.YResolution >= h &&
-		   (vmib.ModeAttributes & MOVIE_MODE) == MOVIE_MODE &&
-		   vmib.BitsPerPixel == bpp &&
-		   vmib.MemoryModel == memRGB)
-		   {
-			if(vmib.XResolution <= best_x &&
-			   vmib.YResolution <= best_y)
-			   {
-				best_x = vmib.XResolution;
-				best_y = vmib.YResolution;
-				best_mode_idx = i;
-			   }
-		   }
-		if( mp_msg_test(MSGT_VO,MSGL_V) )
-		{
-		  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Mode (%03u): mode=%04X %ux%u@%u attr=%04X\n"
-			 "vo_vesa:             #planes=%u model=%u(%s) #pages=%u\n"
-			 "vo_vesa:             winA=%X(attr=%u) winB=%X(attr=%u) winSize=%u winGran=%u\n"
-			 "vo_vesa:             direct_color=%u DGA_phys_addr=%08lX\n"
-			 ,i,mode_ptr[i],vmib.XResolution,vmib.YResolution,vmib.BitsPerPixel,vmib.ModeAttributes
-			 ,vmib.NumberOfPlanes,vmib.MemoryModel,model2str(vmib.MemoryModel),vmib.NumberOfImagePages
-			 ,vmib.WinASegment,vmib.WinAAttributes,vmib.WinBSegment,vmib.WinBAttributes,vmib.WinSize,vmib.WinGranularity
-			 ,vmib.DirectColorModeInfo,vmib.PhysBasePtr);
-		  if(vmib.MemoryModel == 6 || vmib.MemoryModel == 7)
-			mp_msg(MSGT_VO,MSGL_V, "vo_vesa:             direct_color_info = %u:%u:%u:%u\n"
-				,vmib.RedMaskSize,vmib.GreenMaskSize,vmib.BlueMaskSize,vmib.RsvdMaskSize);
-		  fflush(stdout);
-		}
-	}
-	if(best_mode_idx != UINT_MAX)
-	{
-		video_mode = vib.VideoModePtr[best_mode_idx];
-		fflush(stdout);
-		if((err=vbeGetMode(&init_mode)) != VBE_OK)
-		{
-			PRINT_VBE_ERR("vbeGetMode",err);
-			return -1;
-		}
-		if( mp_msg_test(MSGT_VO,MSGL_V) ) {
-			mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Initial video mode: %x\n",init_mode); }
-		if((err=vbeGetModeInfo(video_mode,&video_mode_info)) != VBE_OK)
-		{
-			PRINT_VBE_ERR("vbeGetModeInfo",err);
-			return -1;
-		}
-		dstBpp = video_mode_info.BitsPerPixel;
- 		mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVesaMode
-			,best_mode_idx,video_mode,video_mode_info.XResolution
-			,video_mode_info.YResolution,dstBpp);
-		if(subdev_flags & SUBDEV_NODGA) video_mode_info.PhysBasePtr = 0;
-		if(use_scaler || fs_mode)
-		{
-		      /* software scale */
-		      if(use_scaler > 1
+        {
+                if((err=vbeGetModeInfo(mode_ptr[i],&vmib)) != VBE_OK)
+                {
+                        PRINT_VBE_ERR("vbeGetModeInfo",err);
+                        continue;
+                }
+                if(vmib.XResolution >= w &&
+                   vmib.YResolution >= h &&
+                   (vmib.ModeAttributes & MOVIE_MODE) == MOVIE_MODE &&
+                   vmib.BitsPerPixel == bpp &&
+                   vmib.MemoryModel == memRGB)
+                   {
+                        if(vmib.XResolution <= best_x &&
+                           vmib.YResolution <= best_y)
+                           {
+                                best_x = vmib.XResolution;
+                                best_y = vmib.YResolution;
+                                best_mode_idx = i;
+                           }
+                   }
+                if( mp_msg_test(MSGT_VO,MSGL_V) )
+                {
+                  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Mode (%03u): mode=%04X %ux%u@%u attr=%04X\n"
+                         "vo_vesa:             #planes=%u model=%u(%s) #pages=%u\n"
+                         "vo_vesa:             winA=%X(attr=%u) winB=%X(attr=%u) winSize=%u winGran=%u\n"
+                         "vo_vesa:             direct_color=%u DGA_phys_addr=%08lX\n"
+                         ,i,mode_ptr[i],vmib.XResolution,vmib.YResolution,vmib.BitsPerPixel,vmib.ModeAttributes
+                         ,vmib.NumberOfPlanes,vmib.MemoryModel,model2str(vmib.MemoryModel),vmib.NumberOfImagePages
+                         ,vmib.WinASegment,vmib.WinAAttributes,vmib.WinBSegment,vmib.WinBAttributes,vmib.WinSize,vmib.WinGranularity
+                         ,vmib.DirectColorModeInfo,vmib.PhysBasePtr);
+                  if(vmib.MemoryModel == 6 || vmib.MemoryModel == 7)
+                        mp_msg(MSGT_VO,MSGL_V, "vo_vesa:             direct_color_info = %u:%u:%u:%u\n"
+                                ,vmib.RedMaskSize,vmib.GreenMaskSize,vmib.BlueMaskSize,vmib.RsvdMaskSize);
+                  fflush(stdout);
+                }
+        }
+        if(best_mode_idx != UINT_MAX)
+        {
+                video_mode = vib.VideoModePtr[best_mode_idx];
+                fflush(stdout);
+                if((err=vbeGetMode(&init_mode)) != VBE_OK)
+                {
+                        PRINT_VBE_ERR("vbeGetMode",err);
+                        return -1;
+                }
+                if( mp_msg_test(MSGT_VO,MSGL_V) ) {
+                        mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Initial video mode: %x\n",init_mode); }
+                if((err=vbeGetModeInfo(video_mode,&video_mode_info)) != VBE_OK)
+                {
+                        PRINT_VBE_ERR("vbeGetModeInfo",err);
+                        return -1;
+                }
+                dstBpp = video_mode_info.BitsPerPixel;
+                mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVesaMode
+                        ,best_mode_idx,video_mode,video_mode_info.XResolution
+                        ,video_mode_info.YResolution,dstBpp);
+                if(subdev_flags & SUBDEV_NODGA) video_mode_info.PhysBasePtr = 0;
+                if(use_scaler || fs_mode)
+                {
+                      /* software scale */
+                      if(use_scaler > 1
 #ifdef CONFIG_VIDIX
-				|| vidix_name
+                                || vidix_name
 #endif
-			  )
-		      {
-		        aspect_save_orig(width,height);
-			aspect_save_prescale(d_width,d_height);
-			aspect_save_screenres(video_mode_info.XResolution,video_mode_info.YResolution);
-			aspect(&dstW,&dstH,A_ZOOM);
-		      }
-		      else
-		      if(fs_mode)
-		      {
-			dstW = video_mode_info.XResolution;
-			dstH = video_mode_info.YResolution;
-		      }
-		      use_scaler = 1;
-		}
-		if(!lvo_name
+                          )
+                      {
+                        aspect_save_orig(width,height);
+                        aspect_save_prescale(d_width,d_height);
+                        aspect_save_screenres(video_mode_info.XResolution,video_mode_info.YResolution);
+                        aspect(&dstW,&dstH,A_ZOOM);
+                      }
+                      else
+                      if(fs_mode)
+                      {
+                        dstW = video_mode_info.XResolution;
+                        dstH = video_mode_info.YResolution;
+                      }
+                      use_scaler = 1;
+                }
+                if(!lvo_name
 #ifdef CONFIG_VIDIX
-		&& !vidix_name
+                && !vidix_name
 #endif
-		)
-		{
-		    sws = sws_getContextFromCmdLine(srcW,srcH,srcFourcc,dstW,dstH,dstFourcc);
-		    if(!sws)
-		    {
- 			mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantInitializeSwscaler);
-			return -1;
-		    }
-		    else if( mp_msg_test(MSGT_VO,MSGL_V) ) {
-			mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Using SW BES emulator\n"); }
-		}
-		if((video_mode_info.WinAAttributes & FRAME_MODE) == FRAME_MODE)
-		   win.idx = 0; /* frame A */
-		else
-		if((video_mode_info.WinBAttributes & FRAME_MODE) == FRAME_MODE)
-		   win.idx = 1; /* frame B */
-		else win.idx = -2;
-		/* Try use DGA instead */
-		if(video_mode_info.PhysBasePtr && vib.TotalMemory && (video_mode_info.ModeAttributes & MODE_ATTR_LINEAR))
-		{
-		    void *lfb;
-		    unsigned long vsize;
-		    vsize = vib.TotalMemory*64*1024;
-		    lfb = vbeMapVideoBuffer(video_mode_info.PhysBasePtr,vsize);
-		    if(lfb == NULL)
-		      mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantUseDga);
-		    else
-		    {
-		      video_base = win.ptr = lfb;
-		      win.low = 0UL;
-		      win.high = vsize;
-		      win.idx = -1; /* HAS_DGA() is on */
-		      video_mode |= VESA_MODE_USE_LINEAR;
- 		      mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingDga
-			     ,video_mode_info.PhysBasePtr
-			     ,vsize);
-		      if( mp_msg_test(MSGT_VO,MSGL_V) ) {
-			printf(" at %08lXh",(unsigned long)lfb); }
-		      printf("\n");
-		      if(!(multi_size = fillMultiBuffer(vsize,2))) return -1;
-		      if(vo_doublebuffering && multi_size < 2)
- 			mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantUseDoubleBuffering);
-		    }
-		}
-		if(win.idx == -2)
-		{
- 		   mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindNeitherDga);
-		   return -1;
-		}
-		if(!HAS_DGA())
-		{
-		  if(subdev_flags & SUBDEV_FORCEDGA)
-		  {
- 			mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_YouveForcedDga);
-			return -1;
-		  }
-		  if(!(win_seg = win.idx == 0 ? video_mode_info.WinASegment:video_mode_info.WinBSegment))
-		  {
- 		    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindValidWindowAddress);
-		    return -1;
-		  }
-		  win.ptr = PhysToVirtSO(win_seg,0);
-		  win.low = 0L;
-		  win.high= video_mode_info.WinSize*1024;
- 		  mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingBankSwitchingMode
-			 ,(unsigned long)win.ptr,(unsigned long)win.high);
-		}
-		if(video_mode_info.XResolution > dstW)
-		    x_offset = (video_mode_info.XResolution - dstW) / 2;
-		else x_offset = 0;
-		if(video_mode_info.YResolution > dstH)
-		    y_offset = (video_mode_info.YResolution - dstH) / 2;
-		else y_offset = 0;
-		if( mp_msg_test(MSGT_VO,MSGL_V) )
- 		  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: image: %ux%u screen = %ux%u x_offset = %u y_offset = %u\n"
-			,dstW,dstH
-			,video_mode_info.XResolution,video_mode_info.YResolution
-			,x_offset,y_offset);
-		if(HAS_DGA())
-		{
-		  dga_buffer = win.ptr; /* Trickly ;) */
-		  cpy_blk_fnc = vbeCopyBlockFast;
-		}
-		else
-		{
-		  cpy_blk_fnc = vbeCopyBlock;
-		  if(!lvo_name
+                )
+                {
+                    sws = sws_getContextFromCmdLine(srcW,srcH,srcFourcc,dstW,dstH,dstFourcc);
+                    if(!sws)
+                    {
+                        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantInitializeSwscaler);
+                        return -1;
+                    }
+                    else if( mp_msg_test(MSGT_VO,MSGL_V) ) {
+                        mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Using SW BES emulator\n"); }
+                }
+                if((video_mode_info.WinAAttributes & FRAME_MODE) == FRAME_MODE)
+                   win.idx = 0; /* frame A */
+                else
+                if((video_mode_info.WinBAttributes & FRAME_MODE) == FRAME_MODE)
+                   win.idx = 1; /* frame B */
+                else win.idx = -2;
+                /* Try use DGA instead */
+                if(video_mode_info.PhysBasePtr && vib.TotalMemory && (video_mode_info.ModeAttributes & MODE_ATTR_LINEAR))
+                {
+                    void *lfb;
+                    unsigned long vsize;
+                    vsize = vib.TotalMemory*64*1024;
+                    lfb = vbeMapVideoBuffer(video_mode_info.PhysBasePtr,vsize);
+                    if(lfb == NULL)
+                      mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantUseDga);
+                    else
+                    {
+                      video_base = win.ptr = lfb;
+                      win.low = 0UL;
+                      win.high = vsize;
+                      win.idx = -1; /* HAS_DGA() is on */
+                      video_mode |= VESA_MODE_USE_LINEAR;
+                      mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingDga
+                             ,video_mode_info.PhysBasePtr
+                             ,vsize);
+                      if( mp_msg_test(MSGT_VO,MSGL_V) ) {
+                        printf(" at %08lXh",(unsigned long)lfb); }
+                      printf("\n");
+                      if(!(multi_size = fillMultiBuffer(vsize,2))) return -1;
+                      if(vo_doublebuffering && multi_size < 2)
+                        mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_CantUseDoubleBuffering);
+                    }
+                }
+                if(win.idx == -2)
+                {
+                   mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindNeitherDga);
+                   return -1;
+                }
+                if(!HAS_DGA())
+                {
+                  if(subdev_flags & SUBDEV_FORCEDGA)
+                  {
+                        mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_YouveForcedDga);
+                        return -1;
+                  }
+                  if(!(win_seg = win.idx == 0 ? video_mode_info.WinASegment:video_mode_info.WinBSegment))
+                  {
+                    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindValidWindowAddress);
+                    return -1;
+                  }
+                  win.ptr = PhysToVirtSO(win_seg,0);
+                  win.low = 0L;
+                  win.high= video_mode_info.WinSize*1024;
+                  mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingBankSwitchingMode
+                         ,(unsigned long)win.ptr,(unsigned long)win.high);
+                }
+                if(video_mode_info.XResolution > dstW)
+                    x_offset = (video_mode_info.XResolution - dstW) / 2;
+                else x_offset = 0;
+                if(video_mode_info.YResolution > dstH)
+                    y_offset = (video_mode_info.YResolution - dstH) / 2;
+                else y_offset = 0;
+                if( mp_msg_test(MSGT_VO,MSGL_V) )
+                  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: image: %ux%u screen = %ux%u x_offset = %u y_offset = %u\n"
+                        ,dstW,dstH
+                        ,video_mode_info.XResolution,video_mode_info.YResolution
+                        ,x_offset,y_offset);
+                if(HAS_DGA())
+                {
+                  dga_buffer = win.ptr; /* Trickly ;) */
+                  cpy_blk_fnc = vbeCopyBlockFast;
+                }
+                else
+                {
+                  cpy_blk_fnc = vbeCopyBlock;
+                  if(!lvo_name
 #ifdef CONFIG_VIDIX
-		   && !vidix_name
+                   && !vidix_name
 #endif
-		  )
-		  {
-		    if(!(dga_buffer = memalign(64,video_mode_info.XResolution*video_mode_info.YResolution*dstBpp)))
-		    {
- 		      mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantAllocateTemporaryBuffer);
-		      return -1;
-		    }
-		    if( mp_msg_test(MSGT_VO,MSGL_V) ) {
-			mp_msg(MSGT_VO,MSGL_V, "vo_vesa: dga emulator was allocated = %p\n",dga_buffer); }
-		  }
-		}
-		if((err=vbeSaveState(&init_state)) != VBE_OK)
-		{
-			PRINT_VBE_ERR("vbeSaveState",err);
-		}
+                  )
+                  {
+                    if(!(dga_buffer = memalign(64,video_mode_info.XResolution*video_mode_info.YResolution*dstBpp)))
+                    {
+                      mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantAllocateTemporaryBuffer);
+                      return -1;
+                    }
+                    if( mp_msg_test(MSGT_VO,MSGL_V) ) {
+                        mp_msg(MSGT_VO,MSGL_V, "vo_vesa: dga emulator was allocated = %p\n",dga_buffer); }
+                  }
+                }
+                if((err=vbeSaveState(&init_state)) != VBE_OK)
+                {
+                        PRINT_VBE_ERR("vbeSaveState",err);
+                }
 
-		/* TODO:
-		         user might pass refresh value,
-			 GTF constants might be read from monitor
-			 for best results, I don't have a spec (RM)
-		*/
+                /* TODO:
+                         user might pass refresh value,
+                         GTF constants might be read from monitor
+                         for best results, I don't have a spec (RM)
+                */
 
-		if (((int)(vib.VESAVersion >> 8) & 0xff) > 2) {
+                if (((int)(vib.VESAVersion >> 8) & 0xff) > 2) {
 
-		if (set_refresh(video_mode_info.XResolution,video_mode_info.YResolution,video_mode,&crtc_pass))
-		video_mode = video_mode | 0x800;
+                if (set_refresh(video_mode_info.XResolution,video_mode_info.YResolution,video_mode,&crtc_pass))
+                video_mode = video_mode | 0x800;
 
-		}
+                }
 
-		;
+                ;
 
-		if ((err=vbeSetMode(video_mode,&crtc_pass)) != VBE_OK)
-		{
-			PRINT_VBE_ERR("vbeSetMode",err);
-			return -1;
-		}
+                if ((err=vbeSetMode(video_mode,&crtc_pass)) != VBE_OK)
+                {
+                        PRINT_VBE_ERR("vbeSetMode",err);
+                        return -1;
+                }
 
-		if (neomagic_tvout) {
-		    err = vbeSetTV(video_mode,neomagic_tvnorm);
-		    if (err!=0x4f) {
- 		    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_SorryUnsupportedMode);
-		    }
-		    else {
- 		    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OhYouReallyHavePictureOnTv);
-		    }
-		}
-		/* Now we are in video mode!!!*/
-		/* Below 'return -1' is impossible */
-		if( mp_msg_test(MSGT_VO,MSGL_V) )
-		{
-		  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Graphics mode was activated\n");
-		  fflush(stdout);
-		}
-		if(lvo_name)
-		{
-		  if(vlvo_init(width,height,x_offset,y_offset,dstW,dstH,format,dstBpp) != 0)
-		  {
- 		    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantInitialozeLinuxVideoOverlay);
-		    vesa_term();
-		    return -1;
-		  }
-		  else mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVideoOverlay,lvo_name);
-		  lvo_opened = 1;
-		}
+                if (neomagic_tvout) {
+                    err = vbeSetTV(video_mode,neomagic_tvnorm);
+                    if (err!=0x4f) {
+                    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_VESA_SorryUnsupportedMode);
+                    }
+                    else {
+                    mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_OhYouReallyHavePictureOnTv);
+                    }
+                }
+                /* Now we are in video mode!!!*/
+                /* Below 'return -1' is impossible */
+                if( mp_msg_test(MSGT_VO,MSGL_V) )
+                {
+                  mp_msg(MSGT_VO,MSGL_V, "vo_vesa: Graphics mode was activated\n");
+                  fflush(stdout);
+                }
+                if(lvo_name)
+                {
+                  if(vlvo_init(width,height,x_offset,y_offset,dstW,dstH,format,dstBpp) != 0)
+                  {
+                    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantInitialozeLinuxVideoOverlay);
+                    vesa_term();
+                    return -1;
+                  }
+                  else mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVideoOverlay,lvo_name);
+                  lvo_opened = 1;
+                }
 #ifdef CONFIG_VIDIX
-		else
-		if(vidix_name)
-		{
-		  if(vidix_init(width,height,x_offset,y_offset,dstW,
-				dstH,format,dstBpp,
-				video_mode_info.XResolution,video_mode_info.YResolution) != 0)
-		  {
-		    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantInitializeVidixDriver);
-		    vesa_term();
-		    return -1;
-		  }
-		  else mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVidix);
-		  vidix_start();
+                else
+                if(vidix_name)
+                {
+                  if(vidix_init(width,height,x_offset,y_offset,dstW,
+                                dstH,format,dstBpp,
+                                video_mode_info.XResolution,video_mode_info.YResolution) != 0)
+                  {
+                    mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantInitializeVidixDriver);
+                    vesa_term();
+                    return -1;
+                  }
+                  else mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_UsingVidix);
+                  vidix_start();
 
-		  /* set colorkey */
-		  if (vidix_grkey_support())
-		  {
-		    vidix_grkey_get(&gr_key);
-		    gr_key.key_op = KEYS_PUT;
+                  /* set colorkey */
+                  if (vidix_grkey_support())
+                  {
+                    vidix_grkey_get(&gr_key);
+                    gr_key.key_op = KEYS_PUT;
 #if 0
-		    if (!(vo_colorkey & 0xFF000000))
-		    {
-			gr_key.ckey.op = CKEY_TRUE;
-			gr_key.ckey.red = (vo_colorkey & 0x00FF0000) >> 16;
-			gr_key.ckey.green = (vo_colorkey & 0x0000FF00) >> 8;
-			gr_key.ckey.blue = vo_colorkey & 0x000000FF;
-		    } else
+                    if (!(vo_colorkey & 0xFF000000))
+                    {
+                        gr_key.ckey.op = CKEY_TRUE;
+                        gr_key.ckey.red = (vo_colorkey & 0x00FF0000) >> 16;
+                        gr_key.ckey.green = (vo_colorkey & 0x0000FF00) >> 8;
+                        gr_key.ckey.blue = vo_colorkey & 0x000000FF;
+                    } else
 #endif
-			gr_key.ckey.op = CKEY_FALSE;
-		    vidix_grkey_set(&gr_key);
-		  }
-		  vidix_opened = 1;
-		}
+                        gr_key.ckey.op = CKEY_FALSE;
+                    vidix_grkey_set(&gr_key);
+                  }
+                  vidix_opened = 1;
+                }
 #endif
-	}
-	else
-	{
- 	  mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindModeFor,width,height,bpp);
-	  return -1;
-	}
-	if( mp_msg_test(MSGT_VO,MSGL_V) )
-	{
-	  mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_InitializationComplete);
-	  fflush(stdout);
-	}
-	if(HAS_DGA() && vo_doublebuffering)
-	{
+        }
+        else
+        {
+          mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_VESA_CantFindModeFor,width,height,bpp);
+          return -1;
+        }
+        if( mp_msg_test(MSGT_VO,MSGL_V) )
+        {
+          mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_VESA_InitializationComplete);
+          fflush(stdout);
+        }
+        if(HAS_DGA() && vo_doublebuffering)
+        {
             if (VBE_OK != vbeSetDisplayStart(0, vo_vsync))
             {
               mp_msg(MSGT_VO,MSGL_WARN, "[VO_VESA] Can't use double buffering: changing displays failed.\n");
               multi_size = 1;
             }
-	    for(i=0;i<multi_size;i++)
-	    {
-		win.ptr = dga_buffer = video_base + multi_buff[i];
-                clear_screen();	/* Clear screen for stupid BIOSes */
-		if( mp_msg_test(MSGT_VO,MSGL_DBG2) ) paintBkGnd();
-	    }
-	}
-	else
-	{
-            clear_screen();	/* Clear screen for stupid BIOSes */
-	    if( mp_msg_test(MSGT_VO,MSGL_DBG2) )
-	    {
-	        int x;
-	        x = (video_mode_info.XResolution/video_mode_info.XCharSize)/2-strlen(title)/2;
-	        if(x < 0) x = 0;
-	        paintBkGnd();
-	        vbeWriteString(x,0,7,title);
-	    }
-	}
-	return 0;
+            for(i=0;i<multi_size;i++)
+            {
+                win.ptr = dga_buffer = video_base + multi_buff[i];
+                clear_screen(); /* Clear screen for stupid BIOSes */
+                if( mp_msg_test(MSGT_VO,MSGL_DBG2) ) paintBkGnd();
+            }
+        }
+        else
+        {
+            clear_screen();     /* Clear screen for stupid BIOSes */
+            if( mp_msg_test(MSGT_VO,MSGL_DBG2) )
+            {
+                int x;
+                x = (video_mode_info.XResolution/video_mode_info.XCharSize)/2-strlen(title)/2;
+                if(x < 0) x = 0;
+                paintBkGnd();
+                vbeWriteString(x,0,7,title);
+            }
+        }
+        return 0;
 }
 
 static void
@@ -1075,9 +1075,9 @@ static int preinit(const char *arg)
   // detect now that we can't we can exit cleanly)
   fd = open("/dev/mem", O_RDWR);
   if (fd < 0)
-  	return -1;
+        return -1;
   else
-  	close(fd);
+        close(fd);
   if( mp_msg_test(MSGT_VO,MSGL_DBG3) )
         mp_msg(MSGT_VO,MSGL_DBG3, "vo_subdevice: initialization returns: %i\n",pre_init_err);
   return pre_init_err;

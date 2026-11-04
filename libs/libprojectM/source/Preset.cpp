@@ -10,7 +10,7 @@
 Preset::~Preset() {}
 
 Preset::Preset(const std::string & presetName, const std::string & presetAuthor):
-	_name(presetName), _author(presetAuthor) {}
+    _name(presetName), _author(presetAuthor) {}
 
 void Preset::setName(const std::string & value) { _name = value; }
 

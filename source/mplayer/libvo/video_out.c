@@ -271,7 +271,7 @@ const vo_functions_t* const video_out_drivers[] =
         &video_out_cvidix,
 #endif
 #ifdef GEKKO
-    	&video_out_gekko,
+        &video_out_gekko,
 #endif
         &video_out_null,
         // should not be auto-selected
@@ -323,38 +323,38 @@ const vo_functions_t* init_best_video_out(char** vo_list){
     if(vo_list && vo_list[0])
       while(vo_list[0][0]){
         char* vo=strdup(vo_list[0]);
-	vo_subdevice=strchr(vo,':');
-	if (!strcmp(vo, "pgm"))
-	    mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_PGM_HasBeenReplaced);
-	if (!strcmp(vo, "md5"))
-	    mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_MD5_HasBeenReplaced);
-	if(vo_subdevice){
-	    vo_subdevice[0]=0;
-	    ++vo_subdevice;
-	}
-	for(i=0;video_out_drivers[i];i++){
-	    const vo_functions_t* video_driver=video_out_drivers[i];
-	    const vo_info_t *info = video_driver->info;
-	    if(!strcmp(info->short_name,vo)){
-		// name matches, try it
-		if(!video_driver->preinit(vo_subdevice))
-		{
-		    free(vo);
-		    return video_driver; // success!
-		}
-	    }
-	}
+        vo_subdevice=strchr(vo,':');
+        if (!strcmp(vo, "pgm"))
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_PGM_HasBeenReplaced);
+        if (!strcmp(vo, "md5"))
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_MD5_HasBeenReplaced);
+        if(vo_subdevice){
+            vo_subdevice[0]=0;
+            ++vo_subdevice;
+        }
+        for(i=0;video_out_drivers[i];i++){
+            const vo_functions_t* video_driver=video_out_drivers[i];
+            const vo_info_t *info = video_driver->info;
+            if(!strcmp(info->short_name,vo)){
+                // name matches, try it
+                if(!video_driver->preinit(vo_subdevice))
+                {
+                    free(vo);
+                    return video_driver; // success!
+                }
+            }
+        }
         // continue...
-	free(vo);
-	++vo_list;
-	if(!(vo_list[0])) return NULL; // do NOT fallback to others
+        free(vo);
+        ++vo_list;
+        if(!(vo_list[0])) return NULL; // do NOT fallback to others
       }
     // now try the rest...
     vo_subdevice=NULL;
     for(i=0;video_out_drivers[i];i++){
-	const vo_functions_t* video_driver=video_out_drivers[i];
-	if(!video_driver->preinit(vo_subdevice))
-	    return video_driver; // success!
+        const vo_functions_t* video_driver=video_out_drivers[i];
+        if(!video_driver->preinit(vo_subdevice))
+            return video_driver; // success!
     }
     return NULL;
 }
@@ -496,70 +496,70 @@ float range_max(range_t *r)
 {
 float max = 0;
 
-	for (/* NOTHING */; (r->min != -1 && r->max != -1); r++)
-		if (max < r->max) max = r->max;
-	return max;
+        for (/* NOTHING */; (r->min != -1 && r->max != -1); r++)
+                if (max < r->max) max = r->max;
+        return max;
 }
 
 
 int in_range(range_t *r, float f)
 {
-	for (/* NOTHING */; (r->min != -1 && r->max != -1); r++)
-		if (f >= r->min && f <= r->max)
-			return 1;
-	return 0;
+        for (/* NOTHING */; (r->min != -1 && r->max != -1); r++)
+                if (f >= r->min && f <= r->max)
+                        return 1;
+        return 0;
 }
 
 range_t *str2range(char *s)
 {
-	float tmp_min, tmp_max;
-	char *endptr = s;	// to start the loop
-	range_t *r = NULL;
-	int i;
+        float tmp_min, tmp_max;
+        char *endptr = s;       // to start the loop
+        range_t *r = NULL;
+        int i;
 
-	if (!s)
-		return NULL;
-	for (i = 0; *endptr; i++) {
-		if (*s == ',')
-			goto out_err;
-		if (!(r = realloc(r, sizeof(*r) * (i + 2)))) {
-			mp_msg(MSGT_GLOBAL, MSGL_WARN,"can't realloc 'r'\n");
-			return NULL;
-		}
-		tmp_min = strtod(s, &endptr);
-		if (*endptr == 'k' || *endptr == 'K') {
-			tmp_min *= 1000.0;
-			endptr++;
-		} else if (*endptr == 'm' || *endptr == 'M') {
-			tmp_min *= 1000000.0;
-			endptr++;
-		}
-		if (*endptr == '-') {
-			tmp_max = strtod(endptr + 1, &endptr);
-			if (*endptr == 'k' || *endptr == 'K') {
-				tmp_max *= 1000.0;
-				endptr++;
-			} else if (*endptr == 'm' || *endptr == 'M') {
-				tmp_max *= 1000000.0;
-				endptr++;
-			}
-			if (*endptr != ',' && *endptr)
-				goto out_err;
-		} else if (*endptr == ',' || !*endptr) {
-			tmp_max = tmp_min;
-		} else
-			goto out_err;
-		r[i].min = tmp_min;
-		r[i].max = tmp_max;
-		if (r[i].min < 0 || r[i].max < 0)
-			goto out_err;
-		s = endptr + 1;
-	}
-	r[i].min = r[i].max = -1;
-	return r;
+        if (!s)
+                return NULL;
+        for (i = 0; *endptr; i++) {
+                if (*s == ',')
+                        goto out_err;
+                if (!(r = realloc(r, sizeof(*r) * (i + 2)))) {
+                        mp_msg(MSGT_GLOBAL, MSGL_WARN,"can't realloc 'r'\n");
+                        return NULL;
+                }
+                tmp_min = strtod(s, &endptr);
+                if (*endptr == 'k' || *endptr == 'K') {
+                        tmp_min *= 1000.0;
+                        endptr++;
+                } else if (*endptr == 'm' || *endptr == 'M') {
+                        tmp_min *= 1000000.0;
+                        endptr++;
+                }
+                if (*endptr == '-') {
+                        tmp_max = strtod(endptr + 1, &endptr);
+                        if (*endptr == 'k' || *endptr == 'K') {
+                                tmp_max *= 1000.0;
+                                endptr++;
+                        } else if (*endptr == 'm' || *endptr == 'M') {
+                                tmp_max *= 1000000.0;
+                                endptr++;
+                        }
+                        if (*endptr != ',' && *endptr)
+                                goto out_err;
+                } else if (*endptr == ',' || !*endptr) {
+                        tmp_max = tmp_min;
+                } else
+                        goto out_err;
+                r[i].min = tmp_min;
+                r[i].max = tmp_max;
+                if (r[i].min < 0 || r[i].max < 0)
+                        goto out_err;
+                s = endptr + 1;
+        }
+        r[i].min = r[i].max = -1;
+        return r;
 out_err:
-	free(r);
-	return NULL;
+        free(r);
+        return NULL;
 }
 
 /* Borrowed from vo_fbdev.c END */

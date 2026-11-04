@@ -165,7 +165,7 @@ unsigned int fsdp_get_emails_count (const fsdp_description_t * dsc);
  * is no such index.
  **/
 const char *fsdp_get_email (const fsdp_description_t * dsc,
-			    unsigned int index);
+                            unsigned int index);
 
 /**
  * Get the number of phones specified for the session in the description
@@ -187,7 +187,7 @@ unsigned int fsdp_get_phones_count (const fsdp_description_t * dsc);
  * is no such index.
  **/
 const char *fsdp_get_phone (const fsdp_description_t * dsc,
-			    unsigned int index);
+                            unsigned int index);
 
 /**
  * Get the the global type of network of the multimedia session
@@ -251,7 +251,7 @@ unsigned int fsdp_get_bw_modifier_count (const fsdp_description_t * dsc);
  **/
 fsdp_bw_modifier_type_t
 fsdp_get_bw_modifier_type (const fsdp_description_t * dsc,
-			   unsigned int index);
+                           unsigned int index);
 
 /**
  * Get the textual bandwidth modifier type when it is unknown.
@@ -264,7 +264,7 @@ fsdp_get_bw_modifier_type (const fsdp_description_t * dsc,
  * the provided index is invalid or or there was a parse error.
  **/
 const char *fsdp_get_bw_modifier_type_unknown (const fsdp_description_t * dsc,
-					       unsigned int index);
+                                               unsigned int index);
 
 /**
  * Get the value for the bandwidth modifier.
@@ -321,7 +321,7 @@ fsdp_get_period_stop (const fsdp_description_t * dsc, unsigned int index);
  **/
 unsigned int
 fsdp_get_period_repeats_count (const fsdp_description_t * dsc,
-			       unsigned int index);
+                               unsigned int index);
 
 /**
  * Get the interval time of the repeat selected by rindex for the
@@ -336,7 +336,7 @@ fsdp_get_period_repeats_count (const fsdp_description_t * dsc,
  **/
 unsigned long int
 fsdp_get_period_repeat_interval (const fsdp_description_t * dsc,
-				 unsigned int index, unsigned int rindex);
+                                 unsigned int index, unsigned int rindex);
 
 /**
  * Get the duration of the repeat selected by rindex for the period
@@ -351,7 +351,7 @@ fsdp_get_period_repeat_interval (const fsdp_description_t * dsc,
  **/
 unsigned long int
 fsdp_get_period_repeat_duration (const fsdp_description_t * dsc,
-				 unsigned int index, unsigned int rindex);
+                                 unsigned int index, unsigned int rindex);
 
 /**
  * Get the offsets of the repeat selected by rindex for the period
@@ -365,10 +365,10 @@ fsdp_get_period_repeat_duration (const fsdp_description_t * dsc,
  * @retval NULL if an invalid index is provided.
  **/
 const unsigned long int *fsdp_get_period_repeat_offsets (const
-							 fsdp_description_t *
-							 dsc,
-							 unsigned int index,
-							 unsigned int rindex);
+                                                         fsdp_description_t *
+                                                         dsc,
+                                                         unsigned int index,
+                                                         unsigned int rindex);
 
 /**
  * Get the encryption method defined for this session.
@@ -411,7 +411,7 @@ fsdp_get_unidentified_attribute_count (const fsdp_description_t * dsc);
  *
  **/
 const char *fsdp_get_unidentified_attribute (const fsdp_description_t * dsc,
-					     unsigned int index);
+                                             unsigned int index);
 
 /**
  *
@@ -423,29 +423,29 @@ fsdp_get_media_rtpmap_count (const fsdp_media_description_t * mdsc);
  *
  **/
 const char *fsdp_get_media_rtpmap_payload_type (const fsdp_media_description_t
-						* mdsc, unsigned int index);
+                                                * mdsc, unsigned int index);
 
 /**
  *
  **/
 const char *fsdp_get_media_rtpmap_encoding_name (const
-						 fsdp_media_description_t *
-						 mdsc, unsigned int index);
+                                                 fsdp_media_description_t *
+                                                 mdsc, unsigned int index);
 
 /**
  *
  **/
 unsigned int
 fsdp_get_media_rtpmap_clock_rate (const fsdp_media_description_t * mdsc,
-				  unsigned int index);
+                                  unsigned int index);
 
 /**
  *
  **/
 const char *fsdp_get_media_rtpmap_encoding_parameters (const
-						       fsdp_description_t *
-						       mdsc,
-						       unsigned int index);
+                                                       fsdp_description_t *
+                                                       mdsc,
+                                                       unsigned int index);
 
 /**
  * Get the value of the session attribute specified in
@@ -461,7 +461,7 @@ const char *fsdp_get_media_rtpmap_encoding_parameters (const
  * parse error or an invalid att is given.
  **/
 const char *fsdp_get_str_att (const fsdp_description_t * dsc,
-			      fsdp_session_str_att_t att);
+                              fsdp_session_str_att_t att);
 
 /**
  *
@@ -472,7 +472,7 @@ unsigned int fsdp_get_sdplang_count (const fsdp_description_t * dsc);
  *
  **/
 const char *fsdp_get_sdplang (const fsdp_description_t * dsc,
-			      unsigned int index);
+                              unsigned int index);
 
 /**
  * Get the mode of the conference, specified with attributes sendrecv,
@@ -503,7 +503,7 @@ unsigned int fsdp_get_media_count (const fsdp_description_t * dsc);
  *
  **/
 const fsdp_media_description_t *fsdp_get_media (const fsdp_description_t *
-						dsc, unsigned int index);
+                                                dsc, unsigned int index);
 
 /**
  *
@@ -538,7 +538,7 @@ fsdp_get_media_formats_count (const fsdp_media_description_t * dsc);
  *
  **/
 const char *fsdp_get_media_format (const fsdp_media_description_t * dsc,
-				   unsigned int index);
+                                   unsigned int index);
 
 /**
  *
@@ -573,22 +573,22 @@ fsdp_get_media_address_count (const fsdp_media_description_t * mdsc);
  **/
 fsdp_bw_modifier_type_t
 fsdp_get_media_bw_modifier_type (const fsdp_media_description_t * dsc,
-				 unsigned int index);
+                                 unsigned int index);
 
 /**
  *
  **/
 const char *fsdp_get_media_bw_modifier_type_unknown (const
-						     fsdp_media_description_t
-						     * dsc,
-						     unsigned int index);
+                                                     fsdp_media_description_t
+                                                     * dsc,
+                                                     unsigned int index);
 
 /**
  *
  **/
 unsigned long int
 fsdp_get_media_bw_value (const fsdp_media_description_t * dsc,
-			 unsigned int index);
+                         unsigned int index);
 
 /**
  *
@@ -600,7 +600,7 @@ fsdp_get_media_encryption_method (const fsdp_media_description_t * dsc);
  *
  **/
 const char *fsdp_get_media_encryption_content (const fsdp_media_description_t
-					       * dsc);
+                                               * dsc);
 
 /**
  *
@@ -622,7 +622,7 @@ fsdp_get_media_fmtp_count (const fsdp_media_description_t * mdsc);
  *
  **/
 const char *fsdp_get_media_fmtp (const fsdp_media_description_t * mdsc,
-				 unsigned int index);
+                                 unsigned int index);
 
 /**
  *
@@ -634,7 +634,7 @@ fsdp_get_media_sdplang_count (const fsdp_media_description_t * dsc);
  *
  **/
 const char *fsdp_get_media_sdplang (const fsdp_media_description_t * dsc,
-				    unsigned int index);
+                                    unsigned int index);
 
 /**
  *
@@ -645,13 +645,13 @@ unsigned int fsdp_get_media_lang_count (const fsdp_media_description_t * dsc);
  *
  **/
 const char *fsdp_get_media_lang (const fsdp_media_description_t * dsc,
-				 unsigned int index);
+                                 unsigned int index);
 
 
 unsigned int fsdp_get_control_count (const fsdp_description_t * dsc);
 
 const char *fsdp_get_control (const fsdp_description_t * dsc,
-			      unsigned int index);
+                              unsigned int index);
 
 const char *fsdp_get_range (const fsdp_description_t * dsc);
 
@@ -659,7 +659,7 @@ unsigned int
 fsdp_get_media_control_count (const fsdp_media_description_t * mdsc);
 
 char *fsdp_get_media_control (const fsdp_media_description_t * mdsc,
-			      unsigned int index);
+                              unsigned int index);
 
 char *fsdp_get_media_range (const fsdp_media_description_t * mdsc);
 
@@ -705,24 +705,24 @@ fsdp_get_media_rtcp_address_type (const fsdp_media_description_t * dsc);
  *
  **/
 const char *fsdp_get_media_rtcp_address (const fsdp_media_description_t *
-					 dsc);
+                                         dsc);
 
 /**
  *
  **/
 unsigned int
 fsdp_get_media_unidentified_attribute_count (const fsdp_media_description_t
-					     * mdsc);
+                                             * mdsc);
 
 /**
  *
  **/
 const char *fsdp_get_media_unidentified_attribute (const
-						   fsdp_media_description_t *
-						   mdsc, unsigned int index);
+                                                   fsdp_media_description_t *
+                                                   mdsc, unsigned int index);
 
 
-	  /** @} *//* closes parser group */
+          /** @} *//* closes parser group */
 
 END_C_DECLS
 #endif /* FSDP_PARSER_H */

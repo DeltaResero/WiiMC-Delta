@@ -7,7 +7,7 @@ AM_CPPFLAGS = \
 
 pkginclude_HEADERS =
 
-libfribidi_char_sets_la_LDFLAGS = 
+libfribidi_char_sets_la_LDFLAGS =
 libfribidi_char_sets_la_LIBADD = $(GLIB_LIBS)
 
 if FRIBIDI_CHARSETS

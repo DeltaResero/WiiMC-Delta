@@ -69,8 +69,8 @@ typedef struct af_volume_s
     // method 2
     int idx;
     struct {
-	float avg; // average level of the sample
-	int len; // sample size (weight)
+        float avg; // average level of the sample
+        int len; // sample size (weight)
     } mem[NSAMPLES];
     // "Ideal" level
     float mid_s16;
@@ -103,7 +103,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     float target = DEFAULT_TARGET;
     sscanf((char*)arg,"%d:%f", &i, &target);
     if (i != 1 && i != 2)
-	return AF_ERROR;
+        return AF_ERROR;
     s->method = i-1;
     s->mid_s16 = ((float)SHRT_MAX) * target;
     s->mid_float = ((float)INT_MAX) * target;
@@ -123,8 +123,8 @@ static void uninit(struct af_instance_s* af)
 static void method1_int16(af_volnorm_t *s, af_data_t *c)
 {
   register int i = 0;
-  int16_t *data = (int16_t*)c->audio;	// Audio data
-  int len = c->len/2;		// Number of samples
+  int16_t *data = (int16_t*)c->audio;   // Audio data
+  int len = c->len/2;           // Number of samples
   float curavg = 0.0, newavg, neededmul;
   int tmp;
 
@@ -165,8 +165,8 @@ static void method1_int16(af_volnorm_t *s, af_data_t *c)
 static void method1_float(af_volnorm_t *s, af_data_t *c)
 {
   register int i = 0;
-  float *data = (float*)c->audio;	// Audio data
-  int len = c->len/4;		// Number of samples
+  float *data = (float*)c->audio;       // Audio data
+  int len = c->len/4;           // Number of samples
   float curavg = 0.0, newavg, neededmul, tmp;
 
   for (i = 0; i < len; i++)
@@ -202,8 +202,8 @@ static void method1_float(af_volnorm_t *s, af_data_t *c)
 static void method2_int16(af_volnorm_t *s, af_data_t *c)
 {
   register int i = 0;
-  int16_t *data = (int16_t*)c->audio;	// Audio data
-  int len = c->len/2;		// Number of samples
+  int16_t *data = (int16_t*)c->audio;   // Audio data
+  int len = c->len/2;           // Number of samples
   float curavg = 0.0, newavg, avg = 0.0;
   int tmp, totallen = 0;
 
@@ -227,8 +227,8 @@ static void method2_int16(af_volnorm_t *s, af_data_t *c)
     avg /= (float)totallen;
     if (avg >= SIL_S16)
     {
-	s->mul = s->mid_s16 / avg;
-	s->mul = clamp(s->mul, MUL_MIN, MUL_MAX);
+        s->mul = s->mid_s16 / avg;
+        s->mul = clamp(s->mul, MUL_MIN, MUL_MAX);
     }
   }
 
@@ -252,8 +252,8 @@ static void method2_int16(af_volnorm_t *s, af_data_t *c)
 static void method2_float(af_volnorm_t *s, af_data_t *c)
 {
   register int i = 0;
-  float *data = (float*)c->audio;	// Audio data
-  int len = c->len/4;		// Number of samples
+  float *data = (float*)c->audio;       // Audio data
+  int len = c->len/4;           // Number of samples
   float curavg = 0.0, newavg, avg = 0.0, tmp;
   int totallen = 0;
 
@@ -277,8 +277,8 @@ static void method2_float(af_volnorm_t *s, af_data_t *c)
     avg /= (float)totallen;
     if (avg >= SIL_FLOAT)
     {
-	s->mul = s->mid_float / avg;
-	s->mul = clamp(s->mul, MUL_MIN, MUL_MAX);
+        s->mul = s->mid_float / avg;
+        s->mul = clamp(s->mul, MUL_MIN, MUL_MAX);
     }
   }
 
@@ -303,16 +303,16 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
   if(af->data->format == (AF_FORMAT_S16_NE))
   {
     if (s->method)
-	method2_int16(s, data);
+        method2_int16(s, data);
     else
-	method1_int16(s, data);
+        method1_int16(s, data);
   }
   else if(af->data->format == (AF_FORMAT_FLOAT_NE))
   {
     if (s->method)
-	method2_float(s, data);
+        method2_float(s, data);
     else
-	method1_float(s, data);
+        method1_float(s, data);
   }
   return data;
 }

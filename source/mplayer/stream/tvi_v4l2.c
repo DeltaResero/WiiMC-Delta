@@ -699,19 +699,19 @@ static void *vbi_grabber(void *data)
         bytes=read(priv->vbi_fd,buf,tsp.bufsize);
         if(bytes<0 && errno==EINTR)
             continue;
-	if (bytes!=tsp.bufsize){
-	    mp_msg(MSGT_TV,MSGL_WARN,"vbi: expecting bytes: %d, got: %d\n",tsp.bufsize,bytes);
-	    break;
-	}
+        if (bytes!=tsp.bufsize){
+            mp_msg(MSGT_TV,MSGL_WARN,"vbi: expecting bytes: %d, got: %d\n",tsp.bufsize,bytes);
+            break;
+        }
         seq=*(int*)(buf+bytes-4);
-	if(seq<=1) continue;
-	if (prev_seq && seq!=prev_seq+1){
-	    prev_seq=0;
-	    seq=0;
-	}
-	prev_seq=seq;
+        if(seq<=1) continue;
+        if (prev_seq && seq!=prev_seq+1){
+            prev_seq=0;
+            seq=0;
+        }
+        prev_seq=seq;
         teletext_control(priv->priv_vbi,TV_VBI_CONTROL_DECODE_PAGE,&buf);
-	mp_msg(MSGT_TV,MSGL_DBG3,"grabber: seq:%d\n",seq);
+        mp_msg(MSGT_TV,MSGL_DBG3,"grabber: seq:%d\n",seq);
     }
     free(buf);
     return NULL;
@@ -872,7 +872,7 @@ static int control(priv_t *priv, int cmd, void *arg)
         case TVI_CONTROL_VID_SET_GAIN:
         {
             //value==0 means automatic gain control
-	    int value=*(int*)arg;
+            int value=*(int*)arg;
 
             if (value < 0 || value>100)
                 return TVI_CONTROL_FALSE;
@@ -1037,19 +1037,19 @@ static int control(priv_t *priv, int cmd, void *arg)
     case TVI_CONTROL_VBI_INIT:
     {
         void* ptr;
-	tt_stream_props tsp;
+        tt_stream_props tsp;
 
         if (vbi_init(priv,*(char**)arg)!=TVI_CONTROL_TRUE)
-	    return TVI_CONTROL_FALSE;
+            return TVI_CONTROL_FALSE;
         if(vbi_get_props(priv,&tsp)==TVI_CONTROL_TRUE)
         {
             ptr=&tsp;
             if(teletext_control(NULL,TV_VBI_CONTROL_START,&ptr)==VBI_CONTROL_TRUE)
                 priv->priv_vbi=ptr;
-	    else
-	        priv->priv_vbi=NULL;
+            else
+                priv->priv_vbi=NULL;
         }
-	return TVI_CONTROL_TRUE;
+        return TVI_CONTROL_TRUE;
     }
     case TVI_CONTROL_GET_VBI_PTR:
         *(void **)arg=priv->priv_vbi;
@@ -1564,10 +1564,10 @@ static inline void copy_frame(priv_t *priv, video_buffer_entry *dest, unsigned c
     if(priv->tv_param->automute>0){
         if (ioctl(priv->video_fd, VIDIOC_G_TUNER, &priv->tuner) >= 0) {
             if(priv->tv_param->automute<<8>priv->tuner.signal){
-	        fill_blank_frame(dest->data,dest->framesize,fcc_vl2mp(priv->format.fmt.pix.pixelformat));
-	        set_mute(priv,1);
-	        return;
-	    }
+                fill_blank_frame(dest->data,dest->framesize,fcc_vl2mp(priv->format.fmt.pix.pixelformat));
+                set_mute(priv,1);
+                return;
+            }
         }
         set_mute(priv,0);
     }

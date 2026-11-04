@@ -290,7 +290,7 @@ static int open_dir(menu_t* menu,char* args) {
       if((tp = realloc(namelist, (n+20) * sizeof (char *)))
          == NULL) {
         mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_ReallocError, strerror(errno));
-	n--;
+        n--;
         goto bailout;
       }
       namelist=tp;
@@ -347,29 +347,29 @@ static void read_cmd(menu_t* menu,int cmd) {
     // Directory
     if(mpriv->p.current->d && !mpriv->dir_action) {
         // Default action : open this dirctory ourself
-	int l = strlen(mpriv->dir);
-	char *slash =  NULL, *p = NULL;
-	if(strcmp(mpriv->p.current->p.txt,"../") == 0) {
-	  if(l <= 1) break;
-	  mpriv->dir[l-1] = '\0';
-	  slash = strrchr(mpriv->dir,'/');
+        int l = strlen(mpriv->dir);
+        char *slash =  NULL, *p = NULL;
+        if(strcmp(mpriv->p.current->p.txt,"../") == 0) {
+          if(l <= 1) break;
+          mpriv->dir[l-1] = '\0';
+          slash = strrchr(mpriv->dir,'/');
 #if HAVE_DOS_PATHS
-	  if (!slash)
-	    slash = strrchr(mpriv->dir,'\\');
+          if (!slash)
+            slash = strrchr(mpriv->dir,'\\');
 #endif
-	  if(!slash) break;
-	  slash[1] = '\0';
-	  p = strdup(mpriv->dir);
-	} else {
-	  p = malloc(l + strlen(mpriv->p.current->p.txt) + 1);
-	  sprintf(p,"%s%s",mpriv->dir,mpriv->p.current->p.txt);
-	}
-	menu_list_uninit(menu,free_entry);
-	if(!open_dir(menu,p)) {
-	  mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_CantOpenDirectory,p);
-	  menu->cl = 1;
-	}
-	free(p);
+          if(!slash) break;
+          slash[1] = '\0';
+          p = strdup(mpriv->dir);
+        } else {
+          p = malloc(l + strlen(mpriv->p.current->p.txt) + 1);
+          sprintf(p,"%s%s",mpriv->dir,mpriv->p.current->p.txt);
+        }
+        menu_list_uninit(menu,free_entry);
+        if(!open_dir(menu,p)) {
+          mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_CantOpenDirectory,p);
+          menu->cl = 1;
+        }
+        free(p);
     } else { // File and directory dealt with action string.
       int fname_len = strlen(mpriv->dir) + strlen(mpriv->p.current->p.txt) + 1;
       char filename[fname_len];
@@ -379,7 +379,7 @@ static void read_cmd(menu_t* menu,int cmd) {
       str = replace_path(action, filename,1);
       mp_input_parse_and_queue_cmds(str);
       if (str != action)
-	free(str);
+        free(str);
     }
   } break;
   case MENU_CMD_ACTION: {

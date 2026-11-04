@@ -102,33 +102,33 @@
 #define STREAM_CTRL_GET_LANG 13
 
 enum stream_ctrl_type {
-	stream_ctrl_audio,
-	stream_ctrl_sub,
+        stream_ctrl_audio,
+        stream_ctrl_sub,
 };
 
 struct stream_lang_req {
-	enum stream_ctrl_type type;
-	int id;
-	char buf[40];
+        enum stream_ctrl_type type;
+        int id;
+        char buf[40];
 };
 
 typedef enum {
-	streaming_stopped_e,
-	streaming_playing_e
+        streaming_stopped_e,
+        streaming_playing_e
 } streaming_status;
 
 typedef struct streaming_control {
-	URL_t *url;
-	streaming_status status;
-	int buffering;	// boolean
-	unsigned int prebuffer_size;
-	char *buffer;
-	unsigned int buffer_size;
-	unsigned int buffer_pos;
-	unsigned int bandwidth;	// The downstream available
-	int (*streaming_read)( int fd, char *buffer, int buffer_size, struct streaming_control *stream_ctrl );
-	int (*streaming_seek)( int fd, off_t pos, struct streaming_control *stream_ctrl );
-	void *data;
+        URL_t *url;
+        streaming_status status;
+        int buffering;  // boolean
+        unsigned int prebuffer_size;
+        char *buffer;
+        unsigned int buffer_size;
+        unsigned int buffer_pos;
+        unsigned int bandwidth; // The downstream available
+        int (*streaming_read)( int fd, char *buffer, int buffer_size, struct streaming_control *stream_ctrl );
+        int (*streaming_seek)( int fd, off_t pos, struct streaming_control *stream_ctrl );
+        void *data;
 } streaming_ctrl_t;
 
 struct stream;
@@ -144,8 +144,8 @@ typedef struct stream_info_st {
   const char* protocols[MAX_STREAM_PROTOCOLS];
   const void* opts;
   int opts_url; /* If this is 1 we will parse the url as an option string
-		 * too. Otherwise options are only parsed from the
-		 * options string given to open_stream_plugin */
+                 * too. Otherwise options are only parsed from the
+                 * options string given to open_stream_plugin */
 } stream_info_t;
 
 typedef struct stream {

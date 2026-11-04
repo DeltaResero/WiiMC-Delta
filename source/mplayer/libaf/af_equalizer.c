@@ -32,41 +32,41 @@
 #include "mp_msg.h"
 #include "af.h"
 
-#define L   	2      // Storage for filter taps
-#define KM  	10     // Max number of bands
+#define L       2      // Storage for filter taps
+#define KM      10     // Max number of bands
 
 #define Q   1.2247449 /* Q value for band-pass filters 1.2247=(3/2)^(1/2)
-			 gives 4dB suppression @ Fc*2 and Fc/2 */
+                         gives 4dB suppression @ Fc*2 and Fc/2 */
 
 /* Center frequencies for band-pass filters
    The different frequency bands are:
-   nr.    	center frequency
-   0  	31.25 Hz
-   1 	62.50 Hz
-   2	125.0 Hz
-   3	250.0 Hz
-   4	500.0 Hz
-   5	1.000 kHz
-   6	2.000 kHz
-   7	4.000 kHz
-   8	8.000 kHz
-   9 	16.00 kHz
+   nr.          center frequency
+   0    31.25 Hz
+   1    62.50 Hz
+   2    125.0 Hz
+   3    250.0 Hz
+   4    500.0 Hz
+   5    1.000 kHz
+   6    2.000 kHz
+   7    4.000 kHz
+   8    8.000 kHz
+   9    16.00 kHz
 */
-#define CF  	{31.25,62.5,125,250,500,1000,2000,4000,8000,16000}
+#define CF      {31.25,62.5,125,250,500,1000,2000,4000,8000,16000}
 
 // Maximum and minimum gain for the bands
-#define G_MAX	+12.0
-#define G_MIN	-12.0
+#define G_MAX   +12.0
+#define G_MIN   -12.0
 
 // Data for specific instances of this filter
 typedef struct af_equalizer_s
 {
-  float   a[KM][L];        	// A weights
-  float   b[KM][L];	     	// B weights
-  float   wq[AF_NCH][KM][L];  	// Circular buffer for W data
-  float   g[AF_NCH][KM];      	// Gain factor for each channel and band
-  int     K; 		   	// Number of used eq bands
-  int     channels;        	// Number of channels
+  float   a[KM][L];             // A weights
+  float   b[KM][L];             // B weights
+  float   wq[AF_NCH][KM][L];    // Circular buffer for W data
+  float   g[AF_NCH][KM];        // Gain factor for each channel and band
+  int     K;                    // Number of used eq bands
+  int     channels;             // Number of channels
   float   gain_factor;     // applied at output to avoid clipping
 } af_equalizer_t;
 
@@ -109,7 +109,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 
     if(s->K != KM)
       mp_msg(MSGT_AFILTER, MSGL_INFO, "[equalizer] Limiting the number of filters to"
-	     " %i due to low sample rate.\n",s->K);
+             " %i due to low sample rate.\n",s->K);
 
     // Generate filter taps
     for(k=0;k<s->K;k++)
@@ -142,11 +142,11 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     float g[10]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     int i,j;
     sscanf((char*)arg,"%f:%f:%f:%f:%f:%f:%f:%f:%f:%f", &g[0], &g[1],
-	   &g[2], &g[3], &g[4], &g[5], &g[6], &g[7], &g[8] ,&g[9]);
+           &g[2], &g[3], &g[4], &g[5], &g[6], &g[7], &g[8] ,&g[9]);
     for(i=0;i<AF_NCH;i++){
       for(j=0;j<KM;j++){
-	((af_equalizer_t*)af->setup)->g[i][j] =
-	  pow(10.0,clamp(g[j],G_MIN,G_MAX)/20.0)-1.0;
+        ((af_equalizer_t*)af->setup)->g[i][j] =
+          pow(10.0,clamp(g[j],G_MIN,G_MAX)/20.0)-1.0;
       }
     }
     return AF_OK;
@@ -189,33 +189,33 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*       c 	= data;			    	// Current working data
-  af_equalizer_t*  s 	= (af_equalizer_t*)af->setup; 	// Setup
-  uint32_t  	   ci  	= af->data->nch; 	    	// Index for channels
-  uint32_t	   nch 	= af->data->nch;   	    	// Number of channels
+  af_data_t*       c    = data;                         // Current working data
+  af_equalizer_t*  s    = (af_equalizer_t*)af->setup;   // Setup
+  uint32_t         ci   = af->data->nch;                // Index for channels
+  uint32_t         nch  = af->data->nch;                // Number of channels
 
   while(ci--){
-    float*	g   = s->g[ci];      // Gain factor
-    float*	in  = ((float*)c->audio)+ci;
-    float*	out = ((float*)c->audio)+ci;
-    float* 	end = in + c->len/4; // Block loop end
+    float*      g   = s->g[ci];      // Gain factor
+    float*      in  = ((float*)c->audio)+ci;
+    float*      out = ((float*)c->audio)+ci;
+    float*      end = in + c->len/4; // Block loop end
 
     while(in < end){
-      register int	k  = 0;		// Frequency band index
-      register float 	yt = *in; 	// Current input sample
+      register int      k  = 0;         // Frequency band index
+      register float    yt = *in;       // Current input sample
       in+=nch;
 
       // Run the filters
       for(;k<s->K;k++){
- 	// Pointer to circular buffer wq
- 	register float* wq = s->wq[ci][k];
- 	// Calculate output from AR part of current filter
- 	register float w=yt*s->b[k][0] + wq[0]*s->a[k][0] + wq[1]*s->a[k][1];
- 	// Calculate output form MA part of current filter
- 	yt+=(w + wq[1]*s->b[k][1])*g[k];
- 	// Update circular buffer
- 	wq[1] = wq[0];
-	wq[0] = w;
+        // Pointer to circular buffer wq
+        register float* wq = s->wq[ci][k];
+        // Calculate output from AR part of current filter
+        register float w=yt*s->b[k][0] + wq[0]*s->a[k][0] + wq[1]*s->a[k][1];
+        // Calculate output form MA part of current filter
+        yt+=(w + wq[1]*s->b[k][1])*g[k];
+        // Update circular buffer
+        wq[1] = wq[0];
+        wq[0] = w;
       }
       // Calculate output
       *out=yt*s->gain_factor;

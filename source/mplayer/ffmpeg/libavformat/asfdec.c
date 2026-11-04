@@ -131,7 +131,7 @@ static void print_guid(const ff_asf_guid *g)
     else PRINT_IF_GUID(g, ff_asf_ext_stream_embed_stream_header);
     else PRINT_IF_GUID(g, ff_asf_ext_stream_audio_stream);
     else PRINT_IF_GUID(g, ff_asf_metadata_header);
-	else PRINT_IF_GUID(g, ff_asf_metadata_library_header);
+    else PRINT_IF_GUID(g, ff_asf_metadata_library_header);
     else PRINT_IF_GUID(g, ff_asf_marker_header);
     else PRINT_IF_GUID(g, stream_bitrate_guid);
     else PRINT_IF_GUID(g, ff_asf_language_guid);
@@ -189,11 +189,11 @@ static int asf_read_picture(AVFormatContext *s, int len)
         return AVERROR_INVALIDDATA;
     }
 
-	/* if the file size is big the position of wd/picture different. */
-	if(wm_picture_type2) {
-		avio_seek(s->pb, -len, SEEK_CUR);
-		wm_picture_type2 = 0;
-	}
+    /* if the file size is big the position of wd/picture different. */
+    if(wm_picture_type2) {
+        avio_seek(s->pb, -len, SEEK_CUR);
+        wm_picture_type2 = 0;
+    }
 
     /* picture type */
     type = avio_r8(s->pb);
@@ -248,16 +248,16 @@ static int asf_read_picture(AVFormatContext *s, int len)
         goto fail;
     }
 
-	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
-	avio_seek(s->pb, -picsize, SEEK_CUR);
-	
-	//limit length to avoid crash
-	if(picsize > 1.5*1024*1024)
-		picsize = 1.5*1024*1024;
-	
-	avio_read(s->pb, pos_pic, picsize);
-	embedded_pic = 1;
-//	wiim_inf = 23;
+    pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+    avio_seek(s->pb, -picsize, SEEK_CUR);
+
+    //limit length to avoid crash
+    if(picsize > 1.5*1024*1024)
+        picsize = 1.5*1024*1024;
+
+    avio_read(s->pb, pos_pic, picsize);
+    embedded_pic = 1;
+//  wiim_inf = 23;
 
     if (*desc)
         av_dict_set(&st->metadata, "title", desc, AV_DICT_DONT_STRDUP_VAL);
@@ -294,10 +294,10 @@ static void get_tag(AVFormatContext *s, const char *key, int type, int len)
     } else if (type > 1 && type <= 5) {  // boolean or DWORD or QWORD or WORD
         uint64_t num = get_value(s->pb, type);
         snprintf(value, len, "%"PRIu64, num);
-	} else if (type == 1 && !strcmp(key, "WM/Picture")) { // handle cover art
+    } else if (type == 1 && !strcmp(key, "WM/Picture")) { // handle cover art
         asf_read_picture(s, len);
         goto finish;
-	} else if (type == 6) { // (don't) handle GUID
+    } else if (type == 6) { // (don't) handle GUID
         av_log(s, AV_LOG_DEBUG, "Unsupported GUID value in tag %s.\n", key);
         goto finish;
     } else {
@@ -645,12 +645,12 @@ static int asf_read_metadata(AVFormatContext *s, int64_t size)
         value_num= avio_rl16(pb);//we should use get_value() here but it does not work 2 is le16 here but le32 elsewhere
         avio_skip(pb, value_len - 2);
 
-		if (!strcmp(name, "WM/Picture")) {
-			//so far so good
-			wm_picture_type2 = 1;
-			asf_read_picture(s, value_len);
-			//wiim_inf = value_len;
-		}
+        if (!strcmp(name, "WM/Picture")) {
+            //so far so good
+            wm_picture_type2 = 1;
+            asf_read_picture(s, value_len);
+            //wiim_inf = value_len;
+        }
 
         if(stream_num<128){
             if     (!strcmp(name, "AspectRatioX")) asf->dar[stream_num].num= value_num;
@@ -743,7 +743,7 @@ static int asf_read_header(AVFormatContext *s)
             asf_read_ext_content_desc(s, gsize);
         } else if (!ff_guidcmp(&g, &ff_asf_metadata_header)) {
             asf_read_metadata(s, gsize);
-		} else if (!ff_guidcmp(&g, &ff_asf_metadata_library_header)) {
+        } else if (!ff_guidcmp(&g, &ff_asf_metadata_library_header)) {
             asf_read_metadata(s, gsize);
         } else if (!ff_guidcmp(&g, &ff_asf_ext_stream_header)) {
             asf_read_ext_stream_properties(s, gsize);
@@ -962,7 +962,7 @@ static int asf_read_frame_header(AVFormatContext *s, AVIOContext *pb){
         asf->packet_obj_size = avio_rl32(pb);
         if(asf->packet_obj_size >= (1<<24) || asf->packet_obj_size <= 0){
             av_log(s, AV_LOG_ERROR, "packet_obj_size invalid\n");
-			asf->packet_obj_size = 0;
+            asf->packet_obj_size = 0;
             return -1;
         }
         asf->packet_frag_timestamp = avio_rl32(pb); // timestamp
@@ -1275,7 +1275,7 @@ static void asf_reset_header(AVFormatContext *s)
 
     for(i=0; i<s->nb_streams; i++){
         asf_st= s->streams[i]->priv_data;
-		if (!asf_st)
+        if (!asf_st)
             continue;
         av_free_packet(&asf_st->pkt);
         asf_st->frag_offset=0;

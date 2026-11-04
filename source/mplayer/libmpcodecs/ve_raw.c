@@ -50,57 +50,57 @@ static int set_format(struct vf_instance *vf, unsigned int fmt) {
 
     mux_v->bih->biPlanes = 1;
     if (IMGFMT_IS_RGB(fmt)) {
-	if (IMGFMT_RGB_DEPTH(fmt) < 8 && !(fmt&128))
-	    mux_v->bih->biBitCount = IMGFMT_RGB_DEPTH(fmt);
-	else
-	    mux_v->bih->biBitCount = (IMGFMT_RGB_DEPTH(fmt)+7)&(~7);
-	return 1;
+        if (IMGFMT_RGB_DEPTH(fmt) < 8 && !(fmt&128))
+            mux_v->bih->biBitCount = IMGFMT_RGB_DEPTH(fmt);
+        else
+            mux_v->bih->biBitCount = (IMGFMT_RGB_DEPTH(fmt)+7)&(~7);
+        return 1;
     }
     if (IMGFMT_IS_BGR(fmt)) {
-	if (IMGFMT_BGR_DEPTH(fmt) < 8 && !(fmt&128))
-	    mux_v->bih->biBitCount = IMGFMT_BGR_DEPTH(fmt);
-	else
-	    mux_v->bih->biBitCount = (IMGFMT_BGR_DEPTH(fmt)+7)&(~7);
-	return 1;
+        if (IMGFMT_BGR_DEPTH(fmt) < 8 && !(fmt&128))
+            mux_v->bih->biBitCount = IMGFMT_BGR_DEPTH(fmt);
+        else
+            mux_v->bih->biBitCount = (IMGFMT_BGR_DEPTH(fmt)+7)&(~7);
+        return 1;
     }
     switch (fmt) {
     case IMGFMT_NV12:
     case IMGFMT_NV21:
     case IMGFMT_HM12:
-	mux_v->bih->biPlanes = 2;
-	mux_v->bih->biBitCount = 12;
-	break;
+        mux_v->bih->biPlanes = 2;
+        mux_v->bih->biBitCount = 12;
+        break;
     case IMGFMT_I420:
     case IMGFMT_IYUV:
     case IMGFMT_YV12:
     case IMGFMT_411P:
-	mux_v->bih->biPlanes = 3;
-	mux_v->bih->biBitCount = 12;
-	break;
+        mux_v->bih->biPlanes = 3;
+        mux_v->bih->biBitCount = 12;
+        break;
     case IMGFMT_444P:
-	mux_v->bih->biPlanes = 3;
-	mux_v->bih->biBitCount = 24;
-	break;
+        mux_v->bih->biPlanes = 3;
+        mux_v->bih->biBitCount = 24;
+        break;
     case IMGFMT_422P:
-	mux_v->bih->biPlanes = 3;
-	mux_v->bih->biBitCount = 16;
-	break;
+        mux_v->bih->biPlanes = 3;
+        mux_v->bih->biBitCount = 16;
+        break;
     case IMGFMT_IF09:
-	mux_v->bih->biPlanes = 4;
+        mux_v->bih->biPlanes = 4;
     case IMGFMT_YVU9:
-	mux_v->bih->biBitCount = 9;
-	break;
+        mux_v->bih->biBitCount = 9;
+        break;
     case IMGFMT_UYVY:
     case IMGFMT_YUY2:
-	mux_v->bih->biBitCount = 16;
-	break;
+        mux_v->bih->biBitCount = 16;
+        break;
     case IMGFMT_Y8:
         mux_v->bih->biBitCount = 8;
         break;
     default:
-	mp_msg(MSGT_MENCODER, MSGL_INFO, MSGTR_MPCODECS_OutputWithFourccNotSupported, fmt);
-	mux_v->bih->biCompression = 0;
-	return 0;
+        mp_msg(MSGT_MENCODER, MSGL_INFO, MSGTR_MPCODECS_OutputWithFourccNotSupported, fmt);
+        mux_v->bih->biCompression = 0;
+        return 0;
     }
     return 1;
 }
@@ -108,7 +108,7 @@ static int set_format(struct vf_instance *vf, unsigned int fmt) {
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt)
+        unsigned int flags, unsigned int outfmt)
 {
     int ret;
     mux_v->bih->biWidth = width;
@@ -127,7 +127,7 @@ static int control(struct vf_instance *vf, int request, void *data) {
 
 static int query_format(struct vf_instance *vf, unsigned int fmt) {
     if (IMGFMT_IS_RGB(fmt) || IMGFMT_IS_BGR(fmt))
-	return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW;
+        return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW;
     switch (fmt) {
     case IMGFMT_NV12:
     case IMGFMT_NV21:
@@ -143,7 +143,7 @@ static int query_format(struct vf_instance *vf, unsigned int fmt) {
     case IMGFMT_YVU9:
     case IMGFMT_IF09:
     case IMGFMT_Y8:
-	return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW;
+        return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW;
     }
 
     return 0;

@@ -32,25 +32,25 @@ typedef struct _pm_config pm_config;
 class PCM
 {
     public:
-        
+
         float **PCMd;
         int start;
-        
+
         /** Use wave smoothing */
         float waveSmoothing;
-        
+
         int *ip;
         double *w;
         int newsamples;
-        
+
         int numsamples; //size of new PCM info
         float *pcmdataL;     //holder for most recent pcm data
         float *pcmdataR;     //holder for most recent pcm data
-        
+
         /** PCM data */
         float vdataL[512];  //holders for FFT data (spectrum)
         float vdataR[512];
-        
+
         static int maxsamples;
         PCM(const pm_config &settings);
         ~PCM();
@@ -66,9 +66,9 @@ class PCM
         int getPCMnew(float *PCMdata, int channel, int freq, float smoothing, int derive,int reset);
 
     private:
-        
+
         const pm_config &settings;
-        
+
 };
 
 #endif /** !_PCM_H */

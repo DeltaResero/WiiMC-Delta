@@ -30,7 +30,7 @@ void av_force_cpu_flags(int arg){
 int av_get_cpu_flags(void)
 {
 #ifdef GEKKO
-	return 0;
+    return 0;
 #endif
     if (checked)
         return flags;

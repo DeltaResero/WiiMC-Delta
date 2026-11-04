@@ -59,13 +59,13 @@ int ao_mpegpes_fd = -1;
 static const ao_info_t info =
 {
 #ifdef CONFIG_DVB
-	"DVB audio output",
+        "DVB audio output",
 #else
-	"MPEG-PES audio output",
+        "MPEG-PES audio output",
 #endif
-	"mpegpes",
-	"A'rpi",
-	""
+        "mpegpes",
+        "A'rpi",
+        ""
 };
 
 LIBAO_EXTERN(mpegpes)
@@ -75,28 +75,28 @@ LIBAO_EXTERN(mpegpes)
 static int control(int cmd,void *arg){
 #ifdef CONFIG_DVB
     switch(cmd){
-	case AOCONTROL_GET_VOLUME:
-	  if(ao_mpegpes_fd >= 0){
-	    ((ao_control_vol_t*)(arg))->left=dvb_mixer.volume_left/2.56;
-	    ((ao_control_vol_t*)(arg))->right=dvb_mixer.volume_right/2.56;
-	    return CONTROL_OK;
-	  }
-	  return CONTROL_ERROR;
-	case AOCONTROL_SET_VOLUME:
-	  if(ao_mpegpes_fd >= 0){
-	    dvb_mixer.volume_left=((ao_control_vol_t*)(arg))->left*2.56;
-	    dvb_mixer.volume_right=((ao_control_vol_t*)(arg))->right*2.56;
-	    if(dvb_mixer.volume_left>255) dvb_mixer.volume_left=255;
-	    if(dvb_mixer.volume_right>255) dvb_mixer.volume_right=255;
-	    //	 printf("Setting DVB volume: %d ; %d  \n",dvb_mixer.volume_left,dvb_mixer.volume_right);
-	    if ( (ioctl(ao_mpegpes_fd, AUDIO_SET_MIXER, &dvb_mixer) < 0)){
-		mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_MPEGPES_CantSetMixer,
-		    strerror(errno));
-	      return CONTROL_ERROR;
-	    }
-	    return CONTROL_OK;
-	  }
-	  return CONTROL_ERROR;
+        case AOCONTROL_GET_VOLUME:
+          if(ao_mpegpes_fd >= 0){
+            ((ao_control_vol_t*)(arg))->left=dvb_mixer.volume_left/2.56;
+            ((ao_control_vol_t*)(arg))->right=dvb_mixer.volume_right/2.56;
+            return CONTROL_OK;
+          }
+          return CONTROL_ERROR;
+        case AOCONTROL_SET_VOLUME:
+          if(ao_mpegpes_fd >= 0){
+            dvb_mixer.volume_left=((ao_control_vol_t*)(arg))->left*2.56;
+            dvb_mixer.volume_right=((ao_control_vol_t*)(arg))->right*2.56;
+            if(dvb_mixer.volume_left>255) dvb_mixer.volume_left=255;
+            if(dvb_mixer.volume_right>255) dvb_mixer.volume_right=255;
+            //   printf("Setting DVB volume: %d ; %d  \n",dvb_mixer.volume_left,dvb_mixer.volume_right);
+            if ( (ioctl(ao_mpegpes_fd, AUDIO_SET_MIXER, &dvb_mixer) < 0)){
+                mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_MPEGPES_CantSetMixer,
+                    strerror(errno));
+              return CONTROL_ERROR;
+            }
+            return CONTROL_OK;
+          }
+          return CONTROL_ERROR;
     }
 #endif
     return CONTROL_UNKNOWN;
@@ -108,99 +108,99 @@ static int freq_id=0;
 #ifdef CONFIG_DVB
 static int init_device(int card)
 {
-	char ao_file[30];
-	sprintf(ao_file, "/dev/dvb/adapter%d/audio0", card);
-	mp_msg(MSGT_VO,MSGL_INFO, "Opening %s\n", ao_file);
-	if((ao_mpegpes_fd = open(ao_file,O_RDWR|O_NONBLOCK)) < 0)
-	{
-        	mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO DEVICE: %s\n", strerror(errno));
-        	return -1;
-	}
-	if( (ioctl(ao_mpegpes_fd, AUDIO_SELECT_SOURCE, AUDIO_SOURCE_MEMORY) < 0))
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SELECT SOURCE: %s\n", strerror(errno));
-		goto fail;
-	}
-	if((ioctl(ao_mpegpes_fd, AUDIO_PLAY) < 0))
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO PLAY: %s\n", strerror(errno));
-		goto fail;
-	}
-	if((ioctl(ao_mpegpes_fd, AUDIO_SET_AV_SYNC, true) < 0))
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SET AV SYNC: %s\n", strerror(errno));
-		goto fail;
-	}
-	//FIXME: in vo_mpegpes audio was initialized as MUTEd
-	if((ioctl(ao_mpegpes_fd, AUDIO_SET_MUTE, false) < 0))
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SET MUTE: %s\n", strerror(errno));
-		goto fail;
-	}
-	return ao_mpegpes_fd;
+        char ao_file[30];
+        sprintf(ao_file, "/dev/dvb/adapter%d/audio0", card);
+        mp_msg(MSGT_VO,MSGL_INFO, "Opening %s\n", ao_file);
+        if((ao_mpegpes_fd = open(ao_file,O_RDWR|O_NONBLOCK)) < 0)
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO DEVICE: %s\n", strerror(errno));
+                return -1;
+        }
+        if( (ioctl(ao_mpegpes_fd, AUDIO_SELECT_SOURCE, AUDIO_SOURCE_MEMORY) < 0))
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SELECT SOURCE: %s\n", strerror(errno));
+                goto fail;
+        }
+        if((ioctl(ao_mpegpes_fd, AUDIO_PLAY) < 0))
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO PLAY: %s\n", strerror(errno));
+                goto fail;
+        }
+        if((ioctl(ao_mpegpes_fd, AUDIO_SET_AV_SYNC, true) < 0))
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SET AV SYNC: %s\n", strerror(errno));
+                goto fail;
+        }
+        //FIXME: in vo_mpegpes audio was initialized as MUTEd
+        if((ioctl(ao_mpegpes_fd, AUDIO_SET_MUTE, false) < 0))
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB AUDIO SET MUTE: %s\n", strerror(errno));
+                goto fail;
+        }
+        return ao_mpegpes_fd;
 fail:
-	close(ao_mpegpes_fd);
-	ao_mpegpes_fd = -1;
-	return -1;
+        close(ao_mpegpes_fd);
+        ao_mpegpes_fd = -1;
+        return -1;
 }
 #endif
 
 static int preinit(const char *arg)
 {
-	int card = -1;
-	char *ao_file = NULL;
+        int card = -1;
+        char *ao_file = NULL;
 
-	const opt_t subopts[] = {
-		{"card", OPT_ARG_INT, &card, NULL},
-		{"file", OPT_ARG_MSTRZ, &ao_file, NULL},
-		{NULL}
-	};
+        const opt_t subopts[] = {
+                {"card", OPT_ARG_INT, &card, NULL},
+                {"file", OPT_ARG_MSTRZ, &ao_file, NULL},
+                {NULL}
+        };
 
-	if(subopt_parse(ao_subdevice, subopts) != 0)
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "AO_MPEGPES, Unrecognized options\n");
-		return -1;
-	}
+        if(subopt_parse(ao_subdevice, subopts) != 0)
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "AO_MPEGPES, Unrecognized options\n");
+                return -1;
+        }
 
 #ifdef HAVE_DVB_HEAD
-	if(card==-1)
-	{
-		//search the first usable card
-		int n;
-		char file[30];
-		for(n=0; n<4; n++)
-		{
-			sprintf(file, "/dev/dvb/adapter%d/audio0", n);
-			if(access(file, F_OK | W_OK)==0)
-			{
-				card = n+1;
-				break;
-			}
-        	}
-	}
+        if(card==-1)
+        {
+                //search the first usable card
+                int n;
+                char file[30];
+                for(n=0; n<4; n++)
+                {
+                        sprintf(file, "/dev/dvb/adapter%d/audio0", n);
+                        if(access(file, F_OK | W_OK)==0)
+                        {
+                                card = n+1;
+                                break;
+                        }
+                }
+        }
 #endif
-	if((card < 1) || (card > 4))
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "DVB card number must be between 1 and 4\n");
-		return -1;
-	}
-	card--;
+        if((card < 1) || (card > 4))
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "DVB card number must be between 1 and 4\n");
+                return -1;
+        }
+        card--;
 
 #ifdef CONFIG_DVB
-	if(!ao_file)
-		return init_device(card);
+        if(!ao_file)
+                return init_device(card);
 #else
-	if(!ao_file)
-		return vo_mpegpes_fd;	//video fd
+        if(!ao_file)
+                return vo_mpegpes_fd;   //video fd
 #endif
 
-	ao_mpegpes_fd = open(ao_file, O_WRONLY | O_CREAT, 0666);
-	if(ao_mpegpes_fd < 0)
-	{
-		mp_msg(MSGT_VO, MSGL_ERR, "ao_mpegpes: %s\n", strerror(errno));
-		return -1;
-	}
-	return ao_mpegpes_fd;
+        ao_mpegpes_fd = open(ao_file, O_WRONLY | O_CREAT, 0666);
+        if(ao_mpegpes_fd < 0)
+        {
+                mp_msg(MSGT_VO, MSGL_ERR, "ao_mpegpes: %s\n", strerror(errno));
+                return -1;
+        }
+        return ao_mpegpes_fd;
 }
 
 static int my_ao_write(const unsigned char* data,int len){
@@ -243,33 +243,33 @@ static int init(int rate,int channels,int format,int flags){
     ao_data.channels=2;
     ao_data.outburst=2000;
     switch(format){
-	case AF_FORMAT_S16_BE:
-	case AF_FORMAT_MPEG2:
-	case AF_FORMAT_AC3_BE:
-	    ao_data.format=format;
-	    break;
-	case AF_FORMAT_AC3_LE:
-	    ao_data.format=AF_FORMAT_AC3_BE;
-	    break;
-	default:
-	    ao_data.format=AF_FORMAT_S16_BE;
+        case AF_FORMAT_S16_BE:
+        case AF_FORMAT_MPEG2:
+        case AF_FORMAT_AC3_BE:
+            ao_data.format=format;
+            break;
+        case AF_FORMAT_AC3_LE:
+            ao_data.format=AF_FORMAT_AC3_BE;
+            break;
+        default:
+            ao_data.format=AF_FORMAT_S16_BE;
     }
 
     switch(rate){
-	case 48000:	freq_id=0;break;
-	case 96000:	freq_id=1;break;
-	case 44100:	freq_id=2;break;
-	case 32000:	freq_id=3;break;
-	default:
-	    mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_MPEGPES_UnsupSamplerate, rate);
+        case 48000:     freq_id=0;break;
+        case 96000:     freq_id=1;break;
+        case 44100:     freq_id=2;break;
+        case 32000:     freq_id=3;break;
+        default:
+            mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_MPEGPES_UnsupSamplerate, rate);
 #if 0
-	    if(rate>48000) rate=96000; else
-	    if(rate>44100) rate=48000; else
-	    if(rate>32000) rate=44100; else
-	    rate=32000;
-	    goto retry;
+            if(rate>48000) rate=96000; else
+            if(rate>44100) rate=48000; else
+            if(rate>32000) rate=44100; else
+            rate=32000;
+            goto retry;
 #else
-	    rate=48000; freq_id=0;
+            rate=48000; freq_id=0;
 #endif
     }
 
@@ -281,9 +281,9 @@ static int init(int rate,int channels,int format,int flags){
 
 // close audio device
 static void uninit(int immed){
-	if (ao_mpegpes_fd >= 0)
-		close(ao_mpegpes_fd);
-	ao_mpegpes_fd = -1;
+        if (ao_mpegpes_fd >= 0)
+                close(ao_mpegpes_fd);
+        ao_mpegpes_fd = -1;
 }
 
 // stop playing and empty buffers (for seeking/pause)
@@ -308,7 +308,7 @@ static int get_space(void){
     float x=(float)(vo_pts-ao_data.pts)/90000.0;
     int y;
     //FIXME: is it correct?
-    if(vo_mpegpes_fd < 0) return 32000;	//not using -vo mpegpes
+    if(vo_mpegpes_fd < 0) return 32000; //not using -vo mpegpes
 //    printf("vo_pts: %5.3f  ao_pts: %5.3f\n",vo_pts/90000.0,ao_data.pts/90000.0);
     if(x<=0) return 0;
     y=freq*4*x;y/=ao_data.outburst;y*=ao_data.outburst;
@@ -323,11 +323,11 @@ static int get_space(void){
 static int play(void* data,int len,int flags){
 //    printf("\nao_mpegpes: play(%d) freq=%d\n",len,freq_id);
     if(ao_data.format==AF_FORMAT_MPEG2)
-	send_mpeg_pes_packet (data, len, 0x1C0, ao_data.pts, 1, my_ao_write);
+        send_mpeg_pes_packet (data, len, 0x1C0, ao_data.pts, 1, my_ao_write);
     else {
-//	if(len>2000) len=2000;
-//	printf("ao_mpegpes: len=%d  \n",len);
-	send_mpeg_lpcm_packet(data, len, 0xA0, ao_data.pts, freq_id, my_ao_write);
+//      if(len>2000) len=2000;
+//      printf("ao_mpegpes: len=%d  \n",len);
+        send_mpeg_lpcm_packet(data, len, 0xA0, ao_data.pts, freq_id, my_ao_write);
     }
     return len;
 }

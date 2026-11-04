@@ -1,0 +1,44 @@
+###############################################################################
+# EDITORCONFIG
+#
+# This file helps maintain consistent coding styles across various editors
+# and IDEs. It automatically configures settings like indentation style
+# and line endings for new edits.
+#
+# Learn more at: http://editorconfig.org
+###############################################################################
+
+# This is the root of the project, so stop searching for .editorconfig files.
+root = true
+
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+# These settings apply to all files in the project.
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+# =============================================================================
+# LEGACY ENCODINGS
+# =============================================================================
+# libiconv's glibc locale tables and FriBidi's Hebrew tests are data in
+# Latin-1 and ISO-8859-8, and FFmpeg's clean-diff uses a Latin-1 byte as a
+# marker for tr, so leave their encoding as it is.
+[{external/libiconv/libcharset/tools/*,libs/fribidi/test/test_ISO8859-8_*,source/mplayer/ffmpeg/tools/clean-diff}]
+charset = unset
+
+# =============================================================================
+# BUILD SYSTEM
+# =============================================================================
+# Makefiles, vendored ones too, REQUIRE tabs for indentation.
+[{Makefile*,*.mak,*.mk}]
+indent_style = tab
+
+
+# EOF

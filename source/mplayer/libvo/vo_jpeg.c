@@ -60,10 +60,10 @@
 
 static const vo_info_t info=
 {
-	"JPEG file",
-	"jpeg",
-	"Zoltan Ponekker (pontscho@makacs.poliod.hu)",
-	""
+    "JPEG file",
+    "jpeg",
+    "Zoltan Ponekker (pontscho@makacs.poliod.hu)",
+    ""
 };
 
 const LIBVO_EXTERN (jpeg)

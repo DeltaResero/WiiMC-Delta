@@ -21,15 +21,15 @@
 
 #include <sys/types.h>
 #include <stdint.h>
-#include "config.h"	/* get correct definition of HAVE_BIGENDIAN */
+#include "config.h"     /* get correct definition of HAVE_BIGENDIAN */
 #include "libavutil/common.h"
 #include "mpbswap.h"
 #include "demuxer.h"
 
 #ifndef mmioFOURCC
-#define mmioFOURCC( ch0, ch1, ch2, ch3 )				\
-		( (uint32_t)(uint8_t)(ch0) | ( (uint32_t)(uint8_t)(ch1) << 8 ) |	\
-		( (uint32_t)(uint8_t)(ch2) << 16 ) | ( (uint32_t)(uint8_t)(ch3) << 24 ) )
+#define mmioFOURCC( ch0, ch1, ch2, ch3 )                                \
+                ( (uint32_t)(uint8_t)(ch0) | ( (uint32_t)(uint8_t)(ch1) << 8 ) |        \
+                ( (uint32_t)(uint8_t)(ch2) << 16 ) | ( (uint32_t)(uint8_t)(ch3) << 24 ) )
 #endif
 
 /* Macro to make a TWOCC out of two characters */
@@ -48,7 +48,7 @@
 #define ckidSTREAMHEADER        mmioFOURCC('s', 't', 'r', 'h')
 #define ckidSTREAMFORMAT        mmioFOURCC('s', 't', 'r', 'f')
 #define ckidSTREAMHANDLERDATA   mmioFOURCC('s', 't', 'r', 'd')
-#define ckidSTREAMNAME		mmioFOURCC('s', 't', 'r', 'n')
+#define ckidSTREAMNAME          mmioFOURCC('s', 't', 'r', 'n')
 
 #define listtypeAVIMOVIE        mmioFOURCC('m', 'o', 'v', 'i')
 #define listtypeAVIRECORD       mmioFOURCC('r', 'e', 'c', ' ')
@@ -60,7 +60,7 @@
 */
 #define streamtypeVIDEO         mmioFOURCC('v', 'i', 'd', 's')
 #define streamtypeAUDIO         mmioFOURCC('a', 'u', 'd', 's')
-#define streamtypeMIDI		mmioFOURCC('m', 'i', 'd', 's')
+#define streamtypeMIDI          mmioFOURCC('m', 'i', 'd', 's')
 #define streamtypeTEXT          mmioFOURCC('t', 'x', 't', 's')
 
 /* Basic chunk types */
@@ -73,29 +73,29 @@
 #define ckidAVIPADDING          mmioFOURCC('J', 'U', 'N', 'K')
 
 /* flags for use in <dwFlags> in AVIFileHdr */
-#define AVIF_HASINDEX		0x00000010	// Index at end of file?
-#define AVIF_MUSTUSEINDEX	0x00000020
-#define AVIF_ISINTERLEAVED	0x00000100
-#define AVIF_TRUSTCKTYPE	0x00000800	// Use CKType to find key frames?
-#define AVIF_WASCAPTUREFILE	0x00010000
-#define AVIF_COPYRIGHTED	0x00020000
+#define AVIF_HASINDEX           0x00000010      // Index at end of file?
+#define AVIF_MUSTUSEINDEX       0x00000020
+#define AVIF_ISINTERLEAVED      0x00000100
+#define AVIF_TRUSTCKTYPE        0x00000800      // Use CKType to find key frames?
+#define AVIF_WASCAPTUREFILE     0x00010000
+#define AVIF_COPYRIGHTED        0x00020000
 
 typedef struct
 {
-    uint32_t		dwMicroSecPerFrame;	// frame display rate (or 0L)
-    uint32_t		dwMaxBytesPerSec;	// max. transfer rate
-    uint32_t		dwPaddingGranularity;	// pad to multiples of this
+    uint32_t            dwMicroSecPerFrame;     // frame display rate (or 0L)
+    uint32_t            dwMaxBytesPerSec;       // max. transfer rate
+    uint32_t            dwPaddingGranularity;   // pad to multiples of this
                                                 // size; normally 2K.
-    uint32_t		dwFlags;		// the ever-present flags
-    uint32_t		dwTotalFrames;		// # frames in file
-    uint32_t		dwInitialFrames;
-    uint32_t		dwStreams;
-    uint32_t		dwSuggestedBufferSize;
+    uint32_t            dwFlags;                // the ever-present flags
+    uint32_t            dwTotalFrames;          // # frames in file
+    uint32_t            dwInitialFrames;
+    uint32_t            dwStreams;
+    uint32_t            dwSuggestedBufferSize;
 
-    uint32_t		dwWidth;
-    uint32_t		dwHeight;
+    uint32_t            dwWidth;
+    uint32_t            dwHeight;
 
-    uint32_t		dwReserved[4];
+    uint32_t            dwReserved[4];
 } MainAVIHeader;
 
 typedef struct rectangle_t {
@@ -106,27 +106,27 @@ typedef struct rectangle_t {
 } rectangle_t;
 
 typedef struct {
-    uint32_t		fccType;
-    uint32_t		fccHandler;
-    uint32_t		dwFlags;	/* Contains AVITF_* flags */
-    uint16_t		wPriority;
-    uint16_t		wLanguage;
-    uint32_t		dwInitialFrames;
-    uint32_t		dwScale;
-    uint32_t		dwRate;	/* dwRate / dwScale == samples/second */
-    uint32_t		dwStart;
-    uint32_t		dwLength; /* In units above... */
-    uint32_t		dwSuggestedBufferSize;
-    uint32_t		dwQuality;
-    uint32_t		dwSampleSize;
-    rectangle_t		rcFrame;
+    uint32_t            fccType;
+    uint32_t            fccHandler;
+    uint32_t            dwFlags;        /* Contains AVITF_* flags */
+    uint16_t            wPriority;
+    uint16_t            wLanguage;
+    uint32_t            dwInitialFrames;
+    uint32_t            dwScale;
+    uint32_t            dwRate; /* dwRate / dwScale == samples/second */
+    uint32_t            dwStart;
+    uint32_t            dwLength; /* In units above... */
+    uint32_t            dwSuggestedBufferSize;
+    uint32_t            dwQuality;
+    uint32_t            dwSampleSize;
+    rectangle_t         rcFrame;
 } AVIStreamHeader;
 
 /* Flags for index */
 #define AVIIF_LIST          0x00000001L // chunk is a 'LIST'
 #define AVIIF_KEYFRAME      0x00000010L // this frame is a key frame.
 
-#define AVIIF_NOTIME	    0x00000100L // this frame doesn't take any time
+#define AVIIF_NOTIME        0x00000100L // this frame doesn't take any time
 #define AVIIF_COMPUSE       0x0FFF0000L // these bits are for compressor use
 
 #define FOURCC_RIFF     mmioFOURCC('R', 'I', 'F', 'F')
@@ -134,10 +134,10 @@ typedef struct {
 
 typedef struct
 {
-    uint32_t		ckid;
-    uint32_t		dwFlags;
-    uint32_t		dwChunkOffset;		// Position of chunk
-    uint32_t		dwChunkLength;		// Length of chunk
+    uint32_t            ckid;
+    uint32_t            dwFlags;
+    uint32_t            dwChunkOffset;          // Position of chunk
+    uint32_t            dwChunkLength;          // Length of chunk
 } AVIINDEXENTRY;
 
 
@@ -183,42 +183,42 @@ typedef struct avisuperindex_chunk {
 } avisuperindex_chunk;
 
 typedef struct {
-	uint32_t CompressedBMHeight;
-	uint32_t CompressedBMWidth;
-	uint32_t ValidBMHeight;
-	uint32_t ValidBMWidth;
-	uint32_t ValidBMXOffset;
-	uint32_t ValidBMYOffset;
-	uint32_t VideoXOffsetInT;
-	uint32_t VideoYValidStartLine;
+        uint32_t CompressedBMHeight;
+        uint32_t CompressedBMWidth;
+        uint32_t ValidBMHeight;
+        uint32_t ValidBMWidth;
+        uint32_t ValidBMXOffset;
+        uint32_t ValidBMYOffset;
+        uint32_t VideoXOffsetInT;
+        uint32_t VideoYValidStartLine;
 } VIDEO_FIELD_DESC;
 
 typedef struct {
-	uint32_t VideoFormatToken;
-	uint32_t VideoStandard;
-	uint32_t dwVerticalRefreshRate;
-	uint32_t dwHTotalInT;
-	uint32_t dwVTotalInLines;
-	uint32_t dwFrameAspectRatio;
-	uint32_t dwFrameWidthInPixels;
-	uint32_t dwFrameHeightInLines;
-	uint32_t nbFieldPerFrame;
-	VIDEO_FIELD_DESC FieldInfo[2];
+        uint32_t VideoFormatToken;
+        uint32_t VideoStandard;
+        uint32_t dwVerticalRefreshRate;
+        uint32_t dwHTotalInT;
+        uint32_t dwVTotalInLines;
+        uint32_t dwFrameAspectRatio;
+        uint32_t dwFrameWidthInPixels;
+        uint32_t dwFrameHeightInLines;
+        uint32_t nbFieldPerFrame;
+        VIDEO_FIELD_DESC FieldInfo[2];
 } VideoPropHeader;
 
 typedef enum {
-	FORMAT_UNKNOWN,
-	FORMAT_PAL_SQUARE,
-	FORMAT_PAL_CCIR_601,
-	FORMAT_NTSC_SQUARE,
-	FORMAT_NTSC_CCIR_601,
+        FORMAT_UNKNOWN,
+        FORMAT_PAL_SQUARE,
+        FORMAT_PAL_CCIR_601,
+        FORMAT_NTSC_SQUARE,
+        FORMAT_NTSC_CCIR_601,
 } VIDEO_FORMAT;
 
 typedef enum {
-	STANDARD_UNKNOWN,
-	STANDARD_PAL,
-	STANDARD_NTSC,
-	STANDARD_SECAM
+        STANDARD_UNKNOWN,
+        STANDARD_PAL,
+        STANDARD_NTSC,
+        STANDARD_SECAM
 } VIDEO_STANDARD;
 
 #define MAKE_AVI_ASPECT(a, b) (((a)<<16)|(b))
@@ -229,68 +229,68 @@ typedef enum {
  * into machine endian format
  */
 #if HAVE_BIGENDIAN
-#define	le2me_MainAVIHeader(h) {					\
-    (h)->dwMicroSecPerFrame = le2me_32((h)->dwMicroSecPerFrame);	\
-    (h)->dwMaxBytesPerSec = le2me_32((h)->dwMaxBytesPerSec);		\
-    (h)->dwPaddingGranularity = le2me_32((h)->dwPaddingGranularity);	\
-    (h)->dwFlags = le2me_32((h)->dwFlags);				\
-    (h)->dwTotalFrames = le2me_32((h)->dwTotalFrames);			\
-    (h)->dwInitialFrames = le2me_32((h)->dwInitialFrames);		\
-    (h)->dwStreams = le2me_32((h)->dwStreams);				\
-    (h)->dwSuggestedBufferSize = le2me_32((h)->dwSuggestedBufferSize);	\
-    (h)->dwWidth = le2me_32((h)->dwWidth);				\
-    (h)->dwHeight = le2me_32((h)->dwHeight);				\
+#define le2me_MainAVIHeader(h) {                                        \
+    (h)->dwMicroSecPerFrame = le2me_32((h)->dwMicroSecPerFrame);        \
+    (h)->dwMaxBytesPerSec = le2me_32((h)->dwMaxBytesPerSec);            \
+    (h)->dwPaddingGranularity = le2me_32((h)->dwPaddingGranularity);    \
+    (h)->dwFlags = le2me_32((h)->dwFlags);                              \
+    (h)->dwTotalFrames = le2me_32((h)->dwTotalFrames);                  \
+    (h)->dwInitialFrames = le2me_32((h)->dwInitialFrames);              \
+    (h)->dwStreams = le2me_32((h)->dwStreams);                          \
+    (h)->dwSuggestedBufferSize = le2me_32((h)->dwSuggestedBufferSize);  \
+    (h)->dwWidth = le2me_32((h)->dwWidth);                              \
+    (h)->dwHeight = le2me_32((h)->dwHeight);                            \
 }
 
-#define	le2me_AVIStreamHeader(h) {					\
-    (h)->fccType = le2me_32((h)->fccType);				\
-    (h)->fccHandler = le2me_32((h)->fccHandler);			\
-    (h)->dwFlags = le2me_32((h)->dwFlags);				\
-    (h)->wPriority = le2me_16((h)->wPriority);				\
-    (h)->wLanguage = le2me_16((h)->wLanguage);				\
-    (h)->dwInitialFrames = le2me_32((h)->dwInitialFrames);		\
-    (h)->dwScale = le2me_32((h)->dwScale);				\
-    (h)->dwRate = le2me_32((h)->dwRate);				\
-    (h)->dwStart = le2me_32((h)->dwStart);				\
-    (h)->dwLength = le2me_32((h)->dwLength);				\
-    (h)->dwSuggestedBufferSize = le2me_32((h)->dwSuggestedBufferSize);	\
-    (h)->dwQuality = le2me_32((h)->dwQuality);				\
-    (h)->dwSampleSize = le2me_32((h)->dwSampleSize);			\
-    le2me_RECT(&(h)->rcFrame);						\
+#define le2me_AVIStreamHeader(h) {                                      \
+    (h)->fccType = le2me_32((h)->fccType);                              \
+    (h)->fccHandler = le2me_32((h)->fccHandler);                        \
+    (h)->dwFlags = le2me_32((h)->dwFlags);                              \
+    (h)->wPriority = le2me_16((h)->wPriority);                          \
+    (h)->wLanguage = le2me_16((h)->wLanguage);                          \
+    (h)->dwInitialFrames = le2me_32((h)->dwInitialFrames);              \
+    (h)->dwScale = le2me_32((h)->dwScale);                              \
+    (h)->dwRate = le2me_32((h)->dwRate);                                \
+    (h)->dwStart = le2me_32((h)->dwStart);                              \
+    (h)->dwLength = le2me_32((h)->dwLength);                            \
+    (h)->dwSuggestedBufferSize = le2me_32((h)->dwSuggestedBufferSize);  \
+    (h)->dwQuality = le2me_32((h)->dwQuality);                          \
+    (h)->dwSampleSize = le2me_32((h)->dwSampleSize);                    \
+    le2me_RECT(&(h)->rcFrame);                                          \
 }
-#define	le2me_RECT(h) {							\
-    (h)->left = le2me_16((h)->left);					\
-    (h)->top = le2me_16((h)->top);					\
-    (h)->right = le2me_16((h)->right);					\
-    (h)->bottom = le2me_16((h)->bottom);				\
+#define le2me_RECT(h) {                                                 \
+    (h)->left = le2me_16((h)->left);                                    \
+    (h)->top = le2me_16((h)->top);                                      \
+    (h)->right = le2me_16((h)->right);                                  \
+    (h)->bottom = le2me_16((h)->bottom);                                \
 }
-#define le2me_BITMAPINFOHEADER(h) {					\
-    (h)->biSize = le2me_32((h)->biSize);				\
-    (h)->biWidth = le2me_32((h)->biWidth);				\
-    (h)->biHeight = le2me_32((h)->biHeight);				\
-    (h)->biPlanes = le2me_16((h)->biPlanes);				\
-    (h)->biBitCount = le2me_16((h)->biBitCount);			\
-    (h)->biCompression = le2me_32((h)->biCompression);			\
-    (h)->biSizeImage = le2me_32((h)->biSizeImage);			\
-    (h)->biXPelsPerMeter = le2me_32((h)->biXPelsPerMeter);		\
-    (h)->biYPelsPerMeter = le2me_32((h)->biYPelsPerMeter);		\
-    (h)->biClrUsed = le2me_32((h)->biClrUsed);				\
-    (h)->biClrImportant = le2me_32((h)->biClrImportant);		\
+#define le2me_BITMAPINFOHEADER(h) {                                     \
+    (h)->biSize = le2me_32((h)->biSize);                                \
+    (h)->biWidth = le2me_32((h)->biWidth);                              \
+    (h)->biHeight = le2me_32((h)->biHeight);                            \
+    (h)->biPlanes = le2me_16((h)->biPlanes);                            \
+    (h)->biBitCount = le2me_16((h)->biBitCount);                        \
+    (h)->biCompression = le2me_32((h)->biCompression);                  \
+    (h)->biSizeImage = le2me_32((h)->biSizeImage);                      \
+    (h)->biXPelsPerMeter = le2me_32((h)->biXPelsPerMeter);              \
+    (h)->biYPelsPerMeter = le2me_32((h)->biYPelsPerMeter);              \
+    (h)->biClrUsed = le2me_32((h)->biClrUsed);                          \
+    (h)->biClrImportant = le2me_32((h)->biClrImportant);                \
 }
-#define le2me_WAVEFORMATEX(h) {						\
-    (h)->wFormatTag = le2me_16((h)->wFormatTag);			\
-    (h)->nChannels = le2me_16((h)->nChannels);				\
-    (h)->nSamplesPerSec = le2me_32((h)->nSamplesPerSec);		\
-    (h)->nAvgBytesPerSec = le2me_32((h)->nAvgBytesPerSec);		\
-    (h)->nBlockAlign = le2me_16((h)->nBlockAlign);			\
-    (h)->wBitsPerSample = le2me_16((h)->wBitsPerSample);		\
-    (h)->cbSize = le2me_16((h)->cbSize);				\
+#define le2me_WAVEFORMATEX(h) {                                         \
+    (h)->wFormatTag = le2me_16((h)->wFormatTag);                        \
+    (h)->nChannels = le2me_16((h)->nChannels);                          \
+    (h)->nSamplesPerSec = le2me_32((h)->nSamplesPerSec);                \
+    (h)->nAvgBytesPerSec = le2me_32((h)->nAvgBytesPerSec);              \
+    (h)->nBlockAlign = le2me_16((h)->nBlockAlign);                      \
+    (h)->wBitsPerSample = le2me_16((h)->wBitsPerSample);                \
+    (h)->cbSize = le2me_16((h)->cbSize);                                \
 }
-#define le2me_AVIINDEXENTRY(h) {					\
-    (h)->ckid = le2me_32((h)->ckid);					\
-    (h)->dwFlags = le2me_32((h)->dwFlags);				\
-    (h)->dwChunkOffset = le2me_32((h)->dwChunkOffset);			\
-    (h)->dwChunkLength = le2me_32((h)->dwChunkLength);			\
+#define le2me_AVIINDEXENTRY(h) {                                        \
+    (h)->ckid = le2me_32((h)->ckid);                                    \
+    (h)->dwFlags = le2me_32((h)->dwFlags);                              \
+    (h)->dwChunkOffset = le2me_32((h)->dwChunkOffset);                  \
+    (h)->dwChunkLength = le2me_32((h)->dwChunkLength);                  \
 }
 #define le2me_AVISTDIDXCHUNK(h) {\
     char c; \
@@ -308,35 +308,35 @@ typedef enum {
     (h)->dwOffset = le2me_32((h)->dwOffset);  \
     (h)->dwSize = le2me_32((h)->dwSize);  \
 }
-#define le2me_VideoPropHeader(h) {					\
-    (h)->VideoFormatToken = le2me_32((h)->VideoFormatToken);		\
-    (h)->VideoStandard = le2me_32((h)->VideoStandard);			\
-    (h)->dwVerticalRefreshRate = le2me_32((h)->dwVerticalRefreshRate);	\
-    (h)->dwHTotalInT = le2me_32((h)->dwHTotalInT);			\
-    (h)->dwVTotalInLines = le2me_32((h)->dwVTotalInLines);		\
-    (h)->dwFrameAspectRatio = le2me_32((h)->dwFrameAspectRatio);	\
-    (h)->dwFrameWidthInPixels = le2me_32((h)->dwFrameWidthInPixels);	\
-    (h)->dwFrameHeightInLines = le2me_32((h)->dwFrameHeightInLines);	\
-    (h)->nbFieldPerFrame = le2me_32((h)->nbFieldPerFrame);		\
+#define le2me_VideoPropHeader(h) {                                      \
+    (h)->VideoFormatToken = le2me_32((h)->VideoFormatToken);            \
+    (h)->VideoStandard = le2me_32((h)->VideoStandard);                  \
+    (h)->dwVerticalRefreshRate = le2me_32((h)->dwVerticalRefreshRate);  \
+    (h)->dwHTotalInT = le2me_32((h)->dwHTotalInT);                      \
+    (h)->dwVTotalInLines = le2me_32((h)->dwVTotalInLines);              \
+    (h)->dwFrameAspectRatio = le2me_32((h)->dwFrameAspectRatio);        \
+    (h)->dwFrameWidthInPixels = le2me_32((h)->dwFrameWidthInPixels);    \
+    (h)->dwFrameHeightInLines = le2me_32((h)->dwFrameHeightInLines);    \
+    (h)->nbFieldPerFrame = le2me_32((h)->nbFieldPerFrame);              \
 }
-#define le2me_VIDEO_FIELD_DESC(h) {					\
-    (h)->CompressedBMHeight = le2me_32((h)->CompressedBMHeight);	\
-    (h)->CompressedBMWidth = le2me_32((h)->CompressedBMWidth);		\
-    (h)->ValidBMHeight = le2me_32((h)->ValidBMHeight);			\
-    (h)->ValidBMWidth = le2me_32((h)->ValidBMWidth);			\
-    (h)->ValidBMXOffset = le2me_32((h)->ValidBMXOffset);		\
-    (h)->ValidBMYOffset = le2me_32((h)->ValidBMYOffset);		\
-    (h)->VideoXOffsetInT = le2me_32((h)->VideoXOffsetInT);		\
-    (h)->VideoYValidStartLine = le2me_32((h)->VideoYValidStartLine);	\
+#define le2me_VIDEO_FIELD_DESC(h) {                                     \
+    (h)->CompressedBMHeight = le2me_32((h)->CompressedBMHeight);        \
+    (h)->CompressedBMWidth = le2me_32((h)->CompressedBMWidth);          \
+    (h)->ValidBMHeight = le2me_32((h)->ValidBMHeight);                  \
+    (h)->ValidBMWidth = le2me_32((h)->ValidBMWidth);                    \
+    (h)->ValidBMXOffset = le2me_32((h)->ValidBMXOffset);                \
+    (h)->ValidBMYOffset = le2me_32((h)->ValidBMYOffset);                \
+    (h)->VideoXOffsetInT = le2me_32((h)->VideoXOffsetInT);              \
+    (h)->VideoYValidStartLine = le2me_32((h)->VideoYValidStartLine);    \
 }
 
 #else
-#define	le2me_MainAVIHeader(h)	    /**/
+#define le2me_MainAVIHeader(h)      /**/
 #define le2me_AVIStreamHeader(h)    /**/
-#define le2me_RECT(h)		    /**/
+#define le2me_RECT(h)               /**/
 #define le2me_BITMAPINFOHEADER(h)   /**/
-#define le2me_WAVEFORMATEX(h)	    /**/
-#define le2me_AVIINDEXENTRY(h)	    /**/
+#define le2me_WAVEFORMATEX(h)       /**/
+#define le2me_AVIINDEXENTRY(h)      /**/
 #define le2me_AVISTDIDXCHUNK(h)     /**/
 #define le2me_AVISTDIDXENTRY(h)     /**/
 #define le2me_VideoPropHeader(h)    /**/

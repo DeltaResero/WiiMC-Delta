@@ -32,7 +32,7 @@
 #define PAL  17.73448
 
 /* General Registers */
-#define SPR	0x1F		/* Software Programming Register (videoram) */
+#define SPR 0x1F        /* Software Programming Register (videoram) */
 
 /* 3C4 */
 #define RevisionID 0x09

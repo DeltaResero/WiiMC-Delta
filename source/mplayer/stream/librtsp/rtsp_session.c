@@ -145,17 +145,17 @@ rtsp_session_t *rtsp_session_start(int fd, char **mrl, char *path, char *host,
       if (rtsp_search_answers(rtsp_session->s, RTSP_OPTIONS_LOCATION))
       {
         free(mrl_line);
-	mrl_line=strdup(rtsp_search_answers(rtsp_session->s, RTSP_OPTIONS_LOCATION));
+        mrl_line=strdup(rtsp_search_answers(rtsp_session->s, RTSP_OPTIONS_LOCATION));
         mp_msg (MSGT_OPEN, MSGL_INFO,"rtsp_session: redirected to %s\n", mrl_line);
-	rtsp_close(rtsp_session->s);
-	free(server);
+        rtsp_close(rtsp_session->s);
+        free(server);
         free(*mrl);
         free(rtsp_session);
         /* tell the caller to redirect, return url to redirect to in mrl */
         *mrl = mrl_line;
         *redir = 1;
         return NULL;
-//	goto connect; /* *shudder* i made a design mistake somewhere */
+//      goto connect; /* *shudder* i made a design mistake somewhere */
       } else
       {
         mp_msg (MSGT_OPEN, MSGL_ERR,"rtsp_session: session can not be established.\n");

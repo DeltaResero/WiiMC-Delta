@@ -2746,11 +2746,11 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
 
         case MP_CMD_QUIT:
 #ifdef GEKKO
-			//like pause
-	    	cmd->pausing = 1;
-	    	brk_cmd = 1;
-	    	copyScreen = 1;
-	    	break;
+                        //like pause
+                cmd->pausing = 1;
+                brk_cmd = 1;
+                copyScreen = 1;
+                break;
 #else
             exit_player_with_rc(EXIT_QUIT,
                                 (cmd->nargs > 0) ? cmd->args[0].v.i : 0);

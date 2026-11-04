@@ -36,11 +36,11 @@ static void uninit(sh_video_t *sh);
 static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags);
 
 #define LIBVD_EXTERN(x) const vd_functions_t mpcodecs_vd_##x = {\
-	&info,\
-	init,\
+    &info,\
+    init,\
         uninit,\
-	control,\
-	decode\
+    control,\
+    decode\
 };
 
 #endif /* MPLAYER_VD_INTERNAL_H */

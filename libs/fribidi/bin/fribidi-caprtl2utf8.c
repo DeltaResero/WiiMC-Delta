@@ -19,7 +19,7 @@ main (
 
       FriBidiStrIndex len = strlen (buf);
       while (len && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
-	len--;
+        len--;
       strncpy (eol, buf + len, sizeof eol);
       buf[len] = 0;
 

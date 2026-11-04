@@ -367,7 +367,7 @@ static int control(priv_t *priv, int cmd, void *arg)
     case TVI_CONTROL_TUN_SET_NORM:
         {
         int req_mode = *(int *)arg;
-	u_short tmp_fps;
+    u_short tmp_fps;
 
         priv->iformat = METEOR_FMT_AUTOMODE;
 
@@ -432,7 +432,7 @@ static int control(priv_t *priv, int cmd, void *arg)
             return 0;
             }
 
-	tmp_fps = priv->fps;
+    tmp_fps = priv->fps;
         if(ioctl(priv->btfd, METEORSFPS, &tmp_fps) < 0)
             {
             mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TV_Bt848IoctlFailed, "METEORSFPS", strerror(errno));
@@ -440,11 +440,11 @@ static int control(priv_t *priv, int cmd, void *arg)
             }
 
 #ifdef BT848_SAUDIO
-	if(priv->tunerready == TRUE &&
-	    ioctl(priv->tunerfd, BT848_SAUDIO, &priv->tv_param->audio_id) < 0)
-	    {
+    if(priv->tunerready == TRUE &&
+        ioctl(priv->tunerfd, BT848_SAUDIO, &priv->tv_param->audio_id) < 0)
+        {
            mp_msg(MSGT_TV, MSGL_ERR, MSGTR_TV_Bt848IoctlFailed, "BT848_SAUDIO", strerror(errno));
-	    }
+        }
 #endif
 
         return TVI_CONTROL_TRUE;

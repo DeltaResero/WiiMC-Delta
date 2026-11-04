@@ -223,7 +223,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
   /* `c=' line (connection information - not required if included in all media) [optional] */
   /* c=<network type> <address type> <connection address> */
   result = fsdp_parse_c (&p, &(dsc->c_network_type), &(dsc->c_address_type),
-			 &(dsc->c_address));
+                         &(dsc->c_address));
   if (FSDPE_OK != result)
     return result;
 
@@ -251,7 +251,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
   if (dsc->time_periods_count == 0)
     return FSDPE_MISSING_TIME;
   dsc->time_periods = calloc (dsc->time_periods_count,
-			      sizeof (fsdp_time_period_t *));
+                              sizeof (fsdp_time_period_t *));
   for (j = 0; j < dsc->time_periods_count; j++)
   {
     unsigned int h = 0;
@@ -382,7 +382,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
   /* k=<method>
      k=<method>:<encryption key> */
   result = fsdp_parse_k (&p, &(dsc->k_encryption_method),
-			 &(dsc->k_encryption_content));
+                         &(dsc->k_encryption_content));
   if (result != FSDPE_OK)
     return result;
 
@@ -569,7 +569,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
     /*return FSDPE_MISSING_MEDIA; */
   }
   else
-  {				/* dsc->media_announcements_count > 0 */
+  {                             /* dsc->media_announcements_count > 0 */
     dsc->media_announcements =
       calloc (j, sizeof (fsdp_media_announcement_t *));
     for (j = 0; j < dsc->media_announcements_count; j++)
@@ -601,7 +601,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
           media->media_type = FSDP_MEDIA_CONTROL;
         else
           return FSDPE_UNKNOWN_MEDIA_TYPE;
-        {			/* try to get port specification as port/number */
+        {                       /* try to get port specification as port/number */
           char *slash;
           if ((slash = strchr (fsdp_buf[1], '/')))
           {
@@ -639,7 +639,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
             if (NULL != s)
               s++;
           }
-          k++;		/* when there is no space left, count the last format */
+          k++;          /* when there is no space left, count the last format */
           media->formats_count = k;
           media->formats = calloc (k, sizeof (char *));
           s = longfsdp_buf;
@@ -805,7 +805,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
                 {
                   media->a_rtcp_network_type =
                     FSDP_NETWORK_TYPE_INET;
-                }	/* else
+                }       /* else
                            ; TODO: define error code? */
                 if (opts >= 3)
                 {
@@ -887,7 +887,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
         else
           return FSDPE_INVALID_ATTRIBUTE;
       }
-    }			/* end of for */
+    }                   /* end of for */
   }
 
   /* Check c= has been given at session level or at media level for
@@ -909,8 +909,8 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
 
 static fsdp_error_t
 fsdp_parse_c (const char **p, fsdp_network_type_t * ntype,
-	      fsdp_address_type_t * atype,
-	      fsdp_connection_address_t * address)
+              fsdp_address_type_t * atype,
+              fsdp_connection_address_t * address)
 {
   const unsigned int TEMPCHARS = 3;
   char fsdp_buf[TEMPCHARS][MAXSHORTFIELDLEN];
@@ -976,7 +976,7 @@ fsdp_parse_c (const char **p, fsdp_network_type_t * ntype,
 
 static fsdp_error_t
 fsdp_parse_b (const char **p, fsdp_bw_modifier_t ** bw_modifiers,
-	      unsigned int *bw_modifiers_count)
+              unsigned int *bw_modifiers_count)
 {
   char fsdp_buf[MAXSHORTFIELDLEN];
   unsigned long int wuint;
@@ -1029,7 +1029,7 @@ fsdp_parse_b (const char **p, fsdp_bw_modifier_t ** bw_modifiers,
 
 static fsdp_error_t
 fsdp_parse_k (const char **p, fsdp_encryption_method_t * method,
-	      char **content)
+              char **content)
 {
   char fsdp_buf[MAXSHORTFIELDLEN];
   char longfsdp_buf[MAXLONGFIELDLEN];
@@ -1065,7 +1065,7 @@ fsdp_parse_k (const char **p, fsdp_encryption_method_t * method,
 
 static fsdp_error_t
 fsdp_parse_rtpmap (fsdp_rtpmap_t *** rtpmap, unsigned int *counter,
-		   const char *value)
+                   const char *value)
 {
   fsdp_error_t result = FSDPE_OK;
 
@@ -1328,7 +1328,7 @@ fsdp_get_bw_modifier_type (const fsdp_description_t * dsc, unsigned int index)
 
 const char *
 fsdp_get_bw_modifier_type_unknown (const fsdp_description_t * dsc,
-				   unsigned int index)
+                                   unsigned int index)
 {
   if ((!dsc) || (index >= dsc->bw_modifiers_count) ||
       (dsc->bw_modifiers[index].b_mod_type != FSDP_BW_MOD_TYPE_UNKNOWN))
@@ -1362,7 +1362,7 @@ fsdp_get_period_stop (const fsdp_description_t * dsc, unsigned int index)
 
 unsigned int
 fsdp_get_period_repeats_count (const fsdp_description_t * dsc,
-			       unsigned int index)
+                               unsigned int index)
 {
   if ((!dsc) || (index >= dsc->time_periods_count))
     return 0;
@@ -1371,7 +1371,7 @@ fsdp_get_period_repeats_count (const fsdp_description_t * dsc,
 
 unsigned long int
 fsdp_get_period_repeat_interval (const fsdp_description_t * dsc,
-				 unsigned int index, unsigned int rindex)
+                                 unsigned int index, unsigned int rindex)
 {
   if ((!dsc) || (index >= dsc->time_periods_count))
     return 0;
@@ -1380,7 +1380,7 @@ fsdp_get_period_repeat_interval (const fsdp_description_t * dsc,
 
 unsigned long int
 fsdp_get_period_repeat_duration (const fsdp_description_t * dsc,
-				 unsigned int index, unsigned int rindex)
+                                 unsigned int index, unsigned int rindex)
 {
   if ((!dsc) || (index >= dsc->time_periods_count))
     return 0;
@@ -1389,7 +1389,7 @@ fsdp_get_period_repeat_duration (const fsdp_description_t * dsc,
 
 const unsigned long int *
 fsdp_get_period_repeat_offsets (const fsdp_description_t * dsc,
-				unsigned int index, unsigned int rindex)
+                                unsigned int index, unsigned int rindex)
 {
   if ((!dsc) || (index >= dsc->time_periods_count))
     return NULL;
@@ -1414,7 +1414,7 @@ fsdp_get_unidentified_attribute_count (const fsdp_description_t * dsc)
 
 const char *
 fsdp_get_unidentified_attribute (const fsdp_description_t * dsc,
-				 unsigned int index)
+                                 unsigned int index)
 {
   if (!dsc || (index < dsc->unidentified_attributes_count))
     return NULL;
@@ -1579,7 +1579,7 @@ fsdp_get_media_formats_count (const fsdp_media_description_t * dsc)
 
 const char *
 fsdp_get_media_format (const fsdp_media_description_t * dsc,
-		       unsigned int index)
+                       unsigned int index)
 {
   if (!dsc || (index < dsc->formats_count - 1))
     return NULL;
@@ -1636,7 +1636,7 @@ fsdp_get_media_address_count (const fsdp_media_description_t * mdsc)
 
 fsdp_bw_modifier_type_t
 fsdp_get_media_bw_modifier_type (const fsdp_media_description_t * dsc,
-				 unsigned int index)
+                                 unsigned int index)
 {
   if (!dsc || (index >= dsc->bw_modifiers_count))
     return FSDP_BW_MOD_TYPE_UNDEFINED;
@@ -1645,7 +1645,7 @@ fsdp_get_media_bw_modifier_type (const fsdp_media_description_t * dsc,
 
 const char *
 fsdp_get_media_bw_modifier_type_unknown (const fsdp_media_description_t * dsc,
-					 unsigned int index)
+                                         unsigned int index)
 {
   if (!dsc || (index >= dsc->bw_modifiers_count) ||
       (FSDP_BW_MOD_TYPE_UNKNOWN != dsc->bw_modifiers[index].b_mod_type))
@@ -1655,7 +1655,7 @@ fsdp_get_media_bw_modifier_type_unknown (const fsdp_media_description_t * dsc,
 
 unsigned long int
 fsdp_get_media_bw_value (const fsdp_media_description_t * dsc,
-			 unsigned int index)
+                         unsigned int index)
 {
   if (!dsc || (index >= dsc->bw_modifiers_count))
     return 0;
@@ -1704,7 +1704,7 @@ fsdp_get_media_rtpmap_count (const fsdp_media_description_t * mdsc)
 
 const char *
 fsdp_get_media_rtpmap_payload_type (const fsdp_media_description_t * mdsc,
-				    unsigned int index)
+                                    unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_rtpmaps_count))
     return NULL;
@@ -1713,7 +1713,7 @@ fsdp_get_media_rtpmap_payload_type (const fsdp_media_description_t * mdsc,
 
 const char *
 fsdp_get_media_rtpmap_encoding_name (const fsdp_media_description_t * mdsc,
-				     unsigned int index)
+                                     unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_rtpmaps_count))
     return NULL;
@@ -1722,7 +1722,7 @@ fsdp_get_media_rtpmap_encoding_name (const fsdp_media_description_t * mdsc,
 
 unsigned int
 fsdp_get_media_rtpmap_clock_rate (const fsdp_media_description_t * mdsc,
-				  unsigned int index)
+                                  unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_rtpmaps_count))
     return 0;
@@ -1731,7 +1731,7 @@ fsdp_get_media_rtpmap_clock_rate (const fsdp_media_description_t * mdsc,
 
 const char *
 fsdp_get_media_rtpmap_encoding_parameters (const fsdp_description_t * mdsc,
-					   unsigned int index)
+                                           unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_rtpmaps_count))
     return NULL;
@@ -1748,7 +1748,7 @@ fsdp_get_media_sdplang_count (const fsdp_media_description_t * mdsc)
 
 const char *
 fsdp_get_media_sdplang (const fsdp_media_description_t * mdsc,
-			unsigned int index)
+                        unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_sdplangs_count))
     return NULL;
@@ -1765,7 +1765,7 @@ fsdp_get_media_lang_count (const fsdp_media_description_t * mdsc)
 
 const char *
 fsdp_get_media_lang (const fsdp_media_description_t * mdsc,
-		     unsigned int index)
+                     unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_langs_count))
     return NULL;
@@ -1782,7 +1782,7 @@ fsdp_get_media_control_count (const fsdp_media_description_t * mdsc)
 
 char *
 fsdp_get_media_control (const fsdp_media_description_t * mdsc,
-			unsigned int index)
+                        unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_controls_count))
     return NULL;
@@ -1805,7 +1805,7 @@ fsdp_get_media_fmtp_count (const fsdp_media_description_t * mdsc)
 
 const char *
 fsdp_get_media_fmtp (const fsdp_media_description_t * mdsc,
-		     unsigned int index)
+                     unsigned int index)
 {
   if (!mdsc || (index >= mdsc->a_fmtps_count))
     return NULL;
@@ -1878,7 +1878,7 @@ fsdp_get_media_rtcp_address (const fsdp_media_description_t * dsc)
 
 unsigned int
 fsdp_get_media_unidentified_attribute_count (const fsdp_media_description_t
-					     * mdsc)
+                                             * mdsc)
 {
   if (!mdsc)
     return 0;
@@ -1887,7 +1887,7 @@ fsdp_get_media_unidentified_attribute_count (const fsdp_media_description_t
 
 const char *
 fsdp_get_media_unidentified_attribute (const fsdp_media_description_t * mdsc,
-				       unsigned int index)
+                                       unsigned int index)
 {
   if (!mdsc || (index < mdsc->unidentified_attributes_count))
     return NULL;

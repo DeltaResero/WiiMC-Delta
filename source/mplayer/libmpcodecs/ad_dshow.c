@@ -28,11 +28,11 @@
 
 static const ad_info_t info =
 {
-	"Win32/DirectShow decoders",
-	"dshow",
-	"Nick Kurshev",
-	"avifile.sf.net",
-	""
+        "Win32/DirectShow decoders",
+        "dshow",
+        "Nick Kurshev",
+        "avifile.sf.net",
+        ""
 };
 
 LIBAD_EXTERN(dshow)
@@ -76,21 +76,21 @@ static int control(sh_audio_t *sh_audio,int cmd,void* arg, ...)
     switch(cmd)
     {
       case ADCTRL_SKIP_FRAME:
-		    skip=sh_audio->wf->nBlockAlign;
-		    if(skip<16){
-		      skip=(sh_audio->wf->nAvgBytesPerSec/16)&(~7);
-		      if(skip<16) skip=16;
-		    }
-		    demux_read_data(sh_audio->ds,NULL,skip);
-	  return CONTROL_TRUE;
+                    skip=sh_audio->wf->nBlockAlign;
+                    if(skip<16){
+                      skip=(sh_audio->wf->nAvgBytesPerSec/16)&(~7);
+                      if(skip<16) skip=16;
+                    }
+                    demux_read_data(sh_audio->ds,NULL,skip);
+          return CONTROL_TRUE;
     }
   return CONTROL_UNKNOWN;
 }
 
 static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int maxlen)
 {
-	DS_AudioDecoder* ds_adec = sh_audio->context;
-//	int len=-1;
+        DS_AudioDecoder* ds_adec = sh_audio->context;
+//      int len=-1;
         int size_in=0;
         int size_out=0;
         int srcsize=DS_AudioDecoder_GetSrcSize(ds_adec, maxlen);

@@ -29,7 +29,7 @@ LIBDIR		:=	../lib
 # options for code generation
 #---------------------------------------------------------------------------------
 
-PROJMFLAGS	=	-DUSE_THREADS -DSTBI_NO_DDS -DDISABLE_NATIVE_PRESETS 
+PROJMFLAGS	=	-DUSE_THREADS -DSTBI_NO_DDS -DDISABLE_NATIVE_PRESETS
 
 ifeq ($(PLATFORM),wii)
 CFLAGS		=	-ffast-math -O3 -pipe -mrvl -mcpu=750 -meabi -mhard-float -Wall $(MACHDEP) $(INCLUDE) -DGEKKO $(PROJMFLAGS)

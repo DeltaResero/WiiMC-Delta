@@ -325,7 +325,7 @@ static s64 ntfs_device_gekko_io_readbytes(struct ntfs_device *dev, s64 offset, s
     // Else read into a buffer and copy over only what was requested
     }
     else
-	{
+    {
 
         // Allocate a buffer to hold the read data
         buffer = (u8 *) ntfs_align(sec_count * fd->sectorSize);
@@ -505,7 +505,7 @@ static bool ntfs_device_gekko_io_writesectors(struct ntfs_device *dev, sec_t sec
  */
 static int ntfs_device_gekko_io_sync(struct ntfs_device *dev)
 {
-	gekko_fd *fd = DEV_FD(dev);
+    gekko_fd *fd = DEV_FD(dev);
     ntfs_log_trace("dev %p\n", dev);
 
     // Check that the device can be written to

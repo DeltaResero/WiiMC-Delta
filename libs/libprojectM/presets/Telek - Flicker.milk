@@ -78,7 +78,7 @@ per_frame_14=monitor = ob_a;
 per_frame_15=
 per_frame_16=//Other decays to try:
 per_frame_17=//300000 +  42.53, 90.63, 43.00   These are all fairly similar, but all are stable (equiv to decay  0.990 -> 1 in terms of speed of fade)
-per_frame_18=//3000000 + 57.75 <<<  =:-)         
+per_frame_18=//3000000 + 57.75 <<<  =:-)
 per_pixel_1=dy = (x+.08*sin(rand(100)))*2%2*-.01-.005;
 per_pixel_2=dy = -.0025*((1-y)*10+rand(5));    //wobble, and faster at top - accelerating like real flames
 per_pixel_3=

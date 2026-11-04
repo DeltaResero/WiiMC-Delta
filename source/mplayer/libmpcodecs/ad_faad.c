@@ -33,11 +33,11 @@
 
 static const ad_info_t info =
 {
-	"AAC (MPEG2/4 Advanced Audio Coding)",
-	"faad",
-	"Felix Buenemann",
-	"faad2",
-	"uses libfaad2"
+        "AAC (MPEG2/4 Advanced Audio Coding)",
+        "faad",
+        "Felix Buenemann",
+        "faad2",
+        "uses libfaad2"
 };
 
 LIBAD_EXTERN(faad)
@@ -104,19 +104,19 @@ static int init(sh_audio_t *sh)
       */
     if (audio_output_channels <= 2) faac_conf->downMatrix = 1;
       switch(sh->samplesize){
-	case 1: // 8Bit
-	  mp_msg(MSGT_DECAUDIO,MSGL_WARN,"FAAD: 8Bit samplesize not supported by FAAD, assuming 16Bit!\n");
-	default:
-	  sh->samplesize=2;
-	case 2: // 16Bit
-	  faac_conf->outputFormat = FAAD_FMT_16BIT;
-	  break;
-	case 3: // 24Bit
-	  faac_conf->outputFormat = FAAD_FMT_24BIT;
-	  break;
-	case 4: // 32Bit
-	  faac_conf->outputFormat = FAAD_FMT_32BIT;
-	  break;
+        case 1: // 8Bit
+          mp_msg(MSGT_DECAUDIO,MSGL_WARN,"FAAD: 8Bit samplesize not supported by FAAD, assuming 16Bit!\n");
+        default:
+          sh->samplesize=2;
+        case 2: // 16Bit
+          faac_conf->outputFormat = FAAD_FMT_16BIT;
+          break;
+        case 3: // 24Bit
+          faac_conf->outputFormat = FAAD_FMT_24BIT;
+          break;
+        case 4: // 32Bit
+          faac_conf->outputFormat = FAAD_FMT_32BIT;
+          break;
       }
     //faac_conf->defObjectType = LTP; // => MAIN, LC, SSR, LTP available.
 
@@ -138,8 +138,8 @@ static int init(sh_audio_t *sh)
       sh->a_in_buffer_len -= pos;
       memmove(sh->a_in_buffer, &(sh->a_in_buffer[pos]), sh->a_in_buffer_len);
       sh->a_in_buffer_len +=
-	demux_read_data(sh->ds,&(sh->a_in_buffer[sh->a_in_buffer_len]),
-	sh->a_in_buffer_size - sh->a_in_buffer_len);
+        demux_read_data(sh->ds,&(sh->a_in_buffer[sh->a_in_buffer_len]),
+        sh->a_in_buffer_size - sh->a_in_buffer_len);
       pos = 0;
     }
 
@@ -163,7 +163,7 @@ static int init(sh_audio_t *sh)
       printf("codecdata_dump %d: 0x%02X\n", i, sh_audio->codecdata[i]);*/
 
     faac_init = faacDecInit2(faac_hdec, sh->codecdata,
-       sh->codecdata_len,	&faac_samplerate, &faac_channels);
+       sh->codecdata_len,       &faac_samplerate, &faac_channels);
   }
   if(faac_init < 0) {
     mp_msg(MSGT_DECAUDIO,MSGL_WARN,"FAAD: Failed to initialize the decoder!\n"); // XXX: deal with cleanup!
@@ -201,8 +201,8 @@ static int aac_sync(sh_audio_t *sh)
   if(!sh->codecdata_len && sh->format != mmioFOURCC('M', 'P', '4', 'L')) {
     if(sh->a_in_buffer_len < sh->a_in_buffer_size){
       sh->a_in_buffer_len +=
-	demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
-	sh->a_in_buffer_size - sh->a_in_buffer_len);
+        demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
+        sh->a_in_buffer_size - sh->a_in_buffer_len);
     }
     pos = aac_probe(sh->a_in_buffer, sh->a_in_buffer_len);
     if(pos) {
@@ -220,10 +220,10 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
     {
       case ADCTRL_RESYNC_STREAM:
          aac_sync(sh);
-	 return CONTROL_TRUE;
+         return CONTROL_TRUE;
 #if 0
       case ADCTRL_SKIP_FRAME:
-	  return CONTROL_TRUE;
+          return CONTROL_TRUE;
 #endif
     }
   return CONTROL_UNKNOWN;
@@ -242,8 +242,8 @@ static int decode_audio(sh_audio_t *sh,unsigned char *buf,int minlen,int maxlen)
   if(!sh->codecdata_len)
     if(sh->a_in_buffer_len < sh->a_in_buffer_size){
       sh->a_in_buffer_len +=
-	demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
-	sh->a_in_buffer_size - sh->a_in_buffer_len);
+        demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
+        sh->a_in_buffer_size - sh->a_in_buffer_len);
     }
 
 #ifdef DUMP_AAC_COMPRESSED
@@ -287,8 +287,8 @@ static int decode_audio(sh_audio_t *sh,unsigned char *buf,int minlen,int maxlen)
     int buflen=ds_get_packet_pts(sh->ds, &bufptr, &pts);
     if(buflen<=0) break;
     if (pts != MP_NOPTS_VALUE) {
-	sh->pts = pts;
-	sh->pts_bytes = 0;
+        sh->pts = pts;
+        sh->pts_bytes = 0;
     }
     faac_sample_buffer = faacDecDecode(faac_hdec, &faac_finfo, bufptr, buflen);
   }

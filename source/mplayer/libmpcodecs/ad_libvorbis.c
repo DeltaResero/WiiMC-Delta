@@ -29,15 +29,15 @@
 
 static const ad_info_t info =
 {
-	"Ogg/Vorbis audio decoder",
+        "Ogg/Vorbis audio decoder",
 #ifdef CONFIG_TREMOR
-	"tremor",
+        "tremor",
 #else
-	"libvorbis",
+        "libvorbis",
 #endif
-	"Felix Buenemann, A'rpi",
-	"libvorbis",
-	""
+        "Felix Buenemann, A'rpi",
+        "libvorbis",
+        ""
 };
 
 LIBAD_EXTERN(libvorbis)
@@ -55,7 +55,7 @@ LIBAD_EXTERN(libvorbis)
 // This struct is also defined in demux_ogg.c => common header ?
 typedef struct ov_struct_st {
   vorbis_info      vi; /* struct that stores all the static vorbis bitstream
-			  settings */
+                          settings */
   vorbis_comment   vc; /* struct that stores all the bitstream user comments */
   vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
   vorbis_block     vb; /* local working space for packet->PCM decode */
@@ -165,13 +165,13 @@ static int init(sh_audio_t *sh)
       read_vorbis_comment( *ptr, "replaygain_album_gain=", "%f", &rg_gain );
       read_vorbis_comment( *ptr, "rg_audiophile=", "%f", &rg_gain );
       if( !rg_gain ) {
-	read_vorbis_comment( *ptr, "replaygain_track_gain=", "%f", &rg_gain );
-	read_vorbis_comment( *ptr, "rg_radio=", "%f", &rg_gain );
+        read_vorbis_comment( *ptr, "replaygain_track_gain=", "%f", &rg_gain );
+        read_vorbis_comment( *ptr, "rg_radio=", "%f", &rg_gain );
       }
       read_vorbis_comment( *ptr, "replaygain_album_peak=", "%f", &rg_peak );
       if( !rg_peak ) {
-	read_vorbis_comment( *ptr, "replaygain_track_peak=", "%f", &rg_peak );
-	read_vorbis_comment( *ptr, "rg_peak=", "%f", &rg_peak );
+        read_vorbis_comment( *ptr, "replaygain_track_peak=", "%f", &rg_peak );
+        read_vorbis_comment( *ptr, "rg_peak=", "%f", &rg_peak );
       }
       ++ptr;
     }
@@ -190,7 +190,7 @@ static int init(sh_audio_t *sh)
     ov->rg_scale_int = (int)(ov->rg_scale*64.f);
 #endif
     mp_msg(MSGT_DECAUDIO,MSGL_V,"OggVorbis: Bitstream is %d channel%s, %dHz, %dbit/s %cBR\n",(int)ov->vi.channels,ov->vi.channels>1?"s":"",(int)ov->vi.rate,(int)ov->vi.bitrate_nominal,
-	(ov->vi.bitrate_lower!=ov->vi.bitrate_nominal)||(ov->vi.bitrate_upper!=ov->vi.bitrate_nominal)?'V':'C');
+        (ov->vi.bitrate_lower!=ov->vi.bitrate_nominal)||(ov->vi.bitrate_upper!=ov->vi.bitrate_nominal)?'V':'C');
     if(rg_gain || rg_peak)
       mp_msg(MSGT_DECAUDIO,MSGL_V,"OggVorbis: Gain = %+.2f dB, Peak = %.4f, Scale = %.2f\n", rg_gain, rg_peak, ov->rg_scale);
     mp_msg(MSGT_DECAUDIO,MSGL_V,"OggVorbis: Encoded by: %s\n",vc.vendor);
@@ -232,9 +232,9 @@ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
     {
 #if 0
       case ADCTRL_RESYNC_STREAM:
-	  return CONTROL_TRUE;
+          return CONTROL_TRUE;
       case ADCTRL_SKIP_FRAME:
-	  return CONTROL_TRUE;
+          return CONTROL_TRUE;
 #endif
     }
   return CONTROL_UNKNOWN;
@@ -251,104 +251,104 @@ static int decode_audio(sh_audio_t *sh,unsigned char *buf,int minlen,int maxlen)
         float **pcm;
 #endif
         struct ov_struct_st *ov = sh->context;
-	while(len < minlen) {
-	  while((samples=vorbis_synthesis_pcmout(&ov->vd,&pcm))<=0){
-	    ogg_packet op;
-	    double pts;
-	    memset(&op,0,sizeof(op)); //op.b_o_s = op.e_o_s = 0;
-	    op.bytes = ds_get_packet_pts(sh->ds,&op.packet, &pts);
-	    if(op.bytes<=0) break;
-	    if (pts != MP_NOPTS_VALUE) {
-		sh->pts = pts;
-		sh->pts_bytes = 0;
-	    }
-	    if(vorbis_synthesis(&ov->vb,&op)==0) /* test for success! */
-	      vorbis_synthesis_blockin(&ov->vd,&ov->vb);
-	  }
-	  if(samples<=0) break; // error/EOF
-	  while(samples>0){
-	    int i,j;
-	    int clipflag=0;
-	    int convsize=(maxlen-len)/(2*ov->vi.channels); // max size!
-	    int bout=((samples<convsize)?samples:convsize);
+        while(len < minlen) {
+          while((samples=vorbis_synthesis_pcmout(&ov->vd,&pcm))<=0){
+            ogg_packet op;
+            double pts;
+            memset(&op,0,sizeof(op)); //op.b_o_s = op.e_o_s = 0;
+            op.bytes = ds_get_packet_pts(sh->ds,&op.packet, &pts);
+            if(op.bytes<=0) break;
+            if (pts != MP_NOPTS_VALUE) {
+                sh->pts = pts;
+                sh->pts_bytes = 0;
+            }
+            if(vorbis_synthesis(&ov->vb,&op)==0) /* test for success! */
+              vorbis_synthesis_blockin(&ov->vd,&ov->vb);
+          }
+          if(samples<=0) break; // error/EOF
+          while(samples>0){
+            int i,j;
+            int clipflag=0;
+            int convsize=(maxlen-len)/(2*ov->vi.channels); // max size!
+            int bout=((samples<convsize)?samples:convsize);
 
-	    if(bout<=0) break; // no buffer space
+            if(bout<=0) break; // no buffer space
 
-	    /* convert floats to 16 bit signed ints (host order) and
-	       interleave */
+            /* convert floats to 16 bit signed ints (host order) and
+               interleave */
 #ifdef CONFIG_TREMOR
            if (ov->rg_scale_int == 64) {
-	    for(i=0;i<ov->vi.channels;i++){
-	      ogg_int16_t *convbuffer=(ogg_int16_t *)(&buf[len]);
-	      ogg_int16_t *ptr=convbuffer+i;
-	      ogg_int32_t  *mono=pcm[i];
-	      for(j=0;j<bout;j++){
-		int val=mono[j]>>9;
-		/* might as well guard against clipping */
-		if(val>32767){
-		  val=32767;
-		  clipflag=1;
-		}
-		if(val<-32768){
-		  val=-32768;
-		  clipflag=1;
-		}
-		*ptr=val;
-		ptr+=ov->vi.channels;
-	      }
-	    }
-	   } else
+            for(i=0;i<ov->vi.channels;i++){
+              ogg_int16_t *convbuffer=(ogg_int16_t *)(&buf[len]);
+              ogg_int16_t *ptr=convbuffer+i;
+              ogg_int32_t  *mono=pcm[i];
+              for(j=0;j<bout;j++){
+                int val=mono[j]>>9;
+                /* might as well guard against clipping */
+                if(val>32767){
+                  val=32767;
+                  clipflag=1;
+                }
+                if(val<-32768){
+                  val=-32768;
+                  clipflag=1;
+                }
+                *ptr=val;
+                ptr+=ov->vi.channels;
+              }
+            }
+           } else
 #endif /* CONFIG_TREMOR */
-	   {
+           {
 #ifndef CONFIG_TREMOR
             scale = 32767.f * ov->rg_scale;
 #endif
-	    for(i=0;i<ov->vi.channels;i++){
-	      ogg_int16_t *convbuffer=(ogg_int16_t *)(&buf[len]);
-	      ogg_int16_t *ptr=convbuffer+i;
+            for(i=0;i<ov->vi.channels;i++){
+              ogg_int16_t *convbuffer=(ogg_int16_t *)(&buf[len]);
+              ogg_int16_t *ptr=convbuffer+i;
 #ifdef CONFIG_TREMOR
-	      ogg_int32_t  *mono=pcm[i];
-	      for(j=0;j<bout;j++){
-		int val=(mono[j]*ov->rg_scale_int)>>(9+6);
+              ogg_int32_t  *mono=pcm[i];
+              for(j=0;j<bout;j++){
+                int val=(mono[j]*ov->rg_scale_int)>>(9+6);
 #else
-	      float  *mono=pcm[i];
-	      for(j=0;j<bout;j++){
-		int val=mono[j]*scale;
-		/* might as well guard against clipping */
-		if(val>32767){
-		  val=32767;
-		  clipflag=1;
-		}
-		if(val<-32768){
-		  val=-32768;
-		  clipflag=1;
-		}
+              float  *mono=pcm[i];
+              for(j=0;j<bout;j++){
+                int val=mono[j]*scale;
+                /* might as well guard against clipping */
+                if(val>32767){
+                  val=32767;
+                  clipflag=1;
+                }
+                if(val<-32768){
+                  val=-32768;
+                  clipflag=1;
+                }
 #endif /* CONFIG_TREMOR */
-		*ptr=val;
-		ptr+=ov->vi.channels;
-	      }
-	    }
-	   }
+                *ptr=val;
+                ptr+=ov->vi.channels;
+              }
+            }
+           }
 
-	    if(clipflag)
-	      mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"Clipping in frame %ld\n",(long)(ov->vd.sequence));
-	    len+=2*ov->vi.channels*bout;
-	    sh->pts_bytes += 2*ov->vi.channels*bout;
-	    mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"\n[decoded: %d / %d ]\n",bout,samples);
-	    samples-=bout;
-	    vorbis_synthesis_read(&ov->vd,bout); /* tell libvorbis how
-						    many samples we
-						    actually consumed */
-	  } //while(samples>0)
+            if(clipflag)
+              mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"Clipping in frame %ld\n",(long)(ov->vd.sequence));
+            len+=2*ov->vi.channels*bout;
+            sh->pts_bytes += 2*ov->vi.channels*bout;
+            mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"\n[decoded: %d / %d ]\n",bout,samples);
+            samples-=bout;
+            vorbis_synthesis_read(&ov->vd,bout); /* tell libvorbis how
+                                                    many samples we
+                                                    actually consumed */
+          } //while(samples>0)
 //          if (!samples) break; // why? how?
-	}
+        }
 
-	if (len > 0 && ov->vi.channels >= 5) {
-	  reorder_channel_nch(buf, AF_CHANNEL_LAYOUT_VORBIS_DEFAULT,
-	                      AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
-	                      ov->vi.channels, len / sh->samplesize,
-	                      sh->samplesize);
-	}
+        if (len > 0 && ov->vi.channels >= 5) {
+          reorder_channel_nch(buf, AF_CHANNEL_LAYOUT_VORBIS_DEFAULT,
+                              AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+                              ov->vi.channels, len / sh->samplesize,
+                              sh->samplesize);
+        }
 
 
   return len;

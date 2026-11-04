@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 
@@ -150,46 +150,46 @@ benchmark (
     len = strlen (S_);
     for (i = 0, j = 0; i < len; i++)
       {
-	if (S_[i] == '_')
-	  switch (S_[++i])
-	    {
-	    case '>':
-	      us[j++] = FRIBIDI_CHAR_LRM;
-	      break;
-	    case '<':
-	      us[j++] = FRIBIDI_CHAR_RLM;
-	      break;
-	    case 'l':
-	      us[j++] = FRIBIDI_CHAR_LRE;
-	      break;
-	    case 'r':
-	      us[j++] = FRIBIDI_CHAR_RLE;
-	      break;
-	    case 'L':
-	      us[j++] = FRIBIDI_CHAR_LRO;
-	      break;
-	    case 'R':
-	      us[j++] = FRIBIDI_CHAR_RLO;
-	      break;
-	    case 'o':
-	      us[j++] = FRIBIDI_CHAR_PDF;
-	      break;
-	    case '_':
-	      us[j++] = '_';
-	      break;
-	    default:
-	      us[j++] = '_';
-	      i--;
-	      break;
-	    }
-	else
-	  us[j++] = S_[i];
-	if (us[j] >= 'A' && us[j] <= 'F')
-	  us[j] += FRIBIDI_CHAR_ARABIC_ALEF - 'A';
-	else if (us[j] >= 'G' && us[j] <= 'Z')
-	  us[j] += FRIBIDI_CHAR_HEBREW_ALEF - 'G';
-	else if (us[j] >= '6' && us[j] <= '9')
-	  us[j] += FRIBIDI_CHAR_ARABIC_ZERO - '0';
+        if (S_[i] == '_')
+          switch (S_[++i])
+            {
+            case '>':
+              us[j++] = FRIBIDI_CHAR_LRM;
+              break;
+            case '<':
+              us[j++] = FRIBIDI_CHAR_RLM;
+              break;
+            case 'l':
+              us[j++] = FRIBIDI_CHAR_LRE;
+              break;
+            case 'r':
+              us[j++] = FRIBIDI_CHAR_RLE;
+              break;
+            case 'L':
+              us[j++] = FRIBIDI_CHAR_LRO;
+              break;
+            case 'R':
+              us[j++] = FRIBIDI_CHAR_RLO;
+              break;
+            case 'o':
+              us[j++] = FRIBIDI_CHAR_PDF;
+              break;
+            case '_':
+              us[j++] = '_';
+              break;
+            default:
+              us[j++] = '_';
+              i--;
+              break;
+            }
+        else
+          us[j++] = S_[i];
+        if (us[j] >= 'A' && us[j] <= 'F')
+          us[j] += FRIBIDI_CHAR_ARABIC_ALEF - 'A';
+        else if (us[j] >= 'G' && us[j] <= 'Z')
+          us[j] += FRIBIDI_CHAR_HEBREW_ALEF - 'G';
+        else if (us[j] >= '6' && us[j] <= '9')
+          us[j] += FRIBIDI_CHAR_ARABIC_ZERO - '0';
       }
     len = j;
   }
@@ -202,12 +202,12 @@ benchmark (
       /* Create a bidi string */
       base = FRIBIDI_PAR_ON;
       if (!fribidi_log2vis (us, len, &base,
-			    /* output */
-			    out_us, positionVtoL, positionLtoV,
-			    embedding_list))
-	die2
-	  ("something failed in fribidi_log2vis.\n"
-	   "perhaps memory allocation failure.", NULL);
+                            /* output */
+                            out_us, positionVtoL, positionLtoV,
+                            embedding_list))
+        die2
+          ("something failed in fribidi_log2vis.\n"
+           "perhaps memory allocation failure.", NULL);
     }
 
   /* stop timer */
@@ -218,7 +218,7 @@ benchmark (
   printf ("Iterations = %d\n", niter);
   printf ("%d len*iterations in %f seconds\n", len * niter, time1 - time0);
   printf ("= %.0f kilo.length.iterations/second\n",
-	  1.0 * len * niter / 1000 / (time1 - time0));
+          1.0 * len * niter / 1000 / (time1 - time0));
 
   return;
 }
@@ -237,38 +237,38 @@ main (
     {
       int option_index = 0, c;
       static struct option long_options[] = {
-	{"help", 0, 0, 'h'},
-	{"version", 0, 0, 'V'},
-	{"niter", 0, 0, 'n'},
-	{0, 0, 0, 0}
+        {"help", 0, 0, 'h'},
+        {"version", 0, 0, 'V'},
+        {"niter", 0, 0, 'n'},
+        {0, 0, 0, 0}
       };
 
       c = getopt_long (argc, argv, "hVn:", long_options, &option_index);
       if (c == -1)
-	break;
+        break;
 
       switch (c)
-	{
-	case 0:
-	  break;
-	case 'h':
-	  help ();
-	  break;
-	case 'V':
-	  version ();
-	  break;
-	case 'n':
-	  niter = atoi (optarg);
-	  if (niter <= 0)
-	    die2 ("invalid number of iterations `%s'\n", optarg);
-	  break;
-	case ':':
-	case '?':
-	  die2 (NULL, NULL);
-	  break;
-	default:
-	  break;
-	}
+        {
+        case 0:
+          break;
+        case 'h':
+          help ();
+          break;
+        case 'V':
+          version ();
+          break;
+        case 'n':
+          niter = atoi (optarg);
+          if (niter <= 0)
+            die2 ("invalid number of iterations `%s'\n", optarg);
+          break;
+        case ':':
+        case '?':
+          die2 (NULL, NULL);
+          break;
+        default:
+          break;
+        }
     }
 
   printf ("* Without explicit marks:\n");

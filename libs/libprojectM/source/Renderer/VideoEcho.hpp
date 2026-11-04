@@ -12,20 +12,20 @@
 
 enum Orientation
 {
-	Normal=0, FlipX, FlipY, FlipXY
+    Normal=0, FlipX, FlipY, FlipXY
 };
 
 class VideoEcho: public RenderItem
 {
 public:
-	VideoEcho();
-	virtual ~VideoEcho();
+    VideoEcho();
+    virtual ~VideoEcho();
 
-	float a;
-	float zoom;
-	Orientation orientation;
+    float a;
+    float zoom;
+    Orientation orientation;
 
-	void Draw(RenderContext &context);
+    void Draw(RenderContext &context);
 };
 
 #endif /* VIDEOECHO_HPP_ */

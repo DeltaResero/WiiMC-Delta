@@ -29,23 +29,23 @@
 #define MPLAYER_JPEG_ENC_H
 
 typedef struct {
-	struct MpegEncContext *s;
-	int cheap_upsample;
-	int bw;
-	int y_ps;
-	int u_ps;
-	int v_ps;
-	int y_rs;
-	int u_rs;
-	int v_rs;
+    struct MpegEncContext *s;
+    int cheap_upsample;
+    int bw;
+    int y_ps;
+    int u_ps;
+    int v_ps;
+    int y_rs;
+    int u_rs;
+    int v_rs;
 } jpeg_enc_t;
 
 jpeg_enc_t *jpeg_enc_init(int w, int h, int y_psize, int y_rsize,
-		int u_psize, int u_rsize, int v_psize, int v_rsize,
-		int cu, int q, int b);
+        int u_psize, int u_rsize, int v_psize, int v_rsize,
+        int cu, int q, int b);
 
 int jpeg_enc_frame(jpeg_enc_t *j, unsigned char *y_data,
-		unsigned char *u_data, unsigned char *v_data, char *bufr);
+        unsigned char *u_data, unsigned char *v_data, char *bufr);
 
 void jpeg_enc_uninit(jpeg_enc_t *j);
 

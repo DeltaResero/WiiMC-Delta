@@ -24,7 +24,7 @@ int pos=-3;
 while((c=getchar())>=0){
     head<<=8;
     if(head==0x100){
-	int startcode=head|c;
+        int startcode=head|c;
         printf("%08X 1%02X ",pos,c);
             if     (startcode<=0x11F) printf("Video Object Start");
             else if(startcode<=0x12F) printf("Video Object Layer Start");
@@ -53,7 +53,7 @@ while((c=getchar())>=0){
             else if(startcode==0x1C3) printf("stuffing start");
             else if(startcode<=0x1C5) printf("reserved");
             else if(startcode<=0x1FF) printf("System start");
-	    printf("\n");
+            printf("\n");
     }
     head|=c;
     ++pos;

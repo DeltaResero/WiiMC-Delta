@@ -39,16 +39,16 @@ typedef struct af_data_s
 {
   void* audio;  // data buffer
   int len;      // buffer length
-  int rate;	// sample rate
-  int nch;	// number of channels
-  int format;	// format
-  int bps; 	// bytes per sample
+  int rate;     // sample rate
+  int nch;      // number of channels
+  int format;   // format
+  int bps;      // bytes per sample
 } af_data_t;
 
 
 // Flags used for defining the behavior of an audio filter
-#define AF_FLAGS_REENTRANT 	0x00000000
-#define AF_FLAGS_NOT_REENTRANT 	0x00000001
+#define AF_FLAGS_REENTRANT      0x00000000
+#define AF_FLAGS_NOT_REENTRANT  0x00000001
 
 /* Audio filter information not specific for current instance, but for
    a specific filter */
@@ -69,28 +69,28 @@ typedef struct af_instance_s
   int (*control)(struct af_instance_s* af, int cmd, void* arg);
   void (*uninit)(struct af_instance_s* af);
   af_data_t* (*play)(struct af_instance_s* af, af_data_t* data);
-  void* setup;	  // setup data for this specific instance and filter
+  void* setup;    // setup data for this specific instance and filter
   af_data_t* data; // configuration for outgoing data stream
   struct af_instance_s* next;
   struct af_instance_s* prev;
   double delay; /* Delay caused by the filter, in units of bytes read without
-		 * corresponding output */
+                 * corresponding output */
   double mul; /* length multiplier: how much does this instance change
-		 the length of the buffer. */
+                 the length of the buffer. */
 }af_instance_t;
 
 // Initialization flags
 extern int* af_cpu_speed;
 
-#define AF_INIT_AUTO		0x00000000
-#define AF_INIT_SLOW		0x00000001
-#define AF_INIT_FAST		0x00000002
-#define AF_INIT_FORCE	  	0x00000003
-#define AF_INIT_TYPE_MASK 	0x00000003
+#define AF_INIT_AUTO            0x00000000
+#define AF_INIT_SLOW            0x00000001
+#define AF_INIT_FAST            0x00000002
+#define AF_INIT_FORCE           0x00000003
+#define AF_INIT_TYPE_MASK       0x00000003
 
-#define AF_INIT_INT		0x00000000
-#define AF_INIT_FLOAT		0x00000004
-#define AF_INIT_FORMAT_MASK	0x00000004
+#define AF_INIT_INT             0x00000000
+#define AF_INIT_FLOAT           0x00000004
+#define AF_INIT_FORMAT_MASK     0x00000004
 
 // Default init type
 #ifndef AF_INIT_TYPE
@@ -99,9 +99,9 @@ extern int* af_cpu_speed;
 
 // Configuration switches
 typedef struct af_cfg_s{
-  int force;	// Initialization type
-  char** list;	/* list of names of filters that are added to filter
-		   list during first initialization of stream */
+  int force;    // Initialization type
+  char** list;  /* list of names of filters that are added to filter
+                   list during first initialization of stream */
 }af_cfg_t;
 
 // Current audio stream

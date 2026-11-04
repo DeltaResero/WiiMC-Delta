@@ -27,16 +27,16 @@
 
 
 typedef struct {
-    double	Vsync_need;	   /* Number of lines for vert sync (default 3) */
-    double	min_Vsync_BP;	   /* Minimum vertical sync + back porch (us) (default 550)*/
-    double	min_front_porch;   /* Minimum front porch in lines (default 1)	*/
-    double	char_cell_granularity;  /* Character cell granularity in pixels (default 8) */
-    double	margin_width;	   /* Top/ bottom MARGIN size as % of height (%) (default 1.8) */
-    double	sync_width;	  /* Sync width percent of line period ( default 8) */
-    double  c;		/* Blanking formula offset (default 40)*/
-    double  j;		/* Blanking formula scaling factor weight (default 20)*/
-    double  k;		/* Blanking formula scaling factor (default 128)*/
-    double  m;		/* Blanking formula gradient (default 600)*/
+    double  Vsync_need;    /* Number of lines for vert sync (default 3) */
+    double  min_Vsync_BP;      /* Minimum vertical sync + back porch (us) (default 550)*/
+    double  min_front_porch;   /* Minimum front porch in lines (default 1)  */
+    double  char_cell_granularity;  /* Character cell granularity in pixels (default 8) */
+    double  margin_width;      /* Top/ bottom MARGIN size as % of height (%) (default 1.8) */
+    double  sync_width;   /* Sync width percent of line period ( default 8) */
+    double  c;      /* Blanking formula offset (default 40)*/
+    double  j;      /* Blanking formula scaling factor weight (default 20)*/
+    double  k;      /* Blanking formula scaling factor (default 128)*/
+    double  m;      /* Blanking formula gradient (default 600)*/
     } GTF_constants;
 
 //#ifndef __VESA_VBELIB_INCLUDED__

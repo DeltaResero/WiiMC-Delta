@@ -194,7 +194,7 @@ static int best_overlap_offset_s16(af_scaletempo_t* s)
 }
 
 static void output_overlap_float(af_scaletempo_t* s, void* buf_out,
-				  int bytes_off)
+                                  int bytes_off)
 {
   float* pout = buf_out;
   float* pb   = s->table_blend;
@@ -206,7 +206,7 @@ static void output_overlap_float(af_scaletempo_t* s, void* buf_out,
   }
 }
 static void output_overlap_s16(af_scaletempo_t* s, void* buf_out,
-			       int bytes_off)
+                               int bytes_off)
 {
   int16_t* pout = buf_out;
   int32_t* pb   = s->table_blend;

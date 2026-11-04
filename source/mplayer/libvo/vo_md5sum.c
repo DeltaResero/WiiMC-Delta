@@ -40,7 +40,7 @@
 #include "mp_msg.h"
 #include "video_out.h"
 #include "video_out_internal.h"
-#include "mp_core.h"			/* for exit_player() */
+#include "mp_core.h"            /* for exit_player() */
 #include "help_mp.h"
 #include "libavutil/md5.h"
 
@@ -50,10 +50,10 @@
 
 static const vo_info_t info=
 {
-	"md5sum of each frame",
-	"md5sum",
-	"Ivo van Poorten (ivop@euronet.nl)",
-	""
+    "md5sum of each frame",
+    "md5sum",
+    "Ivo van Poorten (ivop@euronet.nl)",
+    ""
 };
 
 const LIBVO_EXTERN (md5sum)

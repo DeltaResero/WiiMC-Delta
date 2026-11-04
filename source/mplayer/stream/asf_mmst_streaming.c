@@ -99,8 +99,8 @@ static uint32_t get_32 (unsigned char *cmd, int offset)
 }
 
 static void send_command (int s, int command, uint32_t switches,
-			  uint32_t extra, int length,
-			  char *data)
+                          uint32_t extra, int length,
+                          char *data)
 {
   command_t  cmd;
   int        len8;
@@ -157,14 +157,14 @@ static void string_utf16(char *dest, char *src, int len) {
     else
     {
 #endif
-	if (len > 499) len = 499;
-	for (i=0; i<len; i++) {
-	    dest[i*2] = src[i];
-	    dest[i*2+1] = 0;
+        if (len > 499) len = 499;
+        for (i=0; i<len; i++) {
+            dest[i*2] = src[i];
+            dest[i*2+1] = 0;
         }
-	/* trailing zeroes */
-	dest[i*2] = 0;
-	dest[i*2+1] = 0;
+        /* trailing zeroes */
+        dest[i*2] = 0;
+        dest[i*2+1] = 0;
 #ifdef CONFIG_ICONV
     }
 #endif
@@ -203,7 +203,7 @@ static int get_data (int s, char *buf, size_t count)
   while (total < count) {
 
     len = recv (s, &buf[total], count-total, 0);
-	if(len==-EAGAIN) continue;
+        if(len==-EAGAIN) continue;
     if (len<=0) {
       perror ("read error:");
       return 0;
@@ -248,8 +248,8 @@ static int get_header (int s, uint8_t *header, streaming_ctrl_t *streaming_ctrl)
       }
 
       if (!get_data (s, &header[header_len], packet_len)) {
-	mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_HeaderDataReadFailed);
-	return 0;
+        mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_HeaderDataReadFailed);
+        return 0;
       }
 
       header_len += packet_len;
@@ -258,12 +258,12 @@ static int get_header (int s, uint8_t *header, streaming_ctrl_t *streaming_ctrl)
 
 
      if( streaming_bufferize( streaming_ctrl, header, header_len )<0 ) {
-				return -1;
- 	 }
+                                return -1;
+         }
 
-     //	mp_msg(MSGT_NETWORK,MSGL_INFO,"get header packet finished\n");
+     // mp_msg(MSGT_NETWORK,MSGL_INFO,"get header packet finished\n");
 
-	return header_len;
+        return header_len;
 
       }
 
@@ -276,9 +276,9 @@ static int get_header (int s, uint8_t *header, streaming_ctrl_t *streaming_ctrl)
       data = (char*) malloc(BUF_SIZE*sizeof(char));
 
       if (!get_data (s, (char*)&packet_len, 4)) {
-	mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_packet_lenReadFailed);
-	free(data);
-	return 0;
+        mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_packet_lenReadFailed);
+        free(data);
+        return 0;
       }
 
       packet_len = get_32 ((unsigned char*)&packet_len, 0) + 4;
@@ -293,9 +293,9 @@ static int get_header (int s, uint8_t *header, streaming_ctrl_t *streaming_ctrl)
       }
 
       if (!get_data (s, data, packet_len)) {
-	mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_CmdDataReadFailed);
+        mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_CmdDataReadFailed);
     free(data);
-	return 0;
+        return 0;
       }
 
       command = get_32 (data, 24) & 0xFFFF;
@@ -303,8 +303,8 @@ static int get_header (int s, uint8_t *header, streaming_ctrl_t *streaming_ctrl)
 //      mp_msg(MSGT_NETWORK,MSGL_INFO,"command: %02x\n", command);
 
       if (command == 0x1b)
-	send_command (s, 0x1b, 0, 0, 0, data);
-	  free(data);
+        send_command (s, 0x1b, 0, 0, 0, data);
+          free(data);
 
     }
 
@@ -356,7 +356,7 @@ static int interp_header (uint8_t *header, int header_len)
       packet_length = get_32(header, i+92-24);
 
       mp_msg(MSGT_NETWORK,MSGL_INFO,MSGTR_MPDEMUX_MMST_FileObjectPacketLen,
-	      packet_length, get_32(header, i+96-24));
+              packet_length, get_32(header, i+96-24));
 
 
     } else if ((guid_1 == 0x6553200cc000e68eULL) && (guid_2 == 0x11cfa9b7b7dc0791ULL)) {
@@ -379,9 +379,9 @@ static int interp_header (uint8_t *header, int header_len)
       for (; b < length; b++)
       {
         if (isascii(header[b]) || isalpha(header[b]))
-	    printf("%c ", header[b]);
-	else
-    	    printf("%x ", header[b]);
+            printf("%c ", header[b]);
+        else
+            printf("%x ", header[b]);
       }
       printf("\n");
 #else
@@ -413,7 +413,7 @@ static int get_media_packet (int s, int padding, streaming_ctrl_t *stream_ctrl) 
 
 //  for (i=0; i<8; i++)
 //    mp_msg(MSGT_NETWORK,MSGL_INFO,"pre_header[%d] = %02x (%d)\n",
-//	    i, pre_header[i], pre_header[i]);
+//          i, pre_header[i], pre_header[i]);
 
   if (pre_header[4] == 0x04) {
 
@@ -463,7 +463,7 @@ static int get_media_packet (int s, int padding, streaming_ctrl_t *stream_ctrl) 
     }
 
     if ( (pre_header[7] != 0xb0) || (pre_header[6] != 0x0b)
-	 || (pre_header[5] != 0xfa) || (pre_header[4] != 0xce) ) {
+         || (pre_header[5] != 0xfa) || (pre_header[4] != 0xce) ) {
 
       mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_MissingSignature);
       free(data);
@@ -482,10 +482,10 @@ static int get_media_packet (int s, int padding, streaming_ctrl_t *stream_ctrl) 
       return 0;
     }
     else if (command == 0x21 ) {
-	// Looks like it's new in WMS9
-	// Unknown command, but ignoring it seems to work.
-	free(data);
-	return 0;
+        // Looks like it's new in WMS9
+        // Unknown command, but ignoring it seems to work.
+        free(data);
+        return 0;
     }
     else if (command != 0x05) {
       mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_UnknownCmd,command);
@@ -509,35 +509,35 @@ static int asf_mmst_streaming_read( int fd, char *buffer, int size, streaming_ct
 
   while( stream_ctrl->buffer_size==0 ) {
           // buffer is empty - fill it!
-	  int ret = get_media_packet( fd, packet_length1, stream_ctrl);
-	  if( ret<0 ) {
-		  mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_GetMediaPacketErr,strerror(errno));
-		  return -1;
-	  } else if (ret==0) //EOF?
-		  return ret;
+          int ret = get_media_packet( fd, packet_length1, stream_ctrl);
+          if( ret<0 ) {
+                  mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_MMST_GetMediaPacketErr,strerror(errno));
+                  return -1;
+          } else if (ret==0) //EOF?
+                  return ret;
   }
 
-	  len = stream_ctrl->buffer_size-stream_ctrl->buffer_pos;
-	  if(len>size) len=size;
-	  memcpy( buffer, (stream_ctrl->buffer)+(stream_ctrl->buffer_pos), len );
-	  stream_ctrl->buffer_pos += len;
-	  if( stream_ctrl->buffer_pos>=stream_ctrl->buffer_size ) {
-		  free( stream_ctrl->buffer );
-		  stream_ctrl->buffer = NULL;
-		  stream_ctrl->buffer_size = 0;
-		  stream_ctrl->buffer_pos = 0;
-	  }
-	  return len;
+          len = stream_ctrl->buffer_size-stream_ctrl->buffer_pos;
+          if(len>size) len=size;
+          memcpy( buffer, (stream_ctrl->buffer)+(stream_ctrl->buffer_pos), len );
+          stream_ctrl->buffer_pos += len;
+          if( stream_ctrl->buffer_pos>=stream_ctrl->buffer_size ) {
+                  free( stream_ctrl->buffer );
+                  stream_ctrl->buffer = NULL;
+                  stream_ctrl->buffer_size = 0;
+                  stream_ctrl->buffer_pos = 0;
+          }
+          return len;
 
 }
 
 static int asf_mmst_streaming_seek( int fd, off_t pos, streaming_ctrl_t *streaming_ctrl )
 {
-	return -1;
-	// Shut up gcc warning
-	fd++;
-	pos++;
-	streaming_ctrl=NULL;
+        return -1;
+        // Shut up gcc warning
+        fd++;
+        pos++;
+        streaming_ctrl=NULL;
 }
 
 int asf_mmst_streaming_start(stream_t *stream)
@@ -552,8 +552,8 @@ int asf_mmst_streaming_start(stream_t *stream)
   int s = stream->fd;
 
   if( s>0 ) {
-	  closesocket( stream->fd );
-	  stream->fd = -1;
+          closesocket( stream->fd );
+          stream->fd = -1;
   }
 
   /* parse url */
@@ -564,20 +564,20 @@ int asf_mmst_streaming_start(stream_t *stream)
    */
   unescpath=malloc(strlen(path)+1);
   if (!unescpath) {
-	mp_msg(MSGT_NETWORK,MSGL_FATAL,MSGTR_MemAllocFailed);
-	return -1;
+        mp_msg(MSGT_NETWORK,MSGL_FATAL,MSGTR_MemAllocFailed);
+        return -1;
   }
   url_unescape_string(unescpath,path);
   path=unescpath;
 
 
   if( url1->port==0 ) {
-	url1->port=1755;
+        url1->port=1755;
   }
   s = connect2Server( url1->hostname, url1->port, 1);
   if( s<0 ) {
-	  free(path);
-	  return s;
+          free(path);
+          return s;
   }
   mp_msg(MSGT_NETWORK,MSGL_INFO,MSGTR_MPDEMUX_MMST_Connected);
 

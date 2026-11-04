@@ -54,7 +54,7 @@
 // Short filter
 #if defined(L8)
 
-#define L   	8	// Filter length
+#define L       8       // Filter length
 // Unrolled loop to speed up execution
 #define FIR(x,w,y) \
   (y[0])  = ( w[0]*x[0]+w[1]*x[1]+w[2]*x[2]+w[3]*x[3] \
@@ -64,7 +64,7 @@
 
 #else  /* L8/L16 */
 
-#define L   	16
+#define L       16
 // Unrolled loop to speed up execution
 #define FIR(x,w,y) \
   y[0] = ( w[0] *x[0] +w[1] *x[1] +w[2] *x[2] +w[3] *x[3] \
@@ -81,39 +81,39 @@
 
 #if defined(UP)
 
-  uint32_t		ci    = l->nch; 	// Index for channels
-  uint32_t		nch   = l->nch;   	// Number of channels
-  uint32_t		inc   = s->up/s->dn;
-  uint32_t		level = s->up%s->dn;
-  uint32_t		up    = s->up;
-  uint32_t		dn    = s->dn;
-  uint32_t		ns    = c->len/l->bps;
-  register FORMAT*	w     = s->w;
+  uint32_t              ci    = l->nch;         // Index for channels
+  uint32_t              nch   = l->nch;         // Number of channels
+  uint32_t              inc   = s->up/s->dn;
+  uint32_t              level = s->up%s->dn;
+  uint32_t              up    = s->up;
+  uint32_t              dn    = s->dn;
+  uint32_t              ns    = c->len/l->bps;
+  register FORMAT*      w     = s->w;
 
-  register uint32_t	wi    = 0;
-  register uint32_t	xi    = 0;
+  register uint32_t     wi    = 0;
+  register uint32_t     xi    = 0;
 
   // Index current channel
   while(ci--){
     // Temporary pointers
-    register FORMAT*	x     = s->xq[ci];
-    register FORMAT*	in    = ((FORMAT*)c->audio)+ci;
-    register FORMAT*	out   = ((FORMAT*)l->audio)+ci;
-    FORMAT* 		end   = in+ns; // Block loop end
+    register FORMAT*    x     = s->xq[ci];
+    register FORMAT*    in    = ((FORMAT*)c->audio)+ci;
+    register FORMAT*    out   = ((FORMAT*)l->audio)+ci;
+    FORMAT*             end   = in+ns; // Block loop end
     wi = s->wi; xi = s->xi;
 
     while(in < end){
-      register uint32_t	i = inc;
+      register uint32_t i = inc;
       if(wi<level) i++;
 
       ADDQUE(xi,x,in);
       in+=nch;
       while(i--){
-	// Run the FIR filter
-	FIR((&x[xi]),(&w[wi*L]),out);
-	len++; out+=nch;
-	// Update wi to point at the correct polyphase component
-	wi=(wi+dn)%up;
+        // Run the FIR filter
+        FIR((&x[xi]),(&w[wi*L]),out);
+        len++; out+=nch;
+        // Update wi to point at the correct polyphase component
+        wi=(wi+dn)%up;
       }
     }
 
@@ -124,26 +124,26 @@
 #endif /* UP */
 
 #if defined(DN) /* DN */
-  uint32_t		ci    = l->nch; 	// Index for channels
-  uint32_t		nch   = l->nch;   	// Number of channels
-  uint32_t		inc   = s->dn/s->up;
-  uint32_t		level = s->dn%s->up;
-  uint32_t		up    = s->up;
-  uint32_t		dn    = s->dn;
-  uint32_t		ns    = c->len/l->bps;
-  FORMAT*		w     = s->w;
+  uint32_t              ci    = l->nch;         // Index for channels
+  uint32_t              nch   = l->nch;         // Number of channels
+  uint32_t              inc   = s->dn/s->up;
+  uint32_t              level = s->dn%s->up;
+  uint32_t              up    = s->up;
+  uint32_t              dn    = s->dn;
+  uint32_t              ns    = c->len/l->bps;
+  FORMAT*               w     = s->w;
 
-  register int32_t	i     = 0;
-  register uint32_t	wi    = 0;
-  register uint32_t	xi    = 0;
+  register int32_t      i     = 0;
+  register uint32_t     wi    = 0;
+  register uint32_t     xi    = 0;
 
   // Index current channel
   while(ci--){
     // Temporary pointers
-    register FORMAT*	x     = s->xq[ci];
-    register FORMAT*	in    = ((FORMAT*)c->audio)+ci;
-    register FORMAT*	out   = ((FORMAT*)l->audio)+ci;
-    register FORMAT* 	end   = in+ns;    // Block loop end
+    register FORMAT*    x     = s->xq[ci];
+    register FORMAT*    in    = ((FORMAT*)c->audio)+ci;
+    register FORMAT*    out   = ((FORMAT*)l->audio)+ci;
+    register FORMAT*    end   = in+ns;    // Block loop end
     i = s->i; wi = s->wi; xi = s->xi;
 
     while(in < end){
@@ -151,16 +151,16 @@
       ADDQUE(xi,x,in);
       in+=nch;
       if((--i)<=0){
-	// Run the FIR filter
-	FIR((&x[xi]),(&w[wi*L]),out);
-	len++;	out+=nch;
+        // Run the FIR filter
+        FIR((&x[xi]),(&w[wi*L]),out);
+        len++;  out+=nch;
 
-	// Update wi to point at the correct polyphase component
-	wi=(wi+dn)%up;
+        // Update wi to point at the correct polyphase component
+        wi=(wi+dn)%up;
 
-	// Insert i number of new samples in queue
-	i = inc;
-	if(wi<level) i++;
+        // Insert i number of new samples in queue
+        i = inc;
+        if(wi<level) i++;
       }
     }
   }

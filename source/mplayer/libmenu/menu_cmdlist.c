@@ -121,7 +121,7 @@ static int parse_args(menu_t* menu,char* args) {
     } else if(r == 0) {
       asx_parser_free(parser);
       if(!m)
-	mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_NoEntryFoundInTheMenuDefinition);
+        mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_NoEntryFoundInTheMenuDefinition);
       return m ? 1 : 0;
     }
     // Has it a name ?

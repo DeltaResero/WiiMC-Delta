@@ -1135,9 +1135,9 @@ static const PACKTAB_UINT16 MirLev0[1024*1] = {
 /* *INDENT-ON* */
 
 #define FRIBIDI_GET_MIRRORING_DELTA(x) \
-	((x) >= 0x10000 ? 0 :  \
-	MirLev1[((x) & 0x3f) + \
-	MirLev0[((x) >> 6)]])
+        ((x) >= 0x10000 ? 0 :  \
+        MirLev1[((x) & 0x3f) + \
+        MirLev0[((x) >> 6)]])
 
 #undef PACKTAB_UINT8
 #undef PACKTAB_UINT16

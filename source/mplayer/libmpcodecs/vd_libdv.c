@@ -39,11 +39,11 @@
 
 static const vd_info_t info =
 {
-	"Raw DV Video Decoder",
-	"libdv",
-	"Alexander Neundorf <neundorf@kde.org>",
-	"http://libdv.sf.net",
-	"native codec"
+        "Raw DV Video Decoder",
+        "libdv",
+        "Alexander Neundorf <neundorf@kde.org>",
+        "http://libdv.sf.net",
+        "native codec"
 };
 
 LIBVD_EXTERN(libdv)
@@ -91,7 +91,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags)
 
    mpi=mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE, sh->disp_w, sh->disp_h);
 
-   if(!mpi){	// temporary!
+   if(!mpi){    // temporary!
       fprintf(stderr,"couldn't allocate image for stderr codec\n");
       return NULL;
    }

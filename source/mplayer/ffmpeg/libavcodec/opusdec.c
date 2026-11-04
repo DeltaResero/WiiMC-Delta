@@ -614,12 +614,12 @@ static av_cold int opus_decode_init(AVCodecContext *avctx)
     if (!c->streams) {
         c->nb_streams = 0;
         ret = AVERROR(ENOMEM);
-		//wiim_inf = 6;
+        //wiim_inf = 6;
         goto fail;
     }
 
     for (i = 0; i < c->nb_streams; i++) {
-		//wiim_inf = 8;
+        //wiim_inf = 8;
         OpusStreamContext *s = &c->streams[i];
         uint64_t layout;
 
@@ -638,7 +638,7 @@ static av_cold int opus_decode_init(AVCodecContext *avctx)
         s->avr = 1; //avresample_alloc_context();
         if (!s->avr)
             goto fail;
-		//wiim_inf = 26;
+        //wiim_inf = 26;
 
         layout = (s->output_channels == 1) ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
         av_opt_set_int(s->avr, "in_sample_fmt",      avctx->sample_fmt,  0);

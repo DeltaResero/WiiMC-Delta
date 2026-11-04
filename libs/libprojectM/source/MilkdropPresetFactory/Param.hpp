@@ -104,7 +104,7 @@ public:
 
 
 /* Sets the parameter engine value to value val.
-	clipping occurs if necessary */
+    clipping occurs if necessary */
 inline void Param::set_param( float val) {
 
     switch (type) {
@@ -139,7 +139,7 @@ inline void Param::set_param( float val) {
             *((float*)engine_val) = val;
         break;
     default:
-	//abort();
+    //abort();
         break;
 
     }

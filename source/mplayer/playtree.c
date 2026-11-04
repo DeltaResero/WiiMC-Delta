@@ -470,7 +470,7 @@ play_tree_iter_push_params(play_tree_iter_t* iter) {
     int e;
     if((e = m_config_set_option(iter->config,pt->params[n].name,pt->params[n].value)) < 0) {
       mp_msg(MSGT_PLAYTREE,MSGL_ERR,"Error %d while setting option '%s' with value '%s'\n",e,
-	     pt->params[n].name,pt->params[n].value);
+             pt->params[n].name,pt->params[n].value);
     }
   }
 
@@ -606,13 +606,13 @@ play_tree_iter_step(play_tree_iter_t* iter, int d,int with_nodes) {
     } else
     if(iter->tree->parent && iter->tree->parent->loop != 0 && ((d > 0 && iter->loop != 0) || ( d < 0 && (iter->loop < 0 || iter->loop < iter->tree->parent->loop) ) ) ) {
       if(d > 0) { // Go back to the first one
-	for(pt = iter->tree ; pt->prev != NULL; pt = pt->prev)
-	  /* NOTHNG */;
-	if(iter->loop > 0) iter->loop--;
+        for(pt = iter->tree ; pt->prev != NULL; pt = pt->prev)
+          /* NOTHNG */;
+        if(iter->loop > 0) iter->loop--;
       } else if( d < 0 ) { // Or the last one
-	for(pt = iter->tree ; pt->next != NULL; pt = pt->next)
-	  /* NOTHNG */;
-	if(iter->loop >= 0 && iter->loop < iter->tree->parent->loop) iter->loop++;
+        for(pt = iter->tree ; pt->next != NULL; pt = pt->next)
+          /* NOTHNG */;
+        if(iter->loop >= 0 && iter->loop < iter->tree->parent->loop) iter->loop++;
       }
       iter->tree = pt;
       return play_tree_iter_step(iter,0,with_nodes);
@@ -678,7 +678,7 @@ play_tree_is_valid(play_tree_t* pt) {
   else if (pt->child != NULL) {
     for(iter = pt->child ; iter != NULL ; iter = iter->next) {
       if(play_tree_is_valid(iter))
-	return 1;
+        return 1;
     }
   }
   return 0;

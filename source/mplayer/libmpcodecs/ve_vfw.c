@@ -188,28 +188,28 @@ static int vfw_start_encoder(BITMAPINFOHEADER *input_bih, BITMAPINFOHEADER *outp
   {
     unsigned char* temp=(unsigned char*)output_bih;
     mp_msg(MSGT_WIN32, MSGL_V, "Extra info in o_bih (%d bytes)!\n",
-	temp_len-sizeof(BITMAPINFOHEADER));
+        temp_len-sizeof(BITMAPINFOHEADER));
     for(i=sizeof(output_bih);i<temp_len;i++) mp_msg(MSGT_WIN32, MSGL_DBG2, "%02X ",temp[i]);
   }
 
 //  if( mp_msg_test(MSGT_WIN32,MSGL_V) ) {
     printf("Starting compression:\n");
     printf(" Input format:\n");
-	printf("  biSize %ld\n", input_bih->biSize);
-	printf("  biWidth %ld\n", input_bih->biWidth);
-	printf("  biHeight %ld\n", input_bih->biHeight);
-	printf("  biPlanes %d\n", input_bih->biPlanes);
-	printf("  biBitCount %d\n", input_bih->biBitCount);
-	printf("  biCompression 0x%lx ('%.4s')\n", input_bih->biCompression, (char *)&input_bih->biCompression);
-	printf("  biSizeImage %ld\n", input_bih->biSizeImage);
+        printf("  biSize %ld\n", input_bih->biSize);
+        printf("  biWidth %ld\n", input_bih->biWidth);
+        printf("  biHeight %ld\n", input_bih->biHeight);
+        printf("  biPlanes %d\n", input_bih->biPlanes);
+        printf("  biBitCount %d\n", input_bih->biBitCount);
+        printf("  biCompression 0x%lx ('%.4s')\n", input_bih->biCompression, (char *)&input_bih->biCompression);
+        printf("  biSizeImage %ld\n", input_bih->biSizeImage);
     printf(" Output format:\n");
-	printf("  biSize %ld\n", output_bih->biSize);
-	printf("  biWidth %ld\n", output_bih->biWidth);
-	printf("  biHeight %ld\n", output_bih->biHeight);
-	printf("  biPlanes %d\n", output_bih->biPlanes);
-	printf("  biBitCount %d\n", output_bih->biBitCount);
-	printf("  biCompression 0x%lx ('%.4s')\n", output_bih->biCompression, (char *)&output_bih->biCompression);
-	printf("  biSizeImage %ld\n", output_bih->biSizeImage);
+        printf("  biSize %ld\n", output_bih->biSize);
+        printf("  biWidth %ld\n", output_bih->biWidth);
+        printf("  biHeight %ld\n", output_bih->biHeight);
+        printf("  biPlanes %d\n", output_bih->biPlanes);
+        printf("  biBitCount %d\n", output_bih->biBitCount);
+        printf("  biCompression 0x%lx ('%.4s')\n", output_bih->biCompression, (char *)&output_bih->biCompression);
+        printf("  biSizeImage %ld\n", output_bih->biSizeImage);
 //  }
 
   output_bih->biWidth=input_bih->biWidth;
@@ -246,24 +246,24 @@ static int vfw_start_encoder(BITMAPINFOHEADER *input_bih, BITMAPINFOHEADER *outp
 }
 
 static int vfw_encode_frame(BITMAPINFOHEADER* biOutput,void* OutBuf,
-		     BITMAPINFOHEADER* biInput,void* Image,
-		     long* keyframe, int quality){
+                     BITMAPINFOHEADER* biInput,void* Image,
+                     long* keyframe, int quality){
     HRESULT ret;
 
 //long VFWAPIV ICCompress(
-//	HIC hic,long dwFlags,LPBITMAPINFOHEADER lpbiOutput,void* lpOutputBuf,
-//	LPBITMAPINFOHEADER lpbiInput,void* lpImage,long* lpckid,
-//	long* lpdwFlags,long lFrameNum,long dwFrameSize,long dwQuality,
-//	LPBITMAPINFOHEADER lpbiInputPrev,void* lpImagePrev
+//      HIC hic,long dwFlags,LPBITMAPINFOHEADER lpbiOutput,void* lpOutputBuf,
+//      LPBITMAPINFOHEADER lpbiInput,void* lpImage,long* lpckid,
+//      long* lpdwFlags,long lFrameNum,long dwFrameSize,long dwQuality,
+//      LPBITMAPINFOHEADER lpbiInputPrev,void* lpImagePrev
 //);
 
 //    printf("vfw_encode_frame(%p,%p, %p,%p, %p,%d)\n",biOutput,OutBuf,biInput,Image,keyframe,quality);
 
     ret=ICCompress(encoder_hic, 0,
-	biOutput, OutBuf,
-	biInput, Image,
-	NULL, keyframe, encoder_frameno, 0, quality,
-	biInput, encoder_buf);
+        biOutput, OutBuf,
+        biInput, Image,
+        NULL, keyframe, encoder_frameno, 0, quality,
+        biInput, encoder_buf);
 
 //    printf("ok. size=%ld\n",biOutput->biSizeImage);
 
@@ -277,7 +277,7 @@ static int vfw_encode_frame(BITMAPINFOHEADER* biOutput,void* OutBuf,
 
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
+        unsigned int flags, unsigned int outfmt){
 
     vfw_bih->biWidth=width;
     vfw_bih->biHeight=height;
@@ -309,7 +309,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 //    flip_upside_down(vo_image_ptr,vo_image_ptr,3*vo_w,vo_h); // dirty hack
     ret=vfw_encode_frame(mux_v->bih, mux_v->buffer, vfw_bih, mpi->planes[0], &flags, 10000);
 //    if (ret != ICERR_OK)
-//	return 0;
+//      return 0;
     muxer_write_chunk(mux_v,mux_v->bih->biSizeImage,flags, pts, pts);
     return 1;
 }
@@ -356,8 +356,8 @@ static int vf_open(vf_instance_t *vf, char* args){
 
     if (!vfw_param_codec)
     {
-	mp_msg(MSGT_WIN32,MSGL_WARN, MSGTR_MPCODECS_NoVfwCodecSpecified);
-	return 0;
+        mp_msg(MSGT_WIN32,MSGL_WARN, MSGTR_MPCODECS_NoVfwCodecSpecified);
+        return 0;
     }
 //    mux_v->bih=vfw_open_encoder("divxc32.dll",vfw_bih,mmioFOURCC('D', 'I', 'V', '3'));
 //    mux_v->bih=vfw_open_encoder("AvidAVICodec.dll",vfw_bih, 0);

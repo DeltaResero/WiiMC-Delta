@@ -362,7 +362,7 @@ CustomWave::CustomWave(int _id) : Waveform(512),
   {
     abort();
   }
-  
+
   if ((param = Param::new_param_float("t6", P_FLAG_TVAR | P_FLAG_PER_POINT, &this->t6, NULL, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, 0.0)) == NULL)
   {
     abort();
@@ -398,16 +398,16 @@ CustomWave::CustomWave(int _id) : Waveform(512),
   }
 
   for (unsigned int i = 1; i <= NUM_Q_VARIABLES;i++) {
-	std::ostringstream os;
-	os << "q" << i;
-	param = Param::new_param_float ( os.str().c_str(), P_FLAG_QVAR, &this->q[i], NULL, MAX_DOUBLE_SIZE,
-		 -MAX_DOUBLE_SIZE, 0.0 );
-	if ( ParamUtils::insert ( param, &this->param_tree ) < 0 )
-	{
-		abort();
-	}
+        std::ostringstream os;
+        os << "q" << i;
+        param = Param::new_param_float ( os.str().c_str(), P_FLAG_QVAR, &this->q[i], NULL, MAX_DOUBLE_SIZE,
+                 -MAX_DOUBLE_SIZE, 0.0 );
+        if ( ParamUtils::insert ( param, &this->param_tree ) < 0 )
+        {
+                abort();
+        }
   }
-	
+
      /* End of parameter loading. Note that the read only parameters associated
      with custom waves (ie, sample) are variables stored in PresetFrameIO.hpp,
      and not specific to the custom wave datastructure. */
@@ -504,28 +504,28 @@ void CustomWave::evalInitConds()
 
 ColoredPoint CustomWave::PerPoint(ColoredPoint p, const WaveformContext context)
 {
-	    r_mesh[context.sample_int] = r;
-	    g_mesh[context.sample_int] = g;
-	    b_mesh[context.sample_int] = b;
-	    a_mesh[context.sample_int] = a;
-	    x_mesh[context.sample_int] = x;
-	    y_mesh[context.sample_int] = y;
-	    sample = context.sample;
-	    sample_mesh[context.sample_int] = context.sample;
-	    v1 = context.left;
-	    v2 = context.right;
+            r_mesh[context.sample_int] = r;
+            g_mesh[context.sample_int] = g;
+            b_mesh[context.sample_int] = b;
+            a_mesh[context.sample_int] = a;
+            x_mesh[context.sample_int] = x;
+            y_mesh[context.sample_int] = y;
+            sample = context.sample;
+            sample_mesh[context.sample_int] = context.sample;
+            v1 = context.left;
+            v2 = context.right;
 
-	for (std::vector<PerPointEqn*>::iterator pos = per_point_eqn_tree.begin(); pos != per_point_eqn_tree.end();++pos)
-	    (*pos)->evaluate(context.sample_int);
+        for (std::vector<PerPointEqn*>::iterator pos = per_point_eqn_tree.begin(); pos != per_point_eqn_tree.end();++pos)
+            (*pos)->evaluate(context.sample_int);
 
-	    p.a = a_mesh[context.sample_int];
-	    p.r = r_mesh[context.sample_int];
-	    p.g = g_mesh[context.sample_int];
-	    p.b = b_mesh[context.sample_int];
-	    p.x = x_mesh[context.sample_int];
-	    p.y = y_mesh[context.sample_int];
+            p.a = a_mesh[context.sample_int];
+            p.r = r_mesh[context.sample_int];
+            p.g = g_mesh[context.sample_int];
+            p.b = b_mesh[context.sample_int];
+            p.x = x_mesh[context.sample_int];
+            p.y = y_mesh[context.sample_int];
 
-	    return p;
+            return p;
 }
 
 

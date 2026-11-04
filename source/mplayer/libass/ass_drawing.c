@@ -271,13 +271,13 @@ static void drawing_evaluate_curve(ASS_Drawing *drawing,
         // 1   [-1 +3 -3 +1]
         // - * [+3 -6 +3  0]
         // 6   [-3  0 +3  0]
-        //	   [+1 +4 +1  0]
+        //     [+1 +4 +1  0]
 
         double div6 = 1.0/6.0;
 
         cx3 = div6*(-  x0+3*x1-3*x2+x3);
         cx2 = div6*( 3*x0-6*x1+3*x2);
-        cx1 = div6*(-3*x0	   +3*x2);
+        cx1 = div6*(-3*x0      +3*x2);
         cx0 = div6*(   x0+4*x1+1*x2);
 
         cy3 = div6*(-  y0+3*y1-3*y2+y3);

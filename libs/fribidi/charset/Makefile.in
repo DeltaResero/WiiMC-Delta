@@ -291,7 +291,7 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libfribidi-char-sets.la: $(libfribidi_char_sets_la_OBJECTS) $(libfribidi_char_sets_la_DEPENDENCIES) 
+libfribidi-char-sets.la: $(libfribidi_char_sets_la_OBJECTS) $(libfribidi_char_sets_la_DEPENDENCIES)
 	$(libfribidi_char_sets_la_LINK)  $(libfribidi_char_sets_la_OBJECTS) $(libfribidi_char_sets_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:

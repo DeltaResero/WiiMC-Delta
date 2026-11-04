@@ -57,16 +57,16 @@ ogg_int64_t ogg_page_granulepos(ogg_page *og){
 
 int ogg_page_serialno(ogg_page *og){
   return(og->header[14] |
-	 (og->header[15]<<8) |
-	 (og->header[16]<<16) |
-	 (og->header[17]<<24));
+         (og->header[15]<<8) |
+         (og->header[16]<<16) |
+         (og->header[17]<<24));
 }
 
 long ogg_page_pageno(ogg_page *og){
   return(og->header[18] |
-	 (og->header[19]<<8) |
-	 (og->header[20]<<16) |
-	 (og->header[21]<<24));
+         (og->header[19]<<8) |
+         (og->header[20]<<16) |
+         (og->header[21]<<24));
 }
 
 
@@ -108,9 +108,9 @@ static ogg_uint32_t _ogg_crc_entry(unsigned long index){
   for (i=0; i<8; i++)
     if (r & 0x80000000UL)
       r = (r << 1) ^ 0x04c11db7; /* The same as the ethernet generator
-				    polynomial, although we use an
-				    unreflected alg and an init/final
-				    of 0, not 0xffffffff */
+                                    polynomial, although we use an
+                                    unreflected alg and an init/final
+                                    of 0, not 0xffffffff */
     else
        r<<=1;
  return (r & 0xffffffffUL);
@@ -279,7 +279,7 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
     os->body_fill-=os->body_returned;
     if(os->body_fill)
       memmove(os->body_data,os->body_data+os->body_returned,
-	      os->body_fill);
+              os->body_fill);
     os->body_returned=0;
   }
 
@@ -349,8 +349,8 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
     granule_pos=0;
     for(vals=0;vals<maxvals;vals++){
       if((os->lacing_vals[vals]&0x0ff)<255){
-	vals++;
-	break;
+        vals++;
+        break;
       }
     }
   }else{
@@ -394,10 +394,10 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   /* 32 bits of page counter (we have both counter and page header
      because this val can roll over) */
   if(os->pageno==-1)os->pageno=0; /* because someone called
-				     stream_reset; this would be a
-				     strange thing to do in an
-				     encode stream, but it has
-				     plausible uses */
+                                     stream_reset; this would be a
+                                     strange thing to do in an
+                                     encode stream, but it has
+                                     plausible uses */
   {
     long pageno=os->pageno++;
     for(i=18;i<22;i++){
@@ -586,7 +586,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
     /* Compare */
     if(memcmp(chksum,page+22,4)){
       /* D'oh.  Mismatch! Corrupt page (or miscapture and not a page
-	 at all) */
+         at all) */
       /* replace the computed checksum with the one actually read in */
       memcpy(page+22,chksum,4);
 
@@ -694,17 +694,17 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
     if(br){
       os->body_fill-=br;
       if(os->body_fill)
-	memmove(os->body_data,os->body_data+br,os->body_fill);
+        memmove(os->body_data,os->body_data+br,os->body_fill);
       os->body_returned=0;
     }
 
     if(lr){
       /* segment table */
       if(os->lacing_fill-lr){
-	memmove(os->lacing_vals,os->lacing_vals+lr,
-		(os->lacing_fill-lr)*sizeof(*os->lacing_vals));
-	memmove(os->granule_vals,os->granule_vals+lr,
-		(os->lacing_fill-lr)*sizeof(*os->granule_vals));
+        memmove(os->lacing_vals,os->lacing_vals+lr,
+                (os->lacing_fill-lr)*sizeof(*os->lacing_vals));
+        memmove(os->granule_vals,os->granule_vals+lr,
+                (os->lacing_fill-lr)*sizeof(*os->granule_vals));
       }
       os->lacing_fill-=lr;
       os->lacing_packet-=lr;
@@ -741,13 +741,13 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
        os->lacing_vals[os->lacing_fill-1]==0x400){
       bos=0;
       for(;segptr<segments;segptr++){
-	int val=header[27+segptr];
-	body+=val;
-	bodysize-=val;
-	if(val<255){
-	  segptr++;
-	  break;
-	}
+        int val=header[27+segptr];
+        body+=val;
+        bodysize-=val;
+        if(val<255){
+          segptr++;
+          break;
+        }
       }
     }
   }
@@ -766,8 +766,8 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
       os->granule_vals[os->lacing_fill]=-1;
 
       if(bos){
-	os->lacing_vals[os->lacing_fill]|=0x100;
-	bos=0;
+        os->lacing_vals[os->lacing_fill]|=0x100;
+        bos=0;
       }
 
       if(val<255)saved=os->lacing_fill;

@@ -11,12 +11,12 @@
 
 //typedef WORD    VERSION;        /* major (high byte), minor (low byte) */
 
-typedef UINT16	MMVERSION16;
-typedef UINT	MMVERSION;
-typedef UINT16	MCIDEVICEID16;
-typedef UINT	MCIDEVICEID;
-typedef	UINT16	MMRESULT16;
-typedef	UINT	MMRESULT;
+typedef UINT16  MMVERSION16;
+typedef UINT    MMVERSION;
+typedef UINT16  MCIDEVICEID16;
+typedef UINT    MCIDEVICEID;
+typedef UINT16  MMRESULT16;
+typedef UINT    MMRESULT;
 typedef DWORD           FOURCC;         /* a four character code */
 
 

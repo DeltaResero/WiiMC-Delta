@@ -193,7 +193,7 @@ static int aiff_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     AVStream * st;
     AIFFInputContext *aiff = s->priv_data;
-	ID3v2ExtraMeta *id3v2_extra_meta = NULL;
+    ID3v2ExtraMeta *id3v2_extra_meta = NULL;
 
     /* check FORM header */
     filesize = get_tag(pb, &tag);
@@ -230,17 +230,17 @@ static int aiff_read_header(AVFormatContext *s)
             if (offset > 0) // COMM is after SSND
                 goto got_sound;
             break;
-		case MKTAG('I', 'D', '3', ' '):
-			//wiim_inf = 8;
-			position = avio_tell(pb);
+        case MKTAG('I', 'D', '3', ' '):
+            //wiim_inf = 8;
+            position = avio_tell(pb);
             ff_id3v2_read(s, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta);
-			if (id3v2_extra_meta)
+            if (id3v2_extra_meta)
                 if (ret = ff_id3v2_parse_apic(s, &id3v2_extra_meta) < 0) {
                     ff_id3v2_free_extra_meta(&id3v2_extra_meta);
                     return ret;
                 }
             ff_id3v2_free_extra_meta(&id3v2_extra_meta);
-			if (position + size > avio_tell(pb))
+            if (position + size > avio_tell(pb))
                 avio_skip(pb, position + size - avio_tell(pb));
             break;
         case MKTAG('F', 'V', 'E', 'R'):     /* Version chunk */
@@ -334,9 +334,9 @@ static int aiff_read_packet(AVFormatContext *s,
      case CODEC_ID_QCELP:
         size = st->codec->block_align;
      break;
-	default:
+    default:
         size = (MAX_SIZE / st->codec->block_align) * st->codec->block_align;
-	}
+    }
     size = FFMIN(max_size, size);
     res = av_get_packet(s->pb, pkt, size);
     if (res < 0)

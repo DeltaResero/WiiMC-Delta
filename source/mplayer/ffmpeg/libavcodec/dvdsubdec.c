@@ -549,7 +549,7 @@ static int dvdsub_parse_extradata(AVCodecContext *avctx)
 
         if (strncmp("palette:", data, 8) == 0) {
             parse_palette(ctx, data + 8);
-		} else if (strncmp("size:", data, 5) == 0) {
+                } else if (strncmp("size:", data, 5) == 0) {
             int w, h;
             if (sscanf(data + 5, "%dx%d", &w, &h) == 2 &&
                 av_image_check_size(w, h, 0, avctx) >= 0)

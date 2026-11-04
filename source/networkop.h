@@ -10,21 +10,21 @@
 #define _NETWORKOP_H_
 
 struct SMBSettings {
-	char	ip[81];
-	char	share[81];
-	char	user[21];
-	char	pwd[15];
-	char	displayname[41];
+    char    ip[81];
+    char    share[81];
+    char    user[21];
+    char    pwd[15];
+    char    displayname[41];
 };
 
 struct FTPSettings {
-	char	ip[81];
-	char	folder[81];
-	char	user[21];
-	char	pwd[21];
-	int		port;
-	int		passive;
-	char	displayname[41];
+    char    ip[81];
+    char    folder[81];
+    char    user[21];
+    char    pwd[21];
+    int     port;
+    int     passive;
+    char    displayname[41];
 };
 
 void UpdateCheck();

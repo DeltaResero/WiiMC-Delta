@@ -56,8 +56,8 @@ void ass_mp_reset_config(ASS_Library *l);
 ASS_Library* ass_init(void);
 
 typedef struct {
-	ASS_Image* imgs;
-	int changed;
+    ASS_Image* imgs;
+    int changed;
 } EOSD_ImageList;
 
 extern int ass_force_reload;

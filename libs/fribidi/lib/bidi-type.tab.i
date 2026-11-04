@@ -5521,9 +5521,9 @@ static const PACKTAB_UINT16 BidLev0[4352*1] = {
 /* *INDENT-ON* */
 
 #define FRIBIDI_GET_BIDI_TYPE(x) \
-	((x) >= 0x110000 ? LTR :  \
-	BidLev1[((x) & 0xff) + \
-	BidLev0[((x) >> 8)]])
+        ((x) >= 0x110000 ? LTR :  \
+        BidLev1[((x) & 0xff) + \
+        BidLev0[((x) >> 8)]])
 
 #undef PACKTAB_UINT8
 #undef PACKTAB_UINT16

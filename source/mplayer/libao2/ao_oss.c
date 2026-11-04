@@ -50,10 +50,10 @@
 
 static const ao_info_t info =
 {
-	"OSS/ioctl audio output",
-	"oss",
-	"A'rpi",
-	""
+        "OSS/ioctl audio output",
+        "oss",
+        "A'rpi",
+        ""
 };
 
 /* Support for >2 output channels added 2001-11-25 - Steve Davies <steve@daviesfam.org> */
@@ -157,58 +157,58 @@ static int oss_mixer_channel = SOUND_MIXER_PCM;
 // to set/get/query special features/parameters
 static int control(int cmd,void *arg){
     switch(cmd){
-	case AOCONTROL_SET_DEVICE:
-	    dsp=(char*)arg;
-	    return CONTROL_OK;
-	case AOCONTROL_GET_DEVICE:
-	    *(char**)arg=dsp;
-	    return CONTROL_OK;
+        case AOCONTROL_SET_DEVICE:
+            dsp=(char*)arg;
+            return CONTROL_OK;
+        case AOCONTROL_GET_DEVICE:
+            *(char**)arg=dsp;
+            return CONTROL_OK;
 #ifdef SNDCTL_DSP_GETFMTS
-	case AOCONTROL_QUERY_FORMAT:
-	{
-	    int format;
-	    if (!ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &format))
-		if ((unsigned int)format & (unsigned long)arg)
-	    	    return CONTROL_TRUE;
-	    return CONTROL_FALSE;
-	}
+        case AOCONTROL_QUERY_FORMAT:
+        {
+            int format;
+            if (!ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &format))
+                if ((unsigned int)format & (unsigned long)arg)
+                    return CONTROL_TRUE;
+            return CONTROL_FALSE;
+        }
 #endif
-	case AOCONTROL_GET_VOLUME:
-	case AOCONTROL_SET_VOLUME:
-	{
-	    ao_control_vol_t *vol = (ao_control_vol_t *)arg;
-	    int fd, v, devs;
+        case AOCONTROL_GET_VOLUME:
+        case AOCONTROL_SET_VOLUME:
+        {
+            ao_control_vol_t *vol = (ao_control_vol_t *)arg;
+            int fd, v, devs;
 
-	    if(AF_FORMAT_IS_AC3(ao_data.format))
-		return CONTROL_TRUE;
+            if(AF_FORMAT_IS_AC3(ao_data.format))
+                return CONTROL_TRUE;
 
-	    if ((fd = open(oss_mixer_device, O_RDONLY)) > 0)
-	    {
-		ioctl(fd, SOUND_MIXER_READ_DEVMASK, &devs);
-		if (devs & (1 << oss_mixer_channel))
-		{
-		    if (cmd == AOCONTROL_GET_VOLUME)
-		    {
-		        ioctl(fd, MIXER_READ(oss_mixer_channel), &v);
-			vol->right = (v & 0xFF00) >> 8;
-			vol->left = v & 0x00FF;
-		    }
-		    else
-		    {
-		        v = ((int)vol->right << 8) | (int)vol->left;
-			ioctl(fd, MIXER_WRITE(oss_mixer_channel), &v);
-		    }
-		}
-		else
-		{
-		    close(fd);
-		    return CONTROL_ERROR;
-		}
-		close(fd);
-		return CONTROL_OK;
-	    }
-	}
-	return CONTROL_ERROR;
+            if ((fd = open(oss_mixer_device, O_RDONLY)) > 0)
+            {
+                ioctl(fd, SOUND_MIXER_READ_DEVMASK, &devs);
+                if (devs & (1 << oss_mixer_channel))
+                {
+                    if (cmd == AOCONTROL_GET_VOLUME)
+                    {
+                        ioctl(fd, MIXER_READ(oss_mixer_channel), &v);
+                        vol->right = (v & 0xFF00) >> 8;
+                        vol->left = v & 0x00FF;
+                    }
+                    else
+                    {
+                        v = ((int)vol->right << 8) | (int)vol->left;
+                        ioctl(fd, MIXER_WRITE(oss_mixer_channel), &v);
+                    }
+                }
+                else
+                {
+                    close(fd);
+                    return CONTROL_ERROR;
+                }
+                close(fd);
+                return CONTROL_OK;
+            }
+        }
+        return CONTROL_ERROR;
     }
     return CONTROL_UNKNOWN;
 }
@@ -324,7 +324,7 @@ ac3_retry:
   }
 #if 0
   if(oss_format!=format2oss(format))
-	mp_msg(MSGT_AO,MSGL_WARN,"WARNING! Your soundcard does NOT support %s sample format! Broken audio or bad playback speed are possible! Try with '-af format'\n",audio_out_format_name(format));
+        mp_msg(MSGT_AO,MSGL_WARN,"WARNING! Your soundcard does NOT support %s sample format! Broken audio or bad playback speed are possible! Try with '-af format'\n",audio_out_format_name(format));
 #endif
 
   ao_data.format = oss2format(oss_format);
@@ -338,16 +338,16 @@ ac3_retry:
     // We only use SNDCTL_DSP_CHANNELS for >2 channels, in case some drivers don't have it
     if (ao_data.channels > 2) {
       if ( ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &ao_data.channels) == -1 ||
-	   ao_data.channels != channels ) {
-	mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantSetChans, channels);
-	return 0;
+           ao_data.channels != channels ) {
+        mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantSetChans, channels);
+        return 0;
       }
     }
     else {
       int c = ao_data.channels-1;
       if (ioctl (audio_fd, SNDCTL_DSP_STEREO, &c) == -1) {
-	mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantSetChans, ao_data.channels);
-	return 0;
+        mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantSetChans, ao_data.channels);
+        return 0;
       }
       ao_data.channels=c+1;
     }
@@ -424,11 +424,11 @@ static void uninit(int immed){
 #ifdef SNDCTL_DSP_SYNC
     // to get the buffer played
     if (!immed)
-	ioctl(audio_fd, SNDCTL_DSP_SYNC, NULL);
+        ioctl(audio_fd, SNDCTL_DSP_SYNC, NULL);
 #endif
 #ifdef SNDCTL_DSP_RESET
     if (immed)
-	ioctl(audio_fd, SNDCTL_DSP_RESET, NULL);
+        ioctl(audio_fd, SNDCTL_DSP_RESET, NULL);
 #endif
     close(audio_fd);
     audio_fd = -1;
@@ -440,8 +440,8 @@ static void reset(void){
     uninit(1);
     audio_fd=open(dsp, O_WRONLY);
     if(audio_fd < 0){
-	mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantReopen, strerror(errno));
-	return;
+        mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_OSS_CantReopen, strerror(errno));
+        return;
     }
 
 #if defined(FD_CLOEXEC) && defined(F_SETFD)
@@ -487,7 +487,7 @@ static int get_space(void){
       // calculate exact buffer space:
       playsize = zz.fragments*zz.fragsize;
       if (playsize > MAX_OUTBURST)
-	playsize = (MAX_OUTBURST / zz.fragsize) * zz.fragsize;
+        playsize = (MAX_OUTBURST / zz.fragsize) * zz.fragsize;
       return playsize;
   }
 #endif

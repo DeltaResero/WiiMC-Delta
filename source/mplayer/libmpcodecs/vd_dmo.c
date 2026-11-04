@@ -33,11 +33,11 @@
 #include "loader/dmo/DMO_VideoDecoder.h"
 
 static const vd_info_t info = {
-	"DMO video codecs",
-	"dmo",
-	"A'rpi",
-	"based on http://avifile.sf.net",
-	"win32 codecs"
+        "DMO video codecs",
+        "dmo",
+        "A'rpi",
+        "based on http://avifile.sf.net",
+        "win32 codecs"
 };
 
 LIBVD_EXTERN(dmo)
@@ -61,7 +61,7 @@ static int init(sh_video_t *sh){
     if(!(decoder=DMO_VideoDecoder_Open(sh->codec->dll,&sh->codec->guid, sh->bih, 0, 0))){
         mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,sh->codec->dll);
         mp_msg(MSGT_DECVIDEO,MSGL_HINT,MSGTR_DownloadCodecPackage);
-	return 0;
+        return 0;
     }
     if(!mpcodecs_config_vo(sh,sh->disp_w,sh->disp_h,out_fmt)) return 0;
     // mpcodecs_config_vo can change the format
@@ -71,11 +71,11 @@ static int init(sh_video_t *sh){
     switch(out_fmt){
     case IMGFMT_YUY2:
     case IMGFMT_UYVY:
-	DMO_VideoDecoder_SetDestFmt(ctx->decoder,16,out_fmt);break; // packed YUV
+        DMO_VideoDecoder_SetDestFmt(ctx->decoder,16,out_fmt);break; // packed YUV
     case IMGFMT_YV12:
     case IMGFMT_I420:
     case IMGFMT_IYUV:
-	DMO_VideoDecoder_SetDestFmt(ctx->decoder,12,out_fmt);break; // planar YUV
+        DMO_VideoDecoder_SetDestFmt(ctx->decoder,12,out_fmt);break; // planar YUV
     case IMGFMT_YVU9:
         DMO_VideoDecoder_SetDestFmt(ctx->decoder,9,out_fmt);break;
     case IMGFMT_RGB24:
@@ -86,7 +86,7 @@ static int init(sh_video_t *sh){
             ctx->buffer = av_malloc(ctx->stride * sh->disp_h);
         }
     default:
-	DMO_VideoDecoder_SetDestFmt(ctx->decoder,out_fmt&255,0);    // RGB/BGR
+        DMO_VideoDecoder_SetDestFmt(ctx->decoder,out_fmt&255,0);    // RGB/BGR
     }
     DMO_VideoDecoder_StartInternal(ctx->decoder);
     mp_msg(MSGT_DECVIDEO, MSGL_V, "INFO: Win32/DMO video codec init OK.\n");
@@ -113,13 +113,13 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     if(len<=0) return NULL; // skipped frame
 
     if(flags&3){
-	// framedrop:
+        // framedrop:
         DMO_VideoDecoder_DecodeInternal(ctx->decoder, data, len, 0, 0);
-	return NULL;
+        return NULL;
     }
 
     mpi=mpcodecs_get_image(sh, type, MP_IMGFLAG_COMMON_PLANE,
-	sh->disp_w, sh->disp_h);
+        sh->disp_w, sh->disp_h);
     if (buffer) {
         mpi->planes[0] = buffer;
         mpi->stride[0] = ctx->stride;
@@ -127,9 +127,9 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
         buffer = mpi->planes[0];
     }
 
-    if(!mpi){	// temporary!
-	mp_msg(MSGT_DECVIDEO,MSGL_WARN,MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec);
-	return NULL;
+    if(!mpi){   // temporary!
+        mp_msg(MSGT_DECVIDEO,MSGL_WARN,MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec);
+        return NULL;
     }
 
     DMO_VideoDecoder_DecodeInternal(ctx->decoder, data, len, 1, buffer);

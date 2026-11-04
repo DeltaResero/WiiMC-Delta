@@ -29,12 +29,12 @@ typedef struct _pm_config pm_config;
 
 /**
  * Audio beat detection class.
- * Parses various characteristics from decompressed sound buffers 
+ * Parses various characteristics from decompressed sound buffers
  */
 class BeatDetect
 {
     public:
-        
+
         float treb ;
         float mid ;
         float bass ;
@@ -43,9 +43,9 @@ class BeatDetect
         float mid_att ;
         float bass_att ;
         float vol;
-        
+
         PCM *pcm;
-        
+
         /** Methods */
         BeatDetect(const pm_config &settings, PCM *pcm);
         ~BeatDetect();
@@ -53,9 +53,9 @@ class BeatDetect
         void reset();
         void detectFromSamples();
         void getBeatVals ( const float *vdataL, const float *vdataR );
-        
+
     private:
-        
+
         /** Vars */
         const pm_config &settings;
         float beat_buffer[32][80],
@@ -68,7 +68,7 @@ class BeatDetect
         float vol_buffer[80],
         vol_instant,
         vol_history;
-        
+
 };
 
 #endif /** !_BEAT_DETECT_H */

@@ -14,22 +14,22 @@
  * Copyright (C) 2004 Sharif FarsiWeb, Inc
  * Copyright (C) 2001,2002 Behdad Esfahbod
  * Copyright (C) 1999,2000 Dov Grobgeld
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
 
@@ -84,12 +84,12 @@ fribidi_reorder_nsm_status (
 
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_log2vis_get_embedding_levels (
-  const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
-					   fribidi_get_bidi_types() */
-  const FriBidiStrIndex len,	/* input string length of the paragraph */
-  FriBidiParType *pbase_dir,	/* requested and resolved paragraph
-				 * base direction */
-  FriBidiLevel *embedding_levels	/* output list of embedding levels */
+  const FriBidiCharType *bidi_types,    /* input list of bidi types as returned by
+                                           fribidi_get_bidi_types() */
+  const FriBidiStrIndex len,    /* input string length of the paragraph */
+  FriBidiParType *pbase_dir,    /* requested and resolved paragraph
+                                 * base direction */
+  FriBidiLevel *embedding_levels        /* output list of embedding levels */
 )
 {
   return fribidi_get_par_embedding_levels (bidi_types, len, pbase_dir, embedding_levels);
@@ -97,7 +97,7 @@ fribidi_log2vis_get_embedding_levels (
 
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type (
-  FriBidiChar ch		/* input character */
+  FriBidiChar ch                /* input character */
 )
 {
   return fribidi_get_bidi_type (ch);
@@ -105,7 +105,7 @@ fribidi_get_type (
 
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type_internal (
-  FriBidiChar ch		/* input character */
+  FriBidiChar ch                /* input character */
 )
 {
   return fribidi_get_bidi_type (ch);
@@ -142,34 +142,34 @@ fribidi_remove_bidi_marks (
   if (positions_to_this && !position_from_this_list)
     {
       position_from_this_list = fribidi_malloc (sizeof
-						(position_from_this_list[0]) *
-						len);
+                                                (position_from_this_list[0]) *
+                                                len);
       if UNLIKELY
-	(!position_from_this_list) goto out;
+        (!position_from_this_list) goto out;
       private_from_this = true;
       for (i = 0; i < len; i++)
-	position_from_this_list[positions_to_this[i]] = i;
+        position_from_this_list[positions_to_this[i]] = i;
     }
 
   for (i = 0; i < len; i++)
     if (!FRIBIDI_IS_EXPLICIT_OR_BN (fribidi_get_bidi_type (str[i]))
-	&& str[i] != FRIBIDI_CHAR_LRM && str[i] != FRIBIDI_CHAR_RLM)
+        && str[i] != FRIBIDI_CHAR_LRM && str[i] != FRIBIDI_CHAR_RLM)
       {
-	str[j] = str[i];
-	if (embedding_levels)
-	  embedding_levels[j] = embedding_levels[i];
-	if (position_from_this_list)
-	  position_from_this_list[j] = position_from_this_list[i];
-	j++;
+        str[j] = str[i];
+        if (embedding_levels)
+          embedding_levels[j] = embedding_levels[i];
+        if (position_from_this_list)
+          position_from_this_list[j] = position_from_this_list[i];
+        j++;
       }
 
   /* Convert the from_this list to to_this */
   if (positions_to_this)
     {
       for (i = 0; i < len; i++)
-	positions_to_this[i] = -1;
+        positions_to_this[i] = -1;
       for (i = 0; i < len; i++)
-	positions_to_this[position_from_this_list[i]] = i;
+        positions_to_this[position_from_this_list[i]] = i;
     }
 
   status = true;
@@ -228,12 +228,12 @@ fribidi_log2vis (
     {
       embedding_levels = fribidi_malloc (len * sizeof embedding_levels[0]);
       if (!embedding_levels)
-	goto out;
+        goto out;
       private_embedding_levels = true;
     }
 
   max_level = fribidi_get_par_embedding_levels (bidi_types, len, pbase_dir,
-						embedding_levels) - 1;
+                                                embedding_levels) - 1;
   if UNLIKELY
     (max_level < 0) goto out;
 
@@ -242,9 +242,9 @@ fribidi_log2vis (
   if (positions_L_to_V && !positions_V_to_L)
     {
       positions_V_to_L =
-	(FriBidiStrIndex *) fribidi_malloc (sizeof (FriBidiStrIndex) * len);
+        (FriBidiStrIndex *) fribidi_malloc (sizeof (FriBidiStrIndex) * len);
       if (!positions_V_to_L)
-	goto out;
+        goto out;
       private_V_to_L = true;
     }
 
@@ -252,7 +252,7 @@ fribidi_log2vis (
   if (positions_V_to_L)
     {
       for (i = 0; i < len; i++)
-	positions_V_to_L[i] = i;
+        positions_V_to_L[i] = i;
     }
 
 
@@ -260,7 +260,7 @@ fribidi_log2vis (
     {
       /* Using memcpy instead
       for (i = len - 1; i >= 0; i--)
-	visual_str[i] = str[i];
+        visual_str[i] = str[i];
       */
       memcpy (visual_str, str, len * sizeof (*visual_str));
 
@@ -278,16 +278,16 @@ fribidi_log2vis (
    * line in this deprecated function */
   status =
     fribidi_reorder_line (flags, bidi_types, len, 0, *pbase_dir,
-			  embedding_levels, visual_str,
-			  positions_V_to_L);
+                          embedding_levels, visual_str,
+                          positions_V_to_L);
 
   /* Convert the v2l list to l2v */
   if (positions_L_to_V)
     {
       for (i = 0; i < len; i++)
-	positions_L_to_V[i] = -1;
+        positions_L_to_V[i] = -1;
       for (i = 0; i < len; i++)
-	positions_L_to_V[positions_V_to_L[i]] = i;
+        positions_L_to_V[positions_V_to_L[i]] = i;
     }
 
 out:

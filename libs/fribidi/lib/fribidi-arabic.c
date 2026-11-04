@@ -3,21 +3,21 @@
  * Copyright (C) 2005  Behdad Esfahbod
  *
  * This file is part of GNU FriBidi.
- * 
+ *
  * GNU FriBidi is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation; either version 2.1
  * of the License, or (at your option) any later version.
- * 
+ *
  * GNU FriBidi is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with GNU FriBidi; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info> or write to
  * Sharif FarsiWeb, Inc., PO Box 13445-389, Tehran, Iran.
  */
@@ -49,7 +49,7 @@ typedef struct _PairMap {
 
 #define FRIBIDI_ACCESS_SHAPE_TABLE(table,min,max,x,shape) (table), (min), (max)
 # define FRIBIDI_ACCESS_SHAPE_TABLE_REAL(table,min,max,x,shape) \
-	(((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
+        (((x)<(min)||(x)>(max))?(x):(table)[(x)-(min)][(shape)])
 
 #include "arabic-shaping.tab.i"
 #include "arabic-misc.tab.i"
@@ -87,7 +87,7 @@ comp_PairMap (const void *pa, const void *pb)
   else
     return a->pair[1] < b->pair[1] ? -1 :
            a->pair[1] > b->pair[1] ? +1 :
-	   0;
+           0;
 }
 
 
@@ -104,8 +104,8 @@ find_pair_match (const PairMap *table, int size, FriBidiChar first, FriBidiChar 
 }
 
 #define PAIR_MATCH(table,len,first,second) \
-	((first)<(table[0].pair[0])||(first)>(table[len-1].pair[0])?0: \
-	 find_pair_match(table, len, first, second))
+        ((first)<(table[0].pair[0])||(first)>(table[len-1].pair[0])?0: \
+         find_pair_match(table, len, first, second))
 
 static void
 fribidi_shape_arabic_ligature (
@@ -126,22 +126,22 @@ fribidi_shape_arabic_ligature (
   for (i = 0; i < len - 1; i++) {
     register FriBidiChar c;
     if (FRIBIDI_LEVEL_IS_RTL(embedding_levels[i]) &&
-	embedding_levels[i] == embedding_levels[i+1] &&
-	(c = PAIR_MATCH(table, size, str[i], str[i+1])))
+        embedding_levels[i] == embedding_levels[i+1] &&
+        (c = PAIR_MATCH(table, size, str[i], str[i+1])))
       {
-	str[i] = FRIBIDI_CHAR_FILL;
-	FRIBIDI_SET_BITS(ar_props[i], FRIBIDI_MASK_LIGATURED);
-	str[i+1] = c;
+        str[i] = FRIBIDI_CHAR_FILL;
+        FRIBIDI_SET_BITS(ar_props[i], FRIBIDI_MASK_LIGATURED);
+        str[i+1] = c;
       }
   }
 }
 
 #define DO_LIGATURING(table, levels, len, ar_props, str) \
-	fribidi_shape_arabic_ligature ((table), sizeof(table)/sizeof((table)[0]), levels, len, ar_props, str)
+        fribidi_shape_arabic_ligature ((table), sizeof(table)/sizeof((table)[0]), levels, len, ar_props, str)
 
 #define DO_SHAPING(tablemacro, len, ar_props, str) \
-	fribidi_shape_arabic_joining (tablemacro(,), len, ar_props, str);
-	
+        fribidi_shape_arabic_joining (tablemacro(,), len, ar_props, str);
+
 
 
 

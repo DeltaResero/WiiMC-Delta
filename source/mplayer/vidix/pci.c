@@ -92,7 +92,7 @@
 #elif defined (_WIN32) || defined(__CYGWIN__)
 #include "sysdep/pci_win32.c"
 #ifdef __MINGW32__
-#define ENOTSUP 134		/* Not supported */
+#define ENOTSUP 134             /* Not supported */
 #endif
 #endif
 
@@ -107,58 +107,58 @@ static unsigned char *pciConfBase;
 static inline unsigned long
 static swapl(unsigned long val)
 {
-	unsigned char *p = (unsigned char *)&val;
-	return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0);
+        unsigned char *p = (unsigned char *)&val;
+        return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0);
 }
 
 
 #define BUS(tag) (((tag)>>16)&0xff)
 #define DFN(tag) (((tag)>>8)&0xff)
 
-#define PCIBIOS_DEVICE_NOT_FOUND	0x86
-#define PCIBIOS_SUCCESSFUL		0x00
+#define PCIBIOS_DEVICE_NOT_FOUND        0x86
+#define PCIBIOS_SUCCESSFUL              0x00
 
 int pciconfig_read(
           unsigned char bus,
           unsigned char dev,
           unsigned char offset,
-          int len,		/* unused, alway 4 */
+          int len,              /* unused, alway 4 */
           unsigned long *val)
 {
-	unsigned long _val;
-	unsigned long *ptr;
+        unsigned long _val;
+        unsigned long *ptr;
 
-	dev >>= 3;
-	if (bus || dev >= 16) {
-		*val = 0xFFFFFFFF;
-		return PCIBIOS_DEVICE_NOT_FOUND;
-	} else {
-		ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
-		_val = swapl(*ptr);
-	}
-	*val = _val;
-	return PCIBIOS_SUCCESSFUL;
+        dev >>= 3;
+        if (bus || dev >= 16) {
+                *val = 0xFFFFFFFF;
+                return PCIBIOS_DEVICE_NOT_FOUND;
+        } else {
+                ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
+                _val = swapl(*ptr);
+        }
+        *val = _val;
+        return PCIBIOS_SUCCESSFUL;
 }
 
 int pciconfig_write(
           unsigned char bus,
           unsigned char dev,
           unsigned char offset,
-          int len,		/* unused, alway 4 */
+          int len,              /* unused, alway 4 */
           unsigned long val)
 {
-	unsigned long _val;
-	unsigned long *ptr;
+        unsigned long _val;
+        unsigned long *ptr;
 
-	dev >>= 3;
-	_val = swapl(val);
-	if (bus || dev >= 16) {
-		return PCIBIOS_DEVICE_NOT_FOUND;
-	} else {
-		ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
-		*ptr = _val;
-	}
-	return PCIBIOS_SUCCESSFUL;
+        dev >>= 3;
+        _val = swapl(val);
+        if (bus || dev >= 16) {
+                return PCIBIOS_DEVICE_NOT_FOUND;
+        } else {
+                ptr = (unsigned long *)(pciConfBase + ((1<<dev) | offset));
+                *ptr = _val;
+        }
+        return PCIBIOS_SUCCESSFUL;
 }
 #endif /* defined(Lynx) && defined(__powerpc__) */
 
@@ -167,32 +167,32 @@ struct pci_config_reg {
     /* start of official PCI config space header */
     union {
         unsigned long device_vendor;
-	struct {
-	    unsigned short vendor;
-	    unsigned short device;
-	} dv;
+        struct {
+            unsigned short vendor;
+            unsigned short device;
+        } dv;
     } dv_id;
 #define _device_vendor dv_id.device_vendor
 #define _vendor dv_id.dv.vendor
 #define _device dv_id.dv.device
     union {
         unsigned long status_command;
-	struct {
-	    unsigned short command;
-	    unsigned short status;
-	} sc;
+        struct {
+            unsigned short command;
+            unsigned short status;
+        } sc;
     } stat_cmd;
 #define _status_command stat_cmd.status_command
 #define _command stat_cmd.sc.command
 #define _status  stat_cmd.sc.status
     union {
         unsigned long class_revision;
-	struct {
-	    unsigned char rev_id;
-	    unsigned char prog_if;
-	    unsigned char sub_class;
-	    unsigned char base_class;
-	} cr;
+        struct {
+            unsigned char rev_id;
+            unsigned char prog_if;
+            unsigned char sub_class;
+            unsigned char base_class;
+        } cr;
     } class_rev;
 #define _class_revision class_rev.class_revision
 #define _rev_id     class_rev.cr.rev_id
@@ -201,12 +201,12 @@ struct pci_config_reg {
 #define _base_class class_rev.cr.base_class
     union {
         unsigned long bist_header_latency_cache;
-	struct {
-	    unsigned char cache_line_size;
-	    unsigned char latency_timer;
-	    unsigned char header_type;
-	    unsigned char bist;
-	} bhlc;
+        struct {
+            unsigned char cache_line_size;
+            unsigned char latency_timer;
+            unsigned char header_type;
+            unsigned char bist;
+        } bhlc;
     } bhlc;
 #define _bist_header_latency_cache bhlc.bist_header_latency_cache
 #define _cache_line_size bhlc.bhlc.cache_line_size
@@ -214,46 +214,46 @@ struct pci_config_reg {
 #define _header_type     bhlc.bhlc.header_type
 #define _bist            bhlc.bhlc.bist
     union {
-	struct {
-	    unsigned long dv_base0;
-	    unsigned long dv_base1;
-	    unsigned long dv_base2;
-	    unsigned long dv_base3;
-	    unsigned long dv_base4;
-	    unsigned long dv_base5;
-	} dv;
-	struct {
-	    unsigned long bg_rsrvd[2];
-	    unsigned char primary_bus_number;
-	    unsigned char secondary_bus_number;
-	    unsigned char subordinate_bus_number;
-	    unsigned char secondary_latency_timer;
-	    unsigned char io_base;
-	    unsigned char io_limit;
-	    unsigned short secondary_status;
-	    unsigned short mem_base;
-	    unsigned short mem_limit;
-	    unsigned short prefetch_mem_base;
-	    unsigned short prefetch_mem_limit;
-	} bg;
+        struct {
+            unsigned long dv_base0;
+            unsigned long dv_base1;
+            unsigned long dv_base2;
+            unsigned long dv_base3;
+            unsigned long dv_base4;
+            unsigned long dv_base5;
+        } dv;
+        struct {
+            unsigned long bg_rsrvd[2];
+            unsigned char primary_bus_number;
+            unsigned char secondary_bus_number;
+            unsigned char subordinate_bus_number;
+            unsigned char secondary_latency_timer;
+            unsigned char io_base;
+            unsigned char io_limit;
+            unsigned short secondary_status;
+            unsigned short mem_base;
+            unsigned short mem_limit;
+            unsigned short prefetch_mem_base;
+            unsigned short prefetch_mem_limit;
+        } bg;
     } bc;
-#define	_base0				bc.dv.dv_base0
-#define	_base1				bc.dv.dv_base1
-#define	_base2				bc.dv.dv_base2
-#define	_base3				bc.dv.dv_base3
-#define	_base4				bc.dv.dv_base4
-#define	_base5				bc.dv.dv_base5
-#define	_primary_bus_number		bc.bg.primary_bus_number
-#define	_secondary_bus_number		bc.bg.secondary_bus_number
-#define	_subordinate_bus_number		bc.bg.subordinate_bus_number
-#define	_secondary_latency_timer	bc.bg.secondary_latency_timer
-#define _io_base			bc.bg.io_base
-#define _io_limit			bc.bg.io_limit
-#define _secondary_status		bc.bg.secondary_status
-#define _mem_base			bc.bg.mem_base
-#define _mem_limit			bc.bg.mem_limit
-#define _prefetch_mem_base		bc.bg.prefetch_mem_base
-#define _prefetch_mem_limit		bc.bg.prefetch_mem_limit
+#define _base0                          bc.dv.dv_base0
+#define _base1                          bc.dv.dv_base1
+#define _base2                          bc.dv.dv_base2
+#define _base3                          bc.dv.dv_base3
+#define _base4                          bc.dv.dv_base4
+#define _base5                          bc.dv.dv_base5
+#define _primary_bus_number             bc.bg.primary_bus_number
+#define _secondary_bus_number           bc.bg.secondary_bus_number
+#define _subordinate_bus_number         bc.bg.subordinate_bus_number
+#define _secondary_latency_timer        bc.bg.secondary_latency_timer
+#define _io_base                        bc.bg.io_base
+#define _io_limit                       bc.bg.io_limit
+#define _secondary_status               bc.bg.secondary_status
+#define _mem_base                       bc.bg.mem_base
+#define _mem_limit                      bc.bg.mem_limit
+#define _prefetch_mem_base              bc.bg.prefetch_mem_base
+#define _prefetch_mem_limit             bc.bg.prefetch_mem_limit
     unsigned long rsvd1;
     unsigned long rsvd2;
     unsigned long _baserom;
@@ -261,12 +261,12 @@ struct pci_config_reg {
     unsigned long rsvd4;
     union {
         unsigned long max_min_ipin_iline;
-	struct {
-	    unsigned char int_line;
-	    unsigned char int_pin;
-	    unsigned char min_gnt;
-	    unsigned char max_lat;
-	} mmii;
+        struct {
+            unsigned char int_line;
+            unsigned char int_pin;
+            unsigned char min_gnt;
+            unsigned char max_lat;
+        } mmii;
     } mmii;
 #define _max_min_ipin_iline mmii.max_min_ipin_iline
 #define _int_line mmii.mmii.int_line
@@ -275,13 +275,13 @@ struct pci_config_reg {
 #define _max_lat  mmii.mmii.max_lat
     /* I don't know how accurate or standard this is (DHD) */
     union {
-	unsigned long user_config;
-	struct {
-	    unsigned char user_config_0;
-	    unsigned char user_config_1;
-	    unsigned char user_config_2;
-	    unsigned char user_config_3;
-	} uc;
+        unsigned long user_config;
+        struct {
+            unsigned char user_config_0;
+            unsigned char user_config_1;
+            unsigned char user_config_2;
+            unsigned char user_config_3;
+        } uc;
     } uc;
 #define _user_config uc.user_config
 #define _user_config_0 uc.uc.user_config_0
@@ -304,32 +304,32 @@ struct pci_config_reg {
     /* start of official PCI config space header */
     union {
         unsigned long device_vendor;
-	struct {
-	    unsigned short device;
-	    unsigned short vendor;
-	} dv;
+        struct {
+            unsigned short device;
+            unsigned short vendor;
+        } dv;
     } dv_id;
 #define _device_vendor dv_id.device_vendor
 #define _vendor dv_id.dv.vendor
 #define _device dv_id.dv.device
     union {
         unsigned long status_command;
-	struct {
-	    unsigned short status;
-	    unsigned short command;
-	} sc;
+        struct {
+            unsigned short status;
+            unsigned short command;
+        } sc;
     } stat_cmd;
 #define _status_command stat_cmd.status_command
 #define _command stat_cmd.sc.command
 #define _status  stat_cmd.sc.status
     union {
         unsigned long class_revision;
-	struct {
-	    unsigned char base_class;
-	    unsigned char sub_class;
-	    unsigned char prog_if;
-	    unsigned char rev_id;
-	} cr;
+        struct {
+            unsigned char base_class;
+            unsigned char sub_class;
+            unsigned char prog_if;
+            unsigned char rev_id;
+        } cr;
     } class_rev;
 #define _class_revision class_rev.class_revision
 #define _rev_id     class_rev.cr.rev_id
@@ -338,12 +338,12 @@ struct pci_config_reg {
 #define _base_class class_rev.cr.base_class
     union {
         unsigned long bist_header_latency_cache;
-	struct {
-	    unsigned char bist;
-	    unsigned char header_type;
-	    unsigned char latency_timer;
-	    unsigned char cache_line_size;
-	} bhlc;
+        struct {
+            unsigned char bist;
+            unsigned char header_type;
+            unsigned char latency_timer;
+            unsigned char cache_line_size;
+        } bhlc;
     } bhlc;
 #define _bist_header_latency_cache bhlc.bist_header_latency_cache
 #define _cache_line_size bhlc.bhlc.cache_line_size
@@ -351,51 +351,51 @@ struct pci_config_reg {
 #define _header_type     bhlc.bhlc.header_type
 #define _bist            bhlc.bhlc.bist
     union {
-	struct {
-	    unsigned long dv_base0;
-	    unsigned long dv_base1;
-	    unsigned long dv_base2;
-	    unsigned long dv_base3;
-	    unsigned long dv_base4;
-	    unsigned long dv_base5;
-	} dv;
+        struct {
+            unsigned long dv_base0;
+            unsigned long dv_base1;
+            unsigned long dv_base2;
+            unsigned long dv_base3;
+            unsigned long dv_base4;
+            unsigned long dv_base5;
+        } dv;
 /* ?? */
-	struct {
-	    unsigned long bg_rsrvd[2];
+        struct {
+            unsigned long bg_rsrvd[2];
 
-	    unsigned char secondary_latency_timer;
-	    unsigned char subordinate_bus_number;
-	    unsigned char secondary_bus_number;
-	    unsigned char primary_bus_number;
+            unsigned char secondary_latency_timer;
+            unsigned char subordinate_bus_number;
+            unsigned char secondary_bus_number;
+            unsigned char primary_bus_number;
 
-	    unsigned short secondary_status;
-	    unsigned char io_limit;
-	    unsigned char io_base;
+            unsigned short secondary_status;
+            unsigned char io_limit;
+            unsigned char io_base;
 
-	    unsigned short mem_limit;
-	    unsigned short mem_base;
+            unsigned short mem_limit;
+            unsigned short mem_base;
 
-	    unsigned short prefetch_mem_limit;
-	    unsigned short prefetch_mem_base;
-	} bg;
+            unsigned short prefetch_mem_limit;
+            unsigned short prefetch_mem_base;
+        } bg;
     } bc;
-#define	_base0				bc.dv.dv_base0
-#define	_base1				bc.dv.dv_base1
-#define	_base2				bc.dv.dv_base2
-#define	_base3				bc.dv.dv_base3
-#define	_base4				bc.dv.dv_base4
-#define	_base5				bc.dv.dv_base5
-#define	_primary_bus_number		bc.bg.primary_bus_number
-#define	_secondary_bus_number		bc.bg.secondary_bus_number
-#define	_subordinate_bus_number		bc.bg.subordinate_bus_number
-#define	_secondary_latency_timer	bc.bg.secondary_latency_timer
-#define _io_base			bc.bg.io_base
-#define _io_limit			bc.bg.io_limit
-#define _secondary_status		bc.bg.secondary_status
-#define _mem_base			bc.bg.mem_base
-#define _mem_limit			bc.bg.mem_limit
-#define _prefetch_mem_base		bc.bg.prefetch_mem_base
-#define _prefetch_mem_limit		bc.bg.prefetch_mem_limit
+#define _base0                          bc.dv.dv_base0
+#define _base1                          bc.dv.dv_base1
+#define _base2                          bc.dv.dv_base2
+#define _base3                          bc.dv.dv_base3
+#define _base4                          bc.dv.dv_base4
+#define _base5                          bc.dv.dv_base5
+#define _primary_bus_number             bc.bg.primary_bus_number
+#define _secondary_bus_number           bc.bg.secondary_bus_number
+#define _subordinate_bus_number         bc.bg.subordinate_bus_number
+#define _secondary_latency_timer        bc.bg.secondary_latency_timer
+#define _io_base                        bc.bg.io_base
+#define _io_limit                       bc.bg.io_limit
+#define _secondary_status               bc.bg.secondary_status
+#define _mem_base                       bc.bg.mem_base
+#define _mem_limit                      bc.bg.mem_limit
+#define _prefetch_mem_base              bc.bg.prefetch_mem_base
+#define _prefetch_mem_limit             bc.bg.prefetch_mem_limit
     unsigned long rsvd1;
     unsigned long rsvd2;
     unsigned long _baserom;
@@ -403,12 +403,12 @@ struct pci_config_reg {
     unsigned long rsvd4;
     union {
         unsigned long max_min_ipin_iline;
-	struct {
-	    unsigned char max_lat;
-	    unsigned char min_gnt;
-	    unsigned char int_pin;
-	    unsigned char int_line;
-	} mmii;
+        struct {
+            unsigned char max_lat;
+            unsigned char min_gnt;
+            unsigned char int_pin;
+            unsigned char int_line;
+        } mmii;
     } mmii;
 #define _max_min_ipin_iline mmii.max_min_ipin_iline
 #define _int_line mmii.mmii.int_line
@@ -417,13 +417,13 @@ struct pci_config_reg {
 #define _max_lat  mmii.mmii.max_lat
     /* I don't know how accurate or standard this is (DHD) */
     union {
-	unsigned long user_config;
-	struct {
-	    unsigned char user_config_3;
-	    unsigned char user_config_2;
-	    unsigned char user_config_1;
-	    unsigned char user_config_0;
-	} uc;
+        unsigned long user_config;
+        struct {
+            unsigned char user_config_3;
+            unsigned char user_config_2;
+            unsigned char user_config_1;
+            unsigned char user_config_0;
+        } uc;
     } uc;
 #define _user_config uc.user_config
 #define _user_config_0 uc.uc.user_config_0
@@ -441,7 +441,7 @@ struct pci_config_reg {
 #endif /* !defined(__powerpc__) */
 
 #define NF ((void (*)())NULL), { 0.0, 0, 0, NULL }
-#define PCI_MULTIFUNC_DEV	0x80
+#define PCI_MULTIFUNC_DEV       0x80
 #define PCI_ID_REG              0x00
 #define PCI_CMD_STAT_REG        0x04
 #define PCI_CLASS_REG           0x08
@@ -460,14 +460,14 @@ static int pcibus=-1, pcicard=-1, pcifunc=-1 ;
 #define PCI_EN 0x80000000
 #endif
 
-#define	PCI_MODE1_ADDRESS_REG		0xCF8
-#define	PCI_MODE1_DATA_REG		0xCFC
+#define PCI_MODE1_ADDRESS_REG           0xCF8
+#define PCI_MODE1_DATA_REG              0xCFC
 
-#define	PCI_MODE2_ENABLE_REG		0xCF8
+#define PCI_MODE2_ENABLE_REG            0xCF8
 #ifdef PC98
-#define	PCI_MODE2_FORWARD_REG		0xCF9
+#define PCI_MODE2_FORWARD_REG           0xCF9
 #else
-#define	PCI_MODE2_FORWARD_REG		0xCFA
+#define PCI_MODE2_FORWARD_REG           0xCFA
 #endif
 
 /* cpu depended stuff */
@@ -532,7 +532,7 @@ int pci_scan(pciinfo_t *pci_list,unsigned *num_pci)
 
     ret = enable_os_io();
     if (ret != 0)
-	return ret;
+        return ret;
 
     if((pcr._configtype = pci_config_type()) == 0xFFFF) return ENODEV;
 
@@ -551,77 +551,77 @@ int pci_scan(pciinfo_t *pci_list,unsigned *num_pci)
         /*printf("Probing for devices on PCI bus %d:\n\n", pcr._pcibusidx);*/
 
         for (pcr._cardnum = 0x0; pcr._cardnum < MAX_PCI_DEVICES_PER_BUS;
-		pcr._cardnum += 0x1) {
-	  func = 0;
-	  do { /* loop over the different functions, if present */
-	    pcr._device_vendor = pci_get_vendor(pcr._pcibuses[pcr._pcibusidx], pcr._cardnum,
-						func);
+                pcr._cardnum += 0x1) {
+          func = 0;
+          do { /* loop over the different functions, if present */
+            pcr._device_vendor = pci_get_vendor(pcr._pcibuses[pcr._pcibusidx], pcr._cardnum,
+                                                func);
             if ((pcr._vendor == 0xFFFF) || (pcr._device == 0xFFFF))
                 break;   /* nothing there */
 
-	    /*printf("\npci bus 0x%x cardnum 0x%02x function 0x%04x: vendor 0x%04x device 0x%04x\n",
-	        pcr._pcibuses[pcr._pcibusidx], pcr._cardnum, func,
-		pcr._vendor, pcr._device);*/
-	    pcibus = pcr._pcibuses[pcr._pcibusidx];
-	    pcicard = pcr._cardnum;
-	    pcifunc = func;
+            /*printf("\npci bus 0x%x cardnum 0x%02x function 0x%04x: vendor 0x%04x device 0x%04x\n",
+                pcr._pcibuses[pcr._pcibusidx], pcr._cardnum, func,
+                pcr._vendor, pcr._device);*/
+            pcibus = pcr._pcibuses[pcr._pcibusidx];
+            pcicard = pcr._cardnum;
+            pcifunc = func;
 
-	    pcr._status_command = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_CMD_STAT_REG);
-	    pcr._class_revision = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_CLASS_REG);
-	    pcr._bist_header_latency_cache = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_HEADER_MISC);
-	    pcr._base0 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START);
-	    pcr._base1 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START+4);
-	    pcr._base2 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START+8);
-	    pcr._base3 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START+0x0C);
-	    pcr._base4 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START+0x10);
-	    pcr._base5 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_REG_START+0x14);
-	    pcr._baserom = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_MAP_ROM_REG);
-	    pcr._max_min_ipin_iline = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_INTERRUPT_REG);
-	    pcr._user_config = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
-					pcr._cardnum,func,PCI_REG_USERCONFIG);
+            pcr._status_command = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_CMD_STAT_REG);
+            pcr._class_revision = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_CLASS_REG);
+            pcr._bist_header_latency_cache = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_HEADER_MISC);
+            pcr._base0 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START);
+            pcr._base1 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START+4);
+            pcr._base2 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START+8);
+            pcr._base3 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START+0x0C);
+            pcr._base4 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START+0x10);
+            pcr._base5 = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_REG_START+0x14);
+            pcr._baserom = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_MAP_ROM_REG);
+            pcr._max_min_ipin_iline = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_INTERRUPT_REG);
+            pcr._user_config = pci_config_read_long(pcr._pcibuses[pcr._pcibusidx],
+                                        pcr._cardnum,func,PCI_REG_USERCONFIG);
             /* check for pci-pci bridges */
-#define PCI_CLASS_MASK 		0xff000000
-#define PCI_SUBCLASS_MASK 	0x00ff0000
-#define PCI_CLASS_BRIDGE 	0x06000000
-#define PCI_SUBCLASS_BRIDGE_PCI	0x00040000
-	    switch(pcr._class_revision & (PCI_CLASS_MASK|PCI_SUBCLASS_MASK)) {
-		case PCI_CLASS_BRIDGE|PCI_SUBCLASS_BRIDGE_PCI:
-		    if (pcr._secondary_bus_number > 0) {
-		        pcr._pcibuses[pcr._pcinumbus++] = pcr._secondary_bus_number;
-		    }
-			break;
-		case PCI_CLASS_BRIDGE:
-		    if ( ++hostbridges > 1) {
-			pcr._pcibuses[pcr._pcinumbus] = pcr._pcinumbus;
-			pcr._pcinumbus++;
-		    }
-			break;
-		default:
-			break;
-	    }
-	    if((func==0) && ((pcr._header_type & PCI_MULTIFUNC_DEV) == 0)) {
-	        /* not a multi function device */
-		func = 8;
-	    } else {
-	        func++;
-	    }
+#define PCI_CLASS_MASK          0xff000000
+#define PCI_SUBCLASS_MASK       0x00ff0000
+#define PCI_CLASS_BRIDGE        0x06000000
+#define PCI_SUBCLASS_BRIDGE_PCI 0x00040000
+            switch(pcr._class_revision & (PCI_CLASS_MASK|PCI_SUBCLASS_MASK)) {
+                case PCI_CLASS_BRIDGE|PCI_SUBCLASS_BRIDGE_PCI:
+                    if (pcr._secondary_bus_number > 0) {
+                        pcr._pcibuses[pcr._pcinumbus++] = pcr._secondary_bus_number;
+                    }
+                        break;
+                case PCI_CLASS_BRIDGE:
+                    if ( ++hostbridges > 1) {
+                        pcr._pcibuses[pcr._pcinumbus] = pcr._pcinumbus;
+                        pcr._pcinumbus++;
+                    }
+                        break;
+                default:
+                        break;
+            }
+            if((func==0) && ((pcr._header_type & PCI_MULTIFUNC_DEV) == 0)) {
+                /* not a multi function device */
+                func = 8;
+            } else {
+                func++;
+            }
 
-	    if (idx++ >= MAX_PCI_DEVICES)
-	        continue;
+            if (idx++ >= MAX_PCI_DEVICES)
+                continue;
 
-	    identify_card(&pcr, (*num_pci)++);
-	  } while( func < 8 );
+            identify_card(&pcr, (*num_pci)++);
+          } while( func < 8 );
         }
     } while (++pcr._pcibusidx < pcr._pcinumbus);
     }
@@ -642,22 +642,22 @@ int pci_scan(pciinfo_t *pci_list,unsigned *num_pci)
 
     do {
         for (pcr._ioaddr = 0xC000; pcr._ioaddr < 0xD000; pcr._ioaddr += 0x0100){
-	    outb(PCI_MODE2_FORWARD_REG, pcr._pcibuses[pcr._pcibusidx]); /* bus 0 for now */
+            outb(PCI_MODE2_FORWARD_REG, pcr._pcibuses[pcr._pcibusidx]); /* bus 0 for now */
             pcr._device_vendor = inl(pcr._ioaddr);
-	    outb(PCI_MODE2_FORWARD_REG, 0x00); /* bus 0 for now */
+            outb(PCI_MODE2_FORWARD_REG, 0x00); /* bus 0 for now */
 
             if ((pcr._vendor == 0xFFFF) || (pcr._device == 0xFFFF))
                 continue;
             if ((pcr._vendor == 0xF0F0) || (pcr._device == 0xF0F0))
                 continue;  /* catch ASUS P55TP4XE motherboards */
 
-	    /*printf("\npci bus 0x%x slot at 0x%04x, vendor 0x%04x device 0x%04x\n",
-	        pcr._pcibuses[pcr._pcibusidx], pcr._ioaddr, pcr._vendor,
+            /*printf("\npci bus 0x%x slot at 0x%04x, vendor 0x%04x device 0x%04x\n",
+                pcr._pcibuses[pcr._pcibusidx], pcr._ioaddr, pcr._vendor,
                 pcr._device);*/
-	    pcibus = pcr._pcibuses[pcr._pcibusidx] ;
-	    pcicard = pcr._ioaddr ; pcifunc = 0 ;
+            pcibus = pcr._pcibuses[pcr._pcibusidx] ;
+            pcicard = pcr._ioaddr ; pcifunc = 0 ;
 
-	    outb(PCI_MODE2_FORWARD_REG, pcr._pcibuses[pcr._pcibusidx]); /* bus 0 for now */
+            outb(PCI_MODE2_FORWARD_REG, pcr._pcibuses[pcr._pcibusidx]); /* bus 0 for now */
             pcr._status_command = inl(pcr._ioaddr + 0x04);
             pcr._class_revision = inl(pcr._ioaddr + 0x08);
             pcr._bist_header_latency_cache = inl(pcr._ioaddr + 0x0C);
@@ -670,18 +670,18 @@ int pci_scan(pciinfo_t *pci_list,unsigned *num_pci)
             pcr._baserom = inl(pcr._ioaddr + 0x30);
             pcr._max_min_ipin_iline = inl(pcr._ioaddr + 0x3C);
             pcr._user_config = inl(pcr._ioaddr + 0x40);
-	    outb(PCI_MODE2_FORWARD_REG, 0x00); /* bus 0 for now */
+            outb(PCI_MODE2_FORWARD_REG, 0x00); /* bus 0 for now */
 
             /* check for pci-pci bridges (currently we only know Digital) */
             if ((pcr._vendor == 0x1011) && (pcr._device == 0x0001))
                 if (pcr._secondary_bus_number > 0)
                     pcr._pcibuses[pcr._pcinumbus++] = pcr._secondary_bus_number;
 
-	    if (idx++ >= MAX_PCI_DEVICES)
-	        continue;
+            if (idx++ >= MAX_PCI_DEVICES)
+                continue;
 
-	    identify_card(&pcr, (*num_pci)++);
-	}
+            identify_card(&pcr, (*num_pci)++);
+        }
     } while (++pcr._pcibusidx < pcr._pcinumbus);
 
     outb(PCI_MODE2_ENABLE_REG, 0x00);
@@ -704,19 +704,19 @@ int pci_scan(pciinfo_t *pci_list,unsigned *num_pci)
 #endif
 
 int pci_config_read(unsigned char bus, unsigned char dev, unsigned char func,
-		    unsigned char cmd, int len, unsigned long *val)
+                    unsigned char cmd, int len, unsigned long *val)
 {
     int ret;
 
     if (len != 4)
     {
-	fprintf(stderr,"pci_config_read: Reading non-dword not supported!\n");
-	return ENOTSUP;
+        fprintf(stderr,"pci_config_read: Reading non-dword not supported!\n");
+        return ENOTSUP;
     }
 
     ret = enable_os_io();
     if (ret != 0)
-	return ret;
+        return ret;
     ret = pci_config_read_long(bus, dev, func, cmd);
     disable_os_io();
 

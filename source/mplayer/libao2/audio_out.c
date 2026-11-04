@@ -121,7 +121,7 @@ const ao_functions_t* const audio_out_drivers[] =
         &audio_out_v4l2,
 #endif
 #ifdef GEKKO
-		&audio_out_gekko,
+                &audio_out_gekko,
 #endif
         &audio_out_null,
 // should not be auto-selected:
@@ -175,7 +175,7 @@ const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate
                 break;
             }
         }
-	if (!audio_out_drivers[i]) // we searched through the entire list
+        if (!audio_out_drivers[i]) // we searched through the entire list
             mp_msg(MSGT_AO, MSGL_WARN, MSGTR_AO_NoSuchDriver, ao_len, ao);
         // continue...
         ++ao_list;

@@ -41,22 +41,22 @@
 
 // Analog domain biquad section
 typedef struct{
-  float a[3];		// Numerator coefficients
-  float b[3];		// Denominator coefficients
+  float a[3];           // Numerator coefficients
+  float b[3];           // Denominator coefficients
 } biquad_t;
 
 // S-parameters for designing 4th order Butterworth filter
 static biquad_t sp[2] = {{{1.0,0.0,0.0},{1.0,0.765367,1.0}},
-			 {{1.0,0.0,0.0},{1.0,1.847759,1.0}}};
+                         {{1.0,0.0,0.0},{1.0,1.847759,1.0}}};
 
 // Data for specific instances of this filter
 typedef struct af_sub_s
 {
-  float w[2][4];	// Filter taps for low-pass filter
-  float q[2][2];	// Circular queues
-  float	fc;		// Cutoff frequency [Hz] for low-pass filter
-  float k;		// Filter gain;
-  int ch;		// Channel number which to insert the filtered data
+  float w[2][4];        // Filter taps for low-pass filter
+  float q[2][2];        // Circular queues
+  float fc;             // Cutoff frequency [Hz] for low-pass filter
+  float k;              // Filter gain;
+  int ch;               // Channel number which to insert the filtered data
 
 }af_sub_t;
 
@@ -96,7 +96,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     // Sanity check
     if((*(int*)arg >= AF_NCH) || (*(int*)arg < 0)){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[sub] Subwoofer channel number must be between "
-	     " 0 and %i current value is %i\n", AF_NCH-1, *(int*)arg);
+             " 0 and %i current value is %i\n", AF_NCH-1, *(int*)arg);
       return AF_ERROR;
     }
     s->ch = *(int*)arg;
@@ -108,7 +108,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     // Sanity check
     if((*(float*)arg > 300) || (*(float*)arg < 20)){
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[sub] Cutoff frequency must be between 20Hz and"
-	     " 300Hz current value is %0.2f",*(float*)arg);
+             " 300Hz current value is %0.2f",*(float*)arg);
       return AF_ERROR;
     }
     // Set cutoff frequency
@@ -133,7 +133,7 @@ static void uninit(struct af_instance_s* af)
   float h0 = (q)[0]; \
   float h1 = (q)[1]; \
   float hn = (in) - h0 * (w)[0] - h1 * (w)[1];  \
-  out = hn + h0 * (w)[2] + h1 * (w)[3];	 \
+  out = hn + h0 * (w)[2] + h1 * (w)[3];  \
   (q)[1] = h0; \
   (q)[0] = hn; \
 }
@@ -142,12 +142,12 @@ static void uninit(struct af_instance_s* af)
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
-  af_data_t*    c   = data;	 // Current working data
-  af_sub_t*  	s   = af->setup; // Setup for this instance
-  float*   	a   = c->audio;	 // Audio data
-  int		len = c->len/4;	 // Number of samples in current audio block
-  int		nch = c->nch;	 // Number of channels
-  int		ch  = s->ch;	 // Channel in which to insert the sub audio
+  af_data_t*    c   = data;      // Current working data
+  af_sub_t*     s   = af->setup; // Setup for this instance
+  float*        a   = c->audio;  // Audio data
+  int           len = c->len/4;  // Number of samples in current audio block
+  int           nch = c->nch;    // Number of channels
+  int           ch  = s->ch;     // Channel in which to insert the sub audio
   register int  i;
 
   // Run filter
@@ -173,8 +173,8 @@ static int af_open(af_instance_t* af){
   if(af->data == NULL || af->setup == NULL)
     return AF_ERROR;
   // Set default values
-  s->ch = 5;  	 // Channel nr 6
-  s->fc = 60; 	 // Cutoff frequency 60Hz
+  s->ch = 5;     // Channel nr 6
+  s->fc = 60;    // Cutoff frequency 60Hz
   return AF_OK;
 }
 

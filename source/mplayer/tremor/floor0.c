@@ -75,7 +75,7 @@ static inline ogg_int32_t vorbis_coslook_i(long a){
   int i=a>>COS_LOOKUP_I_SHIFT;
   int d=a&COS_LOOKUP_I_MASK;
   return COS_LOOKUP_I[i]- ((d*(COS_LOOKUP_I[i]-COS_LOOKUP_I[i+1]))>>
-			   COS_LOOKUP_I_SHIFT);
+                           COS_LOOKUP_I_SHIFT);
 }
 
 /* interpolated lookup based cos function */
@@ -135,10 +135,10 @@ static const unsigned char MLOOP_2[64]={
 static const unsigned char MLOOP_3[8]={0,1,2,2,3,3,3,3};
 
 void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
-			 ogg_int32_t *lsp,int m,
-			 ogg_int32_t amp,
-			 ogg_int32_t ampoffset,
-			 ogg_int32_t *icos){
+                         ogg_int32_t *lsp,int m,
+                         ogg_int32_t amp,
+                         ogg_int32_t ampoffset,
+                         ogg_int32_t *icos){
 
   /* 0 <= m < 256 */
 
@@ -203,15 +203,15 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
 
     for(j=3;j<m;j+=2){
       if(!(shift=MLOOP_1[(pi|qi)>>25]))
-	if(!(shift=MLOOP_2[(pi|qi)>>19]))
-	  shift=MLOOP_3[(pi|qi)>>16];
+        if(!(shift=MLOOP_2[(pi|qi)>>19]))
+          shift=MLOOP_3[(pi|qi)>>16];
       qi=(qi>>shift)*labs(ilsp[j-1]-wi);
       pi=(pi>>shift)*labs(ilsp[j]-wi);
       qexp+=shift;
     }
     if(!(shift=MLOOP_1[(pi|qi)>>25]))
       if(!(shift=MLOOP_2[(pi|qi)>>19]))
-	shift=MLOOP_3[(pi|qi)>>16];
+        shift=MLOOP_3[(pi|qi)>>16];
 
     /* pi,qi normalized collectively, both tracked using qexp */
 
@@ -223,8 +223,8 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
       qexp+=shift;
 
       if(!(shift=MLOOP_1[(pi|qi)>>25]))
-	if(!(shift=MLOOP_2[(pi|qi)>>19]))
-	  shift=MLOOP_3[(pi|qi)>>16];
+        if(!(shift=MLOOP_2[(pi|qi)>>19]))
+          shift=MLOOP_3[(pi|qi)>>16];
 
       pi>>=shift;
       qi>>=shift;
@@ -241,7 +241,7 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
       /* even order filter; still symmetric */
 
       /* p*=p(1-w), q*=q(1+w), let normalization drift because it isn't
-	 worth tracking step by step */
+         worth tracking step by step */
 
       pi>>=shift;
       qi>>=shift;
@@ -266,15 +266,15 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
       qi>>=1; qexp++;
     }else
       while(qi && !(qi&0x8000)){ /* checks for 0.0xxxxxxxxxxxxxxx or less*/
-	qi<<=1; qexp--;
+        qi<<=1; qexp--;
       }
 
 #endif
 
     amp=vorbis_fromdBlook_i(ampi*                     /*  n.4         */
-			    vorbis_invsqlook_i(qi,qexp)-
-			                              /*  m.8, m+n<=8 */
-			    ampoffseti);              /*  8.12[0]     */
+                            vorbis_invsqlook_i(qi,qexp)-
+                                                      /*  m.8, m+n<=8 */
+                            ampoffseti);              /*  8.12[0]     */
 
 #ifdef _LOW_ACCURACY_
     amp>>=9;
@@ -364,7 +364,7 @@ static vorbis_look_floor *floor0_look (vorbis_dsp_state *vd,vorbis_info_mode *mi
   for(j=0;j<look->n;j++){
 
     int val=(look->ln*
-	     ((toBARK(info->rate/2*j/look->n)<<11)/toBARK(info->rate/2)))>>11;
+             ((toBARK(info->rate/2*j/look->n)<<11)/toBARK(info->rate/2)))>>11;
 
     if(val>=look->ln)val=look->ln-1; /* guard against the approximation */
     look->linearmap[j]=val;
@@ -396,10 +396,10 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
       ogg_int32_t *lsp=(ogg_int32_t *)_vorbis_block_alloc(vb,sizeof(*lsp)*(look->m+1));
 
       for(j=0;j<look->m;j+=b->dim)
-	if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim,-24)==-1)goto eop;
+        if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim,-24)==-1)goto eop;
       for(j=0;j<look->m;){
-	for(k=0;k<b->dim;k++,j++)lsp[j]+=last;
-	last=lsp[j-1];
+        for(k=0;k<b->dim;k++,j++)lsp[j]+=last;
+        last=lsp[j-1];
       }
 
       lsp[look->m]=amp;
@@ -411,7 +411,7 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
 }
 
 static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
-			   void *memo,ogg_int32_t *out){
+                           void *memo,ogg_int32_t *out){
   vorbis_look_floor0 *look=(vorbis_look_floor0 *)i;
   vorbis_info_floor0 *info=look->vi;
 
@@ -421,7 +421,7 @@ static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
 
     /* take the coefficients back to a spectral envelope curve */
     vorbis_lsp_to_curve(out,look->linearmap,look->n,look->ln,
-			lsp,look->m,amp,info->ampdB,look->lsp_look);
+                        lsp,look->m,amp,info->ampdB,look->lsp_look);
     return(1);
   }
   memset(out,0,sizeof(*out)*look->n);

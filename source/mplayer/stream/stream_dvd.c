@@ -46,7 +46,7 @@
 static char* dvd_device_current;
 int dvd_angle=1;
 
-#define	LIBDVDREAD_VERSION(maj,min,micro)	((maj)*10000 + (min)*100 + (micro))
+#define LIBDVDREAD_VERSION(maj,min,micro)       ((maj)*10000 + (min)*100 + (micro))
 /*
  * Try to autodetect the libdvd-0.9.0 library
  * (0.9.0 removed the <dvdread/dvd_udf.h> header, and moved the two defines
@@ -55,9 +55,9 @@ int dvd_angle=1;
  */
 #ifndef DVDREAD_VERSION
 #if defined(DVD_VIDEO_LB_LEN) && defined(MAX_UDF_FILE_NAME_LEN)
-#define	DVDREAD_VERSION	LIBDVDREAD_VERSION(0,9,0)
+#define DVDREAD_VERSION LIBDVDREAD_VERSION(0,9,0)
 #else
-#define	DVDREAD_VERSION	LIBDVDREAD_VERSION(0,8,0)
+#define DVDREAD_VERSION LIBDVDREAD_VERSION(0,8,0)
 #endif
 #endif
 
@@ -324,13 +324,13 @@ read_next:
         //
         // See also gcc problem report PR c/7847:
         // http://gcc.gnu.org/cgi-bin/gnatsweb.pl?database=gcc&cmd=view+audit-trail&pr=7847
-        for(i=0;i<9;i++) {	// check if all values zero:
+        for(i=0;i<9;i++) {      // check if all values zero:
           __typeof__(d->dsi_pack.sml_agli.data[i].address) tmp_addr;
           memcpy(&tmp_addr,&d->dsi_pack.sml_agli.data[i].address,sizeof(tmp_addr));
           if((skip=tmp_addr)!=0) break;
         }
 #else
-        for(i=0;i<9;i++)	// check if all values zero:
+        for(i=0;i<9;i++)        // check if all values zero:
           if((skip=d->dsi_pack.sml_agli.data[i].address)!=0) break;
 #endif
         if(skip && skip!=0x7fffffff) {
@@ -870,33 +870,33 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
  * Try to autodetect main title if title number not specified.
  */
     if (dvd_title == 0) {
-	    int longest_len = 0;
-	    int longest_title = 0;
+            int longest_len = 0;
+            int longest_title = 0;
 
-	    int vts_no;
-	    for (vts_no = 1; vts_no <= vmg_file->vts_atrt->nr_of_vtss; vts_no++) {
-		    ifo_handle_t *temp_vts_file = ifoOpen(dvd, vts_no);
-		    // ignore failed titles
-		    if (temp_vts_file) {
-			    int title_no;
-			    for (title_no = 0; title_no < tt_srpt->nr_of_srpts; title_no++) {
-				    int len;
-				    if (tt_srpt->title[title_no].title_set_nr != vts_no)
-					    continue;
-				    len = mp_get_titleset_length(temp_vts_file, tt_srpt, title_no);
-				    if (len > longest_len) {
-					    longest_len = len;
-					    longest_title = title_no;
-				    }
-			    }
-			    ifoClose(temp_vts_file);
-		    }
-		    
-	    }
-	    dvd_title = longest_title + 1; // remap +1 for the validation
+            int vts_no;
+            for (vts_no = 1; vts_no <= vmg_file->vts_atrt->nr_of_vtss; vts_no++) {
+                    ifo_handle_t *temp_vts_file = ifoOpen(dvd, vts_no);
+                    // ignore failed titles
+                    if (temp_vts_file) {
+                            int title_no;
+                            for (title_no = 0; title_no < tt_srpt->nr_of_srpts; title_no++) {
+                                    int len;
+                                    if (tt_srpt->title[title_no].title_set_nr != vts_no)
+                                            continue;
+                                    len = mp_get_titleset_length(temp_vts_file, tt_srpt, title_no);
+                                    if (len > longest_len) {
+                                            longest_len = len;
+                                            longest_title = title_no;
+                                    }
+                            }
+                            ifoClose(temp_vts_file);
+                    }
+
+            }
+            dvd_title = longest_title + 1; // remap +1 for the validation
     }
     if(dvd_angle < 1)
-    	dvd_angle = 1;
+        dvd_angle = 1;
 #endif
     /**
      * Make sure our title number is valid.
@@ -1107,33 +1107,33 @@ fail:
 #ifdef GEKKO
 static char *gekko_basename(char *name)
 {
-	if(!name)
-		return NULL;
+        if(!name)
+                return NULL;
 
-	char *base = strrchr(name, '/');
+        char *base = strrchr(name, '/');
 
-	if(!base)
-		return strdup("");
+        if(!base)
+                return strdup("");
 
-	base++;
-	return strdup(base);
+        base++;
+        return strdup(base);
 }
 
 static char *gekko_dirname(char *url)
 {
-	if(!url)
-		return NULL;
+        if(!url)
+                return NULL;
 
-	char res[1024];
-	strcpy(res, url);
+        char res[1024];
+        strcpy(res, url);
 
-	char *end = strrchr(res, '/');
+        char *end = strrchr(res, '/');
 
-	if(!end)
-		return strdup(url);
+        if(!end)
+                return strdup(url);
 
-	*end = 0;
-	return strdup(res);
+        *end = 0;
+        return strdup(res);
 }
 #endif
 
@@ -1155,7 +1155,7 @@ static int ifo_stream_open (stream_t *stream, int mode, void *opts, int *file_fo
 #endif
 
     spriv=calloc(1, sizeof(struct stream_priv_s));
-    
+
 #ifdef GEKKO
     spriv->device = gekko_dirname(stream->url);
 #else

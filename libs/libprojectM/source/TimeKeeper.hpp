@@ -17,13 +17,13 @@ public:
   void StartPreset();
   void StartSmoothing();
   void EndSmoothing();
- 
+
   bool CanHardCut();
 
   double SmoothRatio();
   bool IsSmoothing();
 
-  double GetRunningTime(); 
+  double GetRunningTime();
 
   double PresetProgressA();
   double PresetProgressB();
@@ -51,7 +51,7 @@ private:
   int _presetFrameB;
 
   bool _isSmoothing;
-  
+
 
 };
 #endif

@@ -36,11 +36,11 @@
 #endif
 
 static const vd_info_t info = {
-	"Quicktime Video decoder",
-	"qtvideo",
-	"A'rpi",
-	"Sascha Sommer",
-	"win32"
+        "Quicktime Video decoder",
+        "qtvideo",
+        "A'rpi",
+        "Sascha Sommer",
+        "win32"
 };
 
 LIBVD_EXTERN(qtvideo)
@@ -77,9 +77,9 @@ static   OSErr (*DecompressSequenceFrameS)(ImageSequence seqID,
                                            ICMCompletionProcRecordPtr asyncCompletionProc);
 static    PixMapHandle    (*GetGWorldPixMap)(GWorldPtr offscreenGWorld);
 static    OSErr           (*QTNewGWorldFromPtr)(GWorldPtr *gw,
-			       OSType pixelFormat,
-			       const Rect *boundsRect,
-			       CTabHandle cTable,
+                               OSType pixelFormat,
+                               const Rect *boundsRect,
+                               CTabHandle cTable,
                                /*GDHandle*/void* aGDevice, //unused anyway
                                GWorldFlags flags,
                                void *baseAddr,
@@ -135,8 +135,8 @@ static int init(sh_video_t *sh){
     CDSequenceEnd = (OSErr (*)(ImageSequence))GetProcAddress(handler, "CDSequenceEnd");
 
     if(!InitializeQTML || !EnterMovies || !DecompressSequenceBegin || !DecompressSequenceFrameS){
-	mp_msg(MSGT_DECVIDEO,MSGL_ERR,"invalid qtmlClient.dll!\n");
-	return 0;
+        mp_msg(MSGT_DECVIDEO,MSGL_ERR,"invalid qtmlClient.dll!\n");
+        return 0;
     }
 
     result=InitializeQTML(kInitializeQTMLDisableDirectSound |
@@ -181,41 +181,41 @@ static int init(sh_video_t *sh){
     (**framedescHandle).cType = bswap_32(sh->format);
     sh->context = (void *)kYUVSPixelFormat;
     {
-	int imgfmt = sh->codec->outfmt[sh->outfmtidx];
-	int qt_imgfmt;
+        int imgfmt = sh->codec->outfmt[sh->outfmtidx];
+        int qt_imgfmt;
     switch(imgfmt)
     {
-	case IMGFMT_YUY2:
-	    qt_imgfmt = kYUVSPixelFormat;
-	    break;
-	case IMGFMT_YVU9:
-	    qt_imgfmt = 0x73797639; //kYVU9PixelFormat;
-	    break;
-	case IMGFMT_YV12:
-	    qt_imgfmt = 0x79343230;
-	    break;
-	case IMGFMT_UYVY:
-	    qt_imgfmt = k2vuyPixelFormat;
-	    break;
-	case IMGFMT_YVYU:
-	    qt_imgfmt = kYVYU422PixelFormat;
-	    imgfmt = IMGFMT_YUY2;
-	    break;
-	case IMGFMT_RGB16:
-	    qt_imgfmt = k16LE555PixelFormat;
-	    break;
-	case IMGFMT_BGR24:
-	    qt_imgfmt = k24BGRPixelFormat;
-	    break;
-	case IMGFMT_BGR32:
-	    qt_imgfmt = k32BGRAPixelFormat;
-	    break;
-	case IMGFMT_RGB32:
-	    qt_imgfmt = k32RGBAPixelFormat;
-	    break;
-	default:
-	    mp_msg(MSGT_DECVIDEO,MSGL_ERR,"Unknown requested csp\n");
-	    return 0;
+        case IMGFMT_YUY2:
+            qt_imgfmt = kYUVSPixelFormat;
+            break;
+        case IMGFMT_YVU9:
+            qt_imgfmt = 0x73797639; //kYVU9PixelFormat;
+            break;
+        case IMGFMT_YV12:
+            qt_imgfmt = 0x79343230;
+            break;
+        case IMGFMT_UYVY:
+            qt_imgfmt = k2vuyPixelFormat;
+            break;
+        case IMGFMT_YVYU:
+            qt_imgfmt = kYVYU422PixelFormat;
+            imgfmt = IMGFMT_YUY2;
+            break;
+        case IMGFMT_RGB16:
+            qt_imgfmt = k16LE555PixelFormat;
+            break;
+        case IMGFMT_BGR24:
+            qt_imgfmt = k24BGRPixelFormat;
+            break;
+        case IMGFMT_BGR32:
+            qt_imgfmt = k32BGRAPixelFormat;
+            break;
+        case IMGFMT_RGB32:
+            qt_imgfmt = k32RGBAPixelFormat;
+            break;
+        default:
+            mp_msg(MSGT_DECVIDEO,MSGL_ERR,"Unknown requested csp\n");
+            return 0;
     }
     mp_msg(MSGT_DECVIDEO,MSGL_DBG2,"imgfmt: %s qt_imgfmt: %.4s\n", vo_format_name(imgfmt), (char *)&qt_imgfmt);
     sh->context = (void *)qt_imgfmt;
@@ -223,12 +223,12 @@ static int init(sh_video_t *sh){
     }
 
     mpi=mpcodecs_get_image(sh, MP_IMGTYPE_STATIC, MP_IMGFLAG_PRESERVE,
-	sh->disp_w, sh->disp_h);
+        sh->disp_w, sh->disp_h);
     if(!mpi) return 0;
 
     result = QTNewGWorldFromPtr(
         &OutBufferGWorld,
-	(OSType)sh->context,
+        (OSType)sh->context,
         &OutBufferRect,   //we should benchmark if yvu9 is faster for svq3, too
         0,
         0,
@@ -285,33 +285,33 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
         return NULL;
     }
 
-if((int)sh->context==0x73797639){	// Sorenson 16-bit YUV -> std YVU9
+if((int)sh->context==0x73797639){       // Sorenson 16-bit YUV -> std YVU9
     int i;
 
     PixMap dstPixMap = **GetGWorldPixMap(OutBufferGWorld);
     short *src0=(short *)((char*)dstPixMap.baseAddr+0x20);
 
     for(i=0;i<mpi->h;i++){
-	int x;
-	unsigned char* dst=mpi->planes[0]+i*mpi->stride[0];
-	unsigned short* src=src0+i*((mpi->w+15)&(~15));
-	for(x=0;x<mpi->w;x++) dst[x]=src[x];
+        int x;
+        unsigned char* dst=mpi->planes[0]+i*mpi->stride[0];
+        unsigned short* src=src0+i*((mpi->w+15)&(~15));
+        for(x=0;x<mpi->w;x++) dst[x]=src[x];
     }
     src0+=((mpi->w+15)&(~15))*((mpi->h+15)&(~15));
     for(i=0;i<mpi->h/4;i++){
-	int x;
-	unsigned char* dst=mpi->planes[1]+i*mpi->stride[1];
-	unsigned short* src=src0+i*(((mpi->w+63)&(~63))/4);
-	for(x=0;x<mpi->w/4;x++) dst[x]=src[x];
-	src+=((mpi->w+63)&(~63))/4;
+        int x;
+        unsigned char* dst=mpi->planes[1]+i*mpi->stride[1];
+        unsigned short* src=src0+i*(((mpi->w+63)&(~63))/4);
+        for(x=0;x<mpi->w/4;x++) dst[x]=src[x];
+        src+=((mpi->w+63)&(~63))/4;
     }
     src0+=(((mpi->w+63)&(~63))/4)*(((mpi->h+63)&(~63))/4);
     for(i=0;i<mpi->h/4;i++){
-	int x;
-	unsigned char* dst=mpi->planes[2]+i*mpi->stride[2];
-	unsigned short* src=src0+i*(((mpi->w+63)&(~63))/4);
-	for(x=0;x<mpi->w/4;x++) dst[x]=src[x];
-	src+=((mpi->w+63)&(~63))/4;
+        int x;
+        unsigned char* dst=mpi->planes[2]+i*mpi->stride[2];
+        unsigned short* src=src0+i*(((mpi->w+63)&(~63))/4);
+        for(x=0;x<mpi->w/4;x++) dst[x]=src[x];
+        src+=((mpi->w+63)&(~63))/4;
     }
 
 }

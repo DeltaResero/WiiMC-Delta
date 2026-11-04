@@ -19,7 +19,7 @@
 /*
   Blocks: 4bytes atom_size
           4bytes atom_type (name)
-	  ...
+          ...
 
   By older files, mdat is at the beginning, and moov follows it later,
   by newer files, moov is at the begininng.
@@ -87,7 +87,7 @@ static void video_stream_info(FILE *f, int len)
 
   len -= 8;
   for (i=0; i<len; i++)
-	fread(&data[i], 1, 1, f);
+        fread(&data[i], 1, 1, f);
 
 //  strncpy(codec, &data[43], len-43);
 //  printf("  [codec: %s]\n", &codec);
@@ -102,7 +102,7 @@ static void audio_stream_info(FILE *f, int len)
 
   len -= 8;
   for (i=0; i<len; i++)
-	fread(&data[i], 1, 1, f);
+        fread(&data[i], 1, 1, f);
 
   printf("  [%d bit", data[19]);
   if (data[17] == 1)
@@ -132,35 +132,35 @@ static void userdata_info(FILE *f, int len, int pos, int level)
     if(atom_size<8) break; // error
 
 //    printf("%08X:  %*s %.4s (%08X) %05d (begin: %08X)\n",pos,level*2,"",
-//	&atom_type,atom_type,atom_size,pos+8);
+//      &atom_type,atom_type,atom_size,pos+8);
 
     switch(atom_type)
     {
       case 0x797063A9: /* cpy (copyright) */
         {
-	  char *data = malloc(atom_size-8);
+          char *data = malloc(atom_size-8);
 
-	  fseek(f, pos+6, SEEK_SET);
-	  fread(data, atom_size-8, 1, f);
-	  printf(" Copyright: %s\n", data);
-	  free(data);
-	}
+          fseek(f, pos+6, SEEK_SET);
+          fread(data, atom_size-8, 1, f);
+          printf(" Copyright: %s\n", data);
+          free(data);
+        }
         break;
       case 0x666E69A9: /* inf (information) */
         {
-	  char data[atom_size-8];
+          char data[atom_size-8];
 
-	  fread(&data, 1, atom_size-8, f);
-	  printf(" Owner: %s\n", &data);
-	}
+          fread(&data, 1, atom_size-8, f);
+          printf(" Owner: %s\n", &data);
+        }
         break;
       case 0x6D616EA9: /* nam (name) */
         {
-	  char data[atom_size-8];
+          char data[atom_size-8];
 
-	  fread(&data, 1, atom_size-8, f);
-	  printf(" Name: %s\n", &data);
-	}
+          fread(&data, 1, atom_size-8, f);
+          printf(" Name: %s\n", &data);
+        }
         break;
     }
   }
@@ -227,14 +227,14 @@ static void lschunks(FILE *f,int level,unsigned int endpos){
     int x, y;
 
     for (i=0; i<atom_size; i++)
-	fread(&data[i], 1, 1, f);
+        fread(&data[i], 1, 1, f);
 
     x = data[77];
     y = data[81];
     printf(" Flags: %d\n", data[3]);
     printf(" Picture size: %dx%d\n", x, y);
     if (x == 0 && y == 0)
-	printf(" Possible audio stream!\n");
+        printf(" Possible audio stream!\n");
   }
 
   if(atom_type==0x64737473) {  // stsd
@@ -279,7 +279,7 @@ static void lschunks(FILE *f,int level,unsigned int endpos){
       if (stream == S_AUDIO)
         printf("(rate: %f Hz)\n", (float)time_scale/dur);
       else
-	printf("(fps: %f)\n", (float)time_scale/dur);
+        printf("(fps: %f)\n", (float)time_scale/dur);
     }
   }
 
@@ -345,10 +345,10 @@ int main(int argc,char* argv[])
     FILE *f;
 
     if ((f = fopen(argc>1?argv[1]:"Akira.mov","rb")) == NULL)
-	return 1;
+        return 1;
 
     printf("%.8s    %.4s (%.8s) %5s [%s]\n\n",
-	"position", "atom", "atomtype", "len", "human readable atom name");
+        "position", "atom", "atomtype", "len", "human readable atom name");
 
     lschunks(f, 0, 0);
 

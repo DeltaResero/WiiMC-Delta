@@ -78,11 +78,11 @@ static const int8_t adpcm_index[8] =
 
 static const ad_info_t info =
 {
-	"IMA ADPCM audio decoder",
-	"imaadpcm",
-	"Nick Kurshev",
-	"Mike Melanson",
-	""
+        "IMA ADPCM audio decoder",
+        "imaadpcm",
+        "Nick Kurshev",
+        "Mike Melanson",
+        ""
 };
 
 LIBAD_EXTERN(imaadpcm)

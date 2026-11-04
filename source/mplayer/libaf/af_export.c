@@ -43,7 +43,7 @@
 
 #define DEF_SZ 512 // default buffer size (in samples)
 #define SHARED_FILE "mplayer-af_export" /* default file name
-					   (relative to ~/.mplayer/ */
+                                           (relative to ~/.mplayer/ */
 
 #define SIZE_HEADER (2 * sizeof(int) + sizeof(unsigned long long))
 
@@ -51,12 +51,12 @@
 typedef struct af_export_s
 {
   unsigned long long  count; // Used for sync
-  void* buf[AF_NCH]; 	// Buffers for storing the data before it is exported
-  int 	sz;	      	// Size of buffer in samples
-  int 	wi;  		// Write index
-  int	fd;           	// File descriptor to shared memory area
-  char* filename;      	// File to export data
-  uint8_t *mmap_area;  	// MMap shared area
+  void* buf[AF_NCH];    // Buffers for storing the data before it is exported
+  int   sz;             // Size of buffer in samples
+  int   wi;             // Write index
+  int   fd;             // File descriptor to shared memory area
+  char* filename;       // File to export data
+  uint8_t *mmap_area;   // MMap shared area
 } af_export_t;
 
 
@@ -106,7 +106,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     mp_msg(MSGT_AFILTER, MSGL_INFO, "[export] Exporting to file: %s\n", s->filename);
     if(s->fd < 0)
       mp_msg(MSGT_AFILTER, MSGL_FATAL, "[export] Could not open/create file: %s\n",
-	     s->filename);
+             s->filename);
 
     // header + buffer
     mapsize = (SIZE_HEADER + (af->data->bps * s->sz * af->data->nch));
@@ -122,7 +122,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     if(s->mmap_area == NULL)
       mp_msg(MSGT_AFILTER, MSGL_FATAL, "[export] Could not mmap file %s\n", s->filename);
     mp_msg(MSGT_AFILTER, MSGL_INFO, "[export] Memory mapped to file: %s (%p)\n",
-	   s->filename, s->mmap_area);
+           s->filename, s->mmap_area);
 
     // Initialize header
     *((int*)s->mmap_area) = af->data->nch;
@@ -160,7 +160,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     s->sz = * (int *) arg;
     if((s->sz <= 0) || (s->sz > 2048))
       mp_msg(MSGT_AFILTER, MSGL_ERR, "[export] Buffer size must be between"
-	      " 1 and 2048\n" );
+              " 1 and 2048\n" );
 
     return AF_OK;
   case AF_CONTROL_EXPORT_SZ | AF_CONTROL_GET:
@@ -204,27 +204,27 @@ static void uninit( struct af_instance_s* af )
 */
 static af_data_t* play( struct af_instance_s* af, af_data_t* data )
 {
-  af_data_t*   	c   = data;	     // Current working data
-  af_export_t* 	s   = af->setup;     // Setup for this instance
-  int16_t* 	a   = c->audio;	     // Incomming sound
-  int 		nch = c->nch;	     // Number of channels
-  int		len = c->len/c->bps; // Number of sample in data chunk
-  int 		sz  = s->sz;         // buffer size (in samples)
-  int 		flag = 0;	     // Set to 1 if buffer is filled
+  af_data_t*    c   = data;          // Current working data
+  af_export_t*  s   = af->setup;     // Setup for this instance
+  int16_t*      a   = c->audio;      // Incomming sound
+  int           nch = c->nch;        // Number of channels
+  int           len = c->len/c->bps; // Number of sample in data chunk
+  int           sz  = s->sz;         // buffer size (in samples)
+  int           flag = 0;            // Set to 1 if buffer is filled
 
-  int 		ch, i;
+  int           ch, i;
 
   // Fill all buffers
   for(ch = 0; ch < nch; ch++){
-    int 	wi = s->wi;    	 // Reset write index
-    int16_t* 	b  = s->buf[ch]; // Current buffer
+    int         wi = s->wi;      // Reset write index
+    int16_t*    b  = s->buf[ch]; // Current buffer
 
     // Copy data to export buffers
     for(i = ch; i < len; i += nch){
       b[wi++] = a[i];
       if(wi >= sz){ // Don't write outside the end of the buffer
-	flag = 1;
-	break;
+        flag = 1;
+        break;
       }
     }
     s->wi = wi % s->sz;
@@ -236,7 +236,7 @@ static af_data_t* play( struct af_instance_s* af, af_data_t* data )
     memcpy(s->mmap_area + SIZE_HEADER, s->buf[0], sz * c->bps * nch);
     s->count++; // increment counter (to sync)
     memcpy(s->mmap_area + SIZE_HEADER - sizeof(s->count),
-	   &(s->count), sizeof(s->count));
+           &(s->count), sizeof(s->count));
   }
 
   // We don't modify data, just export it

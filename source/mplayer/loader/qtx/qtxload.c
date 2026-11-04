@@ -118,7 +118,7 @@ int main(void) {
 //}
 
 //    for(i=0;i<0x00001837;i++)
-//	if(x_table[i]) printf("x_table[0x%X] = %p\n",i,x_table[i]);
+//  if(x_table[i]) printf("x_table[0x%X] = %p\n",i,x_table[i]);
 
     exit(0);
     //return 0;

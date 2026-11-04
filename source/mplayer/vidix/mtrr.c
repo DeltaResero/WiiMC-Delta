@@ -37,26 +37,26 @@
 #endif
 #endif
 
-int	mtrr_set_type(unsigned base,unsigned size,int type)
+int     mtrr_set_type(unsigned base,unsigned size,int type)
 {
 #ifdef __linux__
     FILE * mtrr_fd;
     const char *stype;
     switch(type)
     {
-	case MTRR_TYPE_UNCACHABLE: stype = "uncachable"; break;
-	case MTRR_TYPE_WRCOMB:	   stype = "write-combining"; break;
-	case MTRR_TYPE_WRTHROUGH:  stype = "write-through"; break;
-	case MTRR_TYPE_WRPROT:	   stype = "write-protect"; break;
-	case MTRR_TYPE_WRBACK:	   stype = "write-back"; break;
-	default:		   return EINVAL;
+        case MTRR_TYPE_UNCACHABLE: stype = "uncachable"; break;
+        case MTRR_TYPE_WRCOMB:     stype = "write-combining"; break;
+        case MTRR_TYPE_WRTHROUGH:  stype = "write-through"; break;
+        case MTRR_TYPE_WRPROT:     stype = "write-protect"; break;
+        case MTRR_TYPE_WRBACK:     stype = "write-back"; break;
+        default:                   return EINVAL;
     }
     mtrr_fd = fopen("/proc/mtrr","wt");
     if(mtrr_fd)
     {
-	int wr_len = fprintf(mtrr_fd, "base=0x%08X size=0x%08X type=%s\n", base, size, stype);
-	fclose(mtrr_fd);
-	return wr_len > 0 ? 0 : EPERM;
+        int wr_len = fprintf(mtrr_fd, "base=0x%08X size=0x%08X type=%s\n", base, size, stype);
+        fclose(mtrr_fd);
+        return wr_len > 0 ? 0 : EPERM;
     }
     return ENOSYS;
 #elif defined (__i386__ ) && defined (__NetBSD__) && __NetBSD_Version__ > 105240000
@@ -71,8 +71,8 @@ int	mtrr_set_type(unsigned base,unsigned size,int type)
     n = 1;
 
     if (i386_set_mtrr(mtrrp, &n) < 0) {
-	free(mtrrp);
-	return errno;
+        free(mtrrp);
+        return errno;
     }
     free(mtrrp);
     return 0;

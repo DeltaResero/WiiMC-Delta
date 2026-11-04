@@ -131,30 +131,30 @@ extern int cntReconnect;
 static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 {
   int total=0;
-  
+
   while(size>0 ){
     int pos,newb,len;
 
-	if(getMESS != 0) { //this loop is significant but not all there is to the bug
-		//getWeird = size; //2048
-		return 0;
-	}
-	if(getWeird > 80) { //assume no longer playing audio
-		getWeird = 0;
-		getMESS = 1; //forces 3 loops to exit, allowing mplayer to still work
-	}
-	++getWeird;
-	
+        if(getMESS != 0) { //this loop is significant but not all there is to the bug
+                //getWeird = size; //2048
+                return 0;
+        }
+        if(getWeird > 80) { //assume no longer playing audio
+                getWeird = 0;
+                getMESS = 1; //forces 3 loops to exit, allowing mplayer to still work
+        }
+        ++getWeird;
+
   //printf("CACHE2_READ: 0x%X <= 0x%X <= 0x%X  \n",s->min_filepos,s->read_filepos,s->max_filepos);
 
     if(s->read_filepos>=s->max_filepos || s->read_filepos<s->min_filepos){
-	// eof?
-	if(s->eof) break;
+        // eof?
+        if(s->eof) break;
 
-	// waiting for buffer fill...
-	usec_sleep(READ_USLEEP_TIME); // 10ms
-	continue; // try again...
-    }	
+        // waiting for buffer fill...
+        usec_sleep(READ_USLEEP_TIME); // 10ms
+        continue; // try again...
+    }
     newb=s->max_filepos-s->read_filepos; // new bytes in the buffer
 
 //    printf("*** newb: %d bytes ***\n",newb);
@@ -171,13 +171,13 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 
     // len=write(mem,newb)
     //printf("Buffer read: %d bytes\n",newb);
-    
-	if(newb<=0 || pos<0 || pos+newb > s->buffer_size) // very very odd error
+
+        if(newb<=0 || pos<0 || pos+newb > s->buffer_size) // very very odd error
     {
-    	//debug_str="Ehh. very very odd error !!! Report bug...\n";
-    	printf("Ehh. very very odd error !!! Report bug... pos: %i  newb: %i\n",pos,newb);
-    	continue;
-	}
+        //debug_str="Ehh. very very odd error !!! Report bug...\n";
+        printf("Ehh. very very odd error !!! Report bug... pos: %i  newb: %i\n",pos,newb);
+        continue;
+        }
     memcpy(buf,&s->buffer[pos],newb);
     buf+=newb;
     len=newb;
@@ -188,10 +188,10 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
     total+=len;
 
   }
-  
+
   //reset
   getWeird = 0;
-  
+
 #ifndef GEKKO
   cache_fill_status=(s->max_filepos-s->read_filepos)/(s->buffer_size / 100);
 #endif
@@ -201,10 +201,10 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 static int cache_fill(cache_vars_t *s)
 {
 #ifdef GEKKO
-  if(!s || s->eof) 
+  if(!s || s->eof)
   {
       cache_fill_status=-1;
-	  return 0;
+          return 0;
   }
 #endif
 
@@ -220,7 +220,7 @@ static int cache_fill(cache_vars_t *s)
       if(s->stream->type!=STREAMTYPE_STREAM ||
           read<s->min_filepos || read>=s->max_filepos+s->seek_limit)
       {
-    	cache_flush(s);
+        cache_flush(s);
         if(s->stream->eof) stream_reset(s->stream);
         stream_seek_internal(s->stream,read);
         //mp_msg(MSGT_CACHE,MSGL_DBG2,"Seek done. new pos: 0x%"PRIX64"  \n",(int64_t)stream_tell(s->stream));
@@ -242,8 +242,8 @@ static int cache_fill(cache_vars_t *s)
   if(space<s->fill_limit){
 //    printf("Buffer is full (%d bytes free, limit: %d)\n",space,s->fill_limit);
 #ifdef GEKKO
-	  if(s->eof) cache_fill_status=-1;
-  	else cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
+          if(s->eof) cache_fill_status=-1;
+        else cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
 #endif
     return 0; // no fill...
   }
@@ -287,44 +287,44 @@ static int cache_fill(cache_vars_t *s)
     } else
   len = stream_read_internal(s->stream, &s->buffer[pos], space);
 #ifdef GEKKO
-  if(len==0) 
+  if(len==0)
   {
-  	if(s->stream->error>0)
-	{
-		s->stream->error++; //count read error
-		
-		if(s->stream->error>500) //num retries
-		{
-			printf("error > 500. eof = 1\n");
-			s->eof=1;
-		}
-		else		
-		{
-		  //retry if we have cache
-		  cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
-		  if(cache_fill_status<5)
-		  {	  
-	  		s->eof=1;
-	  		cache_fill_status=-1;  		
-	  		printf("error: %i cache_fill_status<5  eof=1\n",s->stream->error);
-	  	  }
-	  	  else 
-		  {
-			extern char fileplaying[MAXPATHLEN];
-			//s->eof=0;
-				printf("retry read (%f): %i -> %s \n",cache_fill_status,s->stream->error,fileplaying);
-				
-				if(s->stream->error>3 && strncmp(fileplaying,"smb",3)==0)//only reset network in samba, maybe we can check internet streams later, samba can reconnect
-					CheckMplayerNetwork();
-		  }
-  	    }
-	}
-  	else
-  	{
-  		cache_fill_status=-1;  	
-  		printf("error. eof = 1\n");
-  		s->eof=1;
-  	}
+        if(s->stream->error>0)
+        {
+                s->stream->error++; //count read error
+
+                if(s->stream->error>500) //num retries
+                {
+                        printf("error > 500. eof = 1\n");
+                        s->eof=1;
+                }
+                else
+                {
+                  //retry if we have cache
+                  cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
+                  if(cache_fill_status<5)
+                  {
+                        s->eof=1;
+                        cache_fill_status=-1;
+                        printf("error: %i cache_fill_status<5  eof=1\n",s->stream->error);
+                  }
+                  else
+                  {
+                        extern char fileplaying[MAXPATHLEN];
+                        //s->eof=0;
+                                printf("retry read (%f): %i -> %s \n",cache_fill_status,s->stream->error,fileplaying);
+
+                                if(s->stream->error>3 && strncmp(fileplaying,"smb",3)==0)//only reset network in samba, maybe we can check internet streams later, samba can reconnect
+                                        CheckMplayerNetwork();
+                  }
+            }
+        }
+        else
+        {
+                cache_fill_status=-1;
+                printf("error. eof = 1\n");
+                s->eof=1;
+        }
   }
   else s->stream->error=0;
 #else
@@ -351,7 +351,7 @@ static int cache_execute_control(cache_vars_t *s) {
   u64 now;
 #ifdef GEKKO
   if(!s || !s->stream)
-	  return 0;
+          return 0;
 #endif
   int quit = s->control == -2;
   if (quit || !s->stream->control) {
@@ -361,7 +361,7 @@ static int cache_execute_control(cache_vars_t *s) {
     s->control = -1;
     return !quit;
   }
-  
+
   now = GetTimerMS();
   if (now - last > 99) {
     double len, pos;
@@ -464,30 +464,30 @@ static cache_vars_t* cache_init(int size,int sector){
 
 void cache_uninit(stream_t *s) {
   cache_vars_t* c = s->cache_data;
-  
+
 #if defined(GEKKO)
-  if(!s->cache_pid) return; 
+  if(!s->cache_pid) return;
   if(!CacheThreadSuspended())
   {
     cache_do_control(s, -2, NULL);
     stop_cache_thread = 1;
     while(!CacheThreadSuspended()) {
-  	  usleep(50);
-	  if(getMESS != 0) { //significant loop
-		//if(getWeird == 8)
-			//getWeird = 9;
-		getMESS = 0;
-		waitReload = 1; //this flag allows a reload after some time has passed to reconnect stream
-		++cntReconnect;
-		//s->eof = 1; //does not make a diff
-		return;
-		//break; //frequent dsi crash
-	  }
-	}
+          usleep(50);
+          if(getMESS != 0) { //significant loop
+                //if(getWeird == 8)
+                        //getWeird = 9;
+                getMESS = 0;
+                waitReload = 1; //this flag allows a reload after some time has passed to reconnect stream
+                ++cntReconnect;
+                //s->eof = 1; //does not make a diff
+                return;
+                //break; //frequent dsi crash
+          }
+        }
   }
   s->cache_pid = 0;
   cachearg = NULL;
-#else  
+#else
   if(s->cache_pid) {
 #if defined(__MINGW32__) || defined(PTHREAD_CACHE) || defined(__OS2__) || defined(GEKKO)
     cache_do_control(s, -2, NULL);
@@ -495,7 +495,7 @@ void cache_uninit(stream_t *s) {
     kill(s->cache_pid,SIGKILL);
     waitpid(s->cache_pid,NULL,0);
 #endif
-	s->cache_pid = 0;
+        s->cache_pid = 0;
   }
 #endif //GEKKO
 
@@ -544,7 +544,7 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
   }
 #ifdef GEKKO
   if(cache_mutex == LWP_MUTEX_NULL)
-    LWP_MutexInit(&cache_mutex, false);	
+    LWP_MutexInit(&cache_mutex, false);
 #endif
   s=cache_init(size,ss);
   if(s == NULL) return -1;
@@ -571,24 +571,24 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
   {
     stream_t* stream2=malloc(sizeof(stream_t));
     memcpy(stream2,s->stream,sizeof(stream_t));
-    s->stream=stream2;    
+    s->stream=stream2;
 #if defined(__MINGW32__)
     stream->cache_pid = _beginthread( ThreadProc, 0, s );
 #elif defined(__OS2__)
     stream->cache_pid = _beginthread( ThreadProc, NULL, 256 * 1024, s );
 #elif defined(GEKKO)
-	stop_cache_thread = 1;
-	while(!CacheThreadSuspended()) {
-		usleep(50);
+        stop_cache_thread = 1;
+        while(!CacheThreadSuspended()) {
+                usleep(50);
 
-		//if(getMESS != 0) { //this doesn't hit, but let's assume it's useful for edgecases
-		//	return -1;
-		//}
-	}
-	cachearg = s;
-	stop_cache_thread = 0;
-	ResumeCacheThread();
-	stream->cache_pid = 1;
+                //if(getMESS != 0) { //this doesn't hit, but let's assume it's useful for edgecases
+                //      return -1;
+                //}
+        }
+        cachearg = s;
+        stop_cache_thread = 0;
+        ResumeCacheThread();
+        stream->cache_pid = 1;
 #else
     {
     pthread_t tid;
@@ -604,27 +604,27 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
     }
     // wait until cache is filled at least prefill_init %
     mp_msg(MSGT_CACHE,MSGL_V,"CACHE_PRE_INIT: %"PRId64" [%"PRId64"] %"PRId64"  pre:%d  eof:%d  \n",
-	(int64_t)s->min_filepos,(int64_t)s->read_filepos,(int64_t)s->max_filepos,min,s->eof);
+        (int64_t)s->min_filepos,(int64_t)s->read_filepos,(int64_t)s->max_filepos,min,s->eof);
 
     while(s->read_filepos<s->min_filepos || s->max_filepos-s->read_filepos<min){
-	mp_msg(MSGT_CACHE,MSGL_STATUS,MSGTR_CacheFill,
-	    100.0*(float)(s->max_filepos-s->read_filepos)/(float)(s->buffer_size),
-	    (int64_t)s->max_filepos-s->read_filepos
-	);
+        mp_msg(MSGT_CACHE,MSGL_STATUS,MSGTR_CacheFill,
+            100.0*(float)(s->max_filepos-s->read_filepos)/(float)(s->buffer_size),
+            (int64_t)s->max_filepos-s->read_filepos
+        );
 
-	//if(getMESS != 0) {
-		//getWeird = 8;
-		//return -1; //it's unlikely but let's assume in case of edgecases
-	//}
-	
+        //if(getMESS != 0) {
+                //getWeird = 8;
+                //return -1; //it's unlikely but let's assume in case of edgecases
+        //}
+
 #ifdef GEKKO
-	if(s->stream->type == STREAMTYPE_STREAM && cntReconnect == 0)
-		ShowProgress("Buffering...", (int)(100.0*(float)(s->max_filepos)/(float)(min)), 100);
+        if(s->stream->type == STREAMTYPE_STREAM && cntReconnect == 0)
+                ShowProgress("Buffering...", (int)(100.0*(float)(s->max_filepos)/(float)(min)), 100);
 #endif
-	if(s->eof) break; // file is smaller than prefill size
-	if(stream_check_interrupt(PREFILL_SLEEP_TIME)) {
-	  res = 0;
-	  goto err_out;
+        if(s->eof) break; // file is smaller than prefill size
+        if(stream_check_interrupt(PREFILL_SLEEP_TIME)) {
+          res = 0;
+          goto err_out;
         }
     }
 
@@ -651,21 +651,21 @@ static void ThreadProc( void *s ){
 // cache thread mainloop:
 #ifndef GEKKO
   signal(SIGTERM,exit_sighandler); // kill
-#endif  
+#endif
   do {
     if(!cache_fill(s)){
-	 usec_sleep(FILL_USLEEP_TIME); // idle
+         usec_sleep(FILL_USLEEP_TIME); // idle
     }else usec_sleep(500);
 #ifndef GEKKO
   } while (cache_execute_control(s));
 #else
   //} while (cache_execute_control(s) && !stop_cache_thread && getMESS == 0); //not this, but let's assume due to edgecases
   } while (cache_execute_control(s) && !stop_cache_thread); //not this
-#endif  
+#endif
 #if defined(__MINGW32__) || defined(__OS2__)
   _endthread();
 #endif
-#if defined(PTHREAD_CACHE) || defined(GEKKO) 
+#if defined(PTHREAD_CACHE) || defined(GEKKO)
   return NULL;
 #endif
   // make sure forked code never leaves this function
@@ -675,14 +675,14 @@ static void ThreadProc( void *s ){
 #ifdef GEKKO
 void *mplayercachethread(void *arg)
 {
-	while(1)
-	{
-		SuspendCacheThread();
+        while(1)
+        {
+                SuspendCacheThread();
 
-		if(cachearg != NULL)
-			ThreadProc(cachearg);
-	}
-	return NULL;
+                if(cachearg != NULL)
+                        ThreadProc(cachearg);
+        }
+        return NULL;
 }
 #endif
 
@@ -726,9 +726,9 @@ int cache_stream_seek_long(stream_t *stream,off_t pos){
   stream->pos=s->read_filepos=newpos;
   s->eof=0; // !!!!!!!
 
-	LWP_MutexUnlock(cache_mutex);
+        LWP_MutexUnlock(cache_mutex);
   cache_stream_fill_buffer(stream);
-	LWP_MutexLock(cache_mutex);
+        LWP_MutexLock(cache_mutex);
 
   pos-=newpos;
   if(pos>=0 && pos<=stream->buf_len){
@@ -736,7 +736,7 @@ int cache_stream_seek_long(stream_t *stream,off_t pos){
     LWP_MutexUnlock(cache_mutex);
     return 1;
   }
-	LWP_MutexUnlock(cache_mutex);
+        LWP_MutexUnlock(cache_mutex);
 //  stream->buf_pos=stream->buf_len=0;
 //  return 1;
 
@@ -780,9 +780,9 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
       return STREAM_UNSUPPORTED;
   }
   while (s->control != -1) {
-	usec_sleep(CONTROL_SLEEP_TIME);
-	if(getMESS != 0) //significant loop
-		return 0;
+        usec_sleep(CONTROL_SLEEP_TIME);
+        if(getMESS != 0) //significant loop
+                return 0;
   }
 
   if (s->control_res != STREAM_OK)
@@ -826,23 +826,23 @@ int stream_read(stream_t *s,char* mem,int total)
   while(len>0)
   {
     int x;
-	
-	//One bread ahead of the bread
-/*	if(getINFO == 2) {
-		getINFO = 0;
-		return 0;
-	}*/
-	//if(getMESS != 0) //don't care, let's assume there's an edgecase that still fails rarely...
-		//return 0;
+
+        //One bread ahead of the bread
+/*      if(getINFO == 2) {
+                getINFO = 0;
+                return 0;
+        }*/
+        //if(getMESS != 0) //don't care, let's assume there's an edgecase that still fails rarely...
+                //return 0;
 
     if(s->buf_len-s->buf_pos==0)
     {
-      if(!cache_stream_fill_buffer(s)) 
-	  {
-	  	return total-len; // EOF or error
-	  }
+      if(!cache_stream_fill_buffer(s))
+          {
+                return total-len; // EOF or error
+          }
       x=s->buf_len-s->buf_pos;
-    } 
+    }
     LWP_MutexLock(cache_mutex);
     x=s->buf_len-s->buf_pos;
     if(x>len) x=len;
@@ -856,56 +856,56 @@ int stream_read(stream_t *s,char* mem,int total)
 
 int stream_error(stream_t *stream)
 {
-	if(!stream || !stream->cache_data)
-		return 0;
+        if(!stream || !stream->cache_data)
+                return 0;
 
-	cache_vars_t *vars = (cache_vars_t *)stream->cache_data;
-	return vars->stream->error;
+        cache_vars_t *vars = (cache_vars_t *)stream->cache_data;
+        return vars->stream->error;
 }
 
 #if 0
 void refillcache(stream_t *stream,float min)
 {
-	cache_vars_t* s;
-	int out=0;
-	s=stream->cache_data;
-	u64 t1;
-	float old=0;
-	t1 = GetTimerMS();
+        cache_vars_t* s;
+        int out=0;
+        s=stream->cache_data;
+        u64 t1;
+        float old=0;
+        t1 = GetTimerMS();
 
     while(cache_fill_status<min)
     {
-		//printf("Cache fill: %5.2f%%  \n",(float)(100.0*(float)(cache_fill_status)/(float)(min)));
-    	ShowProgress("Buffering...", (int)cache_fill_status, (int)min);
-		if(s->eof) break; // file is smaller than prefill size
-			
-		if(out==0)out=stream_check_interrupt(PREFILL_SLEEP_TIME);
-		else
-		{ //remove others pause commands if you press pause several times
-		  mp_cmd_t* cmd;
-		  if((cmd = mp_input_get_cmd(PREFILL_SLEEP_TIME,0,1)) != NULL)
-		  {
-			  if(cmd->id==MP_CMD_PAUSE)
-			  {
-				  cmd = mp_input_get_cmd(0,0,0);
-				  mp_cmd_free(cmd);
-			  }
-		  }
+                //printf("Cache fill: %5.2f%%  \n",(float)(100.0*(float)(cache_fill_status)/(float)(min)));
+        ShowProgress("Buffering...", (int)cache_fill_status, (int)min);
+                if(s->eof) break; // file is smaller than prefill size
 
-		}
-		//printf("Cache fill: %5.2f%%  \n",cache_fill_status);
-		if(cache_fill_status > 5 && out)
-		{
-			//printf("break Cache fill: %5.2f%%  \n",cache_fill_status);
-			return ;
-		}	
-		
-		//not needed, for security	
-		if(old<cache_fill_status)t1 = GetTimerMS();
-	    if(GetTimerMS()-t1>1500) return;
-		old=cache_fill_status;
-		usleep(50);
+                if(out==0)out=stream_check_interrupt(PREFILL_SLEEP_TIME);
+                else
+                { //remove others pause commands if you press pause several times
+                  mp_cmd_t* cmd;
+                  if((cmd = mp_input_get_cmd(PREFILL_SLEEP_TIME,0,1)) != NULL)
+                  {
+                          if(cmd->id==MP_CMD_PAUSE)
+                          {
+                                  cmd = mp_input_get_cmd(0,0,0);
+                                  mp_cmd_free(cmd);
+                          }
+                  }
+
+                }
+                //printf("Cache fill: %5.2f%%  \n",cache_fill_status);
+                if(cache_fill_status > 5 && out)
+                {
+                        //printf("break Cache fill: %5.2f%%  \n",cache_fill_status);
+                        return ;
+                }
+
+                //not needed, for security
+                if(old<cache_fill_status)t1 = GetTimerMS();
+            if(GetTimerMS()-t1>1500) return;
+                old=cache_fill_status;
+                usleep(50);
     }
-    //printf("end Cache fill: %5.2f%%  \n",cache_fill_status);   
+    //printf("end Cache fill: %5.2f%%  \n",cache_fill_status);
 }
 #endif

@@ -355,7 +355,7 @@ ssize_t ntfs_read_r (struct _reent *r, void *fd, char *ptr, size_t len)
         ntfs_log_trace("EOVERFLOW");
     }
 
-	ntfs_log_trace("file->pos:%d, len:%d, file->len:%d \n", (u32)file->pos, (u32)len, (u32)file->len);
+    ntfs_log_trace("file->pos:%d, len:%d, file->len:%d \n", (u32)file->pos, (u32)len, (u32)file->len);
 
     // Read from the files data attribute
     while (len) {

@@ -100,7 +100,7 @@ void print_wave_header(WAVEFORMATEX *h, int verbose_level){
     uint8_t* p = (uint8_t*)(h + 1);
     mp_msg(MSGT_HEADER, verbose_level, "Unknown extra header dump: ");
     for (i = 0; i < h->cbSize; i++)
-	mp_msg(MSGT_HEADER, verbose_level, "[%x] ", p[i]);
+        mp_msg(MSGT_HEADER, verbose_level, "[%x] ", p[i]);
     mp_msg(MSGT_HEADER, verbose_level, "\n");
   }
   mp_msg(MSGT_HEADER, verbose_level, "==========================================================================\n");
@@ -109,20 +109,20 @@ void print_wave_header(WAVEFORMATEX *h, int verbose_level){
 
 void print_video_header(BITMAPINFOHEADER *h, int verbose_level){
   mp_msg(MSGT_HEADER, verbose_level, "======= VIDEO Format ======\n");
-	mp_msg(MSGT_HEADER, verbose_level, "  biSize %d\n", h->biSize);
-	mp_msg(MSGT_HEADER, verbose_level, "  biWidth %d\n", h->biWidth);
-	mp_msg(MSGT_HEADER, verbose_level, "  biHeight %d\n", h->biHeight);
-	mp_msg(MSGT_HEADER, verbose_level, "  biPlanes %d\n", h->biPlanes);
-	mp_msg(MSGT_HEADER, verbose_level, "  biBitCount %d\n", h->biBitCount);
-	mp_msg(MSGT_HEADER, verbose_level, "  biCompression %d='%.4s'\n", h->biCompression, (char *)&h->biCompression);
-	mp_msg(MSGT_HEADER, verbose_level, "  biSizeImage %d\n", h->biSizeImage);
+        mp_msg(MSGT_HEADER, verbose_level, "  biSize %d\n", h->biSize);
+        mp_msg(MSGT_HEADER, verbose_level, "  biWidth %d\n", h->biWidth);
+        mp_msg(MSGT_HEADER, verbose_level, "  biHeight %d\n", h->biHeight);
+        mp_msg(MSGT_HEADER, verbose_level, "  biPlanes %d\n", h->biPlanes);
+        mp_msg(MSGT_HEADER, verbose_level, "  biBitCount %d\n", h->biBitCount);
+        mp_msg(MSGT_HEADER, verbose_level, "  biCompression %d='%.4s'\n", h->biCompression, (char *)&h->biCompression);
+        mp_msg(MSGT_HEADER, verbose_level, "  biSizeImage %d\n", h->biSizeImage);
   if (h->biSize > sizeof(*h))
   {
     int i;
     uint8_t* p = (uint8_t*)(h + 1);
     mp_msg(MSGT_HEADER, verbose_level, "Unknown extra header dump: ");
     for (i = 0; i < h->biSize-sizeof(*h); i++)
-	mp_msg(MSGT_HEADER, verbose_level, "[%x] ", *(p+i));
+        mp_msg(MSGT_HEADER, verbose_level, "[%x] ", *(p+i));
     mp_msg(MSGT_HEADER, verbose_level, "\n");
   }
   mp_msg(MSGT_HEADER, verbose_level, "===========================\n");
@@ -191,6 +191,6 @@ void print_avisuperindex_chunk(avisuperindex_chunk *h, int verbose_level){
     mp_msg (MSGT_HEADER, verbose_level, "  bIndexSubType (%d) bIndexType (%d)\n", h->bIndexSubType, h->bIndexType);
     mp_msg (MSGT_HEADER, verbose_level, "  nEntriesInUse (%d) dwChunkId (%.4s)\n", h->nEntriesInUse, h->dwChunkId);
     mp_msg (MSGT_HEADER, verbose_level, "  dwReserved[0] (%d) dwReserved[1] (%d) dwReserved[2] (%d)\n",
-	    h->dwReserved[0], h->dwReserved[1], h->dwReserved[2]);
+            h->dwReserved[0], h->dwReserved[1], h->dwReserved[2]);
     mp_msg (MSGT_HEADER, verbose_level, "===========================\n");
 }

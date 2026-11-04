@@ -110,7 +110,7 @@ static enum AVDiscard skip_frame;
 
 static const mp_image_t mpi_no_picture =
 {
-	.type = MP_IMGTYPE_INCOMPLETE
+        .type = MP_IMGTYPE_INCOMPLETE
 };
 
 const m_option_t lavc_decode_opts_conf[]={
@@ -883,11 +883,11 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 //--
 
     if(!got_picture) {
-	if (avctx->codec->id == CODEC_ID_H264 &&
-	    skip_frame == AVDISCARD_NONE)
-	    return &mpi_no_picture; // H.264 first field only
-	else
-	    return NULL;    // skipped image
+        if (avctx->codec->id == CODEC_ID_H264 &&
+            skip_frame == AVDISCARD_NONE)
+            return &mpi_no_picture; // H.264 first field only
+        else
+            return NULL;    // skipped image
     }
 
     if(init_vo(sh, avctx->pix_fmt) < 0) return NULL;

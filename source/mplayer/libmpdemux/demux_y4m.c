@@ -55,7 +55,7 @@ static int y4m_check_file(demuxer_t* demuxer){
     buf[9] = 0;
 
     if (strncmp("YUV4MPEG2", buf, 9) && strncmp("YUV4MPEG ", buf, 9)) {
-	    return 0;
+            return 0;
     }
 
     demuxer->priv = malloc(sizeof(y4m_priv_t));
@@ -65,8 +65,8 @@ static int y4m_check_file(demuxer_t* demuxer){
 
     if (!strncmp("YUV4MPEG ", buf, 9))
     {
-	mp_msg(MSGT_DEMUX, MSGL_V, "Found older YUV4MPEG format (used by xawtv)\n");
-	priv->is_older = 1;
+        mp_msg(MSGT_DEMUX, MSGL_V, "Found older YUV4MPEG format (used by xawtv)\n");
+        priv->is_older = 1;
     }
 
     mp_msg(MSGT_DEMUX,MSGL_DBG2,"Success: YUV4MPEG2\n");
@@ -116,11 +116,11 @@ static int demux_y4m_fill_buffer(demuxer_t *demux, demux_stream_t *dsds) {
 
     c = stream_read_char(demux->stream); /* F */
     if (c == -256)
-	return 0; /* EOF */
+        return 0; /* EOF */
     if (c != 'F')
     {
-	mp_msg(MSGT_DEMUX, MSGL_V, "Bad frame at %d\n", (int)stream_tell(demux->stream)-1);
-	return 0;
+        mp_msg(MSGT_DEMUX, MSGL_V, "Bad frame at %d\n", (int)stream_tell(demux->stream)-1);
+        return 0;
     }
     stream_skip(demux->stream, 5); /* RAME\n */
     stream_read(demux->stream, buf[0], size);
@@ -154,83 +154,83 @@ static void read_streaminfo(demuxer_t *demuxer)
 
     if (priv->is_older)
     {
-	char buf[4];
-	int frame_rate_code;
+        char buf[4];
+        int frame_rate_code;
 
-	stream_skip(demuxer->stream, 8); /* YUV4MPEG */
-	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 3);
-	buf[3] = 0;
-	sh->disp_w = atoi(buf);
-	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 3);
-	buf[3] = 0;
-	sh->disp_h = atoi(buf);
-	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 1);
-	buf[1] = 0;
-	frame_rate_code = atoi(buf);
-	stream_skip(demuxer->stream, 1); /* new-line */
+        stream_skip(demuxer->stream, 8); /* YUV4MPEG */
+        stream_skip(demuxer->stream, 1); /* space */
+        stream_read(demuxer->stream, (char *)&buf[0], 3);
+        buf[3] = 0;
+        sh->disp_w = atoi(buf);
+        stream_skip(demuxer->stream, 1); /* space */
+        stream_read(demuxer->stream, (char *)&buf[0], 3);
+        buf[3] = 0;
+        sh->disp_h = atoi(buf);
+        stream_skip(demuxer->stream, 1); /* space */
+        stream_read(demuxer->stream, (char *)&buf[0], 1);
+        buf[1] = 0;
+        frame_rate_code = atoi(buf);
+        stream_skip(demuxer->stream, 1); /* new-line */
 
-	if (!sh->fps)
-	{
-	    /* values from xawtv */
-	    switch(frame_rate_code)
-	    {
-		case 1:
-		    sh->fps = 23.976f;
-		    break;
-		case 2:
-		    sh->fps = 24.0f;
-		    break;
-		case 3:
-		    sh->fps = 25.0f;
-		    break;
-		case 4:
-		    sh->fps = 29.97f;
-		    break;
-		case 5:
-		    sh->fps = 30.0f;
-		    break;
-		case 6:
-		    sh->fps = 50.0f;
-		    break;
-		case 7:
-		    sh->fps = 59.94f;
-		    break;
-		case 8:
-		    sh->fps = 60.0f;
-		    break;
-		default:
-		    sh->fps = 25.0f;
-	    }
-	}
-	sh->frametime = 1.0f/sh->fps;
+        if (!sh->fps)
+        {
+            /* values from xawtv */
+            switch(frame_rate_code)
+            {
+                case 1:
+                    sh->fps = 23.976f;
+                    break;
+                case 2:
+                    sh->fps = 24.0f;
+                    break;
+                case 3:
+                    sh->fps = 25.0f;
+                    break;
+                case 4:
+                    sh->fps = 29.97f;
+                    break;
+                case 5:
+                    sh->fps = 30.0f;
+                    break;
+                case 6:
+                    sh->fps = 50.0f;
+                    break;
+                case 7:
+                    sh->fps = 59.94f;
+                    break;
+                case 8:
+                    sh->fps = 60.0f;
+                    break;
+                default:
+                    sh->fps = 25.0f;
+            }
+        }
+        sh->frametime = 1.0f/sh->fps;
     }
     else
     {
-	y4m_init_stream_info(priv->si);
-	if ((err=y4m_read_stream_header(demuxer->stream, priv->si)) != Y4M_OK)
-	    mp_msg(MSGT_DEMUXER, MSGL_FATAL, "error parsing YUV4MPEG header: %s\n", y4m_strerr(err));
+        y4m_init_stream_info(priv->si);
+        if ((err=y4m_read_stream_header(demuxer->stream, priv->si)) != Y4M_OK)
+            mp_msg(MSGT_DEMUXER, MSGL_FATAL, "error parsing YUV4MPEG header: %s\n", y4m_strerr(err));
 
-	if(!sh->fps) {
-    	    ratio = y4m_si_get_framerate(priv->si);
-    	    if (ratio.d != 0)
-        	sh->fps=(float)ratio.n/(float)ratio.d;
-    	    else
-        	sh->fps=15.0f;
-	}
-	sh->frametime=1.0f/sh->fps;
+        if(!sh->fps) {
+            ratio = y4m_si_get_framerate(priv->si);
+            if (ratio.d != 0)
+                sh->fps=(float)ratio.n/(float)ratio.d;
+            else
+                sh->fps=15.0f;
+        }
+        sh->frametime=1.0f/sh->fps;
 
-	ratio = y4m_si_get_sampleaspect(priv->si);
+        ratio = y4m_si_get_sampleaspect(priv->si);
 
-	sh->disp_w = y4m_si_get_width(priv->si);
-	sh->disp_h = y4m_si_get_height(priv->si);
+        sh->disp_w = y4m_si_get_width(priv->si);
+        sh->disp_h = y4m_si_get_height(priv->si);
 
-	if (ratio.d != 0 && ratio.n != 0)
-	    sh->aspect = (float)(sh->disp_w*ratio.n)/(float)(sh->disp_h*ratio.d);
+        if (ratio.d != 0 && ratio.n != 0)
+            sh->aspect = (float)(sh->disp_w*ratio.n)/(float)(sh->disp_h*ratio.d);
 
-    	demuxer->seekable = 0;
+        demuxer->seekable = 0;
     }
 
     sh->format = mmioFOURCC('Y', 'V', '1', '2');
@@ -287,9 +287,9 @@ static void demux_seek_y4m(demuxer_t *demuxer, float rel_seek_secs, float audio_
          * demuxed (counting from ONE (see demux_open_y4m)) */
         stream_seek(demuxer->stream, curr_pos + rel_seek_frames*(size+6));
     } else {
-	    /* should never come here, because seeking for YUV4MPEG2
-	     * is disabled. */
-	    mp_msg(MSGT_DEMUX, MSGL_WARN, "Seeking for YUV4MPEG2 not yet implemented!\n");
+            /* should never come here, because seeking for YUV4MPEG2
+             * is disabled. */
+            mp_msg(MSGT_DEMUX, MSGL_WARN, "Seeking for YUV4MPEG2 not yet implemented!\n");
     }
 }
 
@@ -300,7 +300,7 @@ static void demux_close_y4m(demuxer_t *demuxer)
     if(!priv)
       return;
     if (!priv->is_older)
-	y4m_fini_stream_info(((y4m_priv_t*)demuxer->priv)->si);
+        y4m_fini_stream_info(((y4m_priv_t*)demuxer->priv)->si);
     free(((y4m_priv_t*)demuxer->priv)->si);
     free(demuxer->priv);
     return;

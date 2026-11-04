@@ -145,7 +145,7 @@ public:
     static int last_token_size;
     static bool tokenWrapAroundEnabled;
 
-    static PerFrameEqn *parse_per_frame_eqn( std::istream & fs, int index, 
+    static PerFrameEqn *parse_per_frame_eqn( std::istream & fs, int index,
                                              MilkdropPreset * preset);
     static int parse_per_pixel_eqn( std::istream & fs, MilkdropPreset * preset,
                                     char * init_string);
@@ -174,7 +174,7 @@ public:
     static int parse_wave_helper(std::istream & fs, MilkdropPreset * preset, int id, char * eqn_type, char * init_string);
     static int parse_shapecode(char * eqn_string, std::istream & fs, MilkdropPreset * preset);
     static int parse_shapecode_prefix(char * token, int * id, char ** var_string);
-    
+
     static void parse_string_block(std::istream &  fs, std::string * out_string);
     static bool scanForComment(std::istream & fs);
     static int parse_wave(char * eqn_string, std::istream & fs, MilkdropPreset * preset);

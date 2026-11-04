@@ -52,9 +52,9 @@ typedef struct {
   unsigned int buffer_len;
   // mpeg block buffer:
   unsigned char *b_buffer;
-  unsigned int b_buffer_size;	//size of b_buffer
-  unsigned int b_buffer_ptr;	//index to next data to write
-  unsigned int b_buffer_len;	//len of next data to write
+  unsigned int b_buffer_size;   //size of b_buffer
+  unsigned int b_buffer_ptr;    //index to next data to write
+  unsigned int b_buffer_len;    //len of next data to write
   // muxer frame buffer:
   unsigned int muxbuf_seen;
   // source stream:
@@ -96,9 +96,9 @@ typedef struct muxer_t{
   int idx_pos;
   int idx_size;
   // streams:
-  int num_videos;	// for MPEG recalculations
+  int num_videos;       // for MPEG recalculations
   int num_audios;
-  unsigned int sysrate;	// max rate in bytes/s
+  unsigned int sysrate; // max rate in bytes/s
   //int num_streams;
   muxer_stream_t* def_v;  // default video stream (for general headers)
   muxer_stream_t* streams[MUXER_MAX_STREAMS];

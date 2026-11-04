@@ -89,46 +89,46 @@ static int pm3_probe(int verbose, int force)
     err = pci_scan(lst,&num_pci);
     if(err)
     {
-	printf("[pm3] Error occurred during pci scan: %s\n",strerror(err));
-	return err;
+        printf("[pm3] Error occurred during pci scan: %s\n",strerror(err));
+        return err;
     }
     else
     {
-	err = ENXIO;
-	for(i=0; i < num_pci; i++)
-	{
-	    if(lst[i].vendor == VENDOR_3DLABS)
-	    {
-		int idx;
-		const char *dname;
-		idx = find_chip(lst[i].device);
-		if(idx == -1)
-		    continue;
-		dname = pci_device_name(VENDOR_3DLABS, lst[i].device);
-		dname = dname ? dname : "Unknown chip";
-		printf("[pm3] Found chip: %s\n", dname);
+        err = ENXIO;
+        for(i=0; i < num_pci; i++)
+        {
+            if(lst[i].vendor == VENDOR_3DLABS)
+            {
+                int idx;
+                const char *dname;
+                idx = find_chip(lst[i].device);
+                if(idx == -1)
+                    continue;
+                dname = pci_device_name(VENDOR_3DLABS, lst[i].device);
+                dname = dname ? dname : "Unknown chip";
+                printf("[pm3] Found chip: %s\n", dname);
 #if 0
-		if ((lst[i].command & PCI_COMMAND_IO) == 0)
-		{
-			printf("[pm3] Device is disabled, ignoring\n");
-			continue;
-		}
+                if ((lst[i].command & PCI_COMMAND_IO) == 0)
+                {
+                        printf("[pm3] Device is disabled, ignoring\n");
+                        continue;
+                }
 #endif
-		pm3_cap.device_id = lst[i].device;
-		err = 0;
-		memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
-		break;
-	    }
-	}
+                pm3_cap.device_id = lst[i].device;
+                err = 0;
+                memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
+                break;
+            }
+        }
     }
     if(err && verbose) printf("[pm3] Can't find chip\n");
     return err;
 }
 
-#define PRINT_REG(reg)							\
-{									\
-    long _foo = READ_REG(reg);						\
-    printf("[pm3] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);	\
+#define PRINT_REG(reg)                                                  \
+{                                                                       \
+    long _foo = READ_REG(reg);                                          \
+    printf("[pm3] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);      \
 }
 
 static int pm3_init(void)
@@ -155,9 +155,9 @@ static int is_supported_fourcc(uint32_t fourcc)
     switch(fourcc){
     case IMGFMT_YUY2:
     case IMGFMT_UYVY:
-	return 1;
+        return 1;
     default:
-	return 0;
+        return 0;
     }
 }
 
@@ -165,29 +165,29 @@ static int pm3_query_fourcc(vidix_fourcc_t *to)
 {
     if(is_supported_fourcc(to->fourcc))
     {
-	to->depth = VID_DEPTH_ALL;
-	to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
-	return 0;
+        to->depth = VID_DEPTH_ALL;
+        to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
+        return 0;
     }
     else  to->depth = to->flags = 0;
     return ENOSYS;
 }
 
-#define FORMAT_RGB8888	PM3VideoOverlayMode_COLORFORMAT_RGB8888
-#define FORMAT_RGB4444	PM3VideoOverlayMode_COLORFORMAT_RGB4444
-#define FORMAT_RGB5551	PM3VideoOverlayMode_COLORFORMAT_RGB5551
-#define FORMAT_RGB565	PM3VideoOverlayMode_COLORFORMAT_RGB565
-#define FORMAT_RGB332	PM3VideoOverlayMode_COLORFORMAT_RGB332
-#define FORMAT_BGR8888	PM3VideoOverlayMode_COLORFORMAT_BGR8888
-#define FORMAT_BGR4444	PM3VideoOverlayMode_COLORFORMAT_BGR4444
-#define FORMAT_BGR5551	PM3VideoOverlayMode_COLORFORMAT_BGR5551
-#define FORMAT_BGR565	PM3VideoOverlayMode_COLORFORMAT_BGR565
-#define FORMAT_BGR332	PM3VideoOverlayMode_COLORFORMAT_BGR332
-#define FORMAT_CI8	PM3VideoOverlayMode_COLORFORMAT_CI8
-#define FORMAT_VUY444	PM3VideoOverlayMode_COLORFORMAT_VUY444
-#define FORMAT_YUV444	PM3VideoOverlayMode_COLORFORMAT_YUV444
-#define FORMAT_VUY422	PM3VideoOverlayMode_COLORFORMAT_VUY422
-#define FORMAT_YUV422	PM3VideoOverlayMode_COLORFORMAT_YUV422
+#define FORMAT_RGB8888  PM3VideoOverlayMode_COLORFORMAT_RGB8888
+#define FORMAT_RGB4444  PM3VideoOverlayMode_COLORFORMAT_RGB4444
+#define FORMAT_RGB5551  PM3VideoOverlayMode_COLORFORMAT_RGB5551
+#define FORMAT_RGB565   PM3VideoOverlayMode_COLORFORMAT_RGB565
+#define FORMAT_RGB332   PM3VideoOverlayMode_COLORFORMAT_RGB332
+#define FORMAT_BGR8888  PM3VideoOverlayMode_COLORFORMAT_BGR8888
+#define FORMAT_BGR4444  PM3VideoOverlayMode_COLORFORMAT_BGR4444
+#define FORMAT_BGR5551  PM3VideoOverlayMode_COLORFORMAT_BGR5551
+#define FORMAT_BGR565   PM3VideoOverlayMode_COLORFORMAT_BGR565
+#define FORMAT_BGR332   PM3VideoOverlayMode_COLORFORMAT_BGR332
+#define FORMAT_CI8      PM3VideoOverlayMode_COLORFORMAT_CI8
+#define FORMAT_VUY444   PM3VideoOverlayMode_COLORFORMAT_VUY444
+#define FORMAT_YUV444   PM3VideoOverlayMode_COLORFORMAT_YUV444
+#define FORMAT_VUY422   PM3VideoOverlayMode_COLORFORMAT_VUY422
+#define FORMAT_YUV422   PM3VideoOverlayMode_COLORFORMAT_YUV422
 
 /* Notice, have to check that we don't overflow the deltas here ... */
 static void
@@ -201,19 +201,19 @@ compute_scale_factor(
      * The 'shrink_delta' is prone to this the most - FIXME ! */
 
     if (*src_w >= *dst_w) {
-	*src_w &= ~0x3;
-	*dst_w &= ~0x3;
-	*shrink_delta = (((*src_w << 16) / *dst_w) + 0x0f) & 0x0ffffff0;
-	*zoom_delta = 1<<16;
-	if ( ((*shrink_delta * *dst_w) >> 16) & 0x03 )
-	    *shrink_delta += 0x10;
+        *src_w &= ~0x3;
+        *dst_w &= ~0x3;
+        *shrink_delta = (((*src_w << 16) / *dst_w) + 0x0f) & 0x0ffffff0;
+        *zoom_delta = 1<<16;
+        if ( ((*shrink_delta * *dst_w) >> 16) & 0x03 )
+            *shrink_delta += 0x10;
     } else {
-	*src_w &= ~0x3;
-	*dst_w &= ~0x3;
-	*zoom_delta = (((*src_w << 16) / *dst_w) + 0x0f) & 0x0001fff0;
-	*shrink_delta = 1<<16;
-	if ( ((*zoom_delta * *dst_w) >> 16) & 0x03 )
-	    *zoom_delta += 0x10;
+        *src_w &= ~0x3;
+        *dst_w &= ~0x3;
+        *zoom_delta = (((*src_w << 16) / *dst_w) + 0x0f) & 0x0001fff0;
+        *shrink_delta = 1<<16;
+        if ( ((*zoom_delta * *dst_w) >> 16) & 0x03 )
+            *zoom_delta += 0x10;
     }
 }
 
@@ -234,17 +234,17 @@ static int pm3_config_playback(vidix_playback_t *info)
     TRACE_ENTER();
 
     if(!is_supported_fourcc(info->fourcc))
-	return -1;
+        return -1;
 
     switch(info->fourcc){
     case IMGFMT_YUY2:
-	format = FORMAT_YUV422;
-	break;
+        format = FORMAT_YUV422;
+        break;
     case IMGFMT_UYVY:
-	format = FORMAT_VUY422;
-	break;
+        format = FORMAT_VUY422;
+        break;
     default:
-	return -1;
+        return -1;
     }
 
     src_w = info->src.w;
@@ -258,7 +258,7 @@ static int pm3_config_playback(vidix_playback_t *info)
     /* Assume we have 16 MB to play with */
     info->num_frames = 0x1000000 / (pitch * src_h * 2);
     if(info->num_frames > VID_PLAY_MAXFRAMES)
-	info->num_frames = VID_PLAY_MAXFRAMES;
+        info->num_frames = VID_PLAY_MAXFRAMES;
 
     /* Start at 16 MB. Let's hope it's not in use. */
     base0 = 0x1000000;
@@ -272,8 +272,8 @@ static int pm3_config_playback(vidix_playback_t *info)
     info->offset.u = 0;
     info->frame_size = pitch * src_h * 2;
     for(i = 0; i < info->num_frames; i++){
-	info->offsets[i] = info->frame_size * i;
-	frames[i] = (base0 + info->offsets[i]) >> 1;
+        info->offsets[i] = info->frame_size * i;
+        frames[i] = (base0 + info->offsets[i]) >> 1;
     }
 
     compute_scale_factor(&src_w, &drw_w, &shrink, &zoom);
@@ -286,17 +286,17 @@ static int pm3_config_playback(vidix_playback_t *info)
 
     /* Scale the source to the destinationsize */
     if (src_h == drw_h) {
-	WRITE_REG(PM3VideoOverlayYDelta, PM3VideoOverlayYDelta_NONE);
+        WRITE_REG(PM3VideoOverlayYDelta, PM3VideoOverlayYDelta_NONE);
     } else {
-	WRITE_REG(PM3VideoOverlayYDelta,
-		  PM3VideoOverlayYDelta_DELTA(src_h, drw_h));
+        WRITE_REG(PM3VideoOverlayYDelta,
+                  PM3VideoOverlayYDelta_DELTA(src_h, drw_h));
     }
     if (src_w == drw_w) {
-    	WRITE_REG(PM3VideoOverlayShrinkXDelta, 1<<16);
-    	WRITE_REG(PM3VideoOverlayZoomXDelta, 1<<16);
+        WRITE_REG(PM3VideoOverlayShrinkXDelta, 1<<16);
+        WRITE_REG(PM3VideoOverlayZoomXDelta, 1<<16);
     } else {
-    	WRITE_REG(PM3VideoOverlayShrinkXDelta, shrink);
-    	WRITE_REG(PM3VideoOverlayZoomXDelta, zoom);
+        WRITE_REG(PM3VideoOverlayShrinkXDelta, shrink);
+        WRITE_REG(PM3VideoOverlayZoomXDelta, zoom);
     }
     WRITE_REG(PM3VideoOverlayIndex, 0);
 
@@ -305,28 +305,28 @@ static int pm3_config_playback(vidix_playback_t *info)
     RAMDAC_SET_REG(PM3RD_VideoOverlayXStartHigh, (info->dest.x & 0xf00)>>8);
     RAMDAC_SET_REG(PM3RD_VideoOverlayXEndLow, (info->dest.x+drw_w) & 0xff);
     RAMDAC_SET_REG(PM3RD_VideoOverlayXEndHigh,
-		   ((info->dest.x+drw_w) & 0xf00)>>8);
+                   ((info->dest.x+drw_w) & 0xf00)>>8);
     RAMDAC_SET_REG(PM3RD_VideoOverlayYStartLow, (info->dest.y & 0xff));
     RAMDAC_SET_REG(PM3RD_VideoOverlayYStartHigh, (info->dest.y & 0xf00)>>8);
     RAMDAC_SET_REG(PM3RD_VideoOverlayYEndLow, (info->dest.y+drw_h) & 0xff);
     RAMDAC_SET_REG(PM3RD_VideoOverlayYEndHigh,
-		   ((info->dest.y+drw_h) & 0xf00)>>8);
+                   ((info->dest.y+drw_h) & 0xf00)>>8);
 
     RAMDAC_SET_REG(PM3RD_VideoOverlayKeyR, 0xff);
     RAMDAC_SET_REG(PM3RD_VideoOverlayKeyG, 0x00);
     RAMDAC_SET_REG(PM3RD_VideoOverlayKeyB, 0xff);
 
     overlay_mode =
-	1 << 5 |
-	format |
-	PM3VideoOverlayMode_FILTER_FULL |
-	PM3VideoOverlayMode_BUFFERSYNC_MANUAL |
-	PM3VideoOverlayMode_FLIP_VIDEO;
+        1 << 5 |
+        format |
+        PM3VideoOverlayMode_FILTER_FULL |
+        PM3VideoOverlayMode_BUFFERSYNC_MANUAL |
+        PM3VideoOverlayMode_FLIP_VIDEO;
 
     overlay_control =
-	PM3RD_VideoOverlayControl_KEY_COLOR |
-	PM3RD_VideoOverlayControl_MODE_MAINKEY |
-	PM3RD_VideoOverlayControl_DIRECTCOLOR_ENABLED;
+        PM3RD_VideoOverlayControl_KEY_COLOR |
+        PM3RD_VideoOverlayControl_MODE_MAINKEY |
+        PM3RD_VideoOverlayControl_DIRECTCOLOR_ENABLED;
 
     TRACE_EXIT();
     return 0;
@@ -337,11 +337,11 @@ static int pm3_playback_on(void)
     TRACE_ENTER();
 
     WRITE_REG(PM3VideoOverlayMode,
-	      overlay_mode | PM3VideoOverlayMode_ENABLE);
+              overlay_mode | PM3VideoOverlayMode_ENABLE);
     RAMDAC_SET_REG(PM3RD_VideoOverlayControl,
-		   overlay_control | PM3RD_VideoOverlayControl_ENABLE);
+                   overlay_control | PM3RD_VideoOverlayControl_ENABLE);
     WRITE_REG(PM3VideoOverlayUpdate,
-	      PM3VideoOverlayUpdate_ENABLE);
+              PM3VideoOverlayUpdate_ENABLE);
 
     TRACE_EXIT();
     return 0;
@@ -350,9 +350,9 @@ static int pm3_playback_on(void)
 static int pm3_playback_off(void)
 {
     RAMDAC_SET_REG(PM3RD_VideoOverlayControl,
-		   PM3RD_VideoOverlayControl_DISABLE);
+                   PM3RD_VideoOverlayControl_DISABLE);
     WRITE_REG(PM3VideoOverlayMode,
-	      PM3VideoOverlayMode_DISABLE);
+              PM3VideoOverlayMode_DISABLE);
 
     RAMDAC_SET_REG(PM3RD_VideoOverlayKeyR, 0x01);
     RAMDAC_SET_REG(PM3RD_VideoOverlayKeyG, 0x01);

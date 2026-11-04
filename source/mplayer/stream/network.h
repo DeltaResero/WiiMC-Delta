@@ -70,11 +70,11 @@
 typedef int socklen_t;
 #endif
 
-#define BUFFER_SIZE		2048
+#define BUFFER_SIZE     2048
 
 typedef struct {
-	const char *mime_type;
-	int demuxer_type;
+    const char *mime_type;
+    int demuxer_type;
 } mime_struct_t;
 
 extern const mime_struct_t mime_type_table[];
