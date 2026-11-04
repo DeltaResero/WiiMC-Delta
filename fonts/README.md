@@ -2,18 +2,19 @@
 
 ## Built in
 
-`source/fonts/font.ttf` is compiled into the DOL and draws the menus in every
-language that uses Latin letters.
+`source/fonts/font.ttf` is compiled into the DOL. It draws the menus in every
+language that uses Latin letters, Greek and Cyrillic file names, and
+subtitles unless `subfont.ttf` replaces it.
 
 - Font: Noto Sans Bold 2.015
   (https://github.com/notofonts/latin-greek-cyrillic)
 - Licence: SIL Open Font License 1.1 (`OFL.txt`)
-- Cut down to Basic Latin, Latin-1, Latin Extended-A, punctuation and
-  currency signs, without hinting, which looks the same on screen and
-  keeps the DOL 22 KB smaller:
+- Cut down to Basic Latin, Latin-1, Latin Extended-A, Greek, Cyrillic,
+  punctuation and currency signs, without hinting, which looks the same on
+  screen and keeps the DOL smaller:
 
       pyftsubset NotoSans-Bold.ttf --output-file=font.ttf \
-          --unicodes=U+0020-007E,U+00A0-017F,U+0192,U+02C6-02C7,U+02D8-02DD,U+2000-206F,U+20A0-20CF,U+2122,U+2212,U+FFFD \
+          --unicodes=U+0020-007E,U+00A0-017F,U+0192,U+02C6-02C7,U+02D8-02DD,U+0370-03FF,U+0400-04FF,U+2000-206F,U+20A0-20CF,U+2122,U+2212,U+FFFD \
           --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting \
           --name-IDs='*' --name-languages='*'
 
@@ -48,20 +49,12 @@ The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 None of the fonts keep kerning or vertical metrics. WiiMC only reads the
 older `kern` table, which Noto doesn't have, and never draws vertical text.
 
-### Subtitle fonts (optional)
+### Closed-caption font
 
-Without these, subtitles use the built-in font, which has no Greek or
-Cyrillic. Copy them to `apps/wiimc/` to get those, or copy one of the
-language fonts there as `subfont.ttf` for Japanese, Korean or Chinese
-subtitles. WiiMC reads a subtitle font the first time a subtitle needs it.
-
-| File            | Font                      | Used for                              |
-|-----------------|---------------------------|---------------------------------------|
-| `subfont.ttf`   | Noto Sans Bold 2.015      | Subtitles                             |
-| `monospace.ttf` | Noto Sans Mono Bold 2.014 | Monospaced styles and closed captions |
-
-Both are cut to Latin (Vietnamese included), Greek, Cyrillic, punctuation,
-currency, arrows, box drawing and geometric shapes, with the same options as
-the built-in font:
+`monospace.ttf` is Noto Sans Mono Bold 2.014. Subtitles use it when the
+Monospaced subtitle setting is on, which keeps closed captions lined up.
+WiiMC reads it the first time a subtitle needs it. It is cut to Latin
+(Vietnamese included), Greek, Cyrillic, punctuation, currency, arrows, box
+drawing and geometric shapes, with the same options as the built-in font:
 
     --unicodes=U+0020-007E,U+00A0-024F,U+0370-03FF,U+0400-04FF,U+1E00-1EFF,U+2000-206F,U+20A0-20CF,U+2100-214F,U+2190-2193,U+2212,U+2500-257F,U+25A0-25FF,U+FFFD
