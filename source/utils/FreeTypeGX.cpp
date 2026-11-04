@@ -311,7 +311,7 @@ void FreeTypeGX::unloadFont()
 {
     if(this->fontData.size() == 0)
         return;
-    for(std::map<wchar_t, ftgxCharData>::iterator i = this->fontData.begin(), iEnd = this->fontData.end(); i != iEnd; ++i)
+    for(std::unordered_map<wchar_t, ftgxCharData>::iterator i = this->fontData.begin(), iEnd = this->fontData.end(); i != iEnd; ++i)
         ft_free(i->second.glyphDataTexture);
     this->fontData.clear();
 }
@@ -376,6 +376,20 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode)
         }
     }
     return NULL;
+}
+
+/**
+ * Returns a character's cached glyph data, caching it first if needed.
+ *
+ * @param charCode  The requested glyph's character code.
+ * @return A pointer to the glyph data, or NULL if the glyph could not be loaded.
+ */
+ftgxCharData *FreeTypeGX::getGlyph(wchar_t charCode)
+{
+    std::unordered_map<wchar_t, ftgxCharData>::iterator i = this->fontData.find(charCode);
+    if (i != this->fontData.end())
+        return &i->second;
+    return this->cacheGlyphData(charCode);
 }
 
 /**
@@ -528,15 +542,7 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
     int i = 0;
     while (text[i])
     {
-        ftgxCharData* glyphData = NULL;
-        if (this->fontData.find(text[i]) != this->fontData.end())
-        {
-            glyphData = &this->fontData[text[i]];
-        }
-        else
-        {
-            glyphData = this->cacheGlyphData(text[i]);
-        }
+        ftgxCharData* glyphData = this->getGlyph(text[i]);
 
         if (glyphData != NULL)
         {
@@ -593,12 +599,7 @@ uint16_t FreeTypeGX::getWidth(wchar_t *text)
     int i = 0;
     while (text[i])
     {
-        ftgxCharData* glyphData = NULL;
-
-        if (this->fontData.find(text[i]) != this->fontData.end())
-            glyphData = &this->fontData[text[i]];
-        else
-            glyphData = this->cacheGlyphData(text[i]);
+        ftgxCharData* glyphData = this->getGlyph(text[i]);
 
         if (glyphData != NULL)
         {
@@ -660,15 +661,7 @@ void FreeTypeGX::getOffset(wchar_t *text, ftgxDataOffset* offset)
     int i = 0;
     while (text[i])
     {
-        ftgxCharData* glyphData = NULL;
-        if (this->fontData.find(text[i]) != this->fontData.end())
-        {
-            glyphData = &this->fontData[text[i]];
-        }
-        else
-        {
-            glyphData = this->cacheGlyphData(text[i]);
-        }
+        ftgxCharData* glyphData = this->getGlyph(text[i]);
 
         if(glyphData != NULL)
         {

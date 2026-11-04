@@ -31,7 +31,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <wchar.h>
-#include <map>
+#include <unordered_map>
 
 #define MAX_FONT_SIZE 100
 
@@ -127,7 +127,7 @@ class FreeTypeGX {
         bool bold;              /**< Flag indicating glyphs are thickened. */
         uint8_t vertexIndex;    /**< Vertex format descriptor index. */
         uint32_t compatibilityMode; /**< Compatibility mode for default tev operations and vertex descriptors. */
-        std::map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
+        std::unordered_map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
 
         static uint16_t adjustTextureWidth(uint16_t textureWidth);
         static uint16_t adjustTextureHeight(uint16_t textureHeight);
@@ -137,6 +137,7 @@ class FreeTypeGX {
 
         void unloadFont();
         ftgxCharData *cacheGlyphData(wchar_t charCode);
+        ftgxCharData *getGlyph(wchar_t charCode);
         uint16_t cacheGlyphDataComplete();
         void loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData);
 
