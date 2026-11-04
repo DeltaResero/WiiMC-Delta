@@ -31,7 +31,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <wchar.h>
-#include <map>
+#include <unordered_map>
 
 #define MAX_FONT_SIZE 100
 
@@ -42,7 +42,6 @@
 typedef struct ftgxCharData_ {
     int16_t renderOffsetX;      /**< Texture X axis bearing offset. */
     uint16_t glyphAdvanceX;     /**< Character glyph X coordinate advance in pixels. */
-    uint16_t glyphIndex;        /**< Charachter glyph index in the font face. */
 
     uint16_t textureWidth;      /**< Texture width in pixels/bytes. */
     uint16_t textureHeight;     /**< Texture glyph height in pixels/bytes. */
@@ -109,6 +108,9 @@ const GXColor ftgxWhite = (GXColor){0xff, 0xff, 0xff, 0xff}; /**< Constant color
 bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize);
 void DeinitFreeType();
 void ChangeFontSize(FT_UInt pixelSize);
+enum { FALLBACK_JP, FALLBACK_KO, FALLBACK_ZH_CN, FALLBACK_ZH_TW }; // the language fonts, for LoadFallbackFont
+void DropFallbackFont();
+u8 *LoadFallbackFont(int font, u32 *size); // in menu.cpp
 wchar_t* charToWideChar(const char* p);
 void ClearFontData();
 
@@ -125,10 +127,11 @@ class FreeTypeGX {
 
     private:
         FT_UInt ftPointSize;    /**< Requested size of the rendered font. */
-        bool ftKerningEnabled;  /**< Flag indicating the availability of font kerning data. */
+        bool bold;              /**< Flag indicating glyphs are thickened. */
         uint8_t vertexIndex;    /**< Vertex format descriptor index. */
         uint32_t compatibilityMode; /**< Compatibility mode for default tev operations and vertex descriptors. */
-        std::map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
+        const wchar_t *currentText; /**< String being measured or drawn, to pick a fallback font by script. */
+        std::unordered_map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
 
         static uint16_t adjustTextureWidth(uint16_t textureWidth);
         static uint16_t adjustTextureHeight(uint16_t textureHeight);
@@ -138,6 +141,8 @@ class FreeTypeGX {
 
         void unloadFont();
         ftgxCharData *cacheGlyphData(wchar_t charCode);
+        ftgxCharData *getGlyph(wchar_t charCode);
+        FT_Face fallbackFor(wchar_t charCode);
         uint16_t cacheGlyphDataComplete();
         void loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData);
 
@@ -148,7 +153,7 @@ class FreeTypeGX {
         void copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY,  GXColor color);
 
     public:
-        FreeTypeGX(FT_UInt pixelSize, uint8_t vertexIndex = GX_VTXFMT1);
+        FreeTypeGX(FT_UInt pixelSize, bool bold = false, uint8_t vertexIndex = GX_VTXFMT1);
         ~FreeTypeGX();
 
 //!Operator overload: new, delete, new[] and delete[]

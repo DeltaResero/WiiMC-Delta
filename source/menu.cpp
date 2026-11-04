@@ -1447,12 +1447,56 @@ static void ResetText()
 
 static int currentFont = FONT_DEFAULT;
 static u8 *ext_font_ttf = NULL;
+static u8 *fallback_ttf = NULL; // a language font lent to the built-in one, in the same memory
+
+/****************************************************************************
+ * LoadFallbackFont
+ *
+ * Reads a language font so the built-in font can borrow glyphs from it for
+ * file names in other scripts. Only while no language font is loaded, as
+ * both use the language font's memory. FreeTypeGX closes the old fallback
+ * face before calling this.
+ ***************************************************************************/
+u8 *LoadFallbackFont(int font, u32 *size)
+{
+    static const char *files[] = { "jp.ttf", "ko.ttf", "zh_cn.ttf", "zh_tw.ttf" };
+
+    if(fallback_ttf)
+    {
+        mem2_free(fallback_ttf, MEM2_EXTFONT);
+        fallback_ttf = NULL;
+    }
+    if(currentFont != FONT_DEFAULT || font < FALLBACK_JP || font > FALLBACK_ZH_TW)
+        return NULL;
+
+    char filepath[MAXPATHLEN];
+    sprintf(filepath, "%s/%s", appPath, files[font]);
+    FILE *file = fopen(filepath, "rb");
+    if(!file)
+        return NULL;
+
+    fseeko(file, 0, SEEK_END);
+    u32 loadSize = ftello(file);
+    if(loadSize > 0 && AddMem2Area(loadSize+1024, MEM2_EXTFONT))
+    {
+        fallback_ttf = (u8 *)mem2_memalign(32, loadSize, MEM2_EXTFONT);
+        fseeko(file, 0, SEEK_SET);
+        if(fallback_ttf && fread(fallback_ttf, 1, loadSize, file) != loadSize)
+        {
+            mem2_free(fallback_ttf, MEM2_EXTFONT);
+            fallback_ttf = NULL;
+        }
+    }
+    fclose(file);
+    *size = loadSize;
+    return fallback_ttf;
+}
 
 void ChangeLanguage()
 {
     char error[128] = {0};
 
-    if(WiiSettings.language < 7 || WiiSettings.language == LANG_KOREAN)
+    if(WiiSettings.language >= 0 && WiiSettings.language < LANG_LENGTH)
     {
         char filepath[MAXPATHLEN];
         int newFont = 0;
@@ -1464,16 +1508,27 @@ void ChangeLanguage()
                 sprintf(filepath, "%s/ko.ttf", appPath);
                 newFont = FONT_KOREAN;
                 break;
-        #if 0
             case LANG_JAPANESE:
                 if(currentFont == FONT_JAPANESE) return;
                 sprintf(filepath, "%s/jp.ttf", appPath);
                 newFont = FONT_JAPANESE;
                 break;
-        #endif
+            case LANG_SIMP_CHINESE:
+                if(currentFont == FONT_SIMP_CHINESE) return;
+                sprintf(filepath, "%s/zh_cn.ttf", appPath);
+                newFont = FONT_SIMP_CHINESE;
+                break;
+            case LANG_TRAD_CHINESE:
+                if(currentFont == FONT_TRAD_CHINESE) return;
+                sprintf(filepath, "%s/zh_tw.ttf", appPath);
+                newFont = FONT_TRAD_CHINESE;
+                break;
             case LANG_ENGLISH:
+            case LANG_GERMAN:
+            case LANG_FRENCH:
             case LANG_SPANISH:
-            //case LANG_FRENCH:
+            case LANG_ITALIAN:
+            case LANG_DUTCH:
                 //if(currentFont == FONT_GENERIC) return;
                 sprintf(filepath, "%s/def.ttf", appPath);
                 newFont = FONT_GENERIC;
@@ -1486,6 +1541,14 @@ restart:
 
         if(file)
         {
+            if(fallback_ttf) // the language font needs this memory
+            {
+                SuspendGui();
+                DropFallbackFont();
+                mem2_free(fallback_ttf, MEM2_EXTFONT);
+                fallback_ttf = NULL;
+            }
+
             fseeko(file,0,SEEK_END);
             u32 loadSize = ftello(file);
 
@@ -1544,7 +1607,8 @@ restart:
         }
 error:
         WiiSettings.language = WiiSettings.language;
-        if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE)
+        if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE ||
+            WiiSettings.language == LANG_SIMP_CHINESE || WiiSettings.language == LANG_TRAD_CHINESE)
             WiiSettings.language = LANG_ENGLISH;
     }
 
@@ -1554,6 +1618,7 @@ error:
         DeinitFreeType();
         if(ext_font_ttf) mem2_free(ext_font_ttf, MEM2_EXTFONT);
         ext_font_ttf = NULL;
+        RemoveMem2Area(MEM2_EXTFONT); // hand the language font's memory back
         InitFreeType((u8*)font_ttf, font_ttf_size);
         currentFont = FONT_DEFAULT;
         ResetText();
@@ -1662,6 +1727,7 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
     GuiText msgTxt(NULL, 20, (GXColor){255, 255, 255, 255});
@@ -1815,6 +1881,7 @@ ProgressWindow(char *title, char *msg)
     throbberImg.SetPosition(0, 40);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
     GuiText msgTxt(msg, 20, (GXColor){255, 255, 255, 255});
@@ -2263,6 +2330,7 @@ SettingWindow(const char *title, GuiWindow *w)
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
 
@@ -4468,6 +4536,7 @@ static void MenuSettingsGlobal()
     }
 
     GuiText titleTxt("Settings - Global", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -4522,28 +4591,7 @@ static void MenuSettingsGlobal()
         switch (ret)
         {
             case 0:
-                switch (WiiSettings.language) {
-                    case LANG_ENGLISH:
-                        WiiSettings.language = LANG_SPANISH;
-                        break;
-                    case LANG_SPANISH:
-                        WiiSettings.language = LANG_KOREAN;
-                        break;
-                //  case LANG_FRENCH:
-                //      WiiSettings.language = LANG_KOREAN;
-                //      break;
-                    case LANG_KOREAN:
-                        WiiSettings.language = LANG_ENGLISH;
-                        break;
-                //  case LANG_JAPANESE:
-                //      WiiSettings.language = LANG_ENGLISH;
-                //      break;
-                }
-            //WiiSettings.language++;
-            /*  if(WiiSettings.language == LANG_GERMAN)
-                    ++WiiSettings.language;
-                else if(WiiSettings.language >= LANG_LENGTH)
-                    WiiSettings.language = 0; */
+                WiiSettings.language = (WiiSettings.language + 1) % LANG_LENGTH;
                 break;
             case 1:
                 WiiSettings.volume += 10;
@@ -4700,29 +4748,16 @@ static void MenuSettingsGlobal()
 
             switch(WiiSettings.language)
             {
-                //case LANG_JAPANESE:               sprintf(options.value[0], "Japanese"); break;
+                case LANG_JAPANESE:             sprintf(options.value[0], "Japanese"); break;
                 case LANG_ENGLISH:              sprintf(options.value[0], "English"); break;
-                //only support languages that can have all text translated
-                //case LANG_GERMAN:             sprintf(options.value[0], "Deutsch"); break;
-                //case LANG_FRENCH:             sprintf(options.value[0], "Français"); break;
+                case LANG_GERMAN:               sprintf(options.value[0], "Deutsch"); break;
+                case LANG_FRENCH:               sprintf(options.value[0], "Français"); break;
                 case LANG_SPANISH:              sprintf(options.value[0], "Español"); break;
-                /*case LANG_ITALIAN:                sprintf(options.value[0], "Italiano"); break;
-                case LANG_DUTCH:                sprintf(options.value[0], "Dutch"); break;
+                case LANG_ITALIAN:              sprintf(options.value[0], "Italiano"); break;
+                case LANG_DUTCH:                sprintf(options.value[0], "Nederlands"); break;
                 case LANG_SIMP_CHINESE:         sprintf(options.value[0], "Chinese (Simplified)"); break;
-                case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;*/
+                case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;
                 case LANG_KOREAN:               sprintf(options.value[0], "Korean"); break;
-                /*case LANG_ROMANIAN:               sprintf(options.value[0], "Romanian"); break;
-                case LANG_ESTONIAN:             sprintf(options.value[0], "Estonian"); break;
-                case LANG_PORTUGUESE:           sprintf(options.value[0], "Portuguese"); break;
-                case LANG_BRAZILIAN_PORTUGUESE: sprintf(options.value[0], "Brazilian Portuguese"); break;
-                case LANG_HUNGARIAN:            sprintf(options.value[0], "Hungarian"); break;
-                case LANG_POLISH:               sprintf(options.value[0], "Polish"); break;
-                case LANG_RUSSIAN:              sprintf(options.value[0], "Russian"); break;
-                case LANG_SLOVAK:               sprintf(options.value[0], "Slovak"); break;
-                case LANG_TAMIL:                sprintf(options.value[0], "Tamil"); break;
-                case LANG_SWEDISH:              sprintf(options.value[0], "Swedish"); break;
-                case LANG_DANISH:               sprintf(options.value[0], "Danish"); break;
-                case LANG_BULGARIAN:            sprintf(options.value[0], "Bulgarian"); break;*/
             }
 
             sprintf (options.value[1], "%d%%", WiiSettings.volume);
@@ -5040,6 +5075,7 @@ static void LanguageWindow(char *lang)
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
 
     if(lang == WiiSettings.subtitleLanguage)
         titleTxt.SetText("Subtitle Language");
@@ -5172,6 +5208,7 @@ static void MenuSettingsVideos()
     }
 
     GuiText titleTxt("Settings - Videos", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5427,6 +5464,7 @@ static void MenuSettingsMusic()
     }
 
     GuiText titleTxt("Settings - Music", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5565,6 +5603,7 @@ static void MenuSettingsDVD()
     }
 
     GuiText titleTxt("Settings - DVD", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5741,6 +5780,7 @@ static void MenuSettingsOnlineMedia()
     }
 
     GuiText titleTxt("Settings - Online Media", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5935,6 +5975,7 @@ static void MenuSettingsNetwork()
     options.length = i;
 
     GuiText titleTxt("Settings - Network", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -6072,6 +6113,7 @@ static void MenuSettingsNetworkSMB()
     swprintf(titleStr, 100, L"%s - %s", gettext("Settings - Network"), gettext(shareName));
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetWText(titleStr);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
@@ -6290,6 +6332,7 @@ static void MenuSettingsNetworkFTP()
     swprintf(titleStr, 100, L"%s - %s", gettext("Settings - Network"), gettext(siteName));
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetWText(titleStr);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
@@ -6478,6 +6521,7 @@ static void CodepageWindow()
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt("Subtitle Codepage", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
 
@@ -6589,6 +6633,7 @@ static void MenuSettingsSubtitles()
     }
 
     GuiText titleTxt("Settings - Subtitles", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -6625,9 +6670,6 @@ static void MenuSettingsSubtitles()
     mainWindow->Append(&w);
     mainWindow->Append(&titleTxt);
     ResumeGui();
-
-    if(!subtitleFontFound)
-        InfoPrompt("Subtitle font file not found. Using internal.");
 
     while(menuCurrent == MENU_SETTINGS_SUBTITLES && !guiShutdown)
     {
@@ -6754,6 +6796,7 @@ static void MenuSettings()
     }
 
     GuiText titleTxt("Settings", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 

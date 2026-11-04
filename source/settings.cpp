@@ -752,7 +752,10 @@ void DefaultSettings ()
     memset(&WiiSettings, 0, sizeof(SWiiSettings));
 
     // Global
-    WiiSettings.language = CONF_GetLanguage() == 4 ? LANG_SPANISH : LANG_ENGLISH;
+    // LANG_* follows libogc's CONF_LANG_* order
+    WiiSettings.language = CONF_GetLanguage();
+    if(WiiSettings.language < 0 || WiiSettings.language >= LANG_LENGTH)
+        WiiSettings.language = LANG_ENGLISH;
     WiiSettings.volume = 50;
     WiiSettings.hideExtensions = 1;
     WiiSettings.exitAction = EXIT_AUTO;
@@ -849,8 +852,7 @@ void DefaultSettings ()
 static void FixInvalidSettings()
 {
     // Global
-    if(WiiSettings.language != LANG_ENGLISH && WiiSettings.language != LANG_SPANISH &&
-        WiiSettings.language != LANG_KOREAN)
+    if(WiiSettings.language < 0 || WiiSettings.language >= LANG_LENGTH)
         WiiSettings.language = LANG_ENGLISH;
     if(WiiSettings.volume < 0 || WiiSettings.volume > 100)
         WiiSettings.volume = 50;
@@ -1404,6 +1406,10 @@ bool LoadSettings()
                 wiiLoadRestorePoints(buffer, size);
             mem2_free(buffer, MEM2_OTHER);
         }
+    }
+    else
+    {
+        ChangeLanguage(); // no settings.xml yet, so use the Wii's language
     }
     return settingsFound;
 }

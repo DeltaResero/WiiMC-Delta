@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <gctypes.h>
 #include <unistd.h>
+#include <zlib.h>
 
 #include "gettext.h"
 #include "filelist.h"
@@ -206,34 +207,46 @@ bool LoadLanguage()
     char line[350];
     char *lastID = NULL;
 
-    char *file, *eof;
+    const u8 *packed;
+    u32 packedSize;
 
     switch(WiiSettings.language)
     {
-        case LANG_JAPANESE: file = (char *)jp_lang; eof = file + jp_lang_size; break;
-        case LANG_ENGLISH: file = (char *)en_lang; eof = file + en_lang_size; break;
-        //case LANG_GERMAN: file = (char *)de_lang; eof = file + de_lang_size; break;
-        case LANG_FRENCH: file = (char *)fr_lang; eof = file + fr_lang_size; break;
-        case LANG_SPANISH: file = (char *)es_lang; eof = file + es_lang_size; break;
-        /*case LANG_ITALIAN: file = (char *)it_lang; eof = file + it_lang_size; break;
-        case LANG_DUTCH: file = (char *)nl_lang; eof = file + nl_lang_size; break;
-        case LANG_SIMP_CHINESE: file = (char *)zh_cn_lang; eof = file + zh_cn_lang_size; break;
-        case LANG_TRAD_CHINESE: file = (char *)zh_tw_lang; eof = file + zh_tw_lang_size; break;*/
-        case LANG_KOREAN: file = (char *)ko_lang; eof = file + ko_lang_size; break;
-        /*case LANG_ROMANIAN: file = (char *)ro_lang; eof = file + ro_lang_size; break;
-        case LANG_ESTONIAN: file = (char *)et_lang; eof = file + et_lang_size; break;
-        case LANG_PORTUGUESE: file = (char *)pt_lang; eof = file + pt_lang_size; break;
-        case LANG_BRAZILIAN_PORTUGUESE: file = (char *)pt_br_lang; eof = file + pt_br_lang_size; break;
-        case LANG_HUNGARIAN: file = (char *)hu_lang; eof = file + hu_lang_size; break;
-        case LANG_POLISH: file = (char *)pl_lang; eof = file + pl_lang_size; break;
-        case LANG_RUSSIAN: file = (char *)ru_lang; eof = file + ru_lang_size; break;
-        case LANG_SLOVAK: file = (char *)sk_lang; eof = file + sk_lang_size; break;
-        case LANG_TAMIL: file = (char *)ta_lang; eof = file + ta_lang_size; break;
-        case LANG_SWEDISH: file = (char *)sv_lang; eof = file + sv_lang_size; break;
-        case LANG_DANISH: file = (char *)da_lang; eof = file + da_lang_size; break;
-        case LANG_BULGARIAN: file = (char *)bg_lang; eof = file + bg_lang_size; break;*/
+        case LANG_JAPANESE: packed = jp_lang_gz; packedSize = jp_lang_gz_size; break;
+        case LANG_ENGLISH: packed = en_lang_gz; packedSize = en_lang_gz_size; break;
+        case LANG_GERMAN: packed = de_lang_gz; packedSize = de_lang_gz_size; break;
+        case LANG_FRENCH: packed = fr_lang_gz; packedSize = fr_lang_gz_size; break;
+        case LANG_SPANISH: packed = es_lang_gz; packedSize = es_lang_gz_size; break;
+        case LANG_ITALIAN: packed = it_lang_gz; packedSize = it_lang_gz_size; break;
+        case LANG_DUTCH: packed = nl_lang_gz; packedSize = nl_lang_gz_size; break;
+        case LANG_SIMP_CHINESE: packed = zh_cn_lang_gz; packedSize = zh_cn_lang_gz_size; break;
+        case LANG_TRAD_CHINESE: packed = zh_tw_lang_gz; packedSize = zh_tw_lang_gz_size; break;
+        case LANG_KOREAN: packed = ko_lang_gz; packedSize = ko_lang_gz_size; break;
         default: return false;
     }
+
+    // the files are gzipped, and gzip ends with the unpacked size
+    u32 size = packed[packedSize-4] | packed[packedSize-3] << 8 | packed[packedSize-2] << 16 | packed[packedSize-1] << 24;
+    char *text = (char *)mem2_malloc(size + 1, MEM2_OTHER);
+    if(!text)
+        return false;
+
+    z_stream zs;
+    memset(&zs, 0, sizeof(zs));
+    zs.next_in = (Bytef *)packed;
+    zs.avail_in = packedSize;
+    zs.next_out = (Bytef *)text;
+    zs.avail_out = size;
+    bool unpacked = inflateInit2(&zs, 16 + MAX_WBITS) == Z_OK && inflate(&zs, Z_FINISH) == Z_STREAM_END;
+    inflateEnd(&zs);
+    if(!unpacked)
+    {
+        mem2_free(text, MEM2_OTHER);
+        return false;
+    }
+    text[size] = 0;
+
+    char *file = text, *eof = text + size;
 
     gettextCleanUp();
 
@@ -282,6 +295,9 @@ bool LoadLanguage()
             lastID = NULL;
         }
     }
+    if(lastID)
+        free(lastID);
+    mem2_free(text, MEM2_OTHER);
     return true;
 }
 

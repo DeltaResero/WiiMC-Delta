@@ -77,16 +77,13 @@ msgid "Loading..."
 msgstr "로딩중..."
 
 msgid "Global"
-msgstr "글로벌"
+msgstr "일반"
 
 msgid "Network"
 msgstr "네트워크"
 
 msgid "Subtitles"
 msgstr "자막"
-
-msgid "Subtitle Delay"
-msgstr "자막 지연"
 
 msgid "Settings"
 msgstr "환경설정"
@@ -106,17 +103,11 @@ msgstr "비활성"
 msgid "Skip Backward"
 msgstr "뒤로"
 
-msgid "Pause"
-msgstr "일시정지"
-
 msgid "Skip Forward"
 msgstr "앞으로"
 
 msgid "Single"
 msgstr "한번"
-
-msgid "Now Playing"
-msgstr "현재 재생중"
 
 msgid "Previous"
 msgstr "이전"
@@ -146,7 +137,7 @@ msgid "Port is outside the allowed range (4-49151)!"
 msgstr "포트가 허용된 범위 (4-49151)를 벗어났습니다!"
 
 msgid "Settings - Global"
-msgstr "설정 - 글로벌"
+msgstr "설정 - 일반"
 
 msgid "Settings - Videos"
 msgstr "설정 - 비디오"
@@ -176,7 +167,7 @@ msgid "Exit Action"
 msgstr "종료 동작"
 
 msgid "Wii Remote Rumble"
-msgstr "위모트 진동"
+msgstr "Wii 리모컨 진동"
 
 msgid "Hide"
 msgstr "숨기기"
@@ -240,9 +231,6 @@ msgstr "재생 명령"
 
 msgid "Music Folder"
 msgstr "음악 파일 폴더"
-
-msgid "Pictures Files Folder"
-msgstr "그림 파일 폴더"
 
 msgid "Display Name"
 msgstr "디스플레이 이름"
@@ -353,7 +341,7 @@ msgid "Data DVD"
 msgstr "데이타 DVD"
 
 msgid "USB drive not found!"
-mmsgstr "USB 드라이브가 없음!"
+msgstr "USB 드라이브가 없음!"
 
 msgid "SD card not found!"
 msgstr "SD card가 없음!"
@@ -363,9 +351,6 @@ msgstr "DVD 로딩중..."
 
 msgid "No disc inserted!"
 msgstr "삽입된 디스크 없음!"
-
-msgid "Invalid DVD."
-msgstr "유효하지 않은 DVD."
 
 msgid "Error opening"
 msgstr "열기 오류"
@@ -401,7 +386,7 @@ msgid "Playlist is Empty"
 msgstr "재생목록 비었음"
 
 msgid "Hover over items and push the + button to add them to your playlist."
-msgstr "파일 위에 포인를 두고 +를 누르면 재생목록에 추가 됩니다."
+msgstr "파일 위에 포인터를 두고 +를 누르면 재생목록에 추가됩니다."
 
 msgid "Exit Playlist"
 msgstr "재생목록 종료"
@@ -466,9 +451,6 @@ msgstr "메뉴 삽화"
 msgid "Programming"
 msgstr "프로그래밍"
 
-msgid "& menu design"
-msgstr "& 메뉴 디자인"
-
 msgid "This is a private build of WiiMC."
 msgstr "이것은 WiiMC 개인 빌드입니다."
 
@@ -483,9 +465,6 @@ msgstr "버퍼링중..."
 
 msgid "Buffering"
 msgstr "버퍼링"
-
-msgid "Unable to initialize network (Error #:"
-msgstr "네트워크 초기화할 수 없음 (오류 #:"
 
 msgid "Settings - Subtitles"
 msgstr "설정 - 자막"
@@ -510,12 +489,6 @@ msgstr "기본설정"
 
 msgid "Could not change language. Not enough memory!"
 msgstr "언어를 바꿀수 없습니다. 메모리가 부족합니다."
-
-msgid "Font Required"
-msgstr "폰트 파일이 필요합니다."
-
-msgid "Out of Memory"
-msgstr "메모리 초과"
 
 msgid "Subtitle Codepage"
 msgstr "자막 코드페이지"
@@ -574,9 +547,6 @@ msgstr "DVD 지원"
 msgid "Interlacing"
 msgstr "인터레이스"
 
-msgid "Interlacing"
-msgstr "인터레이스"
-
 msgid "Blur"
 msgstr "흐릿함"
 
@@ -585,9 +555,6 @@ msgstr "해상도가 최대 허용치 (1024x720)를 초과합니다!"
 
 msgid "Online media file is invalid."
 msgstr "온라인 미디어 파일이 유효하지 않습니다."
-
-msgid "Subtitle font file not found. Subtitles will not be visible."
-msgstr "자막 폰트 파일을 찾을 수 없습니다. 자막은 표시되지 않습니다."
 
 msgid "WiiMC does not have DVD access."
 msgstr "WiiMC에는 DVD 접속 권한이 없습니다."
@@ -598,14 +565,8 @@ msgstr "시작 지역"
 msgid "Artwork Viewer"
 msgstr "아트워크 뷰어"
 
-msgid "Artwork Viewer"
-msgstr "아트워크 뷰어"
-
 msgid "Art Folder"
 msgstr "아트 폴더"
-
-msgid "Screensaver Banner Limiter"
-msgstr "스크린세이버 배너 제한기"
 
 msgid "Banner Folder"
 msgstr "배너 폴더"
@@ -645,3 +606,75 @@ msgstr "자막 지연이 잘못되었습니다."
 
 msgid "DVD playback is not supported on this Wii."
 msgstr "이 Wii에서는 DVD 재생이 지원되지 않습니다."
+
+msgid "Online media file not found."
+msgstr "온라인 미디어 파일을 찾을 수 없습니다."
+
+msgid "Error loading YouTube file!"
+msgstr "YouTube 파일 로딩 오류!"
+
+msgid "Screensaver Banners"
+msgstr "화면보호기 배너"
+
+msgid "Double Strike"
+msgstr "Double Strike"
+
+msgid "Japanese"
+msgstr "일본어"
+
+msgid "Chinese (Simplified)"
+msgstr "중국어 간체"
+
+msgid "Chinese (Traditional)"
+msgstr "중국어 번체"
+
+msgid "Korean"
+msgstr "한국어"
+
+msgid "hours"
+msgstr "시간"
+
+msgid "Full Alt"
+msgstr "전체 (대체)"
+
+msgid "Original"
+msgstr "원본"
+
+msgid "TV"
+msgstr "TV"
+
+msgid "Low (400x240)"
+msgstr "낮음 (400x240)"
+
+msgid "Medium (480x360)"
+msgstr "보통 (480x360)"
+
+msgid "High (854x480)"
+msgstr "높음 (854x480)"
+
+msgid "Highest Resolution"
+msgstr "최고 해상도"
+
+msgid "Cover 200px"
+msgstr "커버 200px"
+
+msgid "Poster 150px"
+msgstr "포스터 150px"
+
+msgid "Poster 300px"
+msgstr "포스터 300px"
+
+msgid "Color"
+msgstr "색상"
+
+msgid "Internet Stream"
+msgstr "인터넷 스트림"
+
+msgid "now playing"
+msgstr "현재 재생중"
+
+msgid "Credits"
+msgstr "크레딧"
+
+msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
+msgstr "현재 IOS가 변경되었습니다 (fake-signed). 기능/안정성에 악영향을 미칠 수 있습니다."
