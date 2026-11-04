@@ -2863,6 +2863,10 @@ static void advance_timer(double amount)
         mpctx->delay -= amount;
 }
 
+#ifdef GEKKO
+static int video_drained;
+#endif
+
 static double update_video(int *blit_frame)
 {
     sh_video_t *const sh_video = mpctx->sh_video;
@@ -2902,6 +2906,14 @@ static double update_video(int *blit_frame)
             }
 #endif
             flush = in_size < 0 && mpctx->d_video->eof;
+#ifdef GEKKO
+            // Once a flush at the end of the video has given no picture,
+            // don't flush again on every pass while the audio plays out.
+            if (in_size >= 0)
+                video_drained = 0;
+            else if (flush && video_drained)
+                return -1;
+#endif
                         if (flush) {
                                 start = NULL;
                                 in_size = 0;
@@ -2921,8 +2933,12 @@ static double update_video(int *blit_frame)
             decoded_frame = decode_video(sh_video, start, in_size, drop_frame,
                                          sh_video->pts, sh_video->endpts, &full_frame);
 
-            if (flush && !decoded_frame)
+            if (flush && !decoded_frame) {
+#ifdef GEKKO
+                video_drained = 1;
+#endif
                 return -1;
+            }
 
             if (full_frame) {
                 advance_timer(frame_time);
