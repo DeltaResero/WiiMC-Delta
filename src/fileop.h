@@ -57,6 +57,7 @@ bool IsImageExt(char *ext);
 bool IsAllowedExt(char *ext);
 bool IsAllowedProtocol(char *file);
 bool IsInternetStream(char *file);
+bool IsHttpUrl(const char *file);
 void FindFile();
 void FindDirectory();
 bool ParseDone();

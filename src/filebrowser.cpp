@@ -368,7 +368,7 @@ static int UpdateDirName()
 
     // entering a playlist - this is handled when the playlist is parsed
     if(browser.selIndex->type == TYPE_PLAYLIST ||
-        strncmp(browser.selIndex->file, "http:", 5) == 0)
+        IsHttpUrl(browser.selIndex->file))
     {
         BrowserHistoryStore(browser.dir);
         GetFullPath(browser.selIndex, browser.dir);
@@ -486,7 +486,7 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
         }
     }
 
-    if(isPlaylist || (strlen(browser.dir) > 10 && strncmp(browser.dir,"http:", 5) == 0))
+    if(isPlaylist || (strlen(browser.dir) > 10 && IsHttpUrl(browser.dir)))
     {
         int res = ParsePlaylistFile();
 

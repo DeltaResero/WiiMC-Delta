@@ -1656,12 +1656,24 @@ bool IsAllowedProtocol(char *file)
     return false;
 }
 
+// http:// or https://
+bool IsHttpUrl(const char *file)
+{
+    return strncmp(file, "http:", 5) == 0 || strncmp(file, "https:", 6) == 0;
+}
+
 bool IsInternetStream(char *file)
 {
-    if(strncmp(file, "http://", 7) != 0)
+    int start;
+
+    if(strncmp(file, "http://", 7) == 0)
+        start = 7;
+    else if(strncmp(file, "https://", 8) == 0)
+        start = 8;
+    else
         return false;
 
-    char *pos = strchr(&file[7], '/');
+    char *pos = strchr(&file[start], '/');
 
     if(!pos || pos == &file[strlen(file)-1])
         return true;
@@ -2101,7 +2113,7 @@ static int ParsePLXPlaylist()
     memset(buffer, 0, MAX_PLX_SIZE);
     int size = 0;
 
-    if(strncmp(browser.dir, "http:", 5) == 0)
+    if(IsHttpUrl(browser.dir))
         size = http_request(browser.dir, NULL, buffer, MAX_PLX_SIZE, SILENT);
     else
         size = LoadFile(buffer, MAX_PLX_SIZE, browser.dir, SILENT);
@@ -2268,7 +2280,7 @@ static int ParsePLXPlaylist()
     f_entry->length = 0;
     f_entry->icon = ICON_FOLDER;
 
-    if(IsPlaylistExt(ext) || strncmp(root, "http:", 5) == 0)
+    if(IsPlaylistExt(ext) || IsHttpUrl(root))
         f_entry->type = TYPE_PLAYLIST;
     else
         f_entry->type = TYPE_FOLDER;
@@ -2465,7 +2477,7 @@ int ParsePlaylistFile()
                     break;
                 }
 
-                if(IsPlaylistExt(ext) || strncmp(root, "http:", 5) == 0)
+                if(IsPlaylistExt(ext) || IsHttpUrl(root))
                     f_entry->type = TYPE_PLAYLIST;
                 else
                     f_entry->type = TYPE_FOLDER;

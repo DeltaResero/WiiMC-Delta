@@ -3042,7 +3042,7 @@ static void *ThumbThread (void *arg)
                 BROWSERENTRY *loadIndex = thumbIndex;
                 int read = 0;
                 //if(!bannerSSactive && loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0) {
-                if(!bannerSSactive && loadIndex->image && strncmp(browser.selIndex->file, "http:", 5) == 0) {
+                if(!bannerSSactive && loadIndex->image && IsHttpUrl(browser.selIndex->file)) {
                     //read = http_request(loadIndex->image, NULL, thumbBuffer, 200*1024, SILENT);
                     //read = http_request("https://cdn-albums.tunein.com/gn/B3XTN3P0BRg.jpg", NULL, thumbBuffer, 200*1024, SILENT);
 
@@ -3674,7 +3674,7 @@ static void MenuBrowse(int menu)
         }
     }
 
-    if(strncmp(browser.dir, "http:", 5) == 0)
+    if(IsHttpUrl(browser.dir))
     {
         mainWindow->Append(disabled);
         mainWindow->SetState(STATE_DISABLED);
@@ -3788,7 +3788,7 @@ static void MenuBrowse(int menu)
         {
             upOneLevelBtn.ResetState();
 
-            if(browser.selIndex && browser.selIndex->file && strncmp(browser.selIndex->file, "http:", 5) == 0)
+            if(browser.selIndex && browser.selIndex->file && IsHttpUrl(browser.selIndex->file))
             {
                 mainWindow->Append(disabled);
                 mainWindow->SetState(STATE_DISABLED);
@@ -3904,10 +3904,10 @@ static void MenuBrowse(int menu)
                     (browser.selIndex->type == TYPE_PLAYLIST ||
                     IsPlaylistExt(ext) ||
                     !IsAllowedProtocol(browser.selIndex->file) ||
-                    (strncmp(browser.selIndex->file, "http:", 5) == 0 && !IsInternetStream(browser.selIndex->file)))
+                    (IsHttpUrl(browser.selIndex->file) && !IsInternetStream(browser.selIndex->file)))
                     )
                 {
-                    if(strncmp(browser.selIndex->file, "http:", 5) == 0)
+                    if(IsHttpUrl(browser.selIndex->file))
                     {
                         mainWindow->Append(disabled);
                         mainWindow->SetState(STATE_DISABLED);
@@ -7299,7 +7299,7 @@ static void AudioNowPlayingCallback(void *ptr)
     // display ICY data
     if(total <= 0.01)
     {
-        if(strncmp(loadedFile, "http:", 5) == 0)
+        if(IsHttpUrl(loadedFile))
         {
             if(streamtitle_changed)
             {
@@ -8361,7 +8361,7 @@ void MPlayerMenu()
 
     HideVideoVolumeLevelBar();
 
-    if(strncmp(loadedFile, "http:", 5) == 0)
+    if(IsHttpUrl(loadedFile))
     {
         videobar->Remove(videobarBackwardBtn);
         videobar->Remove(videobarForwardBtn);
