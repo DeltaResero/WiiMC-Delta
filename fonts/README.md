@@ -58,3 +58,17 @@ WiiMC reads it the first time a subtitle needs it. It is cut to Latin
 drawing and geometric shapes, with the same options as the built-in font:
 
     --unicodes=U+0020-007E,U+00A0-024F,U+0370-03FF,U+0400-04FF,U+1E00-1EFF,U+2000-206F,U+20A0-20CF,U+2100-214F,U+2190-2193,U+2212,U+2500-257F,U+25A0-25FF,U+FFFD
+
+## Your own fonts
+
+Any TrueType or OpenType font can take a file's place in `apps/wiimc/`:
+
+| File            | Replaces                                                   |
+|-----------------|------------------------------------------------------------|
+| `def.ttf`       | The built-in font, for menus in the Latin-script languages |
+| `subfont.ttf`   | The built-in font, for subtitles                           |
+| `monospace.ttf` | The closed-caption font                                    |
+
+For Japanese, Korean or Chinese subtitles, copy that language's font as
+`subfont.ttf`. A `def.ttf` turns off borrowing glyphs for Japanese, Korean
+and Chinese file names, since both use the same memory.
