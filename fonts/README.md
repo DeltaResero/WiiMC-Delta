@@ -9,13 +9,13 @@ subtitles unless `subfont.ttf` replaces it.
 - Font: Noto Sans Bold 2.015
   (https://github.com/notofonts/latin-greek-cyrillic)
 - Licence: SIL Open Font License 1.1 (`OFL.txt`)
-- Cut down to Basic Latin, Latin-1, Latin Extended-A, Greek, Cyrillic,
-  punctuation and currency signs, without hinting, which looks the same on
-  screen and keeps the DOL smaller:
+- Cut down to Basic Latin, Latin-1, Latin Extended-A, Vietnamese, Greek,
+  Cyrillic, punctuation and currency signs, without hinting, which looks the
+  same on screen and keeps the DOL smaller:
 
       pyftsubset NotoSans-Bold.ttf --output-file=font.ttf \
-          --unicodes=U+0020-007E,U+00A0-017F,U+0192,U+02C6-02C7,U+02D8-02DD,U+0370-03FF,U+0400-04FF,U+2000-206F,U+20A0-20CF,U+2122,U+2212,U+FFFD \
-          --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting \
+          --unicodes=U+0020-007E,U+00A0-017F,U+0192,U+01A0-01A1,U+01AF-01B0,U+02C6-02C7,U+02D8-02DD,U+0370-03FF,U+0400-04FF,U+1EA0-1EF9,U+2000-206F,U+20A0-20CF,U+2122,U+2212,U+FFFD \
+          --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting --notdef-outline \
           --name-IDs='*' --name-languages='*'
 
 `source/fonts/mono.ttf` is compiled in too. Subtitles use it when the
@@ -61,6 +61,9 @@ The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 
 None of the fonts keep kerning or vertical metrics. WiiMC only reads the
 older `kern` table, which Noto doesn't have, and never draws vertical text.
+All of them keep the box Noto draws for a missing character
+(`--notdef-outline`), so a letter none of the fonts has shows as a box
+rather than vanishing.
 
 ## Your own fonts
 
