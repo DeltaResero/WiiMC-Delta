@@ -60,6 +60,13 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 
     (void)data;
 
+    /* mbedTLS asks for MBEDTLS_ENTROPY_MAX_GATHER (128) bytes, but its pool
+     * stops gathering once the strong sources have given
+     * MBEDTLS_ENTROPY_BLOCK_SIZE (64), so one poll of that size is enough
+     * and costs half the round trips. Returning less than asked is allowed. */
+    if (len > MBEDTLS_ENTROPY_BLOCK_SIZE)
+        len = MBEDTLS_ENTROPY_BLOCK_SIZE;
+
     for (n = 0; n < len; n++)
         output[n] = jitter_byte();
 
