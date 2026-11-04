@@ -35,6 +35,7 @@
 static FT_Library ftLibrary = NULL;     /**< FreeType FT_Library instance. */
 static FT_Face ftFace = NULL;           /**< FreeType reusable FT_Face typographic object. */
 static FT_GlyphSlot ftSlot = NULL;      /**< FreeType reusable FT_GlyphSlot glyph container object. */
+static volatile bool texturesChanged = false; /**< A glyph texture was written since the GPU's texture cache was last cleared. */
 
 FreeTypeGX *fontSystem[MAX_FONT_SIZE+1];
 FreeTypeGX *fontSystemBold[MAX_FONT_SIZE+1];
@@ -400,17 +401,16 @@ uint16_t FreeTypeGX::cacheGlyphDataComplete()
 /**
  * Loads the rendered bitmap into the relevant structure's data buffer.
  *
- * This routine does a simple byte-wise copy of the glyph's rendered 8-bit grayscale bitmap into the structure's buffer.
- * Each byte is converted from the bitmap's intensity value into the a uint32_t RGBA value.
+ * This routine does a simple byte-wise copy of the glyph's rendered 8-bit grayscale bitmap into the structure's buffer,
+ * as an I8 texture. GX samples I8 as the same value in all four channels, as the RGBA8 texture it replaces did.
  *
  * @param bmp   A pointer to the most recently rendered glyph's bitmap.
  * @param charData  A pointer to an allocated ftgxCharData structure whose data represent that of the last rendered glyph.
- *
- * Optimized for RGBA8 use by Dimok.
  */
 void FreeTypeGX::loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData)
 {
-    int length = charData->textureWidth * charData->textureHeight * 4;
+    int tilesWide = (charData->textureWidth + 7) >> 3; // I8 data comes in 8x4 tiles, even for a width of 4
+    int length = (tilesWide << 3) * charData->textureHeight;
 
     uint8_t * glyphData = (uint8_t *) ft_memalign(32, length);
     if(!glyphData)
@@ -425,16 +425,15 @@ void FreeTypeGX::loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData)
     {
         for (int imagePosX = 0; imagePosX < bmp->width; ++imagePosX)
         {
-            offset = ((((imagePosY >> 2) * (charData->textureWidth >> 2) + (imagePosX >> 2)) << 5) + ((imagePosY & 3) << 2) + (imagePosX & 3)) << 1;
+            // 8x4 tiles of 32 bytes, rows of 8 within a tile
+            offset = (((imagePosY >> 2) * tilesWide + (imagePosX >> 3)) << 5) + ((imagePosY & 3) << 3) + (imagePosX & 7);
             glyphData[offset] = *src;
-            glyphData[offset+1] = *src;
-            glyphData[offset+32] = *src;
-            glyphData[offset+33] = *src;
             ++src;
         }
     }
     DCFlushRange(glyphData, length);
     charData->glyphDataTexture = (uint32_t *) glyphData;
+    texturesChanged = true; // the GUI thread clears the texture cache before its next glyph
 }
 
 /**
@@ -541,7 +540,7 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
 
         if (glyphData != NULL)
         {
-            GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
             this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos + glyphData->renderOffsetX + x_offset, y - glyphData->renderOffsetY + y_offset, color);
 
             x_pos += glyphData->glyphAdvanceX;
@@ -708,7 +707,11 @@ void FreeTypeGX::getOffset(wchar_t const *text, ftgxDataOffset* offset)
 void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, f32 texWidth, f32 texHeight, int16_t screenX, int16_t screenY, GXColor color)
 {
     GX_LoadTexObj(texObj, GX_TEXMAP0);
-    GX_InvalidateTexAll();
+    if(texturesChanged)
+    {
+        texturesChanged = false;
+        GX_InvalidateTexAll();
+    }
 
     GX_SetTevOp (GX_TEVSTAGE0, GX_MODULATE);
     GX_SetVtxDesc (GX_VA_TEX0, GX_DIRECT);
