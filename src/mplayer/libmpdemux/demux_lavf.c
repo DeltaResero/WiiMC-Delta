@@ -41,6 +41,7 @@
 #include "libavutil/avutil.h"
 #include "libavutil/avstring.h"
 #include "libavutil/display.h"
+#include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/replaygain.h"
@@ -335,6 +336,61 @@ static void export_cover_art(const AVStream *st)
         return;
     memcpy(pos_pic, pkt->data, pkt->size);
     embedded_pic = 1;
+}
+#endif
+
+#ifdef GEKKO
+/* WiiMC loops game music between two points, in seconds. FFmpeg 0.10 set
+ * them from inside its BRSTM demuxer, ADX decoder and Vorbis comment
+ * parser; 7.1 has the same values in metadata and in the ADX header that
+ * its demuxer keeps as extradata. */
+extern double loop_st_point;
+extern double loop_ed_point;
+
+static void adx_loop_points(const AVCodecParameters *par)
+{
+    const uint8_t *h = par->extradata;
+    int size = par->extradata_size;
+    double rate;
+
+    if (size < 12 || !(rate = AV_RB32(h + 8)))
+        return;
+    // header version 3 and 4 keep the loop flags and points in different places
+    if (h[0x12] == 3 && size >= 0x28 && h[0x17] == 1 && h[0x1B] == 1) {
+        loop_st_point = AV_RB32(h + 0x1C) / rate;
+        loop_ed_point = AV_RB32(h + 0x24) / rate;
+    } else if (h[0x12] == 4 && size >= 0x34 && h[0x23] == 1 && h[0x27] == 1) {
+        loop_st_point = AV_RB32(h + 0x28) / rate;
+        loop_ed_point = AV_RB32(h + 0x30) / rate;
+    }
+}
+
+static void export_loop_points(AVFormatContext *avfc)
+{
+    const char *format = avfc->iformat->name;
+    AVDictionaryEntry *t;
+    int i;
+
+    if (!strcmp(format, "brstm") || !strcmp(format, "bfstm")) {
+        // in AV_TIME_BASE units
+        t = av_dict_get(avfc->metadata, "loop_start", NULL, 0);
+        if (t)
+            loop_st_point = strtoll(t->value, NULL, 10) / (double)AV_TIME_BASE;
+    } else if (!strcmp(format, "adx") && avfc->nb_streams > 0) {
+        adx_loop_points(avfc->streams[0]->codecpar);
+    } else if (!strcmp(format, "ogg")) {
+        // the LOOPSTART comment counts samples
+        for (i = 0; i < avfc->nb_streams; i++) {
+            AVStream *st = avfc->streams[i];
+            if (st->codecpar->codec_type != AVMEDIA_TYPE_AUDIO || st->codecpar->sample_rate <= 0)
+                continue;
+            t = av_dict_get(st->metadata, "LOOPSTART", NULL, 0);
+            if (t) {
+                loop_st_point = strtoll(t->value, NULL, 10) / (double)st->codecpar->sample_rate;
+                break;
+            }
+        }
+    }
 }
 #endif
 
@@ -731,6 +787,9 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     for(i=0; i<avfc->nb_streams; i++)
         handle_stream(demuxer, avfc, i);
     priv->nb_streams_last = avfc->nb_streams;
+#ifdef GEKKO
+    export_loop_points(avfc);
+#endif
 
     if(avfc->nb_programs) {
         int p;
