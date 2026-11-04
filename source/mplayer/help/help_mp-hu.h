@@ -45,7 +45,7 @@ static const char help_text[]=
 " x vagy z         felirat késleltetése ± 0.1 másodperccel\n"
 " r vagy t         felirat pozíciójának megváltoztatása, lásd -vf expand-ot is\n"
 "\n"
-" * * * A MANPAGE TOV�?BBI RÉSZLETEKET, OPCIÓKAT, BILLENTYŰKET TARTALMAZ! * * *\n"
+" * * * A MANPAGE TOVÁBBI RÉSZLETEKET, OPCIÓKAT, BILLENTYŰKET TARTALMAZ! * * *\n"
 "\n";
 
 // ========================= MPlayer messages ===========================
@@ -227,7 +227,7 @@ static const char help_text[]=
 #define MSGTR_Brightness "Fényerő"
 #define MSGTR_Contrast "Kontraszt"
 #define MSGTR_Saturation "Telítettség"
-#define MSGTR_Hue "�?rnyalat"
+#define MSGTR_Hue "Árnyalat"
 #define MSGTR_Balance "Egyensúly"
 
 // property state
@@ -257,8 +257,8 @@ static const char help_text[]=
 #define MSGTR_NoVideoEncoderSelected "\nNem választottál ki video enkódert (-ovc)! Válassz egyet (lásd -ovc help)!\n"
 #define MSGTR_CannotOpenOutputFile "Nem tudom a kimeneti fájlt (%s) megnyitni.\n"
 #define MSGTR_EncoderOpenFailed "Enkóder hívása sikertelen.\n"
-#define MSGTR_MencoderWrongFormatAVI "\nFIGYELEM: A KIMENETI F�?JL FORM�?TUM _AVI_. Lásd -of help.\n"
-#define MSGTR_MencoderWrongFormatMPG "\nFIGYELEM: A KIMENETI F�?JL FORM�?TUM _MPEG_. Lásd -of help.\n"
+#define MSGTR_MencoderWrongFormatAVI "\nFIGYELEM: A KIMENETI FÁJL FORMÁTUM _AVI_. Lásd -of help.\n"
+#define MSGTR_MencoderWrongFormatMPG "\nFIGYELEM: A KIMENETI FÁJL FORMÁTUM _MPEG_. Lásd -of help.\n"
 #define MSGTR_MissingOutputFilename "Nincs kimeneti fájl megadva, lásd a -o kapcsolót."
 #define MSGTR_ForcingOutputFourcc "Kimeneti fourcc kényszerítése: %x [%.4s].\n"
 #define MSGTR_ForcingOutputAudiofmtTag "Audió formátum tag kényszerítése: 0x%x.\n"
@@ -517,7 +517,7 @@ static const char help_text[]=
 #define MSGTR_TotalProperties "\nÖsszesen: %d tulajdonság\n"
 
 // loader/ldt_keeper.c
-#define MSGTR_LOADER_DYLD_Warning "FIGYELMEZTETÉS: DLL codec-ek használatának kísérlete, de a\n         DYLD_BIND_AT_LAUNCH környezeti változó nincs beállítva. �?gy ez összeomlást okoz.\n"
+#define MSGTR_LOADER_DYLD_Warning "FIGYELMEZTETÉS: DLL codec-ek használatának kísérlete, de a\n         DYLD_BIND_AT_LAUNCH környezeti változó nincs beállítva. Így ez összeomlást okoz.\n"
 
 
 // ====================== GUI messages/buttons ========================
@@ -591,7 +591,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Playing "Lejátszás"
 #define MSGTR_MENU_Play "Lejátszás"
 #define MSGTR_MENU_Pause "Pillanatállj"
-#define MSGTR_MENU_Stop "�?llj"
+#define MSGTR_MENU_Stop "Állj"
 #define MSGTR_MENU_NextStream "Következő fájl"
 #define MSGTR_MENU_PrevStream "Előző fájl"
 #define MSGTR_MENU_Size "Méret"
@@ -829,7 +829,7 @@ static const char help_text[]=
 #define MSGTR_VO_SUB_Seekbar "Keresősáv"
 #define MSGTR_VO_SUB_Play "Lejátszás"
 #define MSGTR_VO_SUB_Pause "Pillanat állj"
-#define MSGTR_VO_SUB_Stop "�?llj"
+#define MSGTR_VO_SUB_Stop "Állj"
 #define MSGTR_VO_SUB_Rewind "Vissza"
 #define MSGTR_VO_SUB_Forward "Előre"
 #define MSGTR_VO_SUB_Clock "Óra"
@@ -876,7 +876,7 @@ static const char help_text[]=
 #define MSGTR_LIBVO_DXR3_FailedRestoringTVNorm "[VO_DXR3] Sikertelen a TV norma visszaállítása!\n"
 #define MSGTR_LIBVO_DXR3_EnablingPrebuffering "[VO_DXR3] Előbufferelés engedélyezése.\n"
 #define MSGTR_LIBVO_DXR3_UsingNewSyncEngine "[VO_DXR3] Új sync motor használata.\n"
-#define MSGTR_LIBVO_DXR3_UsingOverlay "[VO_DXR3] �?tlapolás használata.\n"
+#define MSGTR_LIBVO_DXR3_UsingOverlay "[VO_DXR3] Átlapolás használata.\n"
 #define MSGTR_LIBVO_DXR3_ErrorYouNeedToCompileMplayerWithX11 "[VO_DXR3] Hiba: Az átlapoláshoz telepített lib-ek/fejléc fájlok mellett kell fordítani az MPlayert.\n"
 #define MSGTR_LIBVO_DXR3_WillSetTVNormTo "[VO_DXR3] TV norma beállítása erre: "
 #define MSGTR_LIBVO_DXR3_AutoAdjustToMovieFrameRatePALPAL60 "automatikus beállítás a film frame rátájára (PAL/PAL-60)"
@@ -976,11 +976,11 @@ static const char help_text[]=
 #define MSGTR_LIBVO_TDFXVID_BlitFailed "[VO_TDFXVID] Blit sikertelen.\n"
 #define MSGTR_LIBVO_TDFXVID_NonNativeOverlayFormatNeedConversion "[VO_TDFXVID] Nem-natív átlapolási formátumhoz konverzió kell.\n"
 #define MSGTR_LIBVO_TDFXVID_UnsupportedInputFormat "[VO_TDFXVID] Nem támogatott bemeneti formátum 0x%x.\n"
-#define MSGTR_LIBVO_TDFXVID_OverlaySetupFailed "[VO_TDFXVID] �?tlapolás beállítása sikertelen.\n"
-#define MSGTR_LIBVO_TDFXVID_OverlayOnFailed "[VO_TDFXVID] �?tlapolás bekapcsolása sikertelen.\n"
-#define MSGTR_LIBVO_TDFXVID_OverlayReady "[VO_TDFXVID] �?tlapolás kész: %d(%d) x %d @ %d => %d(%d) x %d @ %d.\n"
+#define MSGTR_LIBVO_TDFXVID_OverlaySetupFailed "[VO_TDFXVID] Átlapolás beállítása sikertelen.\n"
+#define MSGTR_LIBVO_TDFXVID_OverlayOnFailed "[VO_TDFXVID] Átlapolás bekapcsolása sikertelen.\n"
+#define MSGTR_LIBVO_TDFXVID_OverlayReady "[VO_TDFXVID] Átlapolás kész: %d(%d) x %d @ %d => %d(%d) x %d @ %d.\n"
 #define MSGTR_LIBVO_TDFXVID_TextureBlitReady "[VO_TDFXVID] Textúra blit kész: %d(%d) x %d @ %d => %d(%d) x %d @ %d.\n"
-#define MSGTR_LIBVO_TDFXVID_OverlayOffFailed "[VO_TDFXVID] �?tlapolás kikapcsolása sikertelen\n"
+#define MSGTR_LIBVO_TDFXVID_OverlayOffFailed "[VO_TDFXVID] Átlapolás kikapcsolása sikertelen\n"
 #define MSGTR_LIBVO_TDFXVID_CantOpen "[VO_TDFXVID] Nem nyitható meg %s: %s.\n"
 #define MSGTR_LIBVO_TDFXVID_CantGetCurrentCfg "[VO_TDFXVID] Nem található az aktuális konfiguráció: %s.\n"
 #define MSGTR_LIBVO_TDFXVID_MemmapFailed "[VO_TDFXVID] Memmap sikertelen !!!!!\n"
@@ -1130,7 +1130,7 @@ static const char help_text[]=
 #define MSGTR_AO_OSS_CantSetChans "[AO OSS] audio_setup: Nem sikerült az audio eszközt %d csatornára állítani.\n"
 #define MSGTR_AO_OSS_CantUseGetospace "[AO OSS] audio_setup: a vezérlő nem támogatja a SNDCTL_DSP_GETOSPACE-t :-(\n"
 #define MSGTR_AO_OSS_CantUseSelect "[AO OSS]\n   ***  Az audio vezérlőd NEM támogatja a select() -et ***\n Fordítsd újra az MPlayer-t az #undef HAVE_AUDIO_SELECT sorral a config.h-ban!\n\n"
-#define MSGTR_AO_OSS_CantReopen "[AO OSS]\nVégzetes hiba: *** NEM LEHET ÚJRA MEGNYITNI / BE�?LL�?TANI AZ AUDIO ESZKÖZT *** %s\n"
+#define MSGTR_AO_OSS_CantReopen "[AO OSS]\nVégzetes hiba: *** NEM LEHET ÚJRA MEGNYITNI / BEÁLLÍTANI AZ AUDIO ESZKÖZT *** %s\n"
 #define MSGTR_AO_OSS_UnknownUnsupportedFormat "[AO OSS] Ismeretlen/Nem támogatott OSS formátum: %x.\n"
 
 // ao_arts.c
@@ -1186,7 +1186,7 @@ static const char help_text[]=
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] %s audio eszköz nem elérhető, %s  -> nincs hang.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] audio_setup: a kártyád nem támogat %d csatornát, %s, %d Hz samplerate-t.\n"
 #define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  A hangkártyád NEM támogatja a select()-et ***\nFordítsd újra az MPlayer-t az #undef HAVE_AUDIO_SELECT sorral a config.h-ban !\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\nVégzetes hiba: *** NEM LEHET ÚJRA MEGNYITNI / BE�?LL�?TANI AZ AUDIO ESZKÖZT (%s) ***\n"
+#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\nVégzetes hiba: *** NEM LEHET ÚJRA MEGNYITNI / BEÁLLÍTANI AZ AUDIO ESZKÖZT (%s) ***\n"
 
 // ao_alsa.c
 #define MSGTR_AO_ALSA_InvalidMixerIndexDefaultingToZero "[AO_ALSA] Hibás mixer index. Alapértelmezés 0-ra.\n"
@@ -1235,7 +1235,7 @@ static const char help_text[]=
 #define MSGTR_AO_ALSA_PcmResumeError "[AO_ALSA] pcm folytatás hiba: %s\n"
 #define MSGTR_AO_ALSA_DeviceConfigurationError "[AO_ALSA] Eszköz konfigurációs hiba."
 #define MSGTR_AO_ALSA_PcmInSuspendModeTryingResume "[AO_ALSA] A pcm pihenő módban van, megpróbálom folytatni.\n"
-#define MSGTR_AO_ALSA_WriteError "[AO_ALSA] �?rási hiba: %s\n"
+#define MSGTR_AO_ALSA_WriteError "[AO_ALSA] Írási hiba: %s\n"
 #define MSGTR_AO_ALSA_TryingToResetSoundcard "[AO_ALSA] Hangkártya resetelése.\n"
 #define MSGTR_AO_ALSA_CannotGetPcmStatus "[AO_ALSA] A pcm állapot nem kérdezhető le: %s\n"
 
@@ -1347,7 +1347,7 @@ static const char help_text[]=
 #define MSGTR_CannotInitializeMuxer "A muxer nem inicializálható."
 #define MSGTR_MissingVideoStream "Nincs képfolyam!\n"
 #define MSGTR_MissingAudioStream "Nincs hangfolyam... -> hang nélkül\n"
-#define MSGTR_MissingVideoStreamBug "Nincs képfolyam?! �?rj a szerzőnek, lehet hogy hiba :(\n"
+#define MSGTR_MissingVideoStreamBug "Nincs képfolyam?! Írj a szerzőnek, lehet hogy hiba :(\n"
 
 #define MSGTR_DoesntContainSelectedStream "demux: a fájl nem tartalmazza a kért hang vagy kép folyamot\n"
 
@@ -1924,7 +1924,7 @@ static const char help_text[]=
 #define MSGTR_TV_NoVideoInputPresent "Hiba: Nincs videó bemenet!\n"
 #define MSGTR_TV_UnknownImageFormat ""\
 "==================================================================\n"\
-" FIGYELEM: NEM TESZTELT VAGY ISMERETLEN KIMENETI KÉPFORM�?TUM (0x%x)\n"\
+" FIGYELEM: NEM TESZTELT VAGY ISMERETLEN KIMENETI KÉPFORMÁTUM (0x%x)\n"\
 " Ez hibás lejátszást vagy összeomlást okozhat! A hibajelentéseket\n"\
 " figyelmen kívül hagyjuk! Próbáld újra YV12-vel (az alapértelmezett\n"\
 " színtérrel) és olvasd el a dokumentációt!\n"\

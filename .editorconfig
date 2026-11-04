@@ -25,11 +25,12 @@ indent_style = space
 indent_size = 4
 
 # =============================================================================
-# VENDORED SOURCES
+# LEGACY ENCODINGS
 # =============================================================================
-# A few files in MPlayer and the vendored libraries are Latin-1 or another
-# old encoding, so leave each file's encoding as it is.
-[{source/mplayer/**,external/**,libs/**}]
+# libiconv's glibc locale tables and FriBidi's Hebrew tests are data in
+# Latin-1 and ISO-8859-8, and FFmpeg's clean-diff uses a Latin-1 byte as a
+# marker for tr, so leave their encoding as it is.
+[{external/libiconv/libcharset/tools/*,libs/fribidi/test/test_ISO8859-8_*,source/mplayer/ffmpeg/tools/clean-diff}]
 charset = unset
 
 # =============================================================================
