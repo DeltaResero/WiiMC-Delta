@@ -1662,6 +1662,7 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
     GuiText msgTxt(NULL, 20, (GXColor){255, 255, 255, 255});
@@ -1815,6 +1816,7 @@ ProgressWindow(char *title, char *msg)
     throbberImg.SetPosition(0, 40);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
     GuiText msgTxt(msg, 20, (GXColor){255, 255, 255, 255});
@@ -2263,6 +2265,7 @@ SettingWindow(const char *title, GuiWindow *w)
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(title, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
 
@@ -4468,6 +4471,7 @@ static void MenuSettingsGlobal()
     }
 
     GuiText titleTxt("Settings - Global", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5028,6 +5032,7 @@ static void LanguageWindow(char *lang)
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
 
     if(lang == WiiSettings.subtitleLanguage)
         titleTxt.SetText("Subtitle Language");
@@ -5160,6 +5165,7 @@ static void MenuSettingsVideos()
     }
 
     GuiText titleTxt("Settings - Videos", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5415,6 +5421,7 @@ static void MenuSettingsMusic()
     }
 
     GuiText titleTxt("Settings - Music", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5553,6 +5560,7 @@ static void MenuSettingsDVD()
     }
 
     GuiText titleTxt("Settings - DVD", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5729,6 +5737,7 @@ static void MenuSettingsOnlineMedia()
     }
 
     GuiText titleTxt("Settings - Online Media", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -5923,6 +5932,7 @@ static void MenuSettingsNetwork()
     options.length = i;
 
     GuiText titleTxt("Settings - Network", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -6060,6 +6070,7 @@ static void MenuSettingsNetworkSMB()
     swprintf(titleStr, 100, L"%s - %s", gettext("Settings - Network"), gettext(shareName));
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetWText(titleStr);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
@@ -6278,6 +6289,7 @@ static void MenuSettingsNetworkFTP()
     swprintf(titleStr, 100, L"%s - %s", gettext("Settings - Network"), gettext(siteName));
 
     GuiText titleTxt(NULL, 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetWText(titleStr);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
@@ -6466,6 +6478,7 @@ static void CodepageWindow()
     dialogBoxImg.SetAlpha(220);
 
     GuiText titleTxt("Subtitle Codepage", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     titleTxt.SetPosition(0,18);
 
@@ -6577,6 +6590,7 @@ static void MenuSettingsSubtitles()
     }
 
     GuiText titleTxt("Settings - Subtitles", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 
@@ -6742,6 +6756,7 @@ static void MenuSettings()
     }
 
     GuiText titleTxt("Settings", 28, (GXColor){255, 255, 255, 255});
+    titleTxt.SetBold(true);
     titleTxt.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
     titleTxt.SetPosition(49, 100);
 

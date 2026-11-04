@@ -125,6 +125,7 @@ class FreeTypeGX {
 
     private:
         FT_UInt ftPointSize;    /**< Requested size of the rendered font. */
+        bool bold;              /**< Flag indicating glyphs are thickened. */
         bool ftKerningEnabled;  /**< Flag indicating the availability of font kerning data. */
         uint8_t vertexIndex;    /**< Vertex format descriptor index. */
         uint32_t compatibilityMode; /**< Compatibility mode for default tev operations and vertex descriptors. */
@@ -148,7 +149,7 @@ class FreeTypeGX {
         void copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY,  GXColor color);
 
     public:
-        FreeTypeGX(FT_UInt pixelSize, uint8_t vertexIndex = GX_VTXFMT1);
+        FreeTypeGX(FT_UInt pixelSize, bool bold = false, uint8_t vertexIndex = GX_VTXFMT1);
         ~FreeTypeGX();
 
 //!Operator overload: new, delete, new[] and delete[]

@@ -65,6 +65,7 @@
 using namespace std;
 
 extern FreeTypeGX *fontSystem[];
+extern FreeTypeGX *fontSystemBold[];
 
 #define SCROLL_DELAY_INITIAL    200000
 #define SCROLL_DELAY_LOOP       30000
@@ -771,6 +772,9 @@ class GuiText : public GuiElement
         //!Sets the FreeTypeGX style attributes
         //!\param s Style attributes
         void SetStyle(u16 s);
+        //!Draws the text with thickened strokes
+        //!\param b Bold on/off
+        void SetBold(bool b);
         //!Sets the text alignment
         //!\param hor Horizontal alignment (ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTRE)
         //!\param vert Vertical alignment (ALIGN_TOP, ALIGN_BOTTOM, ALIGN_MIDDLE)
@@ -781,6 +785,7 @@ class GuiText : public GuiElement
         void Draw();
     protected:
         wchar_t* ToWchar(const char * t);
+        FreeTypeGX *Font(int s);
         GXColor color; //!< Font color
         wchar_t* text; //!< Translated Unicode text value
         wchar_t *textDyn[20]; //!< Text value, if max width, scrolling, or wrapping enabled
@@ -793,6 +798,7 @@ class GuiText : public GuiElement
         int textScrollInitialDelay; //!< Delay to wait before starting to scroll
         int textScrollDelay; //!< Scrolling speed
         u16 style; //!< FreeTypeGX style attributes
+        bool bold; //!< Thickened strokes toggle
         bool wrap; //!< Wrapping toggle
 };
 

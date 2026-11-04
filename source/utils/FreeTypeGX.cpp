@@ -21,6 +21,7 @@
  */
 
 #include "FreeTypeGX.h"
+#include FT_OUTLINE_H
 
 //#define ft_malloc malloc
 //#define ft_free free
@@ -36,6 +37,7 @@ static FT_Face ftFace = NULL;           /**< FreeType reusable FT_Face typograph
 static FT_GlyphSlot ftSlot = NULL;      /**< FreeType reusable FT_GlyphSlot glyph container object. */
 
 FreeTypeGX *fontSystem[MAX_FONT_SIZE+1];
+FreeTypeGX *fontSystemBold[MAX_FONT_SIZE+1];
 
 using namespace std;
 
@@ -93,7 +95,10 @@ bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize)
         return false;
 
     for(int i=0; i<50; i++)
+    {
         fontSystem[i] = NULL;
+        fontSystemBold[i] = NULL;
+    }
 
     return true;
 }
@@ -118,6 +123,9 @@ void ClearFontData()
         if(fontSystem[i])
             delete fontSystem[i];
         fontSystem[i] = NULL;
+        if(fontSystemBold[i])
+            delete fontSystemBold[i];
+        fontSystemBold[i] = NULL;
     }
 }
 
@@ -155,11 +163,12 @@ wchar_t* charToWideChar(const char* strChar)
  *
  * @param vertexIndex   Optional vertex format index (GX_VTXFMT*) of the glyph textures as defined by the libogc gx.h header file. If not specified default value is GX_VTXFMT1.
  */
-FreeTypeGX::FreeTypeGX(FT_UInt pixelSize, uint8_t vertexIndex)
+FreeTypeGX::FreeTypeGX(FT_UInt pixelSize, bool bold, uint8_t vertexIndex)
 {
     this->setVertexFormat(vertexIndex);
     this->setCompatibilityMode(FTGX_COMPATIBILITY_DEFAULT_TEVOP_GX_PASSCLR | FTGX_COMPATIBILITY_DEFAULT_VTXDESC_GX_NONE);
     this->ftPointSize = pixelSize;
+    this->bold = bold;
     this->ftKerningEnabled = FT_HAS_KERNING(ftFace);
 }
 /**
@@ -334,8 +343,16 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode)
     uint16_t textureWidth = 0, textureHeight = 0;
 
     gIndex = FT_Get_Char_Index( ftFace, charCode );
-    if (!FT_Load_Glyph(ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_RENDER ))
+    if (!FT_Load_Glyph(ftFace, gIndex, this->bold ? FT_LOAD_NO_BITMAP : FT_LOAD_DEFAULT | FT_LOAD_RENDER ))
     {
+        if(this->bold && ftSlot->format == FT_GLYPH_FORMAT_OUTLINE)
+        {
+            // a lighter touch than FreeType's own synthetic bold (em / 24)
+            FT_Pos strength = FT_MulFix(ftFace->units_per_EM, ftFace->size->metrics.y_scale) / 40;
+            FT_Outline_Embolden(&ftSlot->outline, strength);
+            ftSlot->advance.x += strength;
+            FT_Render_Glyph(ftSlot, FT_RENDER_MODE_NORMAL);
+        }
         if(ftSlot->format == FT_GLYPH_FORMAT_BITMAP)
         {
             FT_Bitmap *glyphBitmap = &ftSlot->bitmap;
