@@ -22,6 +22,8 @@ language that uses Latin letters.
 The other files here go in `apps/wiimc/` next to `boot.dol`. WiiMC loads them
 when it needs them.
 
+### Language fonts
+
 The language fonts are Noto Sans CJK Bold 2.004
 (https://github.com/notofonts/noto-cjk), under the SIL Open Font License 1.1
 (`OFL.txt`). Each is cut down to its region's standard character set, plus
@@ -42,3 +44,21 @@ The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 
 None of the fonts keep kerning or vertical metrics. WiiMC only reads the
 older `kern` table, which Noto doesn't have, and never draws vertical text.
+
+### Subtitle fonts (optional)
+
+Without these, subtitles use the built-in font, which has no Greek or
+Cyrillic. Copy them to `apps/wiimc/` to get those, or copy one of the
+language fonts there as `subfont.ttf` for Japanese, Korean or Chinese
+subtitles. WiiMC reads a subtitle font the first time a subtitle needs it.
+
+| File            | Font                      | Used for                              |
+|-----------------|---------------------------|---------------------------------------|
+| `subfont.ttf`   | Noto Sans Bold 2.015      | Subtitles                             |
+| `monospace.ttf` | Noto Sans Mono Bold 2.014 | Monospaced styles and closed captions |
+
+Both are cut to Latin (Vietnamese included), Greek, Cyrillic, punctuation,
+currency, arrows, box drawing and geometric shapes, with the same options as
+the built-in font:
+
+    --unicodes=U+0020-007E,U+00A0-024F,U+0370-03FF,U+0400-04FF,U+1E00-1EFF,U+2000-206F,U+20A0-20CF,U+2100-214F,U+2190-2193,U+2212,U+2500-257F,U+25A0-25FF,U+FFFD
