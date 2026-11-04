@@ -15,16 +15,16 @@
 #include "font_ttf.h"
 
 // Languages
-#include "jp_lang.h"
-#include "en_lang.h"
-#include "de_lang.h"
-#include "fr_lang.h"
-#include "es_lang.h"
-#include "it_lang.h"
-#include "nl_lang.h"
-#include "zh_cn_lang.h"
-#include "zh_tw_lang.h"
-#include "ko_lang.h"
+#include "jp_lang_gz.h"
+#include "en_lang_gz.h"
+#include "de_lang_gz.h"
+#include "fr_lang_gz.h"
+#include "es_lang_gz.h"
+#include "it_lang_gz.h"
+#include "nl_lang_gz.h"
+#include "zh_cn_lang_gz.h"
+#include "zh_tw_lang_gz.h"
+#include "ko_lang_gz.h"
 
 // Sounds
 

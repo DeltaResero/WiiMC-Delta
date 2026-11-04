@@ -98,8 +98,9 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
+# language files are embedded gzipped (gettext.cpp unpacks the chosen one)
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.ttf) \
-					$(wildcard $(dir)/*.lang) $(wildcard $(dir)/*.png) \
+					$(addsuffix .gz,$(wildcard $(dir)/*.lang)) $(wildcard $(dir)/*.png) \
 					$(wildcard $(dir)/*.jpg)))
 
 #---------------------------------------------------------------------------------
@@ -216,8 +217,14 @@ $(OFILES_SOURCES) : $(HFILES)
 	@echo $(notdir $<)
 	$(bin2o)
 
-%.lang.o %_lang.h : %.lang
+# kept, or make would rebuild them, and everything after, on every run
+.PRECIOUS: %.lang.gz
+
+%.lang.gz : %.lang
 	@echo $(notdir $<)
+	@gzip -9 -n -c $< > $@
+
+%.lang.gz.o %_lang_gz.h : %.lang.gz
 	$(bin2o)
 
 %.png.o %_png.h : %.png
