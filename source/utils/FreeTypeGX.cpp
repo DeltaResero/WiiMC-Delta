@@ -21,6 +21,7 @@
  */
 
 #include "FreeTypeGX.h"
+#include "font_ttf.h"
 #include FT_OUTLINE_H
 
 //#define ft_malloc malloc
@@ -35,6 +36,7 @@
 static FT_Library ftLibrary = NULL;     /**< FreeType FT_Library instance. */
 static FT_Face ftFace = NULL;           /**< FreeType reusable FT_Face typographic object. */
 static FT_GlyphSlot ftSlot = NULL;      /**< FreeType reusable FT_GlyphSlot glyph container object. */
+static FT_Face ftBuiltin = NULL;        /**< The built-in font, lending glyphs to a language font that lacks them. */
 static FT_Face ftFallback = NULL;       /**< Language font lending glyphs the menu font lacks, loaded on demand. */
 static int ftFallbackFont = -1;         /**< Which language font ftFallback is (FALLBACK_*). */
 static const wchar_t *fallbackText = NULL; /**< String the fallback fonts in fallbackTried were loaded for. */
@@ -100,6 +102,10 @@ bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize)
     if(!ftSlot)
         return false;
 
+    // a language font borrows Latin, Greek and Cyrillic letters it lacks from the built-in font
+    if(fontBuffer != font_ttf && FT_New_Memory_Face(ftLibrary, (FT_Byte *)font_ttf, font_ttf_size, 0, &ftBuiltin) != 0)
+        ftBuiltin = NULL;
+
     for(int i=0; i<=MAX_FONT_SIZE; i++)
     {
         fontSystem[i] = NULL;
@@ -126,6 +132,9 @@ void DeinitFreeType()
 {
     ClearFontData();
     DropFallbackFont();
+    if(ftBuiltin)
+        FT_Done_Face(ftBuiltin);
+    ftBuiltin = NULL;
     if(ftLibrary)
         FT_Done_FreeType(ftLibrary);
     ftLibrary = NULL;
@@ -369,7 +378,13 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode)
 
     FT_Face face = ftFace;
     gIndex = FT_Get_Char_Index( ftFace, charCode );
-    if (gIndex == 0)
+    if (gIndex == 0 && ftBuiltin && FT_Get_Char_Index(ftBuiltin, charCode))
+    {
+        face = ftBuiltin;
+        gIndex = FT_Get_Char_Index(face, charCode);
+        FT_Set_Pixel_Sizes(face, 0, this->ftPointSize);
+    }
+    else if (gIndex == 0)
     {
         FT_Face fallback = this->fallbackFor(charCode);
         if (fallback)
