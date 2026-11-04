@@ -3888,7 +3888,7 @@ audio_delay=0;
 #ifdef GEKKO
   strcpy(fileplaying, filename);
   strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying));
-  partitionlabel[sizeof(partitionlabelplaying)-1] = '\0';
+  partitionlabelplaying[sizeof(partitionlabelplaying)-1] = '\0';
 #endif
 
 #ifdef CONFIG_GUI
