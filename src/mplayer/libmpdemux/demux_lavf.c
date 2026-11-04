@@ -287,6 +287,30 @@ static void parse_cryptokey(AVFormatContext *avfc, const char *str) {
         *key++ = (char2int(str[0]) << 4) | char2int(str[1]);
 }
 
+#ifdef GEKKO
+/* WiiMC times its buffer flips to the field order of interlaced video:
+ * 0 progressive, 1 top field first, 2 bottom field first. FFmpeg 0.10's
+ * Matroska demuxer set it from the track's interlace flag and field
+ * order; 7.1 reports those as the stream's field_order. */
+extern int sync_interlace;
+
+static void matroska_sync_interlace(enum AVFieldOrder field_order)
+{
+    switch (field_order) {
+    case AV_FIELD_TT:
+        sync_interlace = 1;
+        break;
+    case AV_FIELD_BB:
+    case AV_FIELD_TB:
+    case AV_FIELD_BT:
+        sync_interlace = 2;
+        break;
+    default:
+        break;
+    }
+}
+#endif
+
 static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
     lavf_priv_t *priv= demuxer->priv;
     AVStream *st= avfc->streams[i];
@@ -423,6 +447,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_video->bih= bih;
             sh_video->disp_w= codec->width;
             sh_video->disp_h= codec->height;
+#ifdef GEKKO
+            if (!strcmp(avfc->iformat->name, "matroska,webm"))
+                matroska_sync_interlace(codec->field_order);
+#endif
             if (st->time_base.den) { /* if container has time_base, use that */
                 sh_video->video.dwRate= st->time_base.den;
                 sh_video->video.dwScale= st->time_base.num;

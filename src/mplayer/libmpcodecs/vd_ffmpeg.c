@@ -93,6 +93,26 @@ typedef struct {
 
 #include "m_option.h"
 
+#ifdef GEKKO
+/* WiiMC times its buffer flips to the field order of interlaced MPEG-2:
+ * 0 progressive, 1 top field first, 2 bottom field first. FFmpeg 0.10
+ * set this from its picture coding extension parser; 7.1 reports the same
+ * two bits in every decoded frame's flags. */
+extern int sync_interlace;
+
+static void update_sync_interlace(const AVCodecContext *avctx, const AVFrame *pic)
+{
+    if (avctx->codec_id != AV_CODEC_ID_MPEG2VIDEO)
+        return;
+    if (!(pic->flags & AV_FRAME_FLAG_INTERLACED))
+        sync_interlace = 0;
+    else if (pic->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST)
+        sync_interlace = 1;
+    else
+        sync_interlace = 2;
+}
+#endif
+
 static int get_buffer(AVCodecContext *avctx, AVFrame *pic, int isreference);
 static int mpcodec_default_get_buffer(AVCodecContext *avctx, AVFrame *frame);
 static int get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags);
@@ -913,6 +933,10 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     if (ret >= 0 || ret == AVERROR_EOF) {
         ret = avcodec_receive_frame(avctx, pic);
         got_picture = ret >= 0;
+#ifdef GEKKO
+        if (got_picture)
+            update_sync_interlace(avctx, pic);
+#endif
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) ret = 0;
     }
     ctx->refcount_frame = pic;
