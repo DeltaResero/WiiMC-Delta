@@ -571,6 +571,42 @@ u8 *mono_mem = NULL;
 unsigned font_mem_size = 0;
 unsigned mono_mem_size = 0;
 int have_mono = 0;
+static char subFontPath[MAXPATHLEN];
+static char monoFontPath[MAXPATHLEN];
+
+/****************************************************************************
+ * LoadSubtitleFont
+ *
+ * Reads subfont.ttf or monospace.ttf into MEM2 the first time libass needs
+ * it, so a font costs nothing until a subtitle is drawn. On failure the
+ * font is marked missing and libass falls back to the built-in one.
+ ***************************************************************************/
+extern "C" void LoadSubtitleFont(int mono)
+{
+    u8 **mem = mono ? &mono_mem : &font_mem;
+    unsigned *memSize = mono ? &mono_mem_size : &font_mem_size;
+    int *found = mono ? &have_mono : &subtitleFontFound;
+
+    if(*mem || !*found)
+        return;
+
+    FILE *fp = fopen(mono ? monoFontPath : subFontPath, "rb");
+    if(fp)
+    {
+        fseeko(fp, 0, SEEK_END);
+        *memSize = ftello(fp);
+        *mem = (u8 *)mem2_memalign(32, *memSize, MEM2_OTHER);
+        fseeko(fp, 0, SEEK_SET);
+        if(*mem && fread(*mem, 1, *memSize, fp) != *memSize)
+        {
+            mem2_free(*mem, MEM2_OTHER);
+            *mem = NULL;
+        }
+        fclose(fp);
+    }
+    if(!*mem)
+        *found = 0;
+}
 
 bool InitMPlayer()
 {
@@ -593,43 +629,15 @@ bool InitMPlayer()
         return false;
     }
 
-    // check if subtitle font file exists
+    // check if subtitle font files exist; LoadSubtitleFont reads them when needed
     struct stat st;
-    char filepath[1024];
-    char monopath[1024];
-    snprintf(filepath, sizeof(filepath), "%s/subfont.ttf", appPath);
-    snprintf(monopath, sizeof(monopath), "%s/monospace.ttf", appPath);
+    snprintf(subFontPath, sizeof(subFontPath), "%s/subfont.ttf", appPath);
+    snprintf(monoFontPath, sizeof(monoFontPath), "%s/monospace.ttf", appPath);
 
-    if(stat(filepath, &st) == 0)
+    if(stat(subFontPath, &st) == 0)
         subtitleFontFound = 1;
-    if(stat(monopath, &st) == 0)
+    if(stat(monoFontPath, &st) == 0)
         have_mono = 1;
-
-    // Memory font
-    if(subtitleFontFound) {
-        FILE *fp;
-        fp = fopen(filepath, "rb");
-
-        fseeko(fp,0,SEEK_END);
-        font_mem_size = ftello(fp);
-        font_mem = (u8 *)mem2_memalign(32, font_mem_size, MEM2_OTHER);
-
-        fseeko(fp,0,SEEK_SET);
-        fread (font_mem, 1, font_mem_size, fp);
-        fclose(fp);
-    }
-    if(have_mono) {
-        FILE *fp;
-        fp = fopen(monopath, "rb");
-
-        fseeko(fp,0,SEEK_END);
-        mono_mem_size = ftello(fp);
-        mono_mem = (u8 *)mem2_memalign(32, mono_mem_size, MEM2_OTHER);
-
-        fseeko(fp,0,SEEK_SET);
-        fread (mono_mem, 1, mono_mem_size, fp);
-        fclose(fp);
-    }
 
     //TEST, MEM WASTE MEM1
 /*  u8 *binar_mem = NULL;

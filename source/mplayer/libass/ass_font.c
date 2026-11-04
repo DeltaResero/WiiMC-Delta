@@ -48,6 +48,7 @@ extern unsigned mono_mem_size;
 extern int have_mono;
 extern int monospaced;
 extern int subtitleFontFound;
+void LoadSubtitleFont(int mono);
 #endif
 
 /**
@@ -182,6 +183,11 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
         /*int *name = (int *) 0x8076A310;
     if(*name != 0x44696567)
         ExitRequested = true;*/
+
+        if (have_mono && monospaced)
+            LoadSubtitleFont(1);
+        else if (subtitleFontFound)
+            LoadSubtitleFont(0);
 
         if (have_mono && monospaced)
             error = FT_New_Memory_Face(font->ftlibrary, (FT_Byte *)mono_mem, mono_mem_size, index, &face);
