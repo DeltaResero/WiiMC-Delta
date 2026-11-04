@@ -106,9 +106,6 @@ msgstr "Deshabilitado"
 msgid "Skip Backward"
 msgstr "Retroceder"
 
-msgid "Pause"
-msgstr "Pausa"
-
 msgid "Skip Forward"
 msgstr "Avanzar"
 
@@ -473,7 +470,7 @@ msgid "This is a private build of WiiMC."
 msgstr "Esto es una versión privada de WiiMC."
 
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 msgid "Version"
 msgstr "Versión"
@@ -572,9 +569,6 @@ msgid "DVD Support"
 msgstr "Soporte DVD"
 
 msgid "Interlacing"
-msgstr "Entrelazado"
-
-msgid "Interlacing"
 msgstr "Entrelazar"
 
 msgid "Blur"
@@ -594,9 +588,6 @@ msgstr "WiiMC no tiene acceso al DVD."
 
 msgid "Starting Area"
 msgstr "Área de inicio"
-
-msgid "Artwork Viewer"
-msgstr "Carátulas y portadas"
 
 msgid "Artwork Viewer"
 msgstr "Carátulas y portadas"
@@ -645,3 +636,78 @@ msgstr "No válido el retraso de subtítulos."
 
 msgid "DVD playback is not supported on this Wii."
 msgstr "La reproducción de DVD no es compatible con esta consola."
+
+msgid "Online media file not found."
+msgstr "No se encuentra el archivo de medios online."
+
+msgid "Error loading YouTube file!"
+msgstr "¡Error cargando el archivo de YouTube!"
+
+msgid "Screensaver Banners"
+msgstr "Banners en el salvapantallas"
+
+msgid "Double Strike"
+msgstr "Double Strike"
+
+msgid "Japanese"
+msgstr "Japonés"
+
+msgid "Chinese (Simplified)"
+msgstr "Chino simplificado"
+
+msgid "Chinese (Traditional)"
+msgstr "Chino tradicional"
+
+msgid "Korean"
+msgstr "Coreano"
+
+msgid "hours"
+msgstr "horas"
+
+msgid "Full Alt"
+msgstr "Completo alt."
+
+msgid "Original"
+msgstr "Original"
+
+msgid "TV"
+msgstr "TV"
+
+msgid "Low (400x240)"
+msgstr "Baja (400x240)"
+
+msgid "Medium (480x360)"
+msgstr "Media (480x360)"
+
+msgid "High (854x480)"
+msgstr "Alta (854x480)"
+
+msgid "Highest Resolution"
+msgstr "Máxima resolución"
+
+msgid "Cover 200px"
+msgstr "Portada 200px"
+
+msgid "Poster 150px"
+msgstr "Póster 150px"
+
+msgid "Poster 300px"
+msgstr "Póster 300px"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Subtitle font file not found. Using internal."
+msgstr "No se encuentra la fuente de los subtítulos. Se usará la interna."
+
+msgid "Internet Stream"
+msgstr "Emisión por Internet"
+
+msgid "now playing"
+msgstr "reproduciendo"
+
+msgid "Credits"
+msgstr "Créditos"
+
+msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
+msgstr "El IOS actual ha sido modificado (fake-signed). La funcionalidad y/o estabilidad pueden verse afectadas."

@@ -106,9 +106,6 @@ msgstr "비활성"
 msgid "Skip Backward"
 msgstr "뒤로"
 
-msgid "Pause"
-msgstr "일시정지"
-
 msgid "Skip Forward"
 msgstr "앞으로"
 
@@ -353,7 +350,7 @@ msgid "Data DVD"
 msgstr "데이타 DVD"
 
 msgid "USB drive not found!"
-mmsgstr "USB 드라이브가 없음!"
+msgstr "USB 드라이브가 없음!"
 
 msgid "SD card not found!"
 msgstr "SD card가 없음!"
@@ -574,9 +571,6 @@ msgstr "DVD 지원"
 msgid "Interlacing"
 msgstr "인터레이스"
 
-msgid "Interlacing"
-msgstr "인터레이스"
-
 msgid "Blur"
 msgstr "흐릿함"
 
@@ -594,9 +588,6 @@ msgstr "WiiMC에는 DVD 접속 권한이 없습니다."
 
 msgid "Starting Area"
 msgstr "시작 지역"
-
-msgid "Artwork Viewer"
-msgstr "아트워크 뷰어"
 
 msgid "Artwork Viewer"
 msgstr "아트워크 뷰어"
@@ -645,3 +636,78 @@ msgstr "자막 지연이 잘못되었습니다."
 
 msgid "DVD playback is not supported on this Wii."
 msgstr "이 Wii에서는 DVD 재생이 지원되지 않습니다."
+
+msgid "Online media file not found."
+msgstr "온라인 미디어 파일을 찾을 수 없습니다."
+
+msgid "Error loading YouTube file!"
+msgstr "YouTube 파일 로딩 오류!"
+
+msgid "Screensaver Banners"
+msgstr "화면보호기 배너"
+
+msgid "Double Strike"
+msgstr "Double Strike"
+
+msgid "Japanese"
+msgstr "일본어"
+
+msgid "Chinese (Simplified)"
+msgstr "중국어 간체"
+
+msgid "Chinese (Traditional)"
+msgstr "중국어 번체"
+
+msgid "Korean"
+msgstr "한국어"
+
+msgid "hours"
+msgstr "시간"
+
+msgid "Full Alt"
+msgstr "전체 (대체)"
+
+msgid "Original"
+msgstr "원본"
+
+msgid "TV"
+msgstr "TV"
+
+msgid "Low (400x240)"
+msgstr "낮음 (400x240)"
+
+msgid "Medium (480x360)"
+msgstr "보통 (480x360)"
+
+msgid "High (854x480)"
+msgstr "높음 (854x480)"
+
+msgid "Highest Resolution"
+msgstr "최고 해상도"
+
+msgid "Cover 200px"
+msgstr "커버 200px"
+
+msgid "Poster 150px"
+msgstr "포스터 150px"
+
+msgid "Poster 300px"
+msgstr "포스터 300px"
+
+msgid "Color"
+msgstr "색상"
+
+msgid "Subtitle font file not found. Using internal."
+msgstr "자막 폰트 파일을 찾을 수 없습니다. 내장 폰트를 사용합니다."
+
+msgid "Internet Stream"
+msgstr "인터넷 스트림"
+
+msgid "now playing"
+msgstr "현재 재생중"
+
+msgid "Credits"
+msgstr "크레딧"
+
+msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
+msgstr "현재 IOS가 변경되었습니다 (fake-signed). 기능/안정성에 악영향을 미칠 수 있습니다."
