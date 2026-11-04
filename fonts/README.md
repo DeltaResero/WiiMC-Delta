@@ -14,7 +14,8 @@ language that uses Latin letters.
 
       pyftsubset NotoSans-Bold.ttf --output-file=font.ttf \
           --unicodes=U+0020-007E,U+00A0-017F,U+0192,U+02C6-02C7,U+02D8-02DD,U+2000-206F,U+20A0-20CF,U+2122,U+2212,U+FFFD \
-          --layout-features=kern --no-hinting --name-IDs='*' --name-languages='*'
+          --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting \
+          --name-IDs='*' --name-languages='*'
 
 ## On the SD card
 
@@ -38,3 +39,6 @@ The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 `--font-number=<face> --layout-features='' --no-layout-closure
 --drop-tables+=GDEF,GPOS,GSUB,BASE,VORG,vhea,vmtx --no-hinting --notdef-outline
 --name-IDs='*' --name-languages='*'`.
+
+None of the fonts keep kerning or vertical metrics. WiiMC only reads the
+older `kern` table, which Noto doesn't have, and never draws vertical text.
