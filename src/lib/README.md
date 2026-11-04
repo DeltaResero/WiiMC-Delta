@@ -109,3 +109,15 @@ Local changes:
 - `libavcodec/h274.c`, `libswscale/utils.c`: with `FF_HEAP_TABLES` the
   H.274 film grain database is allocated the first time a stream needs it,
   and swscale allocates its XYZ gamma tables as it does with `CONFIG_SMALL`.
+
+## mbedTLS
+
+- Upstream: https://github.com/Mbed-TLS/mbedtls (3.6 LTS branch)
+- Version: Mbed TLS 3.6.7 (`mbedtls-3.6.7.tar.bz2` from the GitHub release)
+- SHA-256 of the tarball:
+  `a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6`
+- Fetched: 2026-11-03
+- Licence: Apache 2.0 or GPL 2.0 or later, at the user's choice
+  (`LICENSE`); WiiMC takes it under GPL 2.0 or later.
+- Trimmed to the library: `include/`, `library/`, `LICENSE` and
+  `README.md`.
