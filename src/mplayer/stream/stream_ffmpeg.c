@@ -18,14 +18,22 @@
 
 #include "config.h"
 
+#include <stdio.h>
+#include <unistd.h>
+
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
+#include "libavutil/avstring.h"
+#include "libavutil/opt.h"
 #include "mp_msg.h"
 #include "stream.h"
 #include "m_option.h"
 #include "m_struct.h"
 #include "av_helpers.h"
 #include "libmpdemux/demuxer.h"
+#ifdef CONFIG_NETWORKING
+#include "network.h"
+#endif
 
 char *lavfstreamopts;
 
@@ -133,6 +141,27 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
         goto out;
     }
 
+#ifdef GEKKO
+    /* FFmpeg accepts any server certificate unless told otherwise. WiiMC
+     * always verifies https servers, against the CA bundle in its folder;
+     * without that file no https connection can succeed. */
+    if (!strncmp(filename, "https:", 6)) {
+        extern char appPath[];
+        extern int socInit(void);
+        char ca_file[1024];
+        /* FFmpeg's tcp uses libogc's BSD sockets, whose "soc:" device
+         * only socInit() registers. WiiMC's network thread calls it once
+         * the network is up, but a URL given on the command line can be
+         * opened before that; socInit() does nothing if it already ran. */
+        socInit();
+        snprintf(ca_file, sizeof(ca_file), "%s/cacert.pem", appPath);
+        if (access(ca_file, R_OK) != 0)
+            mp_msg(MSGT_OPEN, MSGL_ERR, "[ffmpeg] https needs a CA bundle at %s to verify servers\n", ca_file);
+        av_dict_set(&avopts, "tls_verify", "1", 0);
+        av_dict_set(&avopts, "ca_file", ca_file, 0);
+    }
+#endif
+
     if (!dummy && avio_open2(&ctx, filename, flags, NULL, &avopts) < 0)
         goto out;
 
@@ -155,6 +184,27 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
         stream->type = STREAMTYPE_STREAM;
         stream->seek = NULL;
     }
+#ifdef CONFIG_NETWORKING
+    /* Pick the demuxer from the server's Content-Type, as MPlayer's own
+     * http stream does. Without it a live stream is probed, which reads
+     * 1.5 MB before playback starts (over a minute at radio bitrates). */
+    if (!dummy && !strncmp(filename, "http", 4)) {
+        uint8_t *mime = NULL;
+        if (av_opt_get(ctx, "mime_type", AV_OPT_SEARCH_CHILDREN, &mime) >= 0 && mime) {
+            char *semi = strchr((char *)mime, ';');
+            int i;
+            if (semi)
+                *semi = '\0';
+            mp_msg(MSGT_OPEN, MSGL_V, "[ffmpeg] Content-Type: %s\n", (char *)mime);
+            for (i = 0; mime_type_table[i].mime_type; i++)
+                if (!av_strcasecmp((char *)mime, mime_type_table[i].mime_type)) {
+                    *file_format = mime_type_table[i].demuxer_type;
+                    break;
+                }
+        }
+        av_free(mime);
+    }
+#endif
     if (dummy) {
         *file_format = DEMUXER_TYPE_LAVF;
     } else {

@@ -26,6 +26,11 @@
 
 extern bool want3DS;
 
+// libogc's BSD socket layer (socket(), connect(), ...), which FFmpeg's https
+// uses, needs its "soc:" device; only if_configex() registers it, not
+// net_init_async(), and no libogc header declares it
+extern "C" int socInit(void);
+
 void ShowAction (const char *msg, UpdateCallback c);
 
 static int netHalt = 0;
@@ -95,6 +100,7 @@ static void * netcb (void *arg)
                 if (hostip.s_addr)
                 {
                     strcpy(wiiIP, inet_ntoa(hostip));
+                    socInit();
                     networkInit = true;
                     prevInit = true;
                     break;

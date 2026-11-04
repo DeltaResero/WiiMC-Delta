@@ -4400,7 +4400,7 @@ if (mpctx->sh_video)
         stream_cache_min_percent=orig_stream_cache_min_percent;
         stream_cache_seek_min_percent=orig_stream_cache_seek_min_percent;
 
-        if(strncmp(fileplaying,"http:",5) == 0 || strncmp(fileplaying,"mms:",4) == 0)
+        if(strncmp(fileplaying,"http:",5) == 0 || strncmp(fileplaying,"https:",6) == 0 || strncmp(fileplaying,"mms:",4) == 0)
         {
                 stream_cache_min_percent=online_stream_cache_min_percent;
                 stream_cache_seek_min_percent=5;
@@ -5134,6 +5134,7 @@ static void save_restore_point(char *_filename, char *_partitionlabel)
         if(     strncmp(_filename,"dvd:",4) == 0 ||
                 strncmp(_filename,"dvdnav:",7) == 0 ||
                 strncmp(_filename,"http:",5) == 0 ||
+                strncmp(_filename,"https:",6) == 0 ||
                 strncmp(_filename,"mms:",4) == 0)
                 return;
 
@@ -5886,7 +5887,7 @@ void wiiSetCacheFill(int fill)
         orig_stream_cache_min_percent = fill;
 
         // only change fill for local streams
-        if(filename && strncmp(filename,"http:",5) != 0 && strncmp(filename,"mms:",5) != 0)
+        if(filename && strncmp(filename,"http:",5) != 0 && strncmp(filename,"https:",6) != 0 && strncmp(filename,"mms:",5) != 0)
                 stream_cache_min_percent = fill;
 }
 
@@ -5941,7 +5942,7 @@ void wiiSetOnlineCacheFill(int fill)
         online_stream_cache_min_percent = fill;
 
         // only change fill for online streams
-        if(filename && (strncmp(filename,"http:",5) == 0 || strncmp(filename,"mms:",5) == 0))
+        if(filename && (strncmp(filename,"http:",5) == 0 || strncmp(filename,"https:",6) == 0 || strncmp(filename,"mms:",5) == 0))
                 stream_cache_min_percent = fill;
 }
 
