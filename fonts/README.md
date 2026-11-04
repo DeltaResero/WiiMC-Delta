@@ -30,6 +30,7 @@ WiiMC loads one into memory only while its language is chosen.
 | File       | Face | Characters                               |
 |------------|------|------------------------------------------|
 | `jp.ttf`   | JP   | JIS X 0208 and all kana                  |
+| `ko.ttf`   | KR   | KS X 1001 and all 11,172 Hangul          |
 
 The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 `--font-number=<face> --layout-features='' --no-layout-closure
