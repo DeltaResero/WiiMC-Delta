@@ -28,7 +28,10 @@ The language fonts are Noto Sans CJK Bold 2.004
 (https://github.com/notofonts/noto-cjk), under the SIL Open Font License 1.1
 (`OFL.txt`). Each is cut down to its region's standard character set, plus
 Latin and punctuation, so file names and tags still show, and keeps no hinting.
-WiiMC loads one into memory only while its language is chosen.
+WiiMC loads one into memory only while its language is chosen, or, with a
+menu in a Latin-script language, once a file name needs its characters: a
+name with Hangul borrows from `ko.ttf`, one with kana from `jp.ttf`, and one
+with Chinese characters alone from `zh_cn.ttf`, then `zh_tw.ttf`.
 
 | File       | Face | Characters                               |
 |------------|------|------------------------------------------|

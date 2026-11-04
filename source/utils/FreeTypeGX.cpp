@@ -35,6 +35,11 @@
 static FT_Library ftLibrary = NULL;     /**< FreeType FT_Library instance. */
 static FT_Face ftFace = NULL;           /**< FreeType reusable FT_Face typographic object. */
 static FT_GlyphSlot ftSlot = NULL;      /**< FreeType reusable FT_GlyphSlot glyph container object. */
+static FT_Face ftFallback = NULL;       /**< Language font lending glyphs the menu font lacks, loaded on demand. */
+static int ftFallbackFont = -1;         /**< Which language font ftFallback is (FALLBACK_*). */
+static const wchar_t *fallbackText = NULL; /**< String the fallback fonts in fallbackTried were loaded for. */
+static int fallbackTried = 0;           /**< Bit per FALLBACK_* font already loaded for fallbackText. */
+static mutex_t glyphLock = LWP_MUTEX_NULL; /**< Glyphs are cached from both the menu and GUI threads. */
 static volatile bool texturesChanged = false; /**< A glyph texture was written since the GPU's texture cache was last cleared. */
 
 FreeTypeGX *fontSystem[MAX_FONT_SIZE+1];
@@ -104,9 +109,23 @@ bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize)
     return true;
 }
 
+/**
+ * Closes the fallback font, before its memory is freed or reused.
+ */
+void DropFallbackFont()
+{
+    if(ftFallback)
+        FT_Done_Face(ftFallback);
+    ftFallback = NULL;
+    ftFallbackFont = -1;
+    fallbackText = NULL;
+    fallbackTried = 0;
+}
+
 void DeinitFreeType()
 {
     ClearFontData();
+    DropFallbackFont();
     if(ftLibrary)
         FT_Done_FreeType(ftLibrary);
     ftLibrary = NULL;
@@ -170,6 +189,7 @@ FreeTypeGX::FreeTypeGX(FT_UInt pixelSize, bool bold, uint8_t vertexIndex)
     this->setCompatibilityMode(FTGX_COMPATIBILITY_DEFAULT_TEVOP_GX_PASSCLR | FTGX_COMPATIBILITY_DEFAULT_VTXDESC_GX_NONE);
     this->ftPointSize = pixelSize;
     this->bold = bold;
+    this->currentText = NULL;
 }
 /**
  * Default destructor for the FreeTypeGX class.
@@ -341,39 +361,134 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode)
 {
     FT_UInt gIndex;
     uint16_t textureWidth = 0, textureHeight = 0;
+    ftgxCharData *glyphData = NULL;
 
+    if(glyphLock == LWP_MUTEX_NULL)
+        LWP_MutexInit(&glyphLock, false);
+    LWP_MutexLock(glyphLock);
+
+    FT_Face face = ftFace;
     gIndex = FT_Get_Char_Index( ftFace, charCode );
-    if (!FT_Load_Glyph(ftFace, gIndex, this->bold ? FT_LOAD_NO_BITMAP : FT_LOAD_DEFAULT | FT_LOAD_RENDER ))
+    if (gIndex == 0)
     {
-        if(this->bold && ftSlot->format == FT_GLYPH_FORMAT_OUTLINE)
+        FT_Face fallback = this->fallbackFor(charCode);
+        if (fallback)
+        {
+            face = fallback;
+            gIndex = FT_Get_Char_Index(face, charCode);
+            FT_Set_Pixel_Sizes(face, 0, this->ftPointSize);
+        }
+    }
+    FT_GlyphSlot slot = face->glyph;
+
+    if (!FT_Load_Glyph(face, gIndex, this->bold ? FT_LOAD_NO_BITMAP : FT_LOAD_DEFAULT | FT_LOAD_RENDER ))
+    {
+        if(this->bold && slot->format == FT_GLYPH_FORMAT_OUTLINE)
         {
             // a lighter touch than FreeType's own synthetic bold (em / 24)
-            FT_Pos strength = FT_MulFix(ftFace->units_per_EM, ftFace->size->metrics.y_scale) / 40;
-            FT_Outline_Embolden(&ftSlot->outline, strength);
-            ftSlot->advance.x += strength;
-            FT_Render_Glyph(ftSlot, FT_RENDER_MODE_NORMAL);
+            FT_Pos strength = FT_MulFix(face->units_per_EM, face->size->metrics.y_scale) / 40;
+            FT_Outline_Embolden(&slot->outline, strength);
+            slot->advance.x += strength;
+            FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
         }
-        if(ftSlot->format == FT_GLYPH_FORMAT_BITMAP)
+        if(slot->format == FT_GLYPH_FORMAT_BITMAP)
         {
-            FT_Bitmap *glyphBitmap = &ftSlot->bitmap;
+            FT_Bitmap *glyphBitmap = &slot->bitmap;
 
             textureWidth = adjustTextureWidth(glyphBitmap->width);
             textureHeight = adjustTextureHeight(glyphBitmap->rows);
 
-            this->fontData[charCode] = (ftgxCharData){
-                ftSlot->bitmap_left,
-                ftSlot->advance.x >> 6,
+            glyphData = &(this->fontData[charCode] = (ftgxCharData){
+                slot->bitmap_left,
+                slot->advance.x >> 6,
                 textureWidth,
                 textureHeight,
-                ftSlot->bitmap_top,
-                ftSlot->bitmap_top,
-                glyphBitmap->rows - ftSlot->bitmap_top,
+                slot->bitmap_top,
+                slot->bitmap_top,
+                glyphBitmap->rows - slot->bitmap_top,
                 NULL
-            };
-            this->loadGlyphData(glyphBitmap, &this->fontData[charCode]);
-
-            return &this->fontData[charCode];
+            });
+            this->loadGlyphData(glyphBitmap, glyphData);
         }
+    }
+    LWP_MutexUnlock(glyphLock);
+    return glyphData;
+}
+
+static bool isHangul(wchar_t c)
+{
+    return (c >= 0x1100 && c <= 0x11FF) || (c >= 0x3130 && c <= 0x318F) || (c >= 0xAC00 && c <= 0xD7AF);
+}
+
+static bool isKana(wchar_t c)
+{
+    return (c >= 0x3040 && c <= 0x30FF) || (c >= 0x31F0 && c <= 0x31FF) || (c >= 0xFF66 && c <= 0xFF9F);
+}
+
+static bool isCJK(wchar_t c)
+{
+    return isHangul(c) || (c >= 0x2E80 && c <= 0x9FFF) || (c >= 0xF900 && c <= 0xFAFF) ||
+        (c >= 0xFE30 && c <= 0xFE4F) || (c >= 0xFF00 && c <= 0xFFEF);
+}
+
+/**
+ * Finds a language font with a glyph the menu font lacks, loading one if needed.
+ *
+ * Only for CJK characters. The font follows the string being drawn: Hangul means
+ * Korean, kana Japanese, and Han characters alone Chinese, Simplified first. Each font
+ * is loaded at most once per string, so a character none of them has can't keep
+ * reloading them.
+ *
+ * @param charCode  The character the menu font lacks.
+ * @return A face with the glyph, or NULL.
+ */
+FT_Face FreeTypeGX::fallbackFor(wchar_t charCode)
+{
+    if (!isCJK(charCode))
+        return NULL;
+
+    int order[2] = { FALLBACK_ZH_CN, FALLBACK_ZH_TW };
+    bool hangul = isHangul(charCode), kana = isKana(charCode);
+    for (const wchar_t *t = this->currentText; t && *t; ++t)
+    {
+        hangul |= isHangul(*t);
+        kana |= isKana(*t);
+    }
+    if (hangul)
+        order[0] = order[1] = FALLBACK_KO;
+    else if (kana)
+        order[0] = order[1] = FALLBACK_JP;
+
+    if (ftFallback && (ftFallbackFont == order[0] || ftFallbackFont == order[1]) &&
+        FT_Get_Char_Index(ftFallback, charCode))
+        return ftFallback;
+
+    if (this->currentText != fallbackText)
+    {
+        fallbackText = this->currentText;
+        fallbackTried = 0;
+    }
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (fallbackTried & (1 << order[i]))
+            continue;
+
+        int tried = fallbackTried | (1 << order[i]);
+        DropFallbackFont(); // its memory is about to be reused
+        fallbackText = this->currentText;
+        fallbackTried = tried;
+
+        u32 size = 0;
+        u8 *buffer = LoadFallbackFont(order[i], &size);
+        if (!buffer || FT_New_Memory_Face(ftLibrary, (FT_Byte *)buffer, size, 0, &ftFallback) != 0)
+        {
+            ftFallback = NULL;
+            continue;
+        }
+        ftFallbackFont = order[i];
+        if (FT_Get_Char_Index(ftFallback, charCode))
+            return ftFallback;
     }
     return NULL;
 }
@@ -528,6 +643,7 @@ uint16_t FreeTypeGX::drawText(int16_t x, int16_t y, wchar_t *text, GXColor color
 
     if(!text)
         return 0;
+    this->currentText = text;
 
     if(textStyle & FTGX_JUSTIFY_MASK)
     {
@@ -595,6 +711,7 @@ void FreeTypeGX::drawTextFeature(int16_t x, int16_t y, uint16_t width, ftgxDataO
 uint16_t FreeTypeGX::getWidth(wchar_t *text)
 {
     uint16_t strWidth = 0;
+    this->currentText = text;
 
     int i = 0;
     while (text[i])
@@ -657,6 +774,7 @@ uint16_t FreeTypeGX::getHeight(wchar_t const *text)
 void FreeTypeGX::getOffset(wchar_t *text, ftgxDataOffset* offset)
 {
     int16_t strMax = 0, strMin = 9999;
+    this->currentText = text;
 
     int i = 0;
     while (text[i])

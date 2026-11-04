@@ -1447,6 +1447,50 @@ static void ResetText()
 
 static int currentFont = FONT_DEFAULT;
 static u8 *ext_font_ttf = NULL;
+static u8 *fallback_ttf = NULL; // a language font lent to the built-in one, in the same memory
+
+/****************************************************************************
+ * LoadFallbackFont
+ *
+ * Reads a language font so the built-in font can borrow glyphs from it for
+ * file names in other scripts. Only while no language font is loaded, as
+ * both use the language font's memory. FreeTypeGX closes the old fallback
+ * face before calling this.
+ ***************************************************************************/
+u8 *LoadFallbackFont(int font, u32 *size)
+{
+    static const char *files[] = { "jp.ttf", "ko.ttf", "zh_cn.ttf", "zh_tw.ttf" };
+
+    if(fallback_ttf)
+    {
+        mem2_free(fallback_ttf, MEM2_EXTFONT);
+        fallback_ttf = NULL;
+    }
+    if(currentFont != FONT_DEFAULT || font < FALLBACK_JP || font > FALLBACK_ZH_TW)
+        return NULL;
+
+    char filepath[MAXPATHLEN];
+    sprintf(filepath, "%s/%s", appPath, files[font]);
+    FILE *file = fopen(filepath, "rb");
+    if(!file)
+        return NULL;
+
+    fseeko(file, 0, SEEK_END);
+    u32 loadSize = ftello(file);
+    if(loadSize > 0 && AddMem2Area(loadSize+1024, MEM2_EXTFONT))
+    {
+        fallback_ttf = (u8 *)mem2_memalign(32, loadSize, MEM2_EXTFONT);
+        fseeko(file, 0, SEEK_SET);
+        if(fallback_ttf && fread(fallback_ttf, 1, loadSize, file) != loadSize)
+        {
+            mem2_free(fallback_ttf, MEM2_EXTFONT);
+            fallback_ttf = NULL;
+        }
+    }
+    fclose(file);
+    *size = loadSize;
+    return fallback_ttf;
+}
 
 void ChangeLanguage()
 {
@@ -1497,6 +1541,14 @@ restart:
 
         if(file)
         {
+            if(fallback_ttf) // the language font needs this memory
+            {
+                SuspendGui();
+                DropFallbackFont();
+                mem2_free(fallback_ttf, MEM2_EXTFONT);
+                fallback_ttf = NULL;
+            }
+
             fseeko(file,0,SEEK_END);
             u32 loadSize = ftello(file);
 

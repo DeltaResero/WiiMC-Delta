@@ -108,6 +108,9 @@ const GXColor ftgxWhite = (GXColor){0xff, 0xff, 0xff, 0xff}; /**< Constant color
 bool InitFreeType(uint8_t* fontBuffer, FT_Long bufferSize);
 void DeinitFreeType();
 void ChangeFontSize(FT_UInt pixelSize);
+enum { FALLBACK_JP, FALLBACK_KO, FALLBACK_ZH_CN, FALLBACK_ZH_TW }; // the language fonts, for LoadFallbackFont
+void DropFallbackFont();
+u8 *LoadFallbackFont(int font, u32 *size); // in menu.cpp
 wchar_t* charToWideChar(const char* p);
 void ClearFontData();
 
@@ -127,6 +130,7 @@ class FreeTypeGX {
         bool bold;              /**< Flag indicating glyphs are thickened. */
         uint8_t vertexIndex;    /**< Vertex format descriptor index. */
         uint32_t compatibilityMode; /**< Compatibility mode for default tev operations and vertex descriptors. */
+        const wchar_t *currentText; /**< String being measured or drawn, to pick a fallback font by script. */
         std::unordered_map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
 
         static uint16_t adjustTextureWidth(uint16_t textureWidth);
@@ -138,6 +142,7 @@ class FreeTypeGX {
         void unloadFont();
         ftgxCharData *cacheGlyphData(wchar_t charCode);
         ftgxCharData *getGlyph(wchar_t charCode);
+        FT_Face fallbackFor(wchar_t charCode);
         uint16_t cacheGlyphDataComplete();
         void loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData);
 
