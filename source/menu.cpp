@@ -1452,7 +1452,7 @@ void ChangeLanguage()
 {
     char error[128] = {0};
 
-    if(WiiSettings.language < 7 || WiiSettings.language == LANG_KOREAN)
+    if(WiiSettings.language >= 0 && WiiSettings.language < LANG_LENGTH)
     {
         char filepath[MAXPATHLEN];
         int newFont = 0;
@@ -1468,6 +1468,16 @@ void ChangeLanguage()
                 if(currentFont == FONT_JAPANESE) return;
                 sprintf(filepath, "%s/jp.ttf", appPath);
                 newFont = FONT_JAPANESE;
+                break;
+            case LANG_SIMP_CHINESE:
+                if(currentFont == FONT_SIMP_CHINESE) return;
+                sprintf(filepath, "%s/zh_cn.ttf", appPath);
+                newFont = FONT_SIMP_CHINESE;
+                break;
+            case LANG_TRAD_CHINESE:
+                if(currentFont == FONT_TRAD_CHINESE) return;
+                sprintf(filepath, "%s/zh_tw.ttf", appPath);
+                newFont = FONT_TRAD_CHINESE;
                 break;
             case LANG_ENGLISH:
             case LANG_GERMAN:
@@ -1545,7 +1555,8 @@ restart:
         }
 error:
         WiiSettings.language = WiiSettings.language;
-        if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE)
+        if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE ||
+            WiiSettings.language == LANG_SIMP_CHINESE || WiiSettings.language == LANG_TRAD_CHINESE)
             WiiSettings.language = LANG_ENGLISH;
     }
 
@@ -4527,37 +4538,7 @@ static void MenuSettingsGlobal()
         switch (ret)
         {
             case 0:
-                switch (WiiSettings.language) {
-                    case LANG_ENGLISH:
-                        WiiSettings.language = LANG_GERMAN;
-                        break;
-                    case LANG_GERMAN:
-                        WiiSettings.language = LANG_FRENCH;
-                        break;
-                    case LANG_FRENCH:
-                        WiiSettings.language = LANG_SPANISH;
-                        break;
-                    case LANG_SPANISH:
-                        WiiSettings.language = LANG_ITALIAN;
-                        break;
-                    case LANG_ITALIAN:
-                        WiiSettings.language = LANG_DUTCH;
-                        break;
-                    case LANG_DUTCH:
-                        WiiSettings.language = LANG_KOREAN;
-                        break;
-                    case LANG_KOREAN:
-                        WiiSettings.language = LANG_JAPANESE;
-                        break;
-                    case LANG_JAPANESE:
-                        WiiSettings.language = LANG_ENGLISH;
-                        break;
-                }
-            //WiiSettings.language++;
-            /*  if(WiiSettings.language == LANG_GERMAN)
-                    ++WiiSettings.language;
-                else if(WiiSettings.language >= LANG_LENGTH)
-                    WiiSettings.language = 0; */
+                WiiSettings.language = (WiiSettings.language + 1) % LANG_LENGTH;
                 break;
             case 1:
                 WiiSettings.volume += 10;
@@ -4716,14 +4697,13 @@ static void MenuSettingsGlobal()
             {
                 case LANG_JAPANESE:             sprintf(options.value[0], "Japanese"); break;
                 case LANG_ENGLISH:              sprintf(options.value[0], "English"); break;
-                //only support languages that can have all text translated
                 case LANG_GERMAN:               sprintf(options.value[0], "Deutsch"); break;
                 case LANG_FRENCH:               sprintf(options.value[0], "Français"); break;
                 case LANG_SPANISH:              sprintf(options.value[0], "Español"); break;
                 case LANG_ITALIAN:              sprintf(options.value[0], "Italiano"); break;
                 case LANG_DUTCH:                sprintf(options.value[0], "Nederlands"); break;
-                /*case LANG_SIMP_CHINESE:         sprintf(options.value[0], "Chinese (Simplified)"); break;
-                case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;*/
+                case LANG_SIMP_CHINESE:         sprintf(options.value[0], "Chinese (Simplified)"); break;
+                case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;
                 case LANG_KOREAN:               sprintf(options.value[0], "Korean"); break;
             }
 

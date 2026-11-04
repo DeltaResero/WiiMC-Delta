@@ -31,6 +31,8 @@ WiiMC loads one into memory only while its language is chosen.
 |------------|------|------------------------------------------|
 | `jp.ttf`   | JP   | JIS X 0208 and all kana                  |
 | `ko.ttf`   | KR   | KS X 1001 and all 11,172 Hangul          |
+| `zh_cn.ttf`| SC   | GB2312                                   |
+| `zh_tw.ttf`| TC   | Big5 symbols and level 1 (common) hanzi  |
 
 The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
 `--font-number=<face> --layout-features='' --no-layout-closure
