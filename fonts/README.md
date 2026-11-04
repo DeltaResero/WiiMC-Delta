@@ -20,3 +20,18 @@ language that uses Latin letters.
 
 The other files here go in `apps/wiimc/` next to `boot.dol`. WiiMC loads them
 when it needs them.
+
+The language fonts are Noto Sans CJK Bold 2.004
+(https://github.com/notofonts/noto-cjk), under the SIL Open Font License 1.1
+(`OFL.txt`). Each is cut down to its region's standard character set, plus
+Latin and punctuation, so file names and tags still show, and keeps no hinting.
+WiiMC loads one into memory only while its language is chosen.
+
+| File       | Face | Characters                               |
+|------------|------|------------------------------------------|
+| `jp.ttf`   | JP   | JIS X 0208 and all kana                  |
+
+The cut is made from `NotoSansCJK-Bold.ttc` with `pyftsubset` and these options:
+`--font-number=<face> --layout-features='' --no-layout-closure
+--drop-tables+=GDEF,GPOS,GSUB,BASE,VORG,vhea,vmtx --no-hinting --notdef-outline
+--name-IDs='*' --name-languages='*'`.

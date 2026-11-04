@@ -1464,13 +1464,11 @@ void ChangeLanguage()
                 sprintf(filepath, "%s/ko.ttf", appPath);
                 newFont = FONT_KOREAN;
                 break;
-        #if 0
             case LANG_JAPANESE:
                 if(currentFont == FONT_JAPANESE) return;
                 sprintf(filepath, "%s/jp.ttf", appPath);
                 newFont = FONT_JAPANESE;
                 break;
-        #endif
             case LANG_ENGLISH:
             case LANG_GERMAN:
             case LANG_FRENCH:
@@ -4549,11 +4547,11 @@ static void MenuSettingsGlobal()
                         WiiSettings.language = LANG_KOREAN;
                         break;
                     case LANG_KOREAN:
+                        WiiSettings.language = LANG_JAPANESE;
+                        break;
+                    case LANG_JAPANESE:
                         WiiSettings.language = LANG_ENGLISH;
                         break;
-                //  case LANG_JAPANESE:
-                //      WiiSettings.language = LANG_ENGLISH;
-                //      break;
                 }
             //WiiSettings.language++;
             /*  if(WiiSettings.language == LANG_GERMAN)
@@ -4716,7 +4714,7 @@ static void MenuSettingsGlobal()
 
             switch(WiiSettings.language)
             {
-                //case LANG_JAPANESE:               sprintf(options.value[0], "Japanese"); break;
+                case LANG_JAPANESE:             sprintf(options.value[0], "Japanese"); break;
                 case LANG_ENGLISH:              sprintf(options.value[0], "English"); break;
                 //only support languages that can have all text translated
                 case LANG_GERMAN:               sprintf(options.value[0], "Deutsch"); break;
