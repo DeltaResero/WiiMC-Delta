@@ -667,9 +667,6 @@ msgstr "포스터 300px"
 msgid "Color"
 msgstr "색상"
 
-msgid "Subtitle font file not found. Using internal."
-msgstr "자막 폰트 파일을 찾을 수 없습니다. 내장 폰트를 사용합니다."
-
 msgid "Internet Stream"
 msgstr "인터넷 스트림"
 

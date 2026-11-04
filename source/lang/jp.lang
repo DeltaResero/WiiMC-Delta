@@ -667,9 +667,6 @@ msgstr "ポスター 300px"
 msgid "Color"
 msgstr "色"
 
-msgid "Subtitle font file not found. Using internal."
-msgstr "字幕フォントが見つからないため 内蔵フォントを使います"
-
 msgid "Internet Stream"
 msgstr "インターネット配信"
 

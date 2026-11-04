@@ -667,9 +667,6 @@ msgstr "海報 300px"
 msgid "Color"
 msgstr "顏色"
 
-msgid "Subtitle font file not found. Using internal."
-msgstr "找不到字幕字型檔，將使用內建字型。"
-
 msgid "Internet Stream"
 msgstr "網路串流"
 

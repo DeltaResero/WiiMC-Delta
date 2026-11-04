@@ -667,9 +667,6 @@ msgstr "Affiche 300px"
 msgid "Color"
 msgstr "Couleur"
 
-msgid "Subtitle font file not found. Using internal."
-msgstr "Police des sous-titres introuvable. La police interne sera utilisée."
-
 msgid "Internet Stream"
 msgstr "Flux Internet"
 

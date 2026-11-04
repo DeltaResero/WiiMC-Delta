@@ -667,9 +667,6 @@ msgstr "Poster 300px"
 msgid "Color"
 msgstr "Farbe"
 
-msgid "Subtitle font file not found. Using internal."
-msgstr "Untertitel-Schriftartdatei nicht gefunden. Die interne wird verwendet."
-
 msgid "Internet Stream"
 msgstr "Internet-Stream"
 

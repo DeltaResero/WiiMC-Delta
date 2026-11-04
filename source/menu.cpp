@@ -6671,9 +6671,6 @@ static void MenuSettingsSubtitles()
     mainWindow->Append(&titleTxt);
     ResumeGui();
 
-    if(!subtitleFontFound)
-        InfoPrompt("Subtitle font file not found. Using internal.");
-
     while(menuCurrent == MENU_SETTINGS_SUBTITLES && !guiShutdown)
     {
         usleep(THREAD_SLEEP);
