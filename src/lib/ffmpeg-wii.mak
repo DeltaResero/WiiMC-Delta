@@ -77,7 +77,7 @@ ffmpeg_list = $(subst $(ffmpeg_space),$(ffmpeg_comma),$(strip $(1)))
 # --target-os=none: bare metal, newlib and libsysbase provide the libc.
 # --disable-dcbzl: dcbzl is a 970 instruction the Wii's 750CL doesn't have.
 FFMPEG_CONFIGURE := \
-	--prefix=$(FFPREFIX) \
+	--prefix=$(EXTPREFIX) \
 	--enable-cross-compile --cross-prefix=powerpc-eabi- \
 	--arch=ppc --cpu=750 --target-os=none \
 	--pkg-config=false \

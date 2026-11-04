@@ -17,13 +17,13 @@ export	FREETYPE_LIBS	:=	`$(DEVKITPRO)/portlibs/ppc/bin/powerpc-eabi-pkg-config -
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-MPLAYER		:=	$(CURDIR)/src/mplayer-ce
+MPLAYER		:=	$(CURDIR)/src/mplayer
 TARGET		:=	wiimc
 TARGETDIR	:=	executables
 BUILD		:=	build
 SOURCES		:=	src src/libwiigui src/utils src/utils/unzip
 DATA		:=	src/images src/lang src/fonts
-INCLUDES	:=	src src/mplayer-ce
+INCLUDES	:=	src src/mplayer
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -42,7 +42,7 @@ LDFLAGS		+=	-L../buildtools
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lavutil \
+LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lswresample -lavutil \
                         -ljpeg -ldi -liso9660 -liconv -lpng -lz -lmxml $(FREETYPE_LIBS) \
                         -lfat -lwiiuse -lbte -logc -ltinysmb
 
@@ -80,20 +80,15 @@ EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
 export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
 EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
 # libraries built in this tree, so the DOL relinks when one of them changes
-export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/libavformat.a \
-				$(MPLAYER)/ffmpeg/libavcodec/libavcodec.a $(MPLAYER)/ffmpeg/libswscale/libswscale.a \
-				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
+export LINKDEPS	=	$(MPLAYER)/libmplayerwii.a $(FFMPEGLIBS) $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
 				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
 # FFmpeg 9.0.2 (src/lib/ffmpeg) is configured and built out of tree, with
-# the options in src/lib/ffmpeg-wii.mak. It installs into a prefix of its
-# own, since in $(EXTPREFIX) its libraries and headers would come before
-# FFmpeg 0.10's.
-FFPREFIX	:=	$(CURDIR)/$(BUILD)/ffmpeg
+# the options in src/lib/ffmpeg-wii.mak, and installed with the others
 include $(LIBSRC)/ffmpeg-wii.mak
 FFSRC		:=	$(LIBSRC)/ffmpeg
 FFBUILD		:=	$(EXTBUILD)/ffmpeg
-FFMPEGLIBS	:=	$(foreach lib,avformat avcodec swscale swresample avutil,$(FFPREFIX)/lib/lib$(lib).a)
+FFMPEGLIBS	:=	$(foreach lib,avformat avcodec swscale swresample avutil,$(EXTPREFIX)/lib/lib$(lib).a)
 FFMPEGFILES	:=	$(wildcard $(addprefix $(FFSRC)/,lib*/*.[chS] lib*/*/*.[chS] lib*/*/*/*.[chS]))
 NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard src/lib/libntfs/source/*.c)))
 
@@ -143,11 +138,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 
 export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 				-L$(EXTPREFIX)/lib \
-				-L$(MPLAYER)/ \
-				-L$(MPLAYER)/ffmpeg/libavcodec \
-				-L$(MPLAYER)/ffmpeg/libavformat \
-				-L$(MPLAYER)/ffmpeg/libavutil \
-				-L$(MPLAYER)/ffmpeg/libswscale
+				-L$(MPLAYER)/
 
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 .PHONY: $(BUILD) clean forwarder
@@ -155,7 +146,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 #---------------------------------------------------------------------------------
 $(BUILD): $(EXTLIBS) $(FFMPEGLIBS)
 	@[ -d $(TARGETDIR) ] || mkdir -p $(TARGETDIR)
-	cd src/mplayer-ce; $(MAKE) -f Makefile; cd ../..
+	cd src/mplayer; $(MAKE) -f Makefile; cd ../..
 	@[ -d $@ ] || mkdir -p $@
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
@@ -208,8 +199,8 @@ clean:
 	rm -f $(BUILD)/*.d $(BUILD)/*.h $(BUILD)/*.ii $(BUILD)/*.lst $(BUILD)/*.map \
 	$(BUILD)/*.o $(BUILD)/*.s
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
-	rm -rf $(EXTPREFIX) $(EXTBUILD) $(FFPREFIX)
-	cd src/mplayer-ce; $(MAKE) -f Makefile clean
+	rm -rf $(EXTPREFIX) $(EXTBUILD)
+	cd src/mplayer; $(MAKE) -f Makefile wiiclean
 	$(MAKE) -C extras/forwarder clean
 
 #---------------------------------------------------------------------------------

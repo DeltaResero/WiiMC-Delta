@@ -28,9 +28,8 @@ indent_size = 4
 # LEGACY ENCODINGS
 # =============================================================================
 # libiconv's glibc locale tables and FriBidi's Hebrew tests are data in
-# Latin-1 and ISO-8859-8, and FFmpeg's clean-diff uses a Latin-1 byte as a
-# marker for tr, so leave their encoding as it is.
-[{src/lib/libiconv/libcharset/tools/*,src/lib/fribidi/test/test_ISO8859-8_*,src/mplayer-ce/ffmpeg/tools/clean-diff}]
+# Latin-1 and ISO-8859-8, so leave their encoding as it is.
+[{src/lib/libiconv/libcharset/tools/*,src/lib/fribidi/test/test_ISO8859-8_*}]
 charset = unset
 
 # =============================================================================
