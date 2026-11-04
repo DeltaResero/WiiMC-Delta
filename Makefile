@@ -205,6 +205,10 @@ $(OUTPUT).elf: $(OFILES) $(LINKDEPS)
 	$(ADD_COMPILE_COMMAND) end
 	$(SILENTCMD)$(LD) $(OFILES) $(LDFLAGS) $(LIBPATHS) $(LIBS) -o $@
 
+# the .d files name these headers by absolute path, which make doesn't tie to
+# the bin2o rules below, so a changed file's size would never reach the code
+$(OFILES_SOURCES) : $(HFILES)
+
 #---------------------------------------------------------------------------------
 # This rule links in binary data with .ttf, .lang, .png, and .jpg extensions
 #---------------------------------------------------------------------------------
