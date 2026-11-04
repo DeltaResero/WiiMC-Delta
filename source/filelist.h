@@ -17,7 +17,6 @@
 // Languages
 #include "jp_lang.h"
 #include "en_lang.h"
-#include "da_lang.h"
 #include "de_lang.h"
 #include "fr_lang.h"
 #include "es_lang.h"
@@ -26,17 +25,6 @@
 #include "zh_cn_lang.h"
 #include "zh_tw_lang.h"
 #include "ko_lang.h"
-#include "ro_lang.h"
-#include "bg_lang.h"
-#include "et_lang.h"
-#include "pt_lang.h"
-#include "pt_br_lang.h"
-#include "hu_lang.h"
-#include "pl_lang.h"
-#include "ru_lang.h"
-#include "sk_lang.h"
-#include "ta_lang.h"
-#include "sv_lang.h"
 
 // Sounds
 

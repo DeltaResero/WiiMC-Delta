@@ -220,18 +220,6 @@ bool LoadLanguage()
         case LANG_SIMP_CHINESE: file = (char *)zh_cn_lang; eof = file + zh_cn_lang_size; break;
         case LANG_TRAD_CHINESE: file = (char *)zh_tw_lang; eof = file + zh_tw_lang_size; break;*/
         case LANG_KOREAN: file = (char *)ko_lang; eof = file + ko_lang_size; break;
-        /*case LANG_ROMANIAN: file = (char *)ro_lang; eof = file + ro_lang_size; break;
-        case LANG_ESTONIAN: file = (char *)et_lang; eof = file + et_lang_size; break;
-        case LANG_PORTUGUESE: file = (char *)pt_lang; eof = file + pt_lang_size; break;
-        case LANG_BRAZILIAN_PORTUGUESE: file = (char *)pt_br_lang; eof = file + pt_br_lang_size; break;
-        case LANG_HUNGARIAN: file = (char *)hu_lang; eof = file + hu_lang_size; break;
-        case LANG_POLISH: file = (char *)pl_lang; eof = file + pl_lang_size; break;
-        case LANG_RUSSIAN: file = (char *)ru_lang; eof = file + ru_lang_size; break;
-        case LANG_SLOVAK: file = (char *)sk_lang; eof = file + sk_lang_size; break;
-        case LANG_TAMIL: file = (char *)ta_lang; eof = file + ta_lang_size; break;
-        case LANG_SWEDISH: file = (char *)sv_lang; eof = file + sv_lang_size; break;
-        case LANG_DANISH: file = (char *)da_lang; eof = file + da_lang_size; break;
-        case LANG_BULGARIAN: file = (char *)bg_lang; eof = file + bg_lang_size; break;*/
         default: return false;
     }
 

@@ -4711,18 +4711,6 @@ static void MenuSettingsGlobal()
                 case LANG_SIMP_CHINESE:         sprintf(options.value[0], "Chinese (Simplified)"); break;
                 case LANG_TRAD_CHINESE:         sprintf(options.value[0], "Chinese (Traditional)"); break;*/
                 case LANG_KOREAN:               sprintf(options.value[0], "Korean"); break;
-                /*case LANG_ROMANIAN:               sprintf(options.value[0], "Romanian"); break;
-                case LANG_ESTONIAN:             sprintf(options.value[0], "Estonian"); break;
-                case LANG_PORTUGUESE:           sprintf(options.value[0], "Portuguese"); break;
-                case LANG_BRAZILIAN_PORTUGUESE: sprintf(options.value[0], "Brazilian Portuguese"); break;
-                case LANG_HUNGARIAN:            sprintf(options.value[0], "Hungarian"); break;
-                case LANG_POLISH:               sprintf(options.value[0], "Polish"); break;
-                case LANG_RUSSIAN:              sprintf(options.value[0], "Russian"); break;
-                case LANG_SLOVAK:               sprintf(options.value[0], "Slovak"); break;
-                case LANG_TAMIL:                sprintf(options.value[0], "Tamil"); break;
-                case LANG_SWEDISH:              sprintf(options.value[0], "Swedish"); break;
-                case LANG_DANISH:               sprintf(options.value[0], "Danish"); break;
-                case LANG_BULGARIAN:            sprintf(options.value[0], "Bulgarian"); break;*/
             }
 
             sprintf (options.value[1], "%d%%", WiiSettings.volume);
