@@ -1136,7 +1136,8 @@ int main(int argc, char *argv[])
     StartNetworkThread(); //to set net heap aside MEM2 area
     usleep(100); //force network thread execution
 
-    AddMem2Area (MPLAYER_BUFFER_SIZE, MEM2_MPLAYER_BUFFER);
+    // the area's heap keeps its own bookkeeping, so the buffer needs room to spare
+    AddMem2Area (MPLAYER_BUFFER_SIZE + 1024, MEM2_MPLAYER_BUFFER);
     global_buffer = (unsigned char *)mem2_malloc(MPLAYER_BUFFER_SIZE, MEM2_MPLAYER_BUFFER);
 
     u32 size = ( (1024*MAX_HEIGHT)+((MAX_WIDTH-1024)*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
