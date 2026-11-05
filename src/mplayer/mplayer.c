@@ -172,6 +172,7 @@ void SetBufferingStatus(int s);
 void PauseAndGotoGUI();
 bool FindNextFile(bool load);
 void SetMPlayerSettings();
+void SetMPlayerLanguages(void);
 bool StartDVDMotor();
 void SetLastDVDMotorTime();
 bool WakeupUSB();
@@ -3894,6 +3895,7 @@ audio_delay=0;
         stream_cache_size=-1;
   else
         stream_cache_size=orig_stream_cache_size;
+  SetMPlayerLanguages();
 #endif
     mpctx->stream  = open_stream(filename, 0, &mpctx->file_format);
     if (!mpctx->stream) { // error...

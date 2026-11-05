@@ -889,6 +889,24 @@ void wiiExtraFont()
 }
 
 extern "C" {
+// MPlayer picks the audio and subtitle tracks when it opens a file, before
+// SetMPlayerSettings() runs, so it calls this itself for each file
+void SetMPlayerLanguages()
+{
+    char audioLang[14] = { 0 };
+    char subtitleLang[14] = { 0 };
+
+    if(WiiSettings.audioLanguage[0] != 0)
+        sprintf(audioLang, "%s,%s,en,eng",
+            WiiSettings.audioLanguage, languages[GetLangIndex(WiiSettings.audioLanguage)].abbrev2);
+    if(WiiSettings.subtitleLanguage[0] != 0)
+        sprintf(subtitleLang, "%s,%s,en,eng",
+            WiiSettings.subtitleLanguage, languages[GetLangIndex(WiiSettings.subtitleLanguage)].abbrev2);
+
+    wiiSetAudioLanguage(audioLang);
+    wiiSetSubtitleLanguage(subtitleLang);
+}
+
 void SetMPlayerSettings()
 {
     static float aspectRatio=-2;
@@ -942,18 +960,7 @@ void SetMPlayerSettings()
 
     wiiSetCodepage(WiiSettings.subtitleCodepage);
 
-    char audioLang[14] = { 0 };
-    char subtitleLang[14] = { 0 };
-
-    if(WiiSettings.audioLanguage[0] != 0)
-        sprintf(audioLang, "%s,%s,en,eng",
-            WiiSettings.audioLanguage, languages[GetLangIndex(WiiSettings.audioLanguage)].abbrev2);
-    if(WiiSettings.subtitleLanguage[0] != 0)
-        sprintf(subtitleLang, "%s,%s,en,eng",
-            WiiSettings.subtitleLanguage, languages[GetLangIndex(WiiSettings.subtitleLanguage)].abbrev2);
-
-    wiiSetAudioLanguage(audioLang);
-    wiiSetSubtitleLanguage(subtitleLang);
+    SetMPlayerLanguages();
     wiiSetSubtitleColor(WiiSettings.subtitleColor);
     wiiSetSubtitleSize(0.6+(WiiSettings.subtitleSize-1)*0.6); // 1.0-5.0 --> 0.6-3.0
 }
