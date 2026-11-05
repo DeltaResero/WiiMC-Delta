@@ -19,7 +19,6 @@
 
 typedef struct
 {
-    char name[100];
     char mount[10];
     int type;
     DISC_INTERFACE* interface;
