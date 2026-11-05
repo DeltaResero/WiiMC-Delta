@@ -55,7 +55,8 @@
 #include "url.h"
 #include "http.h"
 
-#ifdef MSG_NOSIGNAL
+// libogc defines MSG_NOSIGNAL, but the Wii's IOS fails any send that has it
+#if defined(MSG_NOSIGNAL) && !defined(GEKKO)
 #define DEFAULT_SEND_FLAGS MSG_NOSIGNAL
 #else
 #define DEFAULT_SEND_FLAGS 0
