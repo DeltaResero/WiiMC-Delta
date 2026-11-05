@@ -11,7 +11,6 @@
 #include "pngu.h"
 #include "fileop.h"
 
-extern void __exception_closeall();
 typedef void (*entrypoint) (void);
 u32 load_dol_image (void *dolstart, struct __argv *argv);
 
@@ -127,7 +126,6 @@ found:
     u32 level;
     SYS_ResetSystem(SYS_SHUTDOWN, 0, 0);
     _CPU_ISR_Disable(level);
-    __exception_closeall();
     exeEntryPoint();
     _CPU_ISR_Restore(level);
     return 0;
