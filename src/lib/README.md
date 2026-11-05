@@ -112,6 +112,9 @@ Local changes:
 - `libavformat/tls_mbedtls.c`: the parts for listen mode, WHIP and DTLS
   are only built when mbedTLS has the features they need, which WiiMC's
   TLS 1.2 client configuration leaves out.
+- `libavformat/network.h`: with `FF_NO_MSG_NOSIGNAL` sends go out without
+  `MSG_NOSIGNAL`. libogc defines it, but the Wii's IOS fails any send that
+  has it.
 
 ## mbedTLS
 

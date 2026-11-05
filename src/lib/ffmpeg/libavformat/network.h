@@ -129,6 +129,9 @@ typedef union sockaddr_union {
 #endif
 } sockaddr_union;
 
+#if FF_NO_MSG_NOSIGNAL
+#undef MSG_NOSIGNAL
+#endif
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
 #endif
