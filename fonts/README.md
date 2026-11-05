@@ -2,7 +2,7 @@
 
 ## Built in
 
-`source/fonts/font.ttf` is compiled into the DOL. It draws the menus in every
+`src/fonts/font.ttf` is compiled into the DOL. It draws the menus in every
 language that uses Latin letters, Greek and Cyrillic file names, and
 subtitles unless `subfont.ttf` replaces it.
 
@@ -18,7 +18,7 @@ subtitles unless `subfont.ttf` replaces it.
           --layout-features='' --drop-tables+=GDEF,GPOS,GSUB --no-hinting --notdef-outline \
           --name-IDs='*' --name-languages='*'
 
-`source/fonts/mono.ttf` is compiled in too. Subtitles use it when the
+`src/fonts/mono.ttf` is compiled in too. Subtitles use it when the
 Monospaced subtitle setting is on, which keeps closed captions lined up.
 
 - Font: Noto Sans Mono Bold 2.014, same licence
