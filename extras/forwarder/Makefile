@@ -48,9 +48,9 @@ endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
-# include and lib
+# include and lib; EXTPREFIX is where WiiMC's Makefile builds libntfs
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS)
+LIBDIRS	:= $(PORTLIBS) $(EXTPREFIX)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
