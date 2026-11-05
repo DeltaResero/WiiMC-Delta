@@ -3396,7 +3396,7 @@ static int LoadNewFile()
     // failed or we are playing audio
     ResumeDeviceThread();
 
-    if(!wiiAudioOnly())
+    if(!wiiAudioFileLoaded())
     {
         browserMusic.selIndex = NULL;
 

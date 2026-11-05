@@ -209,6 +209,7 @@ static float orig_stream_cache_min_percent=-1;
 static float orig_stream_cache_seek_min_percent=-1;
 static int orig_stream_cache_size=-1;
 static bool playing_file=false;
+static bool audio_file_loaded=false; // MPlayer gave the GUI control back to play audio
 static int force_frame_dropping=-1;
 #endif
 
@@ -4348,6 +4349,7 @@ stream_cache_min_percent=0.2;
         if (!mpctx->sh_video) {
 #ifdef GEKKO
         printf("No video - returning control to GUI\n");
+        audio_file_loaded = mpctx->sh_audio != NULL;
         if(controlledbygui == 0)
                 controlledbygui=1; // send control to gui
 #endif
@@ -5485,6 +5487,7 @@ void fast_continue()
  ***************************************************************************/
 void wiiLoadFile(char *_filename, char *_partitionlabel)
 {
+        audio_file_loaded = false;
 
         if (partitionlabel)
             free(partitionlabel);
@@ -5771,6 +5774,13 @@ void wiiSetDVDDevice(char * dev)
                 return;
 
         dvd_device = strdup(dev);
+}
+
+// true once MPlayer has handed control back to the GUI to play an audio-only
+// file; unlike wiiAudioOnly(), this stays true after a short file has ended
+bool wiiAudioFileLoaded()
+{
+        return audio_file_loaded;
 }
 
 bool wiiAudioOnly()
