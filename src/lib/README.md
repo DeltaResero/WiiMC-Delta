@@ -1,10 +1,11 @@
 # Vendored libraries
 
-devkitPro doesn't package these for the Wii, so WiiMC carries plain copies
-(not submodules).
-The top-level Makefile builds them into `build/external` (headers in
-`include/`, static libraries in `lib/`) before MPlayer and WiiMC, and never
-installs anything into `$DEVKITPRO`. `make clean` removes them.
+devkitPro doesn't package these for the Wii, so WiiMC carries copies of
+them here, with the local changes each section lists.
+The top-level Makefile builds libntfs and libiconv into `build/external`
+(headers in `include/`, static libraries in `lib/`) before MPlayer and
+WiiMC, and never installs anything into `$DEVKITPRO`. `make clean` removes
+them.
 
 ## libntfs
 
@@ -55,3 +56,18 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
   `iconv_open` fails with `EINVAL` as it does for an unknown name.
 - `lib/loop_unicode.h` no longer transliterates (`//TRANSLIT`). WiiMC
   converts only to UTF-8 and UTF-16, which never need it.
+
+## projectM
+
+- Upstream: https://github.com/projectM-visualizer/projectm
+- Version: libprojectM from 2007-2009, ported to the Wii by Rhys "Shareese"
+  Koedijk in 2009; in WiiMC since its first commit
+- Licence: LGPL 2.1 or later (`LICENSE`)
+- A music visualiser that plays MilkDrop presets.
+
+## FriBidi
+
+- Upstream: https://github.com/fribidi/fribidi
+- Version: GNU FriBidi 0.19.2; in WiiMC since its first commit
+- Licence: LGPL 2.1 or later (`COPYING`)
+- Lays out right-to-left text, such as Arabic and Hebrew.
