@@ -36,7 +36,15 @@ LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map -Wl,--section-start,.init=0x81
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-logc -lfat -lntfs -lext2fs -lpng -lm -lz
+LIBS	:=	-logc -lfat -lntfs -lpng -lm -lz
+
+# ext2 support needs libext2fs
+ENABLE_EXT2 = 0
+
+ifeq ($(ENABLE_EXT2), 1)
+CFLAGS += -DWANT_EXT2
+LIBS += -lext2fs
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

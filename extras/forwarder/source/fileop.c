@@ -13,7 +13,9 @@
 #include <ogc/machine/processor.h>
 #include <ntfs.h>
 #include <fat.h>
+#ifdef WANT_EXT2
 #include <ext2.h>
+#endif
 #include <sdcard/wiisd_io.h>
 #include <ogc/usbstorage.h>
 
@@ -174,10 +176,14 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
             if(!ntfsMount(mount, disc, sector, 2, 128, NTFS_DEFAULT | NTFS_RECOVER))
                 return;
             break;
+#ifdef WANT_EXT2
         case T_EXT2:
             if(!ext2Mount(mount, disc, sector, 2, 128, EXT2_FLAG_64BITS | EXT2_FLAG_JOURNAL_DEV_OK))
                 return;
             break;
+#endif
+        default:
+            return;
     }
 
     strcpy(part[device][*devnum].mount, mount);
@@ -449,10 +455,12 @@ static void UnmountPartitions(int device)
                 part[device][i].type = 0;
                 ntfsUnmount(part[device][i].mount, false);
                 break;
+#ifdef WANT_EXT2
             case T_EXT2:
                 part[device][i].type = 0;
                 ext2Unmount(part[device][i].mount);
                 break;
+#endif
         }
         part[device][i].mount[0] = 0;
         part[device][i].sector = 0;
