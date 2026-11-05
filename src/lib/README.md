@@ -1,7 +1,7 @@
 # Vendored libraries
 
-devkitPro doesn't package these for the Wii, so WiiMC carries plain copies
-(not submodules).
+devkitPro doesn't package these for the Wii, so WiiMC carries copies of
+them here, with the local changes each section lists.
 The top-level Makefile builds them into `build/external` (headers in
 `include/`, static libraries in `lib/`) before MPlayer and WiiMC, and never
 installs anything into `$DEVKITPRO`. `make clean` removes them.

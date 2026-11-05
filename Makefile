@@ -73,9 +73,9 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 
 #---------------------------------------------------------------------------------
-# vendored libraries (external/) are built into a prefix inside the build directory
+# vendored libraries (src/lib/) are built into a prefix inside the build directory
 #---------------------------------------------------------------------------------
-EXTERNAL	:=	$(CURDIR)/external
+LIBSRC		:=	$(CURDIR)/src/lib
 EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
 export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
 EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
@@ -85,7 +85,7 @@ export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/liba
 				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
 				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
-NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard external/libntfs/source/*.c)))
+NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard src/lib/libntfs/source/*.c)))
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
@@ -150,21 +150,21 @@ $(BUILD): $(EXTLIBS)
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
-$(EXTBUILD)/libntfs/%.o: $(EXTERNAL)/libntfs/source/%.c
+$(EXTBUILD)/libntfs/%.o: $(LIBSRC)/libntfs/source/%.c
 	@mkdir -p $(@D)
 	$(CC) -O2 -Wall -Wno-address-of-packed-member -fno-asynchronous-unwind-tables \
-		$(MACHDEP) -DHAVE_CONFIG_H -I$(EXTERNAL)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
+		$(MACHDEP) -DHAVE_CONFIG_H -I$(LIBSRC)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
 
 $(EXTPREFIX)/lib/libntfs.a: $(NTFSOBJS)
 	@mkdir -p $(@D) $(EXTPREFIX)/include
 	rm -f $@
 	$(AR) -rc $@ $^
-	cp $(EXTERNAL)/libntfs/include/ntfs.h $(EXTPREFIX)/include/
+	cp $(LIBSRC)/libntfs/include/ntfs.h $(EXTPREFIX)/include/
 
 # libiconv: only libcharset and lib/ are built
 $(EXTPREFIX)/lib/libiconv.a:
 	@rm -rf $(EXTBUILD)/libiconv; mkdir -p $(EXTBUILD)/libiconv
-	cd $(EXTBUILD)/libiconv && $(EXTERNAL)/libiconv/configure $(EXTCONFIGURE)
+	cd $(EXTBUILD)/libiconv && $(LIBSRC)/libiconv/configure $(EXTCONFIGURE)
 	$(MAKE) -C $(EXTBUILD)/libiconv lib/localcharset.h
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib install-lib libdir=$(EXTPREFIX)/lib includedir=$(EXTPREFIX)/include
