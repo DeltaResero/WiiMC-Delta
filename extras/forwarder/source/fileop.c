@@ -13,7 +13,9 @@
 #include <ogc/machine/processor.h>
 #include <ntfs.h>
 #include <fat.h>
+#ifdef WANT_EXT2
 #include <ext2.h>
+#endif
 #include <sdcard/wiisd_io.h>
 #include <ogc/usbstorage.h>
 
@@ -163,37 +165,25 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
 
     char mount[10];
     sprintf(mount, "%s%i", prefix[device], *devnum+1);
-    char *name;
 
     switch(type)
     {
         case T_FAT:
             if(!fatMount(mount, disc, sector, 2, 128))
                 return;
-            fatGetVolumeLabel(mount, part[device][*devnum].name);
             break;
         case T_NTFS:
             if(!ntfsMount(mount, disc, sector, 2, 128, NTFS_DEFAULT | NTFS_RECOVER))
                 return;
-
-            name = (char *)ntfsGetVolumeName(mount);
-
-            if(name)
-                strcpy(part[device][*devnum].name, name);
-            else
-                part[device][*devnum].name[0] = 0;
             break;
+#ifdef WANT_EXT2
         case T_EXT2:
             if(!ext2Mount(mount, disc, sector, 2, 128, EXT2_FLAG_64BITS | EXT2_FLAG_JOURNAL_DEV_OK))
                 return;
-
-            name = (char *)ext2GetVolumeName(mount);
-
-            if(name)
-                strcpy(part[device][*devnum].name, name);
-            else
-                part[device][*devnum].name[0] = 0;
             break;
+#endif
+        default:
+            return;
     }
 
     strcpy(part[device][*devnum].mount, mount);
@@ -211,7 +201,6 @@ static int FindPartitions(int device)
     // clear list
     for(i=0; i < MAX_DEVICES; i++)
     {
-        part[device][i].name[0] = 0;
         part[device][i].mount[0] = 0;
         part[device][i].sector = 0;
         part[device][i].interface = NULL;
@@ -466,12 +455,13 @@ static void UnmountPartitions(int device)
                 part[device][i].type = 0;
                 ntfsUnmount(part[device][i].mount, false);
                 break;
+#ifdef WANT_EXT2
             case T_EXT2:
                 part[device][i].type = 0;
                 ext2Unmount(part[device][i].mount);
                 break;
+#endif
         }
-        part[device][i].name[0] = 0;
         part[device][i].mount[0] = 0;
         part[device][i].sector = 0;
         part[device][i].interface = NULL;

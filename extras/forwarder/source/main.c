@@ -11,7 +11,6 @@
 #include "pngu.h"
 #include "fileop.h"
 
-extern void __exception_closeall();
 typedef void (*entrypoint) (void);
 u32 load_dol_image (void *dolstart, struct __argv *argv);
 
@@ -25,7 +24,7 @@ void StopGX();
 void Menu_Render();
 void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[], f32 degrees, f32 scaleX, f32 scaleY, u8 alphaF );
 
-static ssize_t __out_write(struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t __out_write(struct _reent *r, void *fd, const char *ptr, size_t len)
 {
     return -1;
 }
@@ -127,7 +126,6 @@ found:
     u32 level;
     SYS_ResetSystem(SYS_SHUTDOWN, 0, 0);
     _CPU_ISR_Disable(level);
-    __exception_closeall();
     exeEntryPoint();
     _CPU_ISR_Restore(level);
     return 0;

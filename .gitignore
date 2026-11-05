@@ -11,6 +11,8 @@
 /build/
 # wiimc.elf and wiimc.dol
 /executables/
+# The forwarder's objects and embedded image headers
+/extras/forwarder/build/
 
 # ===================================================================
 # Compiled files and build artifacts

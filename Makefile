@@ -140,7 +140,7 @@ export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 				-L$(MPLAYER)/ffmpeg/libswscale
 
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
-.PHONY: $(BUILD) clean
+.PHONY: $(BUILD) clean forwarder
 
 #---------------------------------------------------------------------------------
 $(BUILD): $(EXTLIBS)
@@ -171,6 +171,11 @@ $(EXTPREFIX)/lib/libiconv.a:
 	cp $(EXTBUILD)/libiconv/include/iconv.h.inst $(EXTPREFIX)/include/iconv.h
 
 #---------------------------------------------------------------------------------
+# the channel forwarder in extras/, which links the libntfs built here
+forwarder: $(EXTPREFIX)/lib/libntfs.a
+	$(MAKE) -C extras/forwarder
+
+#---------------------------------------------------------------------------------
 test:
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
@@ -182,6 +187,7 @@ clean:
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
 	rm -rf $(EXTPREFIX) $(EXTBUILD)
 	cd src/mplayer; $(MAKE) -f Makefile clean
+	$(MAKE) -C extras/forwarder clean
 
 #---------------------------------------------------------------------------------
 run:
