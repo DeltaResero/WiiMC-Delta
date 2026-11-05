@@ -3712,7 +3712,7 @@ controlledbygui = 0;
 
 // reset some MPlayer variables
 pause_low_cache=1;
-audio_id=video_id=-1;
+audio_id=video_id=dvdsub_id=-1;
 force_frame_dropping=-1;
 
 dvd_chapter=1;
