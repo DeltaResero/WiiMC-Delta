@@ -4933,7 +4933,10 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 
     mp_msg(MSGT_CPLAYER, MSGL_INFO, "\n");
 
-    if (benchmark) {
+    /* With -v, also log where the time went (decode, output, audio), so
+     * speed can be compared between builds; -benchmark itself would also
+     * stop the player from waiting for frames' display times. */
+    if (benchmark || mp_msg_test(MSGT_CPLAYER, MSGL_V)) {
         double tot = video_time_usage + vout_time_usage + audio_time_usage;
         double total_time_usage;
         total_time_usage_start = GetTimer() - total_time_usage_start;
@@ -4948,7 +4951,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
                    100.0 * audio_time_usage         / total_time_usage,
                    100.0 * (total_time_usage - tot) / total_time_usage,
                    100.0);
-        if (total_frame_cnt && frame_dropping)
+        if (total_frame_cnt && (frame_dropping || !benchmark))
             mp_msg(MSGT_CPLAYER, MSGL_INFO, "BENCHMARKn: disp: %d (%3.2f fps)  drop: %d (%d%%)  total: %d (%3.2f fps)\n",
                    total_frame_cnt - drop_frame_cnt,
                    (total_time_usage > 0.5) ? ((total_frame_cnt - drop_frame_cnt) / total_time_usage) : 0,
