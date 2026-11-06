@@ -2295,7 +2295,7 @@ static int ParsePLXPlaylist()
             return -1;
         }
 
-        if(list[i].url)
+        if(list[i].url[0])
         {
             f_entry->file = mem2_strdup(list[i].url, MEM2_BROWSER);
             if(!f_entry->file) // no mem
@@ -2307,7 +2307,7 @@ static int ParsePLXPlaylist()
             }
         }
 
-        if(list[i].name)
+        if(list[i].name[0])
         {
             f_entry->display = mem2_strdup(list[i].name, MEM2_BROWSER);
             if(!f_entry->display) // no mem
@@ -2319,7 +2319,7 @@ static int ParsePLXPlaylist()
             }
         }
 
-        if(list[i].thumb)
+        if(list[i].thumb[0])
         {
             f_entry->image = mem2_strdup(list[i].thumb, MEM2_BROWSER);
             if(!f_entry->image) // no mem
@@ -2331,7 +2331,7 @@ static int ParsePLXPlaylist()
             }
         }
 
-        if(list[i].xml)
+        if(list[i].xml[0])
         {
             f_entry->xml = mem2_strdup(list[i].xml, MEM2_BROWSER);
             if(!f_entry->xml) // no mem
@@ -2343,7 +2343,7 @@ static int ParsePLXPlaylist()
             }
         }
 
-        if(list[i].tunein)
+        if(list[i].tunein[0])
         {
             f_entry->tunein = mem2_strdup(list[i].tunein, MEM2_BROWSER);
             if(!f_entry->tunein) // no mem
