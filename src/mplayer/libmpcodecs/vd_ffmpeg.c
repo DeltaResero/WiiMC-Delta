@@ -129,6 +129,29 @@ static void wii_auto_deblock(AVCodecContext *avctx, int dropping)
         avctx->skip_loop_filter = AVDISCARD_DEFAULT;
 }
 
+#include "libvo/csputils.h"
+
+extern int colorspace;
+
+// Which matrix turns this video's YUV into RGB? Untagged video follows the usual
+// convention: BT.709 from HD up, BT.601 below.
+static int wii_colorspace(const AVCodecContext *avctx, enum AVPixelFormat pix_fmt, int width, int height)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+
+    if (desc && (desc->flags & AV_PIX_FMT_FLAG_RGB))
+        return MP_CSP_DEFAULT;
+    switch (avctx->colorspace) {
+    case AVCOL_SPC_BT709:
+        return MP_CSP_BT_709;
+    case AVCOL_SPC_UNSPECIFIED:
+    case AVCOL_SPC_RESERVED:
+        return width >= 1280 || height > 576 ? MP_CSP_BT_709 : MP_CSP_DEFAULT;
+    default:
+        return MP_CSP_DEFAULT;
+    }
+}
+
 static void update_sync_interlace(const AVCodecContext *avctx, const AVFrame *pic)
 {
     if (avctx->codec_id != AV_CODEC_ID_MPEG2VIDEO)
@@ -553,6 +576,9 @@ static void uninit(sh_video_t *sh){
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
 
+#ifdef GEKKO
+    colorspace = MP_CSP_DEFAULT;
+#endif
     if (ctx->refcount_frame) {
         av_frame_unref(ctx->refcount_frame);
         ctx->refcount_frame = NULL;
@@ -694,6 +720,9 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt, int ignore_aspect
     {
         sh->disp_w = width;
         sh->disp_h = height;
+#ifdef GEKKO
+        colorspace = wii_colorspace(avctx, pix_fmt, width, height);
+#endif
         if (!mpcodecs_config_vo(sh, sh->disp_w, sh->disp_h, ctx->best_csp))
             return -1;
         ctx->vo_initialized = 1;
