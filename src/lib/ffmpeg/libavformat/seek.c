@@ -225,6 +225,9 @@ void ff_configure_buffers_for_index(AVFormatContext *s, int64_t time_tolerance)
     }
 
     pos_delta *= 2;
+#ifdef FF_INDEX_BUFFER_MAX
+    pos_delta = FFMIN(pos_delta, FF_INDEX_BUFFER_MAX);
+#endif
     ctx = ffiocontext(s->pb);
     /* XXX This could be adjusted depending on protocol*/
     if (s->pb->buffer_size < pos_delta) {

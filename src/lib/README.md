@@ -109,6 +109,8 @@ Local changes:
 - `libavcodec/h274.c`, `libswscale/utils.c`: with `FF_HEAP_TABLES` the
   H.274 film grain database is allocated the first time a stream needs it,
   and swscale allocates its XYZ gamma tables as it does with `CONFIG_SMALL`.
+- `libavformat/seek.c`: with `FF_INDEX_BUFFER_MAX` the read buffer a badly
+  interleaved file asks for stays within that size.
 - `libavformat/tls_mbedtls.c`: the parts for listen mode, WHIP and DTLS
   are only built when mbedTLS has the features they need, which WiiMC's
   TLS 1.2 client configuration leaves out.
