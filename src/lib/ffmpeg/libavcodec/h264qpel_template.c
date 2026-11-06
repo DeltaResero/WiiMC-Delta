@@ -74,6 +74,28 @@ static inline void FUNC(copy_block16)(uint8_t *dst, const uint8_t *restrict src,
     }
 }
 
+#undef PS_HOOK_H_put_
+#undef PS_HOOK_H_avg_
+#undef PS_HOOK_V_put_
+#undef PS_HOOK_V_avg_
+#undef PS_HOOK_HV_put_
+#undef PS_HOOK_HV_avg_
+#define PS_HOOK_H_avg_(d, s, ds, ss)
+#define PS_HOOK_V_avg_(d, s, ds, ss)
+#define PS_HOOK_HV_avg_(d, t, s, ds, ts, ss)
+#if defined(GEKKO) && BIT_DEPTH == 8
+void ff_ps_qpel8_h(uint8_t *dst, const uint8_t *src, int dstStride, int srcStride);
+void ff_ps_qpel8_v(uint8_t *dst, const uint8_t *src, int dstStride, int srcStride);
+void ff_ps_qpel8_hv(uint8_t *dst, int16_t *tmp, const uint8_t *src, int dstStride, int tmpStride, int srcStride);
+#define PS_HOOK_H_put_(d, s, ds, ss) do { ff_ps_qpel8_h(d, s, ds, ss); return; } while (0);
+#define PS_HOOK_V_put_(d, s, ds, ss) do { ff_ps_qpel8_v(d, s, ds, ss); return; } while (0);
+#define PS_HOOK_HV_put_(d, t, s, ds, ts, ss) do { ff_ps_qpel8_hv(d, (int16_t *)(t), s, ds, ts, ss); return; } while (0);
+#else
+#define PS_HOOK_H_put_(d, s, ds, ss)
+#define PS_HOOK_V_put_(d, s, ds, ss)
+#define PS_HOOK_HV_put_(d, t, s, ds, ts, ss)
+#endif
+
 #define H264_LOWPASS(OPNAME, OP, OP2) \
 static void FUNC(OPNAME ## h264_qpel4_h_lowpass)(uint8_t *_dst, const uint8_t *restrict _src, int dstStride, int srcStride)\
 {\
@@ -165,6 +187,7 @@ static void FUNC(OPNAME ## h264_qpel4_hv_lowpass)(uint8_t *_dst, pixeltmp *tmp, 
 \
 static void FUNC(OPNAME ## h264_qpel8_h_lowpass)(uint8_t *_dst, const uint8_t *restrict _src, int dstStride, int srcStride)\
 {\
+    PS_HOOK_H_ ## OPNAME(_dst, _src, dstStride, srcStride)\
     const int h=8;\
     int i;\
     pixel *dst = (pixel*)_dst;\
@@ -188,6 +211,7 @@ static void FUNC(OPNAME ## h264_qpel8_h_lowpass)(uint8_t *_dst, const uint8_t *r
 \
 static void FUNC(OPNAME ## h264_qpel8_v_lowpass)(uint8_t *_dst, const uint8_t *restrict _src, int dstStride, int srcStride)\
 {\
+    PS_HOOK_V_ ## OPNAME(_dst, _src, dstStride, srcStride)\
     const int w=8;\
     int i;\
     pixel *dst = (pixel*)_dst;\
@@ -224,6 +248,7 @@ static void FUNC(OPNAME ## h264_qpel8_v_lowpass)(uint8_t *_dst, const uint8_t *r
 \
 static void FUNC(OPNAME ## h264_qpel8_hv_lowpass)(uint8_t *_dst, pixeltmp *tmp, const uint8_t *restrict _src, int dstStride, int tmpStride, int srcStride)\
 {\
+    PS_HOOK_HV_ ## OPNAME(_dst, tmp, _src, dstStride, tmpStride, srcStride)\
     const int h=8;\
     const int w=8;\
     const int pad = (BIT_DEPTH == 10) ? (-10 * ((1<<BIT_DEPTH)-1)) : 0;\
