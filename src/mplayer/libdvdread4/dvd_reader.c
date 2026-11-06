@@ -189,7 +189,7 @@ static int initAllCSSKeys( dvd_reader_t *dvd )
       }
       gettimeofday( &t_e, NULL );
       fprintf( stderr, "libdvdread: Elapsed time %ld\n",
-               (long int) t_e.tv_sec - t_s.tv_sec );
+               (long int)(t_e.tv_sec - t_s.tv_sec) );
     }
 
     if( title == 0 ) continue;
@@ -207,14 +207,14 @@ static int initAllCSSKeys( dvd_reader_t *dvd )
     }
     gettimeofday( &t_e, NULL );
     fprintf( stderr, "libdvdread: Elapsed time %ld\n",
-             (long int) t_e.tv_sec - t_s.tv_sec );
+             (long int)(t_e.tv_sec - t_s.tv_sec) );
   }
   title--;
 
   fprintf( stderr, "libdvdread: Found %d VTS's\n", title );
   gettimeofday(&all_e, NULL);
   fprintf( stderr, "libdvdread: Elapsed time %ld\n",
-           (long int) all_e.tv_sec - all_s.tv_sec );
+           (long int)(all_e.tv_sec - all_s.tv_sec) );
 
   return 0;
 }
