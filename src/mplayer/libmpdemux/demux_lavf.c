@@ -871,6 +871,10 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
 
         mp_packet_merge_side_data(&pkt);
         dp=new_demux_packet(pkt.size);
+        if (!dp) {
+            av_packet_unref(&pkt);
+            return 0;
+        }
         memcpy(dp->buffer, pkt.data, pkt.size);
 
     if(pkt.pts != AV_NOPTS_VALUE){

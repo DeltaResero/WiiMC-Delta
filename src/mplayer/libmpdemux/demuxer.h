@@ -287,6 +287,8 @@ typedef struct {
 
 static inline demux_packet_t* new_demux_packet(int len){
   demux_packet_t* dp=(demux_packet_t*)malloc(sizeof(demux_packet_t));
+  if (!dp)
+    return NULL;
   dp->len=len;
   dp->next=NULL;
   dp->pts=MP_NOPTS_VALUE;
