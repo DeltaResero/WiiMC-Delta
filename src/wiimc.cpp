@@ -448,7 +448,7 @@ extern "C" bool FindNextFile(bool load)
             char ext[7];
             GetExt(loadedFile, ext);
 
-            if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
+            if(WiiSettings.skipLoop == 1)
                 wiiDash();
             else
                 wiiElse();
@@ -750,7 +750,7 @@ void LoadMPlayerFile()
         partitionlabel = GetPartitionLabel(loadedFile);
     }
 
-    if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
+    if(WiiSettings.skipLoop == 1)
         wiiDash();
     else
         wiiElse();
