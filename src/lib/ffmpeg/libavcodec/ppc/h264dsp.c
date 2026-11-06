@@ -785,9 +785,49 @@ H264_WEIGHT(16)
 H264_WEIGHT( 8)
 #endif /* HAVE_ALTIVEC */
 
+#ifdef GEKKO
+typedef void paired_weight(uint8_t *block, ptrdiff_t stride, int height, int shift, float weight, float offset);
+typedef void paired_biweight(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int height, int shift,
+                             float weightd, float weights, float offset);
+paired_weight ff_ps_weight16, ff_ps_weight8, ff_ps_weight4;
+paired_biweight ff_ps_biweight16, ff_ps_biweight8, ff_ps_biweight4;
+
+#define WEIGHT_FUNC(w)                                                                 \
+static void weight_h264_pixels ## w ## _paired(uint8_t *block, ptrdiff_t stride, int height, \
+                                               int log2_denom, int weight, int offset) \
+{                                                                                      \
+    offset = (unsigned)offset << log2_denom;                                           \
+    if (log2_denom)                                                                    \
+        offset += 1 << (log2_denom - 1);                                               \
+    ff_ps_weight ## w(block, stride, height, log2_denom, (float)weight, (float)offset);\
+}                                                                                      \
+static void biweight_h264_pixels ## w ## _paired(uint8_t *dst, uint8_t *src, ptrdiff_t stride, \
+                                                 int height, int log2_denom,           \
+                                                 int weightd, int weights, int offset) \
+{                                                                                      \
+    offset = (unsigned)((offset + 1) | 1) << log2_denom;                               \
+    ff_ps_biweight ## w(dst, src, stride, height, log2_denom + 1,                      \
+                        (float)weightd, (float)weights, (float)offset);                \
+}
+
+WEIGHT_FUNC(16)
+WEIGHT_FUNC(8)
+WEIGHT_FUNC(4)
+#endif /* GEKKO */
+
 av_cold void ff_h264dsp_init_ppc(H264DSPContext *c, const int bit_depth,
                                  const int chroma_format_idc)
 {
+#ifdef GEKKO
+    if (bit_depth == 8) {
+        c->weight_pixels_tab[0]   = weight_h264_pixels16_paired;
+        c->weight_pixels_tab[1]   = weight_h264_pixels8_paired;
+        c->weight_pixels_tab[2]   = weight_h264_pixels4_paired;
+        c->biweight_pixels_tab[0] = biweight_h264_pixels16_paired;
+        c->biweight_pixels_tab[1] = biweight_h264_pixels8_paired;
+        c->biweight_pixels_tab[2] = biweight_h264_pixels4_paired;
+    }
+#endif
 #if HAVE_ALTIVEC
     if (!PPC_ALTIVEC(av_get_cpu_flags()))
         return;

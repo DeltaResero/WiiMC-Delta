@@ -93,6 +93,7 @@ FFMPEG_CONFIGURE := \
 	--disable-pthreads --disable-w32threads --disable-os2threads \
 	--disable-runtime-cpudetect --disable-debug \
 	--disable-dcbzl \
+	--optflags=-O2 \
 	--enable-zlib --enable-mbedtls \
 	--disable-everything \
 	--enable-decoder=$(call ffmpeg_list,$(FFMPEG_DECODERS)) \

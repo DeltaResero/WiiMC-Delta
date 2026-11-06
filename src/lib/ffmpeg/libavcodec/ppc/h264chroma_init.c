@@ -49,8 +49,83 @@
 #undef PREFIX_h264_chroma_mc8_num
 #endif /* HAVE_ALTIVEC */
 
+#ifdef GEKKO
+#include <stddef.h>
+#include <stdint.h>
+
+typedef void paired_mc(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int h,
+                       int a, int b, int c, int d);
+paired_mc ff_ps_put8_2d, ff_ps_put4_2d, ff_ps_avg8_2d, ff_ps_avg4_2d;
+paired_mc ff_ps_put8_1d, ff_ps_put4_1d, ff_ps_avg8_1d, ff_ps_avg4_1d;
+
+#define MC_FUNC(op, w)                                                                  \
+static void op ## _h264_chroma_mc ## w ## _paired(uint8_t *dst, const uint8_t *src,     \
+                                                  ptrdiff_t stride, int h, int x, int y)\
+{                                                                                       \
+    const int A = (8 - x) * (8 - y), B = x * (8 - y), C = (8 - x) * y, D = x * y;       \
+    if (D)                                                                              \
+        ff_ps_ ## op ## w ## _2d(dst, src, stride, h, A, B, C, D);                      \
+    else if (B + C)                                                                     \
+        ff_ps_ ## op ## w ## _1d(dst, src, stride, h, 0, C ? stride : 1, A, B + C);     \
+    else                                                                                \
+        op ## _copy ## w(dst, src, stride, h);                                          \
+}
+
+static inline void put_copy8(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int h)
+{
+    do {
+        AV_WN32(dst,     AV_RN32(src));
+        AV_WN32(dst + 4, AV_RN32(src + 4));
+        dst += stride;
+        src += stride;
+    } while (--h);
+}
+
+static inline void put_copy4(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int h)
+{
+    do {
+        AV_WN32(dst, AV_RN32(src));
+        dst += stride;
+        src += stride;
+    } while (--h);
+}
+
+static inline void avg_copy(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int w, int h)
+{
+    do {
+        for (int i = 0; i < w; i++)
+            dst[i] = (dst[i] + src[i] + 1) >> 1;
+        dst += stride;
+        src += stride;
+    } while (--h);
+}
+
+static inline void avg_copy8(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int h)
+{
+    avg_copy(dst, src, stride, 8, h);
+}
+
+static inline void avg_copy4(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int h)
+{
+    avg_copy(dst, src, stride, 4, h);
+}
+
+MC_FUNC(put, 8)
+MC_FUNC(put, 4)
+MC_FUNC(avg, 8)
+MC_FUNC(avg, 4)
+#endif /* GEKKO */
+
 av_cold void ff_h264chroma_init_ppc(H264ChromaContext *c, int bit_depth)
 {
+#ifdef GEKKO
+    if (bit_depth <= 8) {
+        c->put_h264_chroma_pixels_tab[0] = put_h264_chroma_mc8_paired;
+        c->put_h264_chroma_pixels_tab[1] = put_h264_chroma_mc4_paired;
+        c->avg_h264_chroma_pixels_tab[0] = avg_h264_chroma_mc8_paired;
+        c->avg_h264_chroma_pixels_tab[1] = avg_h264_chroma_mc4_paired;
+    }
+#endif
 #if HAVE_ALTIVEC
     const int high_bit_depth = bit_depth > 8;
 
