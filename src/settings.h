@@ -158,7 +158,6 @@ struct SWiiSettings {
     int     audioNorm;
     int     videoDf;
     int     viWidth;
-    int     skipLoop;
     int     interlaceHandle;
     //int       duplicateFrame;
     //int   videoDelay;

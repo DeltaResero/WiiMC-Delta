@@ -5610,17 +5610,6 @@ void wiiSetTiledOFF()
         wiiTiledAuto = false;
 }
 
-void wiiDash()
-{
-        m_config_set_option(mconfig,"lavdopts","skiploopfilter=all"); // H264 deblock skip; all, bidir, nonref, nonkey
-        //m_config_set_option(mconfig,"lavdopts","skiploopfilter=all:fast=1"); // test fast=1
-}
-
-void wiiElse()
-{
-        m_config_set_option(mconfig,"lavdopts","skiploopfilter=default");
-}
-
 void wiiSFD()
 {
         if(use_lavf)

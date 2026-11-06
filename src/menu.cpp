@@ -5196,7 +5196,6 @@ static void MenuSettingsVideos()
     sprintf(options.name[i++], "Volume Normalizer");
     sprintf(options.name[i++], "Deflicker");
     sprintf(options.name[i++], "Set VI Width to 720");
-    sprintf(options.name[i++], "Skip Deblocking Filter");
     //sprintf(options.name[i++], "Delay Frame");
 
     options.length = i;
@@ -5368,9 +5367,6 @@ static void MenuSettingsVideos()
                 else
                     SetVIscaleback();
                 break;
-            case 16:
-                WiiSettings.skipLoop ^= 1;
-                break;
         }
 
         if(ret >= 0 || firstRun)
@@ -5426,7 +5422,6 @@ static void MenuSettingsVideos()
             sprintf (options.value[13], "%d%%", WiiSettings.audioNorm);
             sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
             sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
-            sprintf (options.value[16], "%s", WiiSettings.skipLoop ? "On" : "Off");
             //sprintf (options.value[17], "%d", WiiSettings.videoDelay);
 
             optionBrowser.TriggerUpdate();
