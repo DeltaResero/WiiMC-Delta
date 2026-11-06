@@ -1669,10 +1669,10 @@ decode_cabac_residual_internal(const H264Context *h, H264SliceContext *sl,
 #define DECODE_SIGNIFICANCE( coefs, sig_off, last_off ) \
         for(last= 0; last < coefs; last++) { \
             uint8_t *sig_ctx = significant_coeff_ctx_base + sig_off; \
-            if( get_cabac( CC, sig_ctx )) { \
+            if( get_cabac_inline( CC, sig_ctx )) { \
                 uint8_t *last_ctx = last_coeff_ctx_base + last_off; \
                 index[coeff_count++] = last; \
-                if( get_cabac( CC, last_ctx ) ) { \
+                if( get_cabac_inline( CC, last_ctx ) ) { \
                     last= max_coeff; \
                     break; \
                 } \
@@ -1725,7 +1725,7 @@ decode_cabac_residual_internal(const H264Context *h, H264SliceContext *sl,
  \
         int j= scantable[index[--coeff_count]]; \
  \
-        if( get_cabac( CC, ctx ) == 0 ) { \
+        if( get_cabac_inline( CC, ctx ) == 0 ) { \
             node_ctx = coeff_abs_level_transition[0][node_ctx]; \
             if( is_dc ) { \
                 ((type*)block)[j] = get_cabac_bypass_sign( CC, -1); \
@@ -1737,7 +1737,7 @@ decode_cabac_residual_internal(const H264Context *h, H264SliceContext *sl,
             ctx = coeff_abs_levelgt1_ctx[is_dc && chroma422][node_ctx] + abs_level_m1_ctx_base; \
             node_ctx = coeff_abs_level_transition[1][node_ctx]; \
 \
-            while( coeff_abs < 15 && get_cabac( CC, ctx ) ) { \
+            while( coeff_abs < 15 && get_cabac_inline( CC, ctx ) ) { \
                 coeff_abs++; \
             } \
 \

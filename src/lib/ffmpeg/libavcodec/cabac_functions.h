@@ -54,6 +54,9 @@
 #if ARCH_LOONGARCH64
 #   include "loongarch/cabac.h"
 #endif
+#if ARCH_PPC
+#   include "ppc/cabac.h"
+#endif
 
 static const uint8_t * const ff_h264_norm_shift = ff_h264_cabac_tables + H264_NORM_SHIFT_OFFSET;
 static const uint8_t * const ff_h264_lps_range = ff_h264_cabac_tables + H264_LPS_RANGE_OFFSET;
