@@ -14,7 +14,6 @@ http://www.wiimc.org (Under GPL License)
 * GameCube controller support.
 * Better handling of game formats ADX and BRSTM.
 * Various options: 240p mode, night filter, volnorm, deflicker, etc.
-* Use the ".dash" extension to skip the deblock filter in H.264 and VP8 files.
 * Added Shuffle, Loop, and Continuous modes for video.
 * Artwork Viewer for videos and music using external files.
 * Wii Message Board playlog support when started from a Channel.

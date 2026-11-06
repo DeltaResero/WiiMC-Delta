@@ -371,7 +371,6 @@ prepareSettingsData ()
     createXMLSetting("audioNorm", "Volume Normalizer", toStr(WiiSettings.audioNorm));
     createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
     createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
-    createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
     createXMLSetting("interlaceHandle", "How to handle interlacing", toStr(WiiSettings.interlaceHandle));
     // Music
     createXMLSection("Music", "Music Settings");
@@ -796,7 +795,6 @@ void DefaultSettings ()
     WiiSettings.audioNorm = 0;
     WiiSettings.videoDf = 0;
     WiiSettings.viWidth = 0;
-    WiiSettings.skipLoop = 0;
     WiiSettings.interlaceHandle = 1; //let TV handle it
     // Music
     WiiSettings.playOrder = PLAY_SINGLE;
@@ -919,8 +917,6 @@ static void FixInvalidSettings()
         WiiSettings.videoDf = 0;
     if(WiiSettings.viWidth < 0 || WiiSettings.viWidth > 1)
         WiiSettings.viWidth = 0;
-    if(WiiSettings.skipLoop < 0 || WiiSettings.skipLoop > 1)
-        WiiSettings.skipLoop = 0;
     if(WiiSettings.interlaceHandle < 0 || WiiSettings.interlaceHandle > 2)
         WiiSettings.interlaceHandle = 0;
 
@@ -1302,7 +1298,6 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.audioNorm, "audioNorm");
                 loadXMLSetting(&WiiSettings.videoDf, "videoDf");
                 loadXMLSetting(&WiiSettings.viWidth, "viWidth");
-                loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
                 loadXMLSetting(&WiiSettings.interlaceHandle, "interlaceHandle");
                 // Music
                 loadXMLSetting(&WiiSettings.playOrder, "playOrder");

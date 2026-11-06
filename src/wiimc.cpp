@@ -448,11 +448,6 @@ extern "C" bool FindNextFile(bool load)
             char ext[7];
             GetExt(loadedFile, ext);
 
-            if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
-                wiiDash();
-            else
-                wiiElse();
-
             // THP doesn't support seek, yet the demuxer enables it
             if(strcasecmp(ext, "thp") == 0)
                 wiiTHP();
@@ -749,11 +744,6 @@ void LoadMPlayerFile()
         }
         partitionlabel = GetPartitionLabel(loadedFile);
     }
-
-    if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
-        wiiDash();
-    else
-        wiiElse();
 
     // THP doesn't support seek, yet the demuxer enables it
     if(strcasecmp(ext, "thp") == 0)

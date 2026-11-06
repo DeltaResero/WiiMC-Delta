@@ -100,6 +100,35 @@ typedef struct {
  * two bits in every decoded frame's flags. */
 extern int sync_interlace;
 
+#include "mpcommon.h"
+#include "osdep/timer.h"
+
+// Deblocking matters most on low bitrate video, which is cheap to decode, and
+// costs about a fifth of the decode time on video that isn't. Keep it while the
+// decoder has time to spare. The gap between the limits stops it flipping on and
+// off, and each frame's own slices read the setting, so it can change at any time.
+#define DEBLOCK_OFF_LOAD 0.8
+#define DEBLOCK_ON_LOAD  0.5
+
+static void wii_auto_deblock(AVCodecContext *avctx, int dropping)
+{
+    static unsigned window_ms;
+    static double window_usage;
+    unsigned now = GetTimerMS();
+    unsigned elapsed = now - window_ms;
+    double load;
+
+    if (elapsed < 500)
+        return;
+    load = (video_time_usage - window_usage) / (elapsed * 0.001);
+    window_ms = now;
+    window_usage = video_time_usage;
+    if (load > DEBLOCK_OFF_LOAD)
+        avctx->skip_loop_filter = AVDISCARD_ALL;
+    else if (load < DEBLOCK_ON_LOAD && !dropping)
+        avctx->skip_loop_filter = AVDISCARD_DEFAULT;
+}
+
 static void update_sync_interlace(const AVCodecContext *avctx, const AVFrame *pic)
 {
     if (avctx->codec_id != AV_CODEC_ID_MPEG2VIDEO)
@@ -886,7 +915,9 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     avctx->skip_idct = skip_idct;
     avctx->skip_frame = skip_frame;
 
-    if (flags&3) {
+    if ((flags&3) == 3)
+        avctx->skip_frame = AVDISCARD_NONKEY;
+    else if (flags&3) {
         avctx->skip_frame = AVDISCARD_NONREF;
         if (flags&2)
             avctx->skip_idct = AVDISCARD_ALL;
@@ -925,6 +956,11 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     }
     if (!sh->needs_parsing && sh->ds->buffer_pos < len)
         mp_msg(MSGT_DECVIDEO, MSGL_ERR, "Bad stream state, please report as bug!\n");
+#ifdef GEKKO
+    // an explicit skiploopfilter option still wins
+    if (!lavc_param_skip_loop_filter_str)
+        wii_auto_deblock(avctx, flags & 3);
+#endif
     ret = avcodec_send_packet(avctx, !pkt.data && !pkt.size ? NULL : &pkt);
     if (ret == AVERROR(EAGAIN)) {
         if (!sh->needs_parsing && sh->ds->buffer_pos >= len) sh->ds->buffer_pos -= len;

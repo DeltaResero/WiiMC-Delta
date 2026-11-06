@@ -57,8 +57,6 @@ int mplayer_main(); // in mplayer.c
 
 void wiiLoadFile(char *filename, char *partitionlabel);
 void wiiGotoGui();
-void wiiDash();
-void wiiElse();
 void wiiPause();
 bool wiiIsPaused();
 bool wiiIsPlaying();

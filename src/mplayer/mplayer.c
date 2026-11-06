@@ -1944,6 +1944,8 @@ unsigned waitLag = 0;
 //unsigned timerRumble = 0;
 extern bool useDumbRP;
 
+static int wii_resyncing = 0;
+
 static int check_framedrop(double frame_time)
 {
     // check for frame-drop:
@@ -1966,6 +1968,13 @@ static int check_framedrop(double frame_time)
         // are too late. and we allow 100ms A-V delay here:
                 if(waitLag != 0)
                         --waitLag;
+        // Too far behind for skipping a few frames to help: go to the next key frame
+        if (frame_dropping == 1 && waitLag == 0 && mpctx->osd_function != OSD_PAUSE
+            && (wii_resyncing || d < -1.0)) {
+            wii_resyncing = 1;
+            ++drop_frame_cnt;
+            return 3;
+        }
         if (waitLag == 0 && d < -dropped_frames * frame_time - 0.100 &&
             mpctx->osd_function != OSD_PAUSE) {
             ++drop_frame_cnt;
@@ -2935,6 +2944,8 @@ static double update_video(int *blit_frame)
 #endif
             decoded_frame = decode_video(sh_video, start, in_size, drop_frame,
                                          sh_video->pts, sh_video->endpts, &full_frame);
+            if (decoded_frame)
+                wii_resyncing = 0;
 
             if (flush && !decoded_frame) {
 #ifdef GEKKO
@@ -5597,17 +5608,6 @@ void wiiSetTiledOFF()
 {
         wiiTiledRender = false;
         wiiTiledAuto = false;
-}
-
-void wiiDash()
-{
-        m_config_set_option(mconfig,"lavdopts","skiploopfilter=all"); // H264 deblock skip; all, bidir, nonref, nonkey
-        //m_config_set_option(mconfig,"lavdopts","skiploopfilter=all:fast=1"); // test fast=1
-}
-
-void wiiElse()
-{
-        m_config_set_option(mconfig,"lavdopts","skiploopfilter=default");
 }
 
 void wiiSFD()
