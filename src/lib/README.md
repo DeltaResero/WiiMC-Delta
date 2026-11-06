@@ -84,7 +84,7 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
   are compiled from, the build machinery (`configure`, `ffbuild/`, the
   library Makefiles and version scripts), the component lists `configure`
   scans, the libraries' public headers, and the licence and release files.
-  1,689 of the 10,424 files remain. A build of the trimmed tree compiles
+  1,751 of the 10,424 files remain. A build of the trimmed tree compiles
   to the same code as one of the whole tree.
 
 Local changes:
