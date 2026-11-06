@@ -4364,8 +4364,8 @@ done:
     delete fileBrowser;
     fileBrowser = NULL;
 
-    if(VideoImgVisible())
-        mainWindow->Remove(&backBtn);
+    // the video may have closed since the Resume button went up
+    mainWindow->Remove(&backBtn);
 
     if(menu == MENU_BROWSE_MUSIC || menu == MENU_BROWSE_ONLINEMEDIA)
         mainWindow->Remove(audiobar);
