@@ -5310,8 +5310,71 @@ static float timing_sleep(float time_frame)
 
 //extern bool tiledBlack;
 
+// the languages that pick a track: on a DVD, Default means the Wii's own
+static const char *track_lang(const char *lang)
+{
+        if (!lang && mpctx->stream && (mpctx->stream->type == STREAMTYPE_DVD ||
+                                       mpctx->stream->type == STREAMTYPE_DVDNAV))
+                return wiiDVDLanguage();
+        return lang;
+}
+
+static int lang_differs(const char *a, const char *b)
+{
+        if (!a || !b)
+                return a != b;
+        return strcmp(a, b) != 0;
+}
+
+// switch the playing tracks when the languages changed in the GUI
+static void switch_to_new_languages(const char *old_alang, const char *old_slang)
+{
+        const char *alang = track_lang(audio_lang), *slang = track_lang(dvdsub_lang);
+        int type = mpctx->stream ? mpctx->stream->type : -1;
+        int id;
+
+        if (mpctx->sh_audio && alang && lang_differs(alang, track_lang(old_alang))) {
+                id = -1;
+#ifdef CONFIG_DVDREAD
+                if (type == STREAMTYPE_DVD)
+                        id = dvd_aid_from_lang(mpctx->stream, alang);
+                else
+#endif
+#ifdef CONFIG_DVDNAV
+                if (type == STREAMTYPE_DVDNAV)
+                        id = mp_dvdnav_aid_from_lang(mpctx->stream, alang);
+                else
+#endif
+                if (mpctx->demuxer)
+                        id = demuxer_audio_track_by_lang(mpctx->demuxer, (char *)alang);
+                if (id >= 0)
+                        mp_property_do("switch_audio", M_PROPERTY_SET, &id, mpctx);
+        }
+
+        if (slang && lang_differs(slang, track_lang(old_slang))) {
+                id = -1;
+#ifdef CONFIG_DVDREAD
+                if (type == STREAMTYPE_DVD)
+                        id = dvd_sid_from_lang(mpctx->stream, slang);
+                else
+#endif
+#ifdef CONFIG_DVDNAV
+                if (type == STREAMTYPE_DVDNAV)
+                        id = mp_dvdnav_sid_from_lang(mpctx->stream, slang);
+                else
+#endif
+                if (mpctx->demuxer)
+                        id = demuxer_sub_track_by_lang(mpctx->demuxer, (char *)slang);
+                if (id >= 0)
+                        mp_property_do("sub_demux", M_PROPERTY_SET, &id, mpctx);
+        }
+}
+
 void PauseAndGotoGUI()
 {
+        char *old_alang = audio_lang ? strdup(audio_lang) : NULL;
+        char *old_slang = dvdsub_lang ? strdup(dvdsub_lang) : NULL;
+
         SetLastDVDMotorTime();
 
         //Set FPS back if altered
@@ -5359,8 +5422,11 @@ void PauseAndGotoGUI()
         while (controlledbygui == 1)
                 usec_sleep(20000);
 
-        if (controlledbygui == 2)
+        if (controlledbygui == 2) {
+                free(old_alang);
+                free(old_slang);
                 return;
+        }
 
         //TODO: Resuming video randomly displays a black screen for one frame.
         //fade in to mitigate 1 frame flicker (not currently a fade.)
@@ -5372,7 +5438,10 @@ void PauseAndGotoGUI()
 
         printf("reinit mplayer video/audio\n");
         reinit_audio();
-        reinit_video();
+        reinit_video(); // also takes WiiMC's settings, languages included
+        switch_to_new_languages(old_alang, old_slang);
+        free(old_alang);
+        free(old_slang);
 
         mpctx->osd_function = OSD_PLAY;
 
