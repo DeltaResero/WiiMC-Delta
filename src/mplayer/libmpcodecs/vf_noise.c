@@ -37,7 +37,7 @@
 #include "vf.h"
 #include "libvo/fastmemcpy.h"
 #include "libavutil/mem.h"
-#include "libavutil/x86_cpu.h"
+#include "mpx86asm.h"
 
 #define MAX_NOISE 4096
 #define MAX_SHIFT 1024
@@ -72,7 +72,7 @@ struct vf_priv_s {
 static int nonTempRandShift_init;
 static int nonTempRandShift[MAX_RES];
 
-static int patt[4] = {
+static const int patt[4] = {
     -1,0,1,0
 };
 
@@ -147,7 +147,7 @@ static int8_t *initNoise(FilterParam *fp){
 
 /***************************************************************************/
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static inline void lineNoise_MMX(uint8_t *dst, uint8_t *src, int8_t *noise, int len, int shift){
         x86_reg mmx_len= len&(~7);
         noise+=shift;
@@ -176,7 +176,7 @@ static inline void lineNoise_MMX(uint8_t *dst, uint8_t *src, int8_t *noise, int 
 #endif
 
 //duplicate of previous except movntq
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
 static inline void lineNoise_MMX2(uint8_t *dst, uint8_t *src, int8_t *noise, int len, int shift){
         x86_reg mmx_len= len&(~7);
         noise+=shift;
@@ -218,7 +218,7 @@ static inline void lineNoise_C(uint8_t *dst, uint8_t *src, int8_t *noise, int le
 
 /***************************************************************************/
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static inline void lineNoiseAvg_MMX(uint8_t *dst, uint8_t *src, int len, int8_t **shift){
         x86_reg mmx_len= len&(~7);
 
@@ -339,7 +339,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi){
     mpi->flags|=MP_IMGFLAG_DIRECT;
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
         mp_image_t *dmpi;
 
         if(!(mpi->flags&MP_IMGFLAG_DIRECT)){
@@ -358,14 +358,14 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 
         vf_clone_mpi_attributes(dmpi, mpi);
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX) __asm__ volatile ("emms\n\t");
 #endif
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
         if(gCpuCaps.hasMMX2) __asm__ volatile ("sfence\n\t");
 #endif
 
-        return vf_next_put_image(vf,dmpi, pts);
+        return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static void uninit(struct vf_instance *vf){
@@ -449,13 +449,13 @@ static int vf_open(vf_instance_t *vf, char *args){
     }
 
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
     if(gCpuCaps.hasMMX){
         lineNoise= lineNoise_MMX;
         lineNoiseAvg= lineNoiseAvg_MMX;
     }
 #endif
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
     if(gCpuCaps.hasMMX2) lineNoise= lineNoise_MMX2;
 //    if(gCpuCaps.hasMMX) lineNoiseAvg= lineNoiseAvg_MMX2;
 #endif

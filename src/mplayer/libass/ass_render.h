@@ -26,6 +26,9 @@
 #include FT_STROKER_H
 #include FT_GLYPH_H
 #include FT_SYNTHESIS_H
+#ifdef CONFIG_HARFBUZZ
+#include "hb.h"
+#endif
 
 // XXX: fix the inclusion mess so we can avoid doing this here
 typedef struct ass_shaper ASS_Shaper;
@@ -65,16 +68,18 @@ typedef struct free_list {
 typedef struct {
     int frame_width;
     int frame_height;
+    int storage_width;          // width of the source image
+    int storage_height;         // height of the source image
     double font_size_coeff;     // font size multiplier
     double line_spacing;        // additional line spacing (in frame pixels)
+    double line_position;       // vertical position for subtitles, 0-100 (0 = no change)
     int top_margin;             // height of top margin. Everything except toptitles is shifted down by top_margin.
     int bottom_margin;          // height of bottom margin. (frame_height - top_margin - bottom_margin) is original video height.
     int left_margin;
     int right_margin;
     int use_margins;            // 0 - place all subtitles inside original frame
     // 1 - use margins for placing toptitles and subtitles
-    double aspect;              // frame aspect ratio, d_width / d_height.
-    double storage_aspect;      // pixel ratio of the source image
+    double par;                 // user defined pixel aspect ratio (0 = unset)
     ASS_Hinting hinting;
     ASS_ShapingLevel shaper;
 
@@ -106,6 +111,11 @@ typedef struct glyph_info {
     ASS_Font *font;
     int face_index;
     int glyph_index;
+#ifdef CONFIG_HARFBUZZ
+    hb_script_t script;
+#else
+    int script;
+#endif
     double font_size;
     ASS_Drawing *drawing;
     FT_Outline *outline;
@@ -133,7 +143,9 @@ typedef struct glyph_info {
     double frx, fry, frz;       // rotation
     double fax, fay;            // text shearing
     double scale_x, scale_y;
+    int border_style;
     double border_x, border_y;
+    double hspacing;
     unsigned italic;
     unsigned bold;
     int flags;
@@ -174,6 +186,7 @@ typedef struct {
     int flags;                  // decoration flags (underline/strike-through)
 
     FT_Stroker stroker;
+    int stroker_radius;         // last stroker radius, for caching stroker objects
     int alignment;              // alignment overrides go here; if zero, style value will be used
     double frx, fry, frz;
     double fax, fay;            // text shearing
@@ -188,6 +201,7 @@ typedef struct {
     char have_origin;           // origin is explicitly defined; if 0, get_base_point() is used
     double scale_x, scale_y;
     double hspacing;            // distance between letters, in pixels
+    int border_style;
     double border_x;            // outline width
     double border_y;
     uint32_t c[4];              // colors(Primary, Secondary, so on) in RGBA
@@ -248,6 +262,7 @@ struct ass_renderer {
 
     ASS_Image *images_root;     // rendering result is stored here
     ASS_Image *prev_images_root;
+    int cache_cleared;
 
     EventImages *eimg;          // temporary buffer for sorting rendered events
     int eimg_size;              // allocated buffer size
@@ -258,11 +273,14 @@ struct ass_renderer {
     int orig_width;             // frame width ( = screen width - margins )
     int orig_height_nocrop;     // frame height ( = screen height - margins + cropheight)
     int orig_width_nocrop;      // frame width ( = screen width - margins + cropwidth)
+    int storage_height;         // video height before any rescaling
+    int storage_width;          // video width before any rescaling
     ASS_Track *track;
     long long time;             // frame's timestamp, ms
     double font_scale;
     double font_scale_x;        // x scale applied to all glyphs to preserve text aspect ratio
     double border_scale;
+    double blur_scale;
 
     RenderContext state;
     TextInfo text_info;
@@ -289,7 +307,7 @@ typedef struct {
     int ha, hb;                 // left and width
 } Segment;
 
-void reset_render_context(ASS_Renderer *render_priv);
+void reset_render_context(ASS_Renderer *render_priv, ASS_Style *style);
 void ass_free_images(ASS_Image *img);
 
 // XXX: this is actually in ass.c, includes should be fixed later on

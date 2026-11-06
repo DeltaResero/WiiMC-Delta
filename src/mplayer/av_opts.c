@@ -30,6 +30,12 @@ int parse_avopts(void *v, char *str){
 
     if (!v)
         return -1;
+    if (!str)
+        return 0;
+    if (strcmp(str, "help") == 0) {
+        av_opt_show2(v, NULL, -1, 0);
+        return -1;
+    }
 
     start= str= strdup(str);
 
@@ -42,7 +48,7 @@ int parse_avopts(void *v, char *str){
         arg     = strchr(str, '=');
         if(arg)      *arg++= 0;
 
-        if(av_set_string3(v, str, arg, 0, NULL) < 0){
+        if (av_opt_set(v, str, arg, 0) < 0) {
             free(start);
             return -1;
         }

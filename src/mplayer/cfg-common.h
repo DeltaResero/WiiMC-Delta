@@ -141,7 +141,7 @@ const m_option_t tvopts_conf[]={
 const m_option_t pvropts_conf[]={
     {"aspect", &pvr_param_aspect_ratio, CONF_TYPE_INT, 0, 1, 4, NULL},
     {"arate", &pvr_param_sample_rate, CONF_TYPE_INT, 0, 32000, 48000, NULL},
-    {"alayer", &pvr_param_audio_layer, CONF_TYPE_INT, 0, 1, 2, NULL},
+    {"alayer", &pvr_param_audio_layer, CONF_TYPE_INT, 0, 1, 5, NULL},
     {"abitrate", &pvr_param_audio_bitrate, CONF_TYPE_INT, 0, 32, 448, NULL},
     {"amode", &pvr_param_audio_mode, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"vbitrate", &pvr_param_bitrate, CONF_TYPE_INT, 0, 0, 0, NULL},
@@ -315,6 +315,7 @@ const m_option_t common_opts[] = {
 
 // ------------------------- stream options --------------------
 
+    {"chapter", parse_chapter_range, CONF_TYPE_FUNC_PARAM, 0, 0, 0, NULL},
 #ifdef CONFIG_STREAM_CACHE
     {"cache", &stream_cache_size, CONF_TYPE_INT, CONF_RANGE, 32, 0x7fffffff, NULL},
     {"nocache", &stream_cache_size, CONF_TYPE_FLAG, 0, 1, 0, NULL},
@@ -331,7 +332,6 @@ const m_option_t common_opts[] = {
     {"dvd-speed", &dvd_speed, CONF_TYPE_INT, 0, 0, 0, NULL},
     {"dvd", "-dvd N has been removed, use dvd://N instead.\n" , CONF_TYPE_PRINT, 0, 0, 0, NULL},
     {"dvdangle", &dvd_angle, CONF_TYPE_INT, CONF_RANGE, 1, 99, NULL},
-    {"chapter", dvd_parse_chapter_range, CONF_TYPE_FUNC_PARAM, 0, 0, 0, NULL},
 #else
     {"dvd-device", "MPlayer was compiled without libdvdread support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
     {"dvd-speed", "MPlayer was compiled without libdvdread support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
@@ -340,10 +340,9 @@ const m_option_t common_opts[] = {
     {"bluray-device",  &bluray_device,  CONF_TYPE_STRING, 0,          0,  0, NULL},
 #ifdef CONFIG_LIBBLURAY
     {"bluray-angle",   &bluray_angle,   CONF_TYPE_INT,    CONF_RANGE, 0, 999, NULL},
-    {"bluray-chapter", &bluray_chapter, CONF_TYPE_INT,    CONF_RANGE, 0, 999, NULL},
+    {"bluray-chapter", "The -bluray-chapter option was broken and thus removed, use -chapter instead.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #else
     {"bluray-angle",   "MPlayer was compiled without libbluray support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-    {"bluray-chapter", "MPlayer was compiled without libbluray support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_LIBBLURAY */
     {"alang", &audio_lang, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"slang", &dvdsub_lang, CONF_TYPE_STRING, 0, 0, 0, NULL},
@@ -381,21 +380,10 @@ const m_option_t common_opts[] = {
 
 #ifdef CONFIG_LIVE555
     {"sdp", "-sdp has been removed, use sdp://file instead.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-    {"rtsp-stream-over-http", &rtsp_transport_http, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-http", "-rtsp-stream-over-http requires the \"LIVE555 Streaming Media\" library.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_LIVE555 */
-#if defined(CONFIG_LIBNEMESI) || defined(CONFIG_LIVE555)
-    // -rtsp-stream-over-tcp option, specifying TCP streaming of RTP/RTCP
+    {"rtsp-stream-over-http", &rtsp_transport_http, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"rtsp-stream-over-tcp", &rtsp_transport_tcp, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-tcp", "-rtsp-stream-over-tcp requires the \"LIVE555 Streaming Media\" or \"libnemesi\" libraries.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
-#endif /* defined(CONFIG_LIBNEMESI) || defined(CONFIG_LIVE555) */
-#ifdef CONFIG_LIBNEMESI
     {"rtsp-stream-over-sctp", &rtsp_transport_sctp, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-sctp", "-rtsp-stream-over-sctp requires the \"libnemesi\" library\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
-#endif /* CONFIG_LIBNEMESI */
 #ifdef CONFIG_NETWORKING
 #ifndef GEKKO
     {"rtsp-port", &rtsp_port, CONF_TYPE_INT, CONF_RANGE, -1, 65535, NULL},
@@ -420,7 +408,7 @@ const m_option_t common_opts[] = {
 
     {"edl", &edl_filename,  CONF_TYPE_STRING, 0, 0, 0, NULL},
 
-    // AVI specific: force non-interleaved mode
+    // force non-interleaved mode
     {"ni", &force_ni, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"noni", &force_ni, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 
@@ -535,10 +523,11 @@ const m_option_t common_opts[] = {
 
     // scaling:
     {"sws", &sws_flags, CONF_TYPE_INT, 0, 0, 2, NULL},
+    {"swsopts", &sws_opts, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"ssf", scaler_filter_conf, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
     {"zoom", &softzoom, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"nozoom", &softzoom, CONF_TYPE_FLAG, 0, 1, 0, NULL},
-    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, 0.1, 10.0, NULL},
+    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, 0.01, 10.0, NULL},
     {"noaspect", &movie_aspect, CONF_TYPE_FLAG, 0, 0, 0, NULL},
     {"xy", &screen_size_xy, CONF_TYPE_FLOAT, CONF_RANGE, 0.001, 4096, NULL},
 
@@ -559,6 +548,7 @@ const m_option_t common_opts[] = {
 #ifdef CONFIG_FFMPEG
     {"lavdopts", lavc_decode_opts_conf, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
     {"lavfdopts",  lavfdopts_conf, CONF_TYPE_SUBCONFIG, CONF_GLOBAL, 0, 0, NULL},
+    {"lavfstreamopts",  &lavfstreamopts, CONF_TYPE_STRING, CONF_GLOBAL, 0, 0, NULL},
 #endif
 #ifdef CONFIG_XVID4
     {"xvidopts", xvid_dec_opts, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
@@ -601,7 +591,7 @@ const m_option_t common_opts[] = {
     // specify IFO file for VOBSUB subtitle
     {"ifo", &spudec_ifo, CONF_TYPE_STRING, 0, 0, 0, NULL},
     // enable Closed Captioning display
-    {"subcc", &subcc_enabled, CONF_TYPE_INT, CONF_RANGE, 0, 4, NULL},
+    {"subcc", &subcc_enabled, CONF_TYPE_INT, CONF_RANGE, 0, 8, NULL},
     {"nosubcc", &subcc_enabled, CONF_TYPE_FLAG, 0, 1, 0, NULL},
     {"overlapsub", &suboverlap_enabled, CONF_TYPE_FLAG, 0, 0, 2, NULL},
     {"nooverlapsub", &suboverlap_enabled, CONF_TYPE_FLAG, 0, 0, 0, NULL},
@@ -612,14 +602,14 @@ const m_option_t common_opts[] = {
     {"font", &font_name, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"subfont", &sub_font_name, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"ffactor", &font_factor, CONF_TYPE_FLOAT, CONF_RANGE, 0.0, 10.0, NULL},
-    {"subpos", &sub_pos, CONF_TYPE_INT, CONF_RANGE, 0, 100, NULL},
+    {"subpos", &sub_pos, CONF_TYPE_INT, CONF_RANGE, 0, 150, NULL},
     {"subalign", &sub_alignment, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
     {"subwidth", &sub_width_p, CONF_TYPE_INT, CONF_RANGE, 10, 100, NULL},
     {"spualign", &spu_alignment, CONF_TYPE_INT, CONF_RANGE, -1, 2, NULL},
     {"spuaa", &spu_aamode, CONF_TYPE_INT, CONF_RANGE, 0, 31, NULL},
     {"spugauss", &spu_gaussvar, CONF_TYPE_FLOAT, CONF_RANGE, 0.0, 3.0, NULL},
-#ifdef CONFIG_FREETYPE
     {"subfont-encoding", &subtitle_font_encoding, CONF_TYPE_STRING, 0, 0, 0, NULL},
+#ifdef CONFIG_FREETYPE
     {"subfont-text-scale", &text_font_scale_factor, CONF_TYPE_FLOAT, CONF_RANGE, 0, 100, NULL},
     {"subfont-osd-scale", &osd_font_scale_factor, CONF_TYPE_FLOAT, CONF_RANGE, 0, 100, NULL},
     {"subfont-blur", &subtitle_font_radius, CONF_TYPE_FLOAT, CONF_RANGE, 0, 8, NULL},

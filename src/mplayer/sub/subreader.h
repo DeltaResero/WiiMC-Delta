@@ -33,6 +33,7 @@ extern int sub_no_text_pp;  // disable text post-processing
 extern int sub_match_fuzziness;
 extern int sub_format;
 extern char *sub_cp;
+extern const char *enca_sub_cp;
 
 // subtitle formats
 #define SUB_INVALID   -1
@@ -93,14 +94,13 @@ typedef void (*open_sub_func)(char *, float, int);
 typedef int (*open_vob_func)(const char *, const char * const, int, void *);
 
 sub_data* sub_read_file (const char *filename, float pts);
-subtitle* subcp_recode (subtitle *sub);
+void subcp_recode (subtitle *sub);
 // enca_fd is the file enca uses to determine the codepage.
 // setting to NULL disables enca.
 struct stream;
 void subcp_open (struct stream *st); /* for demux_ogg.c */
 void subcp_close (void); /* for demux_ogg.c */
 const char* guess_buffer_cp(unsigned char* buffer, int buflen, const char *preferred_language, const char *fallback);
-const char* guess_cp(struct stream *st, const char *preferred_language, const char *fallback);
 void load_subtitles(const char *fname, float fps, open_sub_func add_f);
 void load_vob_subtitle(const char *fname, const char * const spudec_ifo, void **spu, open_vob_func add_f);
 void list_sub_file(sub_data* subd);

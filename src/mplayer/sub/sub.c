@@ -65,7 +65,7 @@ struct osd_text_p {
 };
 //^
 
-char * sub_osd_names[]={
+const char * const sub_osd_names[]={
     MSGTR_VO_SUB_Seekbar,
     MSGTR_VO_SUB_Play,
     MSGTR_VO_SUB_Pause,
@@ -80,11 +80,12 @@ char * sub_osd_names[]={
     MSGTR_VO_SUB_Hue,
     MSGTR_VO_SUB_Balance
 };
-char * sub_osd_names_short[] ={ "", "|>", "||", "[]", "<<" , ">>", "", "", "", "", "", "", "" };
+const char * const sub_osd_names_short[] ={ "", "|>", "||", "[]", "<<" , ">>", "", "", "", "", "", "", "" };
 
 //static int vo_font_loaded=-1;
 font_desc_t* vo_font=NULL;
 font_desc_t* sub_font=NULL;
+char *subtitle_font_encoding = NULL;
 
 unsigned char* vo_osd_text=NULL;
 void* vo_osd_teletext_page=NULL;
@@ -152,14 +153,14 @@ static void alloc_buf(mp_osd_obj_t* obj)
     int len;
     if (obj->bbox.x2 < obj->bbox.x1) obj->bbox.x2 = obj->bbox.x1;
     if (obj->bbox.y2 < obj->bbox.y1) obj->bbox.y2 = obj->bbox.y1;
-    obj->stride = ((obj->bbox.x2-obj->bbox.x1)+7)&(~7);
+    obj->stride = ((obj->bbox.x2-obj->bbox.x1)+15)&(~15);
     len = obj->stride*(obj->bbox.y2-obj->bbox.y1);
     if (obj->allocated<len) {
         obj->allocated = len;
-        free(obj->bitmap_buffer);
-        free(obj->alpha_buffer);
-        obj->bitmap_buffer = memalign(16, len);
-        obj->alpha_buffer  = memalign(16, len);
+        av_freep(&obj->bitmap_buffer);
+        av_freep(&obj->alpha_buffer);
+        obj->bitmap_buffer = av_malloc(len);
+        obj->alpha_buffer  = av_malloc(len);
     }
     memset(obj->bitmap_buffer, sub_bg_color, len);
     memset(obj->alpha_buffer, sub_bg_alpha, len);
@@ -943,6 +944,8 @@ static inline void vo_update_text_sub(mp_osd_obj_t *obj, int dxs, int dys)
                     obj->params.subtitle.utbl[utblc++] = c;
                     k++;
                 }
+                if (utblc > MAX_UCS)
+                    break;
                 obj->params.subtitle.utbl[utblc++] = ' ';
             }
             obj->params.subtitle.utbl[utblc - 1] = 0;
@@ -978,8 +981,10 @@ static inline void vo_update_text_sub(mp_osd_obj_t *obj, int dxs, int dys)
 
     if (obj->y < 0)
         obj->y = 0;
+    if (sub_pos <= 100 && obj->y > dys - h)
+        obj->y = FFMAX(dys - h, 0);
     if (obj->y > dys - h)
-        obj->y = dys - h;
+        h = FFMAX(dys - obj->y, 0);
 
     obj->bbox.y2 = obj->y + h;
 
@@ -1097,8 +1102,8 @@ void free_osd_list(void){
     mp_osd_obj_t* obj=vo_osd_list;
     while(obj){
         mp_osd_obj_t* next=obj->next;
-        free(obj->alpha_buffer);
-        free(obj->bitmap_buffer);
+        av_freep(&obj->alpha_buffer);
+        av_freep(&obj->bitmap_buffer);
         free(obj);
         obj=next;
     }

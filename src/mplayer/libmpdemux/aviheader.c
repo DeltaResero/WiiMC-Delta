@@ -288,6 +288,9 @@ while(1){
         sh_video->fps=(float)sh_video->video.dwRate/(float)sh_video->video.dwScale;
         sh_video->frametime=(float)sh_video->video.dwScale/(float)sh_video->video.dwRate;
         sh_video->format = sh_video->bih->biCompression;
+        if (sh_video->bih->biCompression == 0 && sh_video->bih->biHeight > 0)
+            sh_video->flipped_input ^= 1;
+        sh_video->bih->biHeight = FFABS(sh_video->bih->biHeight);
 //        if(demuxer->video->id==-1) demuxer->video->id=stream_id;
         // IdxFix:
         idxfix_videostream=stream_id;
@@ -328,7 +331,7 @@ while(1){
         }
       } else
       if(last_fccType==streamtypeAUDIO){
-        unsigned wf_size = chunksize<sizeof(*sh_audio->wf)?sizeof(*sh_audio->wf):chunksize;
+        unsigned wf_size = FFMAX(chunksize, sizeof(*sh_audio->wf));
         sh_audio->wf=calloc(wf_size,1);
 //        sh_audio->wf=malloc(chunksize); memset(sh_audio->wf,0,chunksize);
         mp_msg(MSGT_HEADER, MSGL_V, "Found 'wf', %u bytes of %zu\n",
@@ -345,6 +348,8 @@ while(1){
         if (sh_audio->format == 1 &&
             last_fccHandler == mmioFOURCC('A', 'x', 'a', 'n'))
             sh_audio->format = last_fccHandler;
+        if (sh_audio->format == 0x11 && sh_audio->wf->wBitsPerSample == 8)
+            sh_audio->format = 0x116b727a; // Zork PCM, format conflicts with IMA ADPCM
         sh_audio->i_bps=sh_audio->wf->nAvgBytesPerSec;
         chunksize=0;
         if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_wave_header(sh_audio->wf,MSGL_V);
@@ -354,7 +359,7 @@ while(1){
       break;
     }
     case mmioFOURCC('v', 'p', 'r', 'p'): {
-        VideoPropHeader *vprp = malloc(chunksize);
+        VideoPropHeader *vprp = calloc(1, FFMAX(chunksize, sizeof(*vprp)));
         unsigned int i;
         stream_read(demuxer->stream, (void*)vprp, chunksize);
         le2me_VideoPropHeader(vprp);
@@ -367,8 +372,8 @@ while(1){
         for (i=0; i<vprp->nbFieldPerFrame; i++) {
                 le2me_VIDEO_FIELD_DESC(&vprp->FieldInfo[i]);
         }
-        if (sh_video) {
-                sh_video->aspect = GET_AVI_ASPECT(vprp->dwFrameAspectRatio);
+        if (sh_video && VALID_AVI_ASPECT(vprp->dwFrameAspectRatio)) {
+                sh_video->original_aspect = GET_AVI_ASPECT(vprp->dwFrameAspectRatio);
         }
         if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_vprp(vprp,MSGL_V);
         free(vprp);
@@ -402,7 +407,7 @@ while(1){
       read = stream_read(demuxer->stream,(char*)priv->idx,priv->idx_size<<4);
       priv->idx_size = FFMAX(read, 0) >> 4;
       for (i = 0; i < priv->idx_size; i++) {    // swap index to machine endian
-        AVIINDEXENTRY *entry=(AVIINDEXENTRY*)priv->idx + i;
+        AVIINDEXENTRY *entry=priv->idx + i;
         le2me_AVIINDEXENTRY(entry);
         /*
          * We (ab)use the upper word for bits 32-47 of the offset, so
@@ -469,7 +474,11 @@ while(1){
 
 }
 
-if (priv->suidx_size > 0 && priv->idx_size == 0) {
+// Some files contain a dummy non-odml index.
+// Ignore an index smaller than some arbitrary size.
+// Some Canon cameras recording in MJPEG do this
+// (encoder software identifier CanonMVI06).
+if (priv->suidx_size > 0 && priv->idx_size < 4) {
     /*
      * No NEWAVIINDEX, but we got an OpenDML index.
      */
@@ -567,7 +576,7 @@ if (priv->isodml && (index_mode==-1 || index_mode==0 || index_mode==1)) {
         stream_reset (demuxer->stream);
 
         // find out the video stream id. I have seen files with 01db.
-        for (idx = &((AVIINDEXENTRY *)priv->idx)[0], i=0; i<priv->idx_size; i++, idx++){
+        for (idx = priv->idx, i=0; i<priv->idx_size; i++, idx++){
             unsigned char res[2];
             if (odml_get_vstream_id(idx->ckid, res)) {
                 db = mmioFOURCC(res[0], res[1], 'd', 'b');
@@ -576,14 +585,14 @@ if (priv->isodml && (index_mode==-1 || index_mode==0 || index_mode==1)) {
         }
 
         // find first non keyframe
-        for (idx = &((AVIINDEXENTRY *)priv->idx)[0], i=0; i<priv->idx_size; i++, idx++){
+        for (idx = priv->idx, i=0; i<priv->idx_size; i++, idx++){
             if (!(idx->dwFlags & AVIIF_KEYFRAME) && idx->ckid == db) break;
         }
         if (i<priv->idx_size && db) {
             stream_seek(demuxer->stream, AVI_IDX_OFFSET(idx));
             id = stream_read_dword_le(demuxer->stream);
             if (id && id != db) // index fcc and real fcc differ? fix it.
-                for (idx = &((AVIINDEXENTRY *)priv->idx)[0], i=0; i<priv->idx_size; i++, idx++){
+                for (idx = priv->idx, i=0; i<priv->idx_size; i++, idx++){
                     if (!(idx->dwFlags & AVIIF_KEYFRAME) && idx->ckid == db)
                         idx->ckid = id;
             }
@@ -618,14 +627,14 @@ if (index_file_load) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_CantReadIdxFile, index_file_load, strerror(errno));
     goto gen_index;
   }
-  fread(&magic, 6, 1, fp);
-  if (strncmp(magic, "MPIDX1", 6)) {
+  if (fread(&magic, 6, 1, fp) != 1 ||
+      strncmp(magic, "MPIDX1", 6) ||
+      fread(&priv->idx_size, sizeof(priv->idx_size), 1, fp) != 1) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_NotValidMPidxFile, index_file_load);
     goto gen_index;
   }
-  fread(&priv->idx_size, sizeof(priv->idx_size), 1, fp);
 #ifndef GEKKO
-  priv->idx=malloc(priv->idx_size*sizeof(AVIINDEXENTRY));
+  priv->idx=calloc(priv->idx_size,sizeof(AVIINDEXENTRY));
 #else
   priv->idx=alloc_index(priv->idx_size*sizeof(AVIINDEXENTRY));
 #endif
@@ -636,20 +645,18 @@ if (index_file_load) {
   }
 
   for (i=0; i<priv->idx_size;i++) {
-    AVIINDEXENTRY *idx;
-    idx=&((AVIINDEXENTRY *)priv->idx)[i];
-    fread(idx, sizeof(AVIINDEXENTRY), 1, fp);
-    if (feof(fp)) {
+    AVIINDEXENTRY *idx=priv->idx + i;
+    if (fread(idx, 1, sizeof(*idx), fp) != sizeof(*idx)) {
       mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_PrematureEOF, index_file_load);
       free(priv->idx);
       priv->idx_size = 0;
       goto gen_index;
     }
   }
-  fclose(fp);
   mp_msg(MSGT_HEADER,MSGL_INFO, MSGTR_MPDEMUX_AVIHDR_IdxFileLoaded, index_file_load);
-}
 gen_index:
+  if (fp) fclose(fp);
+}
 if(index_mode>=2 || (priv->idx_size==0 && index_mode==1)){
   int idx_pos = 0;
   // build index for file:
@@ -693,7 +700,7 @@ if(index_mode>=2 || (priv->idx_size==0 && index_mode==1)){
 #endif
       if(!priv->idx){idx_pos=0; break;} // error!
     }
-    idx=&((AVIINDEXENTRY *)priv->idx)[idx_pos++];
+    idx=priv->idx + idx_pos++;
     idx->ckid=id;
     idx->dwFlags=AVIIF_KEYFRAME; // FIXME
     idx->dwFlags|=(demuxer->filepos>>16)&0xffff0000U;
@@ -759,7 +766,7 @@ skip_chunk:
     fwrite("MPIDX1", 6, 1, fp);
     fwrite(&priv->idx_size, sizeof(priv->idx_size), 1, fp);
     for (i=0; i<priv->idx_size; i++) {
-      AVIINDEXENTRY *idx = &((AVIINDEXENTRY *)priv->idx)[i];
+      AVIINDEXENTRY *idx = priv->idx + i;
       fwrite(idx, sizeof(AVIINDEXENTRY), 1, fp);
     }
     fclose(fp);

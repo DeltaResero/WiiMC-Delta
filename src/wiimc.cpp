@@ -39,8 +39,8 @@ char MPLAYER_CONFDIR[512];
 char MPLAYER_LIBDIR[512];
 char MPLAYER_CSSDIR[512];
 
-#include "mplayer/input/input.h"
-#include "mplayer/osdep/gx_supp.h"
+#include "input/input.h"
+#include "osdep/gx_supp.h"
 
 bool want3DS = false;
 bool isReload = false;
@@ -889,6 +889,42 @@ void wiiExtraFont()
 }
 
 extern "C" {
+// MPlayer picks the audio and subtitle tracks when it opens a file, before
+// SetMPlayerSettings() runs, so it calls this itself for each file
+void SetMPlayerLanguages()
+{
+    char audioLang[14] = { 0 };
+    char subtitleLang[14] = { 0 };
+
+    if(WiiSettings.audioLanguage[0] != 0)
+        sprintf(audioLang, "%s,%s,en,eng",
+            WiiSettings.audioLanguage, languages[GetLangIndex(WiiSettings.audioLanguage)].abbrev2);
+    if(WiiSettings.subtitleLanguage[0] != 0)
+        sprintf(subtitleLang, "%s,%s,en,eng",
+            WiiSettings.subtitleLanguage, languages[GetLangIndex(WiiSettings.subtitleLanguage)].abbrev2);
+
+    wiiSetAudioLanguage(audioLang);
+    wiiSetSubtitleLanguage(subtitleLang);
+}
+
+// the Wii's system language, as the two-letter code DVDs label tracks with
+const char *wiiDVDLanguage()
+{
+    switch(CONF_GetLanguage())
+    {
+        case CONF_LANG_JAPANESE:     return "ja";
+        case CONF_LANG_GERMAN:       return "de";
+        case CONF_LANG_FRENCH:       return "fr";
+        case CONF_LANG_SPANISH:      return "es";
+        case CONF_LANG_ITALIAN:      return "it";
+        case CONF_LANG_DUTCH:        return "nl";
+        case CONF_LANG_SIMP_CHINESE:
+        case CONF_LANG_TRAD_CHINESE: return "zh";
+        case CONF_LANG_KOREAN:       return "ko";
+        default:                     return "en";
+    }
+}
+
 void SetMPlayerSettings()
 {
     static float aspectRatio=-2;
@@ -942,18 +978,7 @@ void SetMPlayerSettings()
 
     wiiSetCodepage(WiiSettings.subtitleCodepage);
 
-    char audioLang[14] = { 0 };
-    char subtitleLang[14] = { 0 };
-
-    if(WiiSettings.audioLanguage[0] != 0)
-        sprintf(audioLang, "%s,%s,en,eng",
-            WiiSettings.audioLanguage, languages[GetLangIndex(WiiSettings.audioLanguage)].abbrev2);
-    if(WiiSettings.subtitleLanguage[0] != 0)
-        sprintf(subtitleLang, "%s,%s,en,eng",
-            WiiSettings.subtitleLanguage, languages[GetLangIndex(WiiSettings.subtitleLanguage)].abbrev2);
-
-    wiiSetAudioLanguage(audioLang);
-    wiiSetSubtitleLanguage(subtitleLang);
+    SetMPlayerLanguages();
     wiiSetSubtitleColor(WiiSettings.subtitleColor);
     wiiSetSubtitleSize(0.6+(WiiSettings.subtitleSize-1)*0.6); // 1.0-5.0 --> 0.6-3.0
 }
@@ -1136,7 +1161,8 @@ int main(int argc, char *argv[])
     StartNetworkThread(); //to set net heap aside MEM2 area
     usleep(100); //force network thread execution
 
-    AddMem2Area (MPLAYER_BUFFER_SIZE, MEM2_MPLAYER_BUFFER);
+    // the area's heap keeps its own bookkeeping, so the buffer needs room to spare
+    AddMem2Area (MPLAYER_BUFFER_SIZE + 1024, MEM2_MPLAYER_BUFFER);
     global_buffer = (unsigned char *)mem2_malloc(MPLAYER_BUFFER_SIZE, MEM2_MPLAYER_BUFFER);
 
     u32 size = ( (1024*MAX_HEIGHT)+((MAX_WIDTH-1024)*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures

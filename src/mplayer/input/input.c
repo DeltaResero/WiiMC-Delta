@@ -25,7 +25,9 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_POSIX_SELECT
 #include <sys/time.h>
+#endif
 #include <fcntl.h>
 #include <ctype.h>
 
@@ -38,6 +40,7 @@
 #include "osdep/getch2.h"
 #include "osdep/keycodes.h"
 #include "osdep/timer.h"
+#include "libavutil/common.h"
 #include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
@@ -66,7 +69,7 @@
 /// the last one) which is actually 9.
 
 /// For the args, the first field is the type (actually int, float or string), the second
-/// is the default value wich is used for optional arguments
+/// is the default value which is used for optional arguments
 
 static const mp_cmd_t mp_cmds[] = {
 #ifdef CONFIG_RADIO
@@ -210,7 +213,7 @@ static const mp_cmd_t mp_cmds[] = {
 
   { MP_CMD_GUI, "gui", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
 
-  { 0, NULL, 0, {} }
+  { 0, "", 0, { 0 } }
 };
 
 /// The names of the keys as used in input.conf
@@ -370,7 +373,7 @@ static const mp_key_name_t key_names[] = {
 
   { KEY_CLOSE_WIN, "CLOSE_WIN" },
 
-  { 0, NULL }
+  { 0, "" }
 };
 
 // This is the default binding. The content of input.conf overrides these.
@@ -574,6 +577,8 @@ static mp_cmd_filter_t* cmd_filters = NULL;
 int (*mp_input_key_cb)(int code) = NULL;
 
 int async_quit_request;
+
+int pausing_default = 0;
 
 static mp_input_fd_t key_fds[MP_MAX_KEY_FD];
 static unsigned int num_key_fd = 0;
@@ -815,26 +820,26 @@ mp_input_parse_cmd(char* str) {
   if(l == 0)
     return NULL;
 
-  for(i=0; mp_cmds[i].name != NULL; i++) {
-    if(strncasecmp(mp_cmds[i].name,str,l) == 0)
+  for(i=0; mp_cmds[i].name[0]; i++) {
+    if(av_strncasecmp(mp_cmds[i].name,str,l) == 0)
       break;
   }
 
-  if(mp_cmds[i].name == NULL)
+  if(!mp_cmds[i].name[0])
     return NULL;
 
   cmd_def = &mp_cmds[i];
 
   cmd = calloc(1, sizeof(mp_cmd_t));
   cmd->id = cmd_def->id;
-  cmd->name = strdup(cmd_def->name);
+  memcpy(cmd->name, cmd_def->name, sizeof(cmd->name));
   if (pausing == -1) {
     switch (cmd->id) {
       case MP_CMD_KEYDOWN_EVENTS:
       case MP_CMD_SET_MOUSE_POS:
         pausing = 4; break;
       default:
-        pausing = 0; break;
+        pausing = pausing_default; break;
     }
   }
   cmd->pausing = pausing;
@@ -1170,7 +1175,7 @@ interpret_key(int code, int paused)
         break;
     }
     if(j == num_key_down) { // key was not in the down keys : add it
-      if(num_key_down > MP_MAX_KEY_DOWN) {
+      if(num_key_down >= MP_MAX_KEY_DOWN) {
         mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_Err2ManyKeyDowns);
         return NULL;
       }
@@ -1291,6 +1296,8 @@ static mp_cmd_t *read_events(int time, int paused)
 #endif
 
         if (key_fds[i].no_readfunc_retval) {   // getch2 handler special-cased for now
+            // TODO: this is quite broken, using e.g. -cache -dumpaudio
+            // with < /dev/null results in 100% CPU usage.
             ((void (*)(void))key_fds[i].read_func)();
             if (cmd_queue_length)
                 return NULL;
@@ -1379,10 +1386,12 @@ mp_cmd_t*
 mp_input_get_cmd(int time, int paused, int peek_only) {
   mp_cmd_t* ret = NULL;
   mp_cmd_filter_t* cf;
-  int from_queue;
+  int from_queue = 0;
 
-  if (async_quit_request)
-    return mp_input_parse_cmd("quit 1");
+  if (async_quit_request) {
+    ret = mp_input_parse_cmd("quit 1");
+    goto end;
+  }
   while(1) {
     from_queue = 1;
     ret = mp_input_get_queued_cmd(peek_only);
@@ -1407,8 +1416,13 @@ mp_input_get_cmd(int time, int paused, int peek_only) {
     }
   }
 
-  if (!from_queue && peek_only)
-    mp_input_queue_cmd(ret);
+end:
+  // enqueue if necessary, if not possible rather drop
+  // command than leak memory
+  if (!from_queue && peek_only && !mp_input_queue_cmd(ret)) {
+    mp_cmd_free(ret);
+    return NULL;
+  }
 
   return ret;
 }
@@ -1420,8 +1434,6 @@ mp_cmd_free(mp_cmd_t* cmd) {
 //  assert(cmd != NULL);
 //#endif
   if ( !cmd ) return;
-
-  free(cmd->name);
 
   for(i=0; i < MP_CMD_MAX_ARGS && cmd->args[i].type != -1; i++) {
     if(cmd->args[i].type == MP_CMD_ARG_STRING)
@@ -1440,8 +1452,6 @@ mp_cmd_clone(mp_cmd_t* cmd) {
 
   ret = malloc(sizeof(mp_cmd_t));
   memcpy(ret,cmd,sizeof(mp_cmd_t));
-  if(cmd->name)
-    ret->name = strdup(cmd->name);
   for(i = 0;  i < MP_CMD_MAX_ARGS && cmd->args[i].type != -1; i++) {
     if(cmd->args[i].type == MP_CMD_ARG_STRING && cmd->args[i].v.s != NULL)
       ret->args[i].v.s = strdup(cmd->args[i].v.s);
@@ -1456,12 +1466,12 @@ static char*
 mp_input_get_key_name(int key) {
   int i;
 
-  for(i = 0; key_names[i].name != NULL; i++) {
+  for(i = 0; key_names[i].name[0]; i++) {
     if(key_names[i].key == key)
       return key_names[i].name;
   }
 
-  if(isprint(key)) {
+  if(0 <= key && key <= 255 && isprint(key)) {
     snprintf(key_str,12,"%c",(char)key);
     return key_str;
   }
@@ -1474,43 +1484,44 @@ mp_input_get_key_name(int key) {
 
 int
 mp_input_get_key_from_name(const char *name) {
+  uint32_t utf8 = 0;
   int i,ret = 0,len = strlen(name);
   if(len == 1) { // Direct key code
     ret = (unsigned char)name[0];
     return ret;
-  } else if(len > 2 && strncasecmp("0x",name,2) == 0)
+  } else if(len > 2 && av_strncasecmp("0x",name,2) == 0)
     return strtol(name,NULL,16);
 
-  for(i = 0; key_names[i].name != NULL; i++) {
-    if(strcasecmp(key_names[i].name,name) == 0)
+  for(i = 0; key_names[i].name[0]; i++) {
+    if(av_strcasecmp(key_names[i].name,name) == 0)
       return key_names[i].key;
   }
+
+  GET_UTF8(utf8, (uint8_t)*name++, return -1;)
+  if (*name == 0 && utf8 < KEY_BASE)
+    return utf8;
 
   return -1;
 }
 
 static int
 mp_input_get_input_from_name(char* name,int* keys) {
-  char *end,*ptr;
+  char *ptr;
   int n=0;
 
   ptr = name;
-  n = 0;
-  for(end = strchr(ptr,'-') ; ptr != NULL ; end = strchr(ptr,'-')) {
+  for(n = 0; ptr && *ptr && n < MP_MAX_KEY_DOWN; n++) {
+    char *end = strchr(ptr,'-');
     if(end && end[1] != '\0') {
       if(end[1] == '-')
-        end = &end[1];
+        end++;
       end[0] = '\0';
     }
     keys[n] = mp_input_get_key_from_name(ptr);
     if(keys[n] < 0) {
       return 0;
     }
-    n++;
-    if(end && end[1] != '\0' && n < MP_MAX_KEY_DOWN)
-      ptr = &end[1];
-    else
-      break;
+    ptr = end + !!end;
   }
   keys[n] = 0;
   return 1;
@@ -1576,10 +1587,15 @@ mp_input_free_binds(mp_cmd_bind_t* binds) {
 
 }
 
+static void strmove(char *dst, const char *src) {
+  memmove(dst, src, strlen(src) + 1);
+}
+
 static int
 mp_input_parse_config(char *file) {
+  int res = 0;
   int fd;
-  int bs = 0,r,eof = 0,comments = 0;
+  int eof = 0,comments = 0;
   char *iter,*end;
   char buffer[BS_MAX];
   int n_binds = 0, keys[MP_MAX_KEY_DOWN+1] = { 0 };
@@ -1594,54 +1610,50 @@ mp_input_parse_config(char *file) {
 
   mp_msg(MSGT_INPUT,MSGL_V,"Parsing input config file %s\n",file);
 
+  buffer[0] = 0;
   while(1) {
+    int bs = strlen(buffer);
     if(! eof && bs < BS_MAX-1) {
-      if(bs > 0) bs--;
-      r = read(fd,buffer+bs,BS_MAX-1-bs);
+      int r = read(fd,buffer+bs,BS_MAX-1-bs);
+      if (r > 0) bs += r;
+      buffer[bs] = 0;
       if(r < 0) {
         if(errno == EINTR)
           continue;
         mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrReadingInputConfig,file,strerror(errno));
-        close(fd);
-        return 0;
-      } else if(r == 0) {
-        eof = 1;
-      } else {
-        bs += r+1;
-        buffer[bs-1] = '\0';
+        break;
       }
+      eof = r == 0;
     }
     // Empty buffer : return
-    if(bs <= 1) {
+    if(!buffer[0]) {
       mp_msg(MSGT_INPUT,MSGL_V,"Input config file %s parsed: %d binds\n",file,n_binds);
-      close(fd);
-      return 1;
+      res = 1;
+      break;
     }
 
     iter = buffer;
 
     if(comments) {
-      for( ; iter[0] != '\0' && iter[0] != '\n' ; iter++)
+      // search for newline ending comment
+      for( ; iter[0] && iter[0] != '\n' ; iter++)
         /* NOTHING */;
-      if(iter[0] == '\0') { // Buffer was full of comment
-        bs = 0;
+      if(!iter[0]) { // Buffer was full of comment
+        buffer[0] = 0;
         continue;
       }
-      iter++;
-      r = strlen(iter);
-      memmove(buffer,iter,r+1);
-      bs = r+1;
       comments = 0;
+      strmove(buffer, iter+1);
       continue;
     }
 
     // Find the wanted key
     if(keys[0] == 0) {
       // Jump beginning space
-      for(  ; iter[0] != '\0' && strchr(SPACE_CHAR,iter[0]) != NULL ; iter++)
+      for(  ; iter[0] && strchr(SPACE_CHAR,iter[0]) != NULL ; iter++)
         /* NOTHING */;
-      if(iter[0] == '\0') { // Buffer was full of space char
-        bs = 0;
+      if(!iter[0]) { // Buffer was full of space char
+        buffer[0] = 0;
         continue;
       }
       if(iter[0] == '#') { // Comments
@@ -1649,33 +1661,22 @@ mp_input_parse_config(char *file) {
         continue;
       }
       // Find the end of the key code name
-      for(end = iter; end[0] != '\0' && strchr(SPACE_CHAR,end[0]) == NULL ; end++)
+      for(end = iter; end[0] && strchr(SPACE_CHAR,end[0]) == NULL ; end++)
         /*NOTHING */;
-      if(end[0] == '\0') { // Key name doesn't fit in the buffer
+      if(!end[0]) { // Key name doesn't fit in the buffer
         if(buffer == iter) {
-          if(eof && (buffer-iter) == bs)
-            mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnfinishedBinding,iter);
-          else
-            mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName,iter);
-          return 0;
+          mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName,iter);
+          break;
         }
-        memmove(buffer,iter,end-iter);
-        bs = end-iter;
+        strmove(buffer,iter);
         continue;
       }
-      {
-        char name[end-iter+1];
-        strncpy(name,iter,end-iter);
-        name[end-iter] = '\0';
-        if(! mp_input_get_input_from_name(name,keys)) {
-          mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnknownKey,name);
-          close(fd);
-          return 0;
+        end[0] = 0;
+        if(! mp_input_get_input_from_name(iter,keys)) {
+          mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrUnknownKey,iter);
+          break;
         }
-      }
-      if( bs > (end-buffer))
-        memmove(buffer,end,bs - (end-buffer));
-      bs -= end-buffer;
+      strmove(buffer,end+1);
       continue;
     } else { // Get the command
       while(iter[0] == ' ' || iter[0] == '\t') iter++;
@@ -1687,45 +1688,29 @@ mp_input_parse_config(char *file) {
           mp_msg(MSGT_INPUT,MSGL_ERR,"-%s",mp_input_get_key_name(keys[i]));
         mp_msg(MSGT_INPUT,MSGL_ERR,"\n");
         keys[0] = 0;
-        if(iter > buffer) {
-          memmove(buffer,iter,bs- (iter-buffer));
-          bs -= (iter-buffer);
-        }
+        strmove(buffer,iter+1);
         continue;
       }
-      for(end = iter ; end[0] != '\n' && end[0] != '\r' && end[0] != '\0' ; end++)
+      for(end = iter ; end[0] != '\n' && end[0] != '\r' && end[0] ; end++)
         /* NOTHING */;
-      if(end[0] == '\0' && ! (eof && ((end+1) - buffer) == bs)) {
+      if(!end[0]) {
         if(iter == buffer) {
           mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd,buffer);
-          close(fd);
-          return 0;
+          break;
         }
-        memmove(buffer,iter,end - iter);
-        bs = end - iter;
+        strmove(buffer,iter);
         continue;
       }
-      {
-        char cmd[end-iter+1];
-        strncpy(cmd,iter,end-iter);
-        cmd[end-iter] = '\0';
-        //printf("Set bind %d => %s\n",keys[0],cmd);
-        mp_input_bind_keys(keys,cmd);
+        end[0] = 0;
+        mp_input_bind_keys(keys,iter);
         n_binds++;
-      }
       keys[0] = 0;
-      end++;
-      if(bs > (end-buffer))
-        memmove(buffer,end,bs-(end-buffer));
-      bs -= (end-buffer);
-      buffer[bs-1] = '\0';
+      strmove(buffer,end+1);
       continue;
     }
   }
-  mp_msg(MSGT_INPUT,MSGL_ERR,MSGTR_INPUT_INPUT_ErrWhyHere);
   close(fd);
-  mp_input_set_section(NULL);
-  return 0;
+  return res;
 }
 
 void
@@ -1842,6 +1827,7 @@ void
 mp_input_uninit(void) {
   unsigned int i;
   mp_cmd_bind_section_t* bind_section;
+  mp_cmd_t *cmd;
 
   for(i=0; i < num_key_fd; i++) {
     if(key_fds[i].close_func)
@@ -1860,6 +1846,11 @@ mp_input_uninit(void) {
     cmd_binds_section=bind_section;
   }
   cmd_binds_section=NULL;
+  // Drop command queue contents to avoid valgrind
+  // warnings
+  while ((cmd = mp_input_get_queued_cmd(0)))
+    mp_cmd_free(cmd);
+  mplayer_key_fifo_uninit();
 }
 
 void
@@ -1870,7 +1861,7 @@ mp_input_register_options(m_config_t* cfg) {
 static int mp_input_print_key_list(m_option_t* cfg) {
   int i;
   printf("\n");
-  for(i= 0; key_names[i].name != NULL ; i++)
+  for(i= 0; key_names[i].name[0] ; i++)
     printf("%s\n",key_names[i].name);
   exit(0);
 }
@@ -1880,7 +1871,7 @@ static int mp_input_print_cmd_list(m_option_t* cfg) {
   int i,j;
   const char* type;
 
-  for(i = 0; (cmd = &mp_cmds[i])->name != NULL ; i++) {
+  for(i = 0; (cmd = &mp_cmds[i])->name[0] ; i++) {
     printf("%-20.20s",cmd->name);
     for(j= 0 ; j < MP_CMD_MAX_ARGS && cmd->args[j].type != -1 ; j++) {
       switch(cmd->args[j].type) {
@@ -1911,8 +1902,9 @@ static int mp_input_print_cmd_list(m_option_t* cfg) {
  */
 int
 mp_input_check_interrupt(int time) {
-  mp_cmd_t* cmd;
-  if((cmd = mp_input_get_cmd(time,0,1)) == NULL)
+  mp_cmd_t *cmd = mp_input_get_cmd(time,0,1);
+  // Note: we must not free this, since we only peeked
+  if (!cmd)
     return 0;
   switch(cmd->id) {
   case MP_CMD_QUIT:

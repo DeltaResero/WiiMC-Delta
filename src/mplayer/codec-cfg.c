@@ -43,17 +43,22 @@
 
 #include "config.h"
 #include "mp_msg.h"
-#ifdef CODECS2HTML
+#if defined(CODECS2HTML) || defined(TESTING)
 #ifdef __GNUC__
 #define mp_msg(t, l, m, args...) fprintf(stderr, m, ##args)
 #else
 #define mp_msg(t, l, ...) fprintf(stderr, __VA_ARGS__)
 #endif
+#include <strings.h>
+#define av_strcasecmp(a, b) strcasecmp(a, b)
+#else
+#include <libavutil/avstring.h>
 #endif
 
 #include "help_mp.h"
 
 #include "libavutil/avutil.h"
+#include "libavutil/common.h"
 #include "libmpcodecs/img_format.h"
 #include "codec-cfg.h"
 
@@ -178,12 +183,20 @@ static const struct {
     {"420P16LE",    IMGFMT_420P16_LE},
     {"420P16BE",    IMGFMT_420P16_BE},
     {"444P16",      IMGFMT_444P16},
+    {"444P14",      IMGFMT_444P14},
+    {"444P12",      IMGFMT_444P12},
     {"444P10",      IMGFMT_444P10},
     {"444P9",       IMGFMT_444P9},
     {"422P16",      IMGFMT_422P16},
+    {"422P14",      IMGFMT_422P14},
+    {"422P12",      IMGFMT_422P12},
     {"422P10",      IMGFMT_422P10},
     {"422P9",       IMGFMT_422P9},
+    {"440P12",      IMGFMT_440P12},
+    {"440P10",      IMGFMT_440P10},
     {"420P16",      IMGFMT_420P16},
+    {"420P14",      IMGFMT_420P14},
+    {"420P12",      IMGFMT_420P12},
     {"420P10",      IMGFMT_420P10},
     {"420P9",       IMGFMT_420P9},
     {"420A",        IMGFMT_420A},
@@ -194,7 +207,11 @@ static const struct {
     {"411P",        IMGFMT_411P},
     {"440P",        IMGFMT_440P},
     {"Y800",        IMGFMT_Y800},
+    {"Y8A",         IMGFMT_Y8A},
     {"Y8",          IMGFMT_Y8},
+    {"Y16LE",       IMGFMT_Y16_LE},
+    {"Y16BE",       IMGFMT_Y16_BE},
+    {"Y16",         IMGFMT_Y16},
 
     {"YUY2",        IMGFMT_YUY2},
     {"UYVY",        IMGFMT_UYVY},
@@ -204,6 +221,8 @@ static const struct {
     {"RGB64BE",     IMGFMT_RGB64BE},
     {"RGB48LE",     IMGFMT_RGB48LE},
     {"RGB48BE",     IMGFMT_RGB48BE},
+    {"BGR48LE",     IMGFMT_BGR48LE},
+    {"BGR48BE",     IMGFMT_BGR48BE},
     {"RGB4",        IMGFMT_RGB4},
     {"RGB8",        IMGFMT_RGB8},
     {"RGB15",       IMGFMT_RGB15},
@@ -211,25 +230,29 @@ static const struct {
     {"RGB24",       IMGFMT_RGB24},
     {"RGB32",       IMGFMT_RGB32},
     {"RGBA",        IMGFMT_RGBA},
+    {"ARGB",        IMGFMT_ARGB},
     {"BGR4",        IMGFMT_BGR4},
     {"BGR8",        IMGFMT_BGR8},
     {"BGR15LE",     IMGFMT_BGR15LE},
+    {"BGR12",       IMGFMT_BGR12},
     {"BGR15",       IMGFMT_BGR15},
     {"BGR16",       IMGFMT_BGR16},
     {"BGR24",       IMGFMT_BGR24},
     {"BGR32",       IMGFMT_BGR32},
     {"BGRA",        IMGFMT_BGRA},
+    {"ABGR",        IMGFMT_ABGR},
     {"RGB1",        IMGFMT_RGB1},
     {"BGR1",        IMGFMT_BGR1},
+    {"XYZ12",       IMGFMT_XYZ12},
     {"GBR24P",      IMGFMT_GBR24P},
+    {"GBR12P",      IMGFMT_GBR12P},
+    {"GBR14P",      IMGFMT_GBR14P},
+    {"GBR10P",      IMGFMT_GBR10P},
 
     {"MPES",        IMGFMT_MPEGPES},
     {"ZRMJPEGNI",   IMGFMT_ZRMJPEGNI},
     {"ZRMJPEGIT",   IMGFMT_ZRMJPEGIT},
     {"ZRMJPEGIB",   IMGFMT_ZRMJPEGIB},
-
-    {"IDCT_MPEG2",  IMGFMT_XVMC_IDCT_MPEG2},
-    {"MOCO_MPEG2",  IMGFMT_XVMC_MOCO_MPEG2},
 
     {"VDPAU_MPEG1", IMGFMT_VDPAU_MPEG1},
     {"VDPAU_MPEG2", IMGFMT_VDPAU_MPEG2},
@@ -237,6 +260,7 @@ static const struct {
     {"VDPAU_WMV3",  IMGFMT_VDPAU_WMV3},
     {"VDPAU_VC1",   IMGFMT_VDPAU_VC1},
     {"VDPAU_MPEG4", IMGFMT_VDPAU_MPEG4},
+    {"VDPAU_HEVC",  IMGFMT_VDPAU_HEVC},
 
     {NULL,    0}
 };
@@ -246,7 +270,7 @@ static int add_to_inout(char *sfmt, char *sflags, unsigned int *outfmt,
                         unsigned char *outflags)
 {
 
-    static char *flagstr[] = {
+    static const char * const flagstr[] = {
         "flip",
         "noflip",
         "yuvhack",
@@ -379,28 +403,29 @@ static short get_driver(char *s,int audioflag)
 static int validate_codec(codecs_t *c, int type)
 {
     unsigned int i;
-    char *tmp_name = c->name;
+    const char *name = codec_idx2str(c->name_idx);
+    const char *tmp_name = name;
 
     for (i = 0; i < strlen(tmp_name) && isalnum(tmp_name[i]); i++)
         /* NOTHING */;
 
     if (i < strlen(tmp_name)) {
-        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_InvalidCodecName, c->name);
+        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_InvalidCodecName, name);
         return 0;
     }
 
-    if (!c->info)
-        c->info = strdup(c->name);
+    if (!c->info_idx)
+        c->info_idx = c->name_idx;
 
 #if 0
     if (c->fourcc[0] == 0xffffffff) {
-        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecLacksFourcc, c->name);
+        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecLacksFourcc, name);
         return 0;
     }
 #endif
 
-    if (!c->drv) {
-        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecLacksDriver, c->name);
+    if (!c->drv_idx) {
+        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecLacksDriver, name);
         return 0;
     }
 
@@ -409,7 +434,7 @@ static int validate_codec(codecs_t *c, int type)
 //FIXME: Where are they defined ????????????
     if (!c->dll && (c->driver == 4 ||
                 (c->driver == 2 && type == TYPE_VIDEO))) {
-        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecNeedsDLL, c->name);
+        mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecNeedsDLL, name);
         return 0;
     }
 // FIXME: Can guid.f1 be 0? How does one know that it was not given?
@@ -417,7 +442,7 @@ static int validate_codec(codecs_t *c, int type)
 
     if (type == TYPE_VIDEO)
         if (c->outfmt[0] == 0xffffffff) {
-            mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecNeedsOutfmt, c->name);
+            mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecNeedsOutfmt, name);
             return 0;
         }
 #endif
@@ -444,7 +469,7 @@ static int add_comment(char *s, char **d)
 
 static short get_cpuflags(char *s)
 {
-    static char *flagstr[] = {
+    static const char * const flagstr[] = {
         "mmx",
         "sse",
         "3dnow",
@@ -538,14 +563,55 @@ out_eol:
 
 static codecs_t *video_codecs=NULL;
 static codecs_t *audio_codecs=NULL;
+static char *codec_strs = NULL;
+static unsigned codec_strs_len = 0;
 static int nr_vcodecs = 0;
 static int nr_acodecs = 0;
+
+const char *codec_idx2str(unsigned idx)
+{
+    if (idx >= codec_strs_len) return NULL;
+    if (idx > 0 && codec_strs[idx - 1]) return NULL;
+    return codec_strs + idx;
+}
+
+static unsigned codec_addstr(const char *s)
+{
+#ifdef CODECS2HTML
+    int i;
+#endif
+    int len;
+    char *newstr;
+    if (!s || !s[0]) return 0;
+    len = strlen(s) + 1;
+#ifdef CODECS2HTML
+    // try to de-duplicate
+    for (i = 1; i < codec_strs_len; ) {
+        int curlen = strlen(codec_strs + i) + 1;
+        if (len == curlen && !strcmp(s, codec_strs + i))
+            return i;
+        i += curlen;
+    }
+#endif
+    if (codec_strs_len) {
+        newstr = realloc(codec_strs, codec_strs_len + len);
+    } else {
+        codec_strs_len = 1;
+        newstr = calloc(1, 1 + len);
+    }
+    if (!newstr) return 0;
+    codec_strs = newstr;
+    memcpy(codec_strs + codec_strs_len, s, len);
+    codec_strs_len += len;
+    return codec_strs_len - len;
+}
 
 int parse_codec_cfg(const char *cfgfile)
 {
     codecs_t *codec = NULL; // current codec
     codecs_t **codecsp = NULL;// points to audio_codecs or to video_codecs
     char *endptr;   // strtoul()...
+    char *comment = NULL;
     int *nr_codecsp;
     int codec_type;     /* TYPE_VIDEO/TYPE_AUDIO */
     int tmp, i;
@@ -564,6 +630,8 @@ int parse_codec_cfg(const char *cfgfile)
         audio_codecs = builtin_audio_codecs;
         nr_vcodecs = sizeof(builtin_video_codecs)/sizeof(codecs_t);
         nr_acodecs = sizeof(builtin_audio_codecs)/sizeof(codecs_t);
+        codec_strs = builtin_codec_strs;
+        codec_strs_len = sizeof(builtin_codec_strs);
         return 1;
 #endif
     }
@@ -616,6 +684,9 @@ int parse_codec_cfg(const char *cfgfile)
             continue;
         if (!strcmp(token[0], "audiocodec") ||
             !strcmp(token[0], "videocodec")) {
+            codec->comment_idx = codec_addstr(comment);
+            free(comment);
+            comment = NULL;
             if (!validate_codec(codec, codec_type))
                 goto err_out_not_valid;
         loop_enter:
@@ -648,27 +719,27 @@ int parse_codec_cfg(const char *cfgfile)
             if (get_token(1, 1) < 0)
                 goto err_out_parse_error;
             for (i = 0; i < *nr_codecsp - 1; i++) {
-                if(( (*codecsp)[i].name!=NULL) &&
-                   (!strcmp(token[0], (*codecsp)[i].name)) ) {
+                if(( (*codecsp)[i].name_idx) &&
+                   (!strcmp(token[0], codec_idx2str((*codecsp)[i].name_idx))) ) {
                     mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CodecNameNotUnique, token[0]);
                     goto err_out_print_linenum;
                 }
             }
-            if (!(codec->name = strdup(token[0]))) {
+            if (!(codec->name_idx = codec_addstr(token[0]))) {
                 mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CantStrdupName, strerror(errno));
                 goto err_out;
             }
         } else if (!strcmp(token[0], "info")) {
-            if (codec->info || get_token(1, 1) < 0)
+            if (codec->info_idx || get_token(1, 1) < 0)
                 goto err_out_parse_error;
-            if (!(codec->info = strdup(token[0]))) {
+            if (!(codec->info_idx = codec_addstr(token[0]))) {
                 mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CantStrdupInfo, strerror(errno));
                 goto err_out;
             }
         } else if (!strcmp(token[0], "comment")) {
             if (get_token(1, 1) < 0)
                 goto err_out_parse_error;
-            add_comment(token[0], &codec->comment);
+            add_comment(token[0], &comment);
         } else if (!strcmp(token[0], "fourcc")) {
             if (get_token(1, 2) < 0)
                 goto err_out_parse_error;
@@ -685,14 +756,14 @@ int parse_codec_cfg(const char *cfgfile)
         } else if (!strcmp(token[0], "driver")) {
             if (get_token(1, 1) < 0)
                 goto err_out_parse_error;
-            if (!(codec->drv = strdup(token[0]))) {
+            if (!(codec->drv_idx = codec_addstr(token[0]))) {
                 mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CantStrdupDriver, strerror(errno));
                 goto err_out;
             }
         } else if (!strcmp(token[0], "dll")) {
             if (get_token(1, 1) < 0)
                 goto err_out_parse_error;
-            if (!(codec->dll = strdup(token[0]))) {
+            if (!(codec->dll_idx = codec_addstr(token[0]))) {
                 mp_msg(MSGT_CODECCFG,MSGL_ERR,MSGTR_CantStrdupDLL, strerror(errno));
                 goto err_out;
             }
@@ -738,17 +809,20 @@ int parse_codec_cfg(const char *cfgfile)
             if (!strcmp(token[0], "align16"))
                 codec->flags |= CODECS_FLAG_ALIGN16;
             else
+            if (!strcmp(token[0], "dummy"))
+                codec->flags |= CODECS_FLAG_DUMMY;
+            else
                 goto err_out_parse_error;
         } else if (!strcmp(token[0], "status")) {
             if (get_token(1, 1) < 0)
                 goto err_out_parse_error;
-            if (!strcasecmp(token[0], "working"))
+            if (!av_strcasecmp(token[0], "working"))
                 codec->status = CODECS_STATUS_WORKING;
-            else if (!strcasecmp(token[0], "crashing"))
+            else if (!av_strcasecmp(token[0], "crashing"))
                 codec->status = CODECS_STATUS_NOT_WORKING;
-            else if (!strcasecmp(token[0], "untested"))
+            else if (!av_strcasecmp(token[0], "untested"))
                 codec->status = CODECS_STATUS_UNTESTED;
-            else if (!strcasecmp(token[0], "buggy"))
+            else if (!av_strcasecmp(token[0], "buggy"))
                 codec->status = CODECS_STATUS_PROBLEMS;
             else
                 goto err_out_parse_error;
@@ -763,8 +837,8 @@ int parse_codec_cfg(const char *cfgfile)
     if (!validate_codec(codec, codec_type))
         goto err_out_not_valid;
     mp_msg(MSGT_CODECCFG,MSGL_INFO,MSGTR_AudioVideoCodecTotals, nr_acodecs, nr_vcodecs);
-    if(video_codecs) video_codecs[nr_vcodecs].name = NULL;
-    if(audio_codecs) audio_codecs[nr_acodecs].name = NULL;
+    if(video_codecs) video_codecs[nr_vcodecs].name_idx = 0;
+    if(audio_codecs) audio_codecs[nr_acodecs].name_idx = 0;
 out:
     free(line);
     line=NULL;
@@ -791,26 +865,14 @@ err_out_release_num:
     goto err_out_print_linenum;
 }
 
-static void codecs_free(codecs_t* codecs,int count) {
-    int i;
-    for ( i = 0; i < count; i++)
-        if ( codecs[i].name ) {
-            free(codecs[i].name);
-            free(codecs[i].info);
-            free(codecs[i].comment);
-            free(codecs[i].dll);
-            free(codecs[i].drv);
-        }
-    free(codecs);
-}
-
 void codecs_uninit_free(void) {
-    if (video_codecs)
-    codecs_free(video_codecs,nr_vcodecs);
+    free(video_codecs);
     video_codecs=NULL;
-    if (audio_codecs)
-    codecs_free(audio_codecs,nr_acodecs);
+    free(audio_codecs);
     audio_codecs=NULL;
+    free(codec_strs);
+    codec_strs=NULL;
+    codec_strs_len = 0;
 }
 
 #ifdef GEKKO
@@ -819,6 +881,8 @@ void load_builtin_codecs() {
     audio_codecs = builtin_audio_codecs;
     nr_vcodecs = sizeof(builtin_video_codecs)/sizeof(codecs_t);
     nr_acodecs = sizeof(builtin_audio_codecs)/sizeof(codecs_t);
+    codec_strs = builtin_codec_strs;
+    codec_strs_len = sizeof(builtin_codec_strs);
 }
 #endif
 
@@ -865,8 +929,7 @@ codecs_t* find_codec(unsigned int fourcc,unsigned int *fourccmap,
         for (/* NOTHING */; i--; c++) {
             if(start && c<=start) continue;
             for (j = 0; j < CODECS_MAX_FOURCC; j++) {
-                // FIXME: do NOT hardwire 'null' name here:
-                if (c->fourcc[j]==fourcc || !strcmp(c->drv,"null")) {
+                if (c->fourcc[j]==fourcc || c->flags & CODECS_FLAG_DUMMY) {
                     if (fourccmap)
                         *fourccmap = c->fourccmap[j];
                     return c;
@@ -928,16 +991,21 @@ void list_codecs(int audioflag){
         case CODECS_STATUS_NOT_WORKING: s="crashing";break;
         case CODECS_STATUS_UNTESTED:    s="untested";break;
         }
-        if(c->dll)
-            mp_msg(MSGT_CODECCFG,MSGL_INFO,"%-11s %-9s %s  %s  [%s]\n",c->name,c->drv,s,c->info,c->dll);
+        if(c->dll_idx)
+            mp_msg(MSGT_CODECCFG,MSGL_INFO,"%-11s %-9s %s  %s  [%s]\n",
+                   codec_idx2str(c->name_idx),
+                   codec_idx2str(c->drv_idx),s,codec_idx2str(c->info_idx),
+                   codec_idx2str(c->dll_idx));
         else
-            mp_msg(MSGT_CODECCFG,MSGL_INFO,"%-11s %-9s %s  %s\n",c->name,c->drv,s,c->info);
+            mp_msg(MSGT_CODECCFG,MSGL_INFO,"%-11s %-9s %s  %s\n",
+                   codec_idx2str(c->name_idx),
+                   codec_idx2str(c->drv_idx),s,codec_idx2str(c->info_idx));
         }
 }
 
 
 #ifdef CODECS2HTML
-static void wrapline(FILE *f2,char *s){
+static void wrapline(FILE *f2,const char *s){
     int c;
     if(!s){
         fprintf(f2,"-");
@@ -961,15 +1029,15 @@ static void parsehtml(FILE *f1,FILE *f2,codecs_t *codec){
         case '.':
         return; // end of section
         case 'n':
-            wrapline(f2,codec->name); break;
+            wrapline(f2,codec_idx2str(codec->name_idx)); break;
         case 'i':
-            wrapline(f2,codec->info); break;
+            wrapline(f2,codec_idx2str(codec->info_idx)); break;
         case 'c':
-            wrapline(f2,codec->comment); break;
+            wrapline(f2,codec_idx2str(codec->comment_idx)); break;
         case 'd':
-            wrapline(f2,codec->dll); break;
+            wrapline(f2,codec_idx2str(codec->dll_idx)); break;
         case 'D':
-            fprintf(f2,"%c",!strcmp(codec->drv,"dshow")?'+':'-'); break;
+            fprintf(f2,"%c",!strcmp(codec_idx2str(codec->drv_idx),"dshow")?'+':'-'); break;
         case 'F':
             for(d=0;d<CODECS_MAX_FOURCC;d++)
                 if(!d || codec->fourcc[d]!=0xFFFFFFFF)
@@ -1027,12 +1095,6 @@ static void print_char_array(const unsigned char* a, int size)
         else
             printf("0x%02x%s", *a++, size?", ":"");
     printf(" }");
-}
-
-static void print_string(const char* s)
-{
-    if (!s) printf("NULL");
-    else printf("\"%s\"", s);
 }
 
 int main(int argc, char* argv[])
@@ -1099,11 +1161,10 @@ int main(int argc, char* argv[])
                 print_char_array(cod[i][j].inflags, CODECS_MAX_INFMT);
                 printf(", /* inflags */\n");
 
-                print_string(cod[i][j].name);    printf(", /* name */\n");
-                print_string(cod[i][j].info);    printf(", /* info */\n");
-                print_string(cod[i][j].comment); printf(", /* comment */\n");
-                print_string(cod[i][j].dll);     printf(", /* dll */\n");
-                print_string(cod[i][j].drv);     printf(", /* drv */\n");
+                printf("%i, /* name */\n%i, /* info */\n"
+                       "%i, /* comment */\n%i, /* dll */\n%i, /* drv */\n",
+                       cod[i][j].name_idx, cod[i][j].info_idx,
+                       cod[i][j].comment_idx, cod[i][j].dll_idx, cod[i][j].drv_idx);
 
                 printf("{ 0x%08lx, %hu, %hu,",
                        cod[i][j].guid.f1,
@@ -1119,6 +1180,9 @@ int main(int argc, char* argv[])
             }
             printf("};\n\n");
         }
+        printf("const char builtin_codec_strs[] = ");
+        print_char_array(codec_strs, codec_strs_len);
+        printf(";\n");
         exit(0);
     }
 
@@ -1223,10 +1287,10 @@ next:
         for(i=0;i<nr_codecs;i++, c++){
             printf("\n============== %scodec %02d ===============\n",
                    state==0?"video":"audio",i);
-            printf("name='%s'\n",c->name);
-            printf("info='%s'\n",c->info);
-            printf("comment='%s'\n",c->comment);
-            printf("dll='%s'\n",c->dll);
+            printf("name='%s'\n",codec_idx2str(c->name_idx));
+            printf("info='%s'\n",codec_idx2str(c->info_idx));
+            printf("comment='%s'\n",codec_idx2str(c->comment_idx));
+            printf("dll='%s'\n",codec_idx2str(c->dll_idx));
             /* printf("flags=%X  driver=%d status=%d cpuflags=%d\n",
                       c->flags, c->driver, c->status, c->cpuflags); */
             printf("flags=%X status=%d cpuflags=%d\n",

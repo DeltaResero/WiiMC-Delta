@@ -35,6 +35,9 @@
 #else
 #define MSG_OOB 0x01 //scip
 #endif
+
+#include "libavutil/avutil.h"
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "network.h"
 #include "stream.h"
@@ -43,7 +46,7 @@
 #include "m_struct.h"
 #include "tcp.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* user;
   char* pass;
   char* host;
@@ -54,18 +57,15 @@ static struct stream_priv_s {
   int handle;
   int cavail,cleft;
   char *buf;
+  char *cmd_buf;
 } stream_priv_dflts = {
-  "anonymous","no@spam",
-  NULL,
-  21,
-  NULL,
-  NULL,
-  NULL,
-
-  0,
-  0,0,
-  NULL
+  .user = "anonymous",
+  .pass = "no@spam",
+  .port = 21,
+  .handle = -1,
 };
+
+#define CMD_BUFSIZE 8192
 
 #define BUFSIZE 2048
 
@@ -107,6 +107,14 @@ static int fd_can_read(int fd,int timeout) {
 /*
  * read a line of text
  *
+ * If the line is too long to fit in the buffer, provided via parameters
+ * buf and max, the remaining characters are skipped. So the next call to
+ * this function is synchronized to the start of the following response
+ * line.
+ *
+ * The parameter buf will always be initialized as long as max is bigger
+ * then 1. If nothing is read it will contain an empty string.
+ *
  * return -1 on error or bytecount
  */
 static int readline(char *buf,int max,struct stream_priv_s *ctl)
@@ -115,9 +123,14 @@ static int readline(char *buf,int max,struct stream_priv_s *ctl)
     char *end,*bp=buf;
     int eof = 0;
 
+    if (max <= 0) {
+      return -1;
+    }
+    *bp = '\0';
+
     do {
       if (ctl->cavail > 0) {
-        x = (max >= ctl->cavail) ? ctl->cavail : max-1;
+        x = FFMIN(ctl->cavail, max-1);
         end = memccpy(bp,ctl->cget,'\n',x);
         if (end != NULL)
           x = end - bp;
@@ -138,8 +151,18 @@ static int readline(char *buf,int max,struct stream_priv_s *ctl)
         }
       }
       if (max == 1) {
-        *buf = '\0';
-        break;
+        char *q = memchr(ctl->cget, '\n', ctl->cavail);
+
+        if (q) { // found EOL: update state and return
+          ++q;
+          ctl->cavail -= q - ctl->cget;
+          ctl->cget = q;
+
+          break;
+        }
+
+        // receive more data to find end of current line
+        ctl->cget = ctl->cput;
       }
       if (ctl->cput == ctl->cget) {
         ctl->cput = ctl->cget = ctl->buf;
@@ -183,13 +206,14 @@ static int readresp(struct stream_priv_s* ctl,char* rsp)
 {
     static char response[256];
     char match[5];
-    int r;
+    int r, len;
 
-    if (readline(response,256,ctl) == -1)
+    len = readline(response,256,ctl);
+    if (rsp) strcpy(rsp,response);
+    if (len == -1)
       return 0;
 
     r = atoi(response)/100;
-    if(rsp) strcpy(rsp,response);
 
     mp_msg(MSGT_STREAM,MSGL_V, "[ftp] < %s",response);
 
@@ -255,7 +279,7 @@ static int FtpOpenPort(struct stream_priv_s* p) {
 
   sscanf(par+1,"%u,%u,%u,%u,%u,%u",&num[0],&num[1],&num[2],
          &num[3],&num[4],&num[5]);
-  snprintf(str,127,"%d.%d.%d.%d",num[0],num[1],num[2],num[3]);
+  snprintf(str,sizeof(str),"%d.%d.%d.%d",num[0],num[1],num[2],num[3]);
   fd = connect2Server(str,(num[4]<<8)+num[5],0);
 
   if(fd < 0)
@@ -264,10 +288,10 @@ static int FtpOpenPort(struct stream_priv_s* p) {
   return fd;
 }
 
-static int FtpOpenData(stream_t* s,off_t newpos) {
+static int FtpOpenData(stream_t* s, int64_t newpos) {
   struct stream_priv_s* p = s->priv;
   int resp;
-  char str[256],rsp_txt[256];
+  char rsp_txt[256];
 
   // Open a new connection
   s->fd = FtpOpenPort(p);
@@ -275,21 +299,21 @@ static int FtpOpenData(stream_t* s,off_t newpos) {
   if(s->fd < 0) return 0;
 
   if(newpos > 0) {
-    snprintf(str,255,"REST %"PRId64, (int64_t)newpos);
+    snprintf(p->cmd_buf,CMD_BUFSIZE,"REST %"PRIu64, newpos);
 
-    resp = FtpSendCmd(str,p,rsp_txt);
+    resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
     if(resp != 3) {
-      mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
+      mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
       newpos = 0;
     }
   }
 
   // Get the file
-  snprintf(str,255,"RETR %s",p->filename);
-  resp = FtpSendCmd(str,p,rsp_txt);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"RETR %s",p->filename);
+  resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
 
   if(resp != 1) {
-    mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
+    mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
     return 0;
   }
 
@@ -312,7 +336,7 @@ static int fill_buffer(stream_t *s, char* buffer, int max_len){
   return (r <= 0) ? -1 : r;
 }
 
-static int seek(stream_t *s,off_t newpos) {
+static int seek(stream_t *s, int64_t newpos) {
   struct stream_priv_s* p = s->priv;
   int resp;
   char rsp_txt[256];
@@ -337,7 +361,7 @@ static int seek(stream_t *s,off_t newpos) {
 
     // First close the fd
     closesocket(s->fd);
-    s->fd = 0;
+    s->fd = -1;
 
     // Send send the telnet sequence needed to make the server react
 
@@ -373,26 +397,29 @@ static void close_f(stream_t *s) {
 
   if(!p) return;
 
-  if(s->fd > 0) {
+  if(s->fd >= 0) {
     closesocket(s->fd);
-    s->fd = 0;
+    s->fd = -1;
   }
 
-  FtpSendCmd("QUIT",p,NULL);
+  if (p->handle >= 0) {
+    FtpSendCmd("QUIT", p, NULL);
+    closesocket(p->handle);
+  }
 
-  if(p->handle) closesocket(p->handle);
   free(p->buf);
+  free(p->cmd_buf);
 
   m_struct_free(&stream_opts,p);
 }
 
 
 
-static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
+static int open_f(stream_t *stream,int mode, void* opts, av_unused int* file_format) {
   int resp;
   int64_t len = 0;
-  struct stream_priv_s* p = (struct stream_priv_s*)opts;
-  char str[256],rsp_txt[256];
+  struct stream_priv_s* p = opts;
+  char rsp_txt[256];
 
   if(mode != STREAM_READ) {
     mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] Unknown open mode %d\n",mode);
@@ -402,6 +429,16 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
 
   if(!p->filename || !p->host) {
     mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] Bad url\n");
+    m_struct_free(&stream_opts,opts);
+    return STREAM_ERROR;
+  }
+
+  // Allocate buffers
+  p->buf = malloc(BUFSIZE);
+  p->cmd_buf = malloc(CMD_BUFSIZE);
+
+  if (!p->buf || !p->cmd_buf) {
+    close_f(stream);
     m_struct_free(&stream_opts,opts);
     return STREAM_ERROR;
   }
@@ -417,7 +454,6 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   // We got a connection, let's start serious things
   stream->fd = -1;
   stream->priv = p;
-  p->buf = malloc(BUFSIZE);
 
   if (readresp(p, NULL) == 0) {
     close_f(stream);
@@ -426,20 +462,20 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   }
 
   // Login
-  snprintf(str,255,"USER %s",p->user);
-  resp = FtpSendCmd(str,p,rsp_txt);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"USER %s",p->user);
+  resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
 
   // password needed
   if(resp == 3) {
-    snprintf(str,255,"PASS %s",p->pass);
-    resp = FtpSendCmd(str,p,rsp_txt);
+    snprintf(p->cmd_buf,CMD_BUFSIZE,"PASS %s",p->pass);
+    resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
     if(resp != 2) {
-      mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
+      mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
       close_f(stream);
       return STREAM_ERROR;
     }
   } else if(resp != 2) {
-    mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
+    mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
     close_f(stream);
     return STREAM_ERROR;
   }
@@ -453,10 +489,10 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   }
 
   // Get the filesize
-  snprintf(str,255,"SIZE %s",p->filename);
-  resp = FtpSendCmd(str,p,rsp_txt);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"SIZE %s",p->filename);
+  resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
   if(resp != 2) {
-    mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
+    mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
   } else {
     int dummy;
     sscanf(rsp_txt,"%d %"SCNd64,&dummy,&len);
@@ -475,6 +511,7 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   stream->priv = p;
   stream->fill_buffer = fill_buffer;
   stream->close = close_f;
+  stream->type = STREAMTYPE_STREAM;
 
   return STREAM_OK;
 }

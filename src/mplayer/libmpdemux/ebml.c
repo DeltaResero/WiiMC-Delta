@@ -28,12 +28,8 @@
 #include "ebml.h"
 #include "libavutil/common.h"
 #include "mpbswap.h"
-#include "libavutil/intfloat_readwrite.h"
+#include "libavutil/intfloat.h"
 
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
 
 /*
  * Read: the element content data ID.
@@ -176,20 +172,20 @@ int64_t ebml_read_int(stream_t *s, uint64_t *length)
 /*
  * Read the next element as a float.
  */
-long double ebml_read_float(stream_t *s, uint64_t *length)
+double ebml_read_float(stream_t *s, uint64_t *length)
 {
-    long double value;
+    double value;
     uint64_t len;
     int l;
 
     len = ebml_read_length(s, &l);
     switch (len) {
     case 4:
-        value = av_int2flt(stream_read_dword(s));
+        value = av_int2float(stream_read_dword(s));
         break;
 
     case 8:
-        value = av_int2dbl(stream_read_qword(s));
+        value = av_int2double(stream_read_qword(s));
         break;
 
     default:
@@ -214,7 +210,7 @@ char *ebml_read_ascii(stream_t *s, uint64_t *length)
     len = ebml_read_length(s, &l);
     if (len == EBML_UINT_INVALID)
         return NULL;
-    if (len > SIZE_MAX - 1)
+    if (len >= INT_MAX)
         return NULL;
     if (length)
         *length = len + l;
@@ -297,7 +293,7 @@ char *ebml_read_header(stream_t *s, int *version)
     while (length > 0) {
         id = ebml_read_id(s, NULL);
         if (id == EBML_ID_INVALID)
-            return NULL;
+            goto err_out;
         length -= 2;
 
         switch (id) {
@@ -305,33 +301,34 @@ char *ebml_read_header(stream_t *s, int *version)
         case EBML_ID_EBMLREADVERSION:
             num = ebml_read_uint(s, &l);
             if (num != EBML_VERSION)
-                return NULL;
+                goto err_out;
             break;
 
             /* we only handle 8 byte lengths at max */
         case EBML_ID_EBMLMAXSIZELENGTH:
             num = ebml_read_uint(s, &l);
             if (num != sizeof(uint64_t))
-                return NULL;
+                goto err_out;
             break;
 
             /* we handle 4 byte IDs at max */
         case EBML_ID_EBMLMAXIDLENGTH:
             num = ebml_read_uint(s, &l);
             if (num != sizeof(uint32_t))
-                return NULL;
+                goto err_out;
             break;
 
         case EBML_ID_DOCTYPE:
+            free(str);
             str = ebml_read_ascii(s, &l);
             if (str == NULL)
-                return NULL;
+                goto err_out;
             break;
 
         case EBML_ID_DOCTYPEREADVERSION:
             num = ebml_read_uint(s, &l);
             if (num == EBML_UINT_INVALID)
-                return NULL;
+                goto err_out;
             if (version)
                 *version = num;
             break;
@@ -342,11 +339,15 @@ char *ebml_read_header(stream_t *s, int *version)
         case EBML_ID_DOCTYPEVERSION:
         default:
             if (ebml_read_skip(s, &l))
-                return NULL;
+                goto err_out;
             break;
         }
         length -= l;
     }
 
     return str;
+
+err_out:
+    free(str);
+    return NULL;
 }

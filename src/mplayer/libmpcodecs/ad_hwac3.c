@@ -20,11 +20,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "mp_msg.h"
@@ -51,7 +49,7 @@ LIBAD_EXTERN(hwac3)
 
 
 static int dts_syncinfo(uint8_t *indata_ptr, int *flags, int *sample_rate, int *bit_rate);
-static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf);
+static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf, int outsize);
 
 
 static int a52_syncinfo (uint8_t *buf, int *sample_rate, int *bit_rate)
@@ -140,7 +138,7 @@ static int ac3dts_fillbuff(sh_audio_t *sh_audio)
       }
     }
     /* bad file => resync*/
-    memcpy(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
+    memmove(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
     --sh_audio->a_in_buffer_len;
   }
   mp_msg(MSGT_DECAUDIO, MSGL_DBG2, "ac3dts: %s len=%d  flags=0x%X  %d Hz %d bit/s\n", isdts == 1 ? "DTS" : isdts == 0 ? "AC3" : "unknown", length, flags, sample_rate, bit_rate);
@@ -170,6 +168,11 @@ static int preinit(sh_audio_t *sh)
 
 static int init(sh_audio_t *sh_audio)
 {
+  demux_stream_t *ds = sh_audio->ds;
+
+  /* Ensure that the demuxer buffer is not empty */
+  if(ds->buffer_pos >= ds->buffer_size && !ds_fill_buffer(ds))
+    return 0;
   /* Dolby AC3 passthrough:*/
   if(ac3dts_fillbuff(sh_audio) < 0)
   {
@@ -207,10 +210,12 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
 
   if(isdts == 1)
   {
-    return decode_audio_dts(sh_audio->a_in_buffer, len, buf);
+    return decode_audio_dts(sh_audio->a_in_buffer, len, buf, maxlen);
   }
   else if(isdts == 0)
   {
+    if (maxlen < 6144) return -1;
+    if (len > 6144 - 8) return -1;
     AV_WB16(buf,     0xF872);   // iec 61937 syncword 1
     AV_WB16(buf + 2, 0x4E1F);   // iec 61937 syncword 2
     buf[4] = sh_audio->a_in_buffer[5] & 0x7; // bsmod
@@ -284,9 +289,7 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
 {
   int ftype;
   int surp;
-  int unknown_bit;
   int fsize;
-  int amode;
 
   int word_mode;
   int le_mode;
@@ -343,7 +346,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     surp = (surp + 1) % 32;
 
     /* One unknown bit, crc? */
-    unknown_bit = indata_ptr[4+le_mode] >> 1 & 0x01;
 
     /* NBLKS 7 bits: Valid Range=5-127, Invalid Range=0-4 */
     *nblks = (indata_ptr[4+le_mode] & 0x01) << 6 | indata_ptr[5-le_mode] >> 2;
@@ -359,7 +361,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     ++fsize;
 
     /* Audio Channel Arrangement ACC AMODE 6 bits */
-    amode = (indata_ptr[7-le_mode] & 0x0f) << 2 | indata_ptr[8+le_mode] >> 6;
 
     /* Source Sampling rate ACC SFREQ 4 bits */
     *sfreq = indata_ptr[8+le_mode] >> 2 & 0x0f;
@@ -402,8 +403,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     fsize = fsize * 8 / 14 * 2;
 
     /* Audio Channel Arrangement ACC AMODE 6 bits */
-    amode = (indata_ptr[8+le_mode] & 0x03) << 4
-            | (indata_ptr[9-le_mode] & 0xf0) >> 4;
 
     /* Source Sampling rate ACC SFREQ 4 bits */
     *sfreq = indata_ptr[9-le_mode] & 0x0f;
@@ -489,7 +488,7 @@ static int convert_14bits_to_16bits(const unsigned char *src,
   return (unsigned char *)p - dest;
 }
 
-static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf)
+static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf, int outsize)
 {
   int nblks;
   int fsize;
@@ -500,7 +499,7 @@ static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *b
   uint16_t *buf16 = (uint16_t *)buf;
 
   fsize = dts_decode_header(indata_ptr, &rate, &nblks, &sfreq);
-  if(fsize < 0)
+  if(fsize < 0 || fsize > len || outsize < fsize + 8 || outsize < nblks * 32 * 2 * 2)
     return -1;
   nr_samples = nblks * 32;
 
@@ -551,23 +550,24 @@ static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *b
   buf16[3] = fsize << 3;
 
   if (!convert_16bits) {
-#if HAVE_BIGENDIAN
-  /* BE stream */
-  if (indata_ptr[0] == 0x1f || indata_ptr[0] == 0x7f)
-#else
-  /* LE stream */
-  if (indata_ptr[0] == 0xff || indata_ptr[0] == 0xfe)
-#endif
-  memcpy(&buf[8], indata_ptr, fsize);
-  else
-  {
-  swab(indata_ptr, &buf[8], fsize);
-  if (fsize & 1) {
-    buf[8+fsize-1] = 0;
-    buf[8+fsize] = indata_ptr[fsize-1];
-    fsize++;
-  }
-  }
+    int be_stream = indata_ptr[0] == 0x1f || indata_ptr[0] == 0x7f;
+    if (be_stream == HAVE_BIGENDIAN)
+      memcpy(&buf[8], indata_ptr, fsize);
+    else
+    {
+      int i = fsize >> 1;
+      uint16_t *d = buf16 + 4;
+      uint8_t *s = indata_ptr;
+      while (i--) {
+        *d++ = HAVE_BIGENDIAN ? AV_RL16(s) : AV_RB16(s);
+        s += 2;
+      }
+      if (fsize & 1) {
+        // treat as if there was an additional 0
+        *d++ = HAVE_BIGENDIAN ? *s : *s << 8;
+        fsize++;
+      }
+    }
   }
   memset(&buf[fsize + 8], 0, nr_samples * 2 * 2 - (fsize + 8));
 

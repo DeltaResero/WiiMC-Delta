@@ -16,6 +16,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#define _BSD_SOURCE
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -257,12 +259,8 @@ int af_reinit(af_stream_t* s, af_instance_t* af)
     int rv=0; // Return value
 
     // Check if there are any filters left in the list
-    if(NULL == af){
-      if(!(af=af_append(s,s->first,"dummy")))
-        return AF_UNKNOWN;
-      else
-        return AF_ERROR;
-    }
+    if(!af)
+      return af_append(s,s->first,"dummy") ? AF_ERROR : AF_UNKNOWN;
 
     // Check if this is the first filter
     if(!af->prev)
@@ -544,11 +542,13 @@ int af_init(af_stream_t* s)
    If the filter couldn't be added the return value is NULL. */
 af_instance_t* af_add(af_stream_t* s, char* name){
   af_instance_t* new;
+  int first_is_format;
   // Sanity check
   if(!s || !s->first || !name)
     return NULL;
+  first_is_format = !strcmp(s->first->info->name,"format");
   // Insert the filter somewhere nice
-  if(!strcmp(s->first->info->name,"format"))
+  if(first_is_format)
     new = af_append(s, s->first, name);
   else
     new = af_prepend(s, s->first, name);
@@ -558,7 +558,17 @@ af_instance_t* af_add(af_stream_t* s, char* name){
   // Reinitalize the filter list
   if(AF_OK != af_reinit(s, s->first) ||
      AF_OK != fixup_output_format(s)){
-    free(new);
+    // remove auto-inserted filters
+    af_instance_t *to_remove = first_is_format ? s->first->next : s->first;
+    while (to_remove != new)
+    {
+        af_instance_t *next = to_remove->next;
+        af_remove(s, to_remove);
+        to_remove = next;
+    }
+    af_remove(s, new);
+    af_reinit(s, s->first);
+    fixup_output_format(s);
     return NULL;
   }
   return new;

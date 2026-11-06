@@ -22,15 +22,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#ifndef GEKKO
-#include <strings.h>
-#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <inttypes.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include "libavutil/avstring.h"
 #include "ass_utils.h"
 #include "ass.h"
 #include "ass_library.h"
@@ -96,7 +94,7 @@ match_fullname(ASS_Library *lib, FCInstance *priv, const char *family,
                 if (FcPatternGetInteger(pat, FC_WEIGHT, 0, &at) != FcResultMatch
                     || at < bold)
                     continue;
-                if (strcasecmp(fullname, family) == 0) {
+                if (av_strcasecmp(fullname, family) == 0) {
                     FcFontSetAdd(result, FcPatternDuplicate(pat));
                     break;
                 }
@@ -181,6 +179,14 @@ static char *select_font(ASS_Library *library, FCInstance *priv,
     rc = FcConfigSubstitute(priv->config, pat, FcMatchPattern);
     if (!rc)
         goto error;
+    /* Fontconfig defaults include a language setting, which it sets based on
+     * some environment variables or defaults to "en". Unset this as we don't
+     * know the real language, and because some some attached fonts lack
+     * non-ascii characters included in fontconfig's list of characters
+     * required for English support and therefore don't match the lang=en
+     * criterion.
+     */
+    FcPatternDel(pat, "lang");
 
     fsorted = FcFontSort(priv->config, pat, FcTrue, NULL, &result);
     ffullname = match_fullname(library, priv, family, bold, italic);
@@ -250,8 +256,8 @@ static char *select_font(ASS_Library *library, FCInstance *priv,
         r_fullname = NULL;
 
     if (!treat_family_as_pattern &&
-        !(r_family && strcasecmp((const char *) r_family, family) == 0) &&
-        !(r_fullname && strcasecmp((const char *) r_fullname, family) == 0))
+        !(r_family && av_strcasecmp((const char *) r_family, family) == 0) &&
+        !(r_fullname && av_strcasecmp((const char *) r_fullname, family) == 0))
         ass_msg(library, MSGL_WARN,
                "fontconfig: Selected font is not the requested one: "
                "'%s' != '%s'",

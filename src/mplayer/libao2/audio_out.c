@@ -40,6 +40,7 @@ extern const ao_functions_t audio_out_jack;
 extern const ao_functions_t audio_out_openal;
 extern const ao_functions_t audio_out_null;
 extern const ao_functions_t audio_out_alsa;
+extern const ao_functions_t audio_out_sndio;
 extern const ao_functions_t audio_out_nas;
 extern const ao_functions_t audio_out_sdl;
 extern const ao_functions_t audio_out_sun;
@@ -49,7 +50,6 @@ extern const ao_functions_t audio_out_dsound;
 extern const ao_functions_t audio_out_kai;
 extern const ao_functions_t audio_out_dart;
 extern const ao_functions_t audio_out_dxr2;
-extern const ao_functions_t audio_out_ivtv;
 extern const ao_functions_t audio_out_v4l2;
 extern const ao_functions_t audio_out_mpegpes;
 extern const ao_functions_t audio_out_pcm;
@@ -75,6 +75,9 @@ const ao_functions_t* const audio_out_drivers[] =
 #endif
 #ifdef CONFIG_COREAUDIO
         &audio_out_coreaudio,
+#endif
+#ifdef CONFIG_SNDIO_AUDIO
+        &audio_out_sndio,
 #endif
 #ifdef CONFIG_OSS_AUDIO
         &audio_out_oss,
@@ -114,9 +117,6 @@ const ao_functions_t* const audio_out_drivers[] =
 #ifdef CONFIG_DXR2
         &audio_out_dxr2,
 #endif
-#ifdef CONFIG_IVTV
-        &audio_out_ivtv,
-#endif
 #ifdef CONFIG_V4L2_DECODER
         &audio_out_v4l2,
 #endif
@@ -138,6 +138,15 @@ void list_audio_out(void){
         mp_msg(MSGT_GLOBAL, MSGL_INFO,"\t%s\t%s\n", info->short_name, info->name);
     }
     mp_msg(MSGT_GLOBAL, MSGL_INFO,"\n");
+}
+
+static int init_wrapper(const ao_functions_t *ao, int rate, int channels, int format, int flags)
+{
+    int res = ao->init(rate, channels, format, flags);
+    if (ao_data.format == (AF_FORMAT_U8 ^ AF_FORMAT_LE) ||
+        ao_data.format == (AF_FORMAT_S8 ^ AF_FORMAT_LE))
+        ao_data.format ^= AF_FORMAT_LE;
+    return res;
 }
 
 const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate,int channels,int format,int flags){
@@ -168,7 +177,7 @@ const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate
             const ao_functions_t* audio_out=audio_out_drivers[i];
             if(!strncmp(audio_out->info->short_name,ao,ao_len)){
                 // name matches, try it
-                if(audio_out->init(rate,channels,format,flags))
+                if(init_wrapper(audio_out,rate,channels,format,flags))
                     return audio_out; // success!
                 else
                     mp_msg(MSGT_AO, MSGL_WARN, MSGTR_AO_FailedInit, ao);
@@ -190,7 +199,7 @@ const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate
     for(i=0;audio_out_drivers[i];i++){
         const ao_functions_t* audio_out=audio_out_drivers[i];
 //        if(audio_out->control(AOCONTROL_QUERY_FORMAT, (int)format) == CONTROL_TRUE)
-        if(audio_out->init(rate,channels,format,flags))
+        if(init_wrapper(audio_out,rate,channels,format,flags))
             return audio_out; // success!
     }
     return NULL;

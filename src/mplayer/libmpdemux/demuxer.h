@@ -110,6 +110,10 @@
 #define DEMUXER_CTRL_SWITCH_VIDEO 14
 #define DEMUXER_CTRL_IDENTIFY_PROGRAM 15
 #define DEMUXER_CTRL_CORRECT_PTS 16
+#define DEMUXER_CTRL_GET_REPLAY_GAIN 17    // returns 10x the adjustment
+// Query stream IDs that the underlying device/stream would recognize
+#define DEMUXER_CTRL_REMAP_AUDIO_ID 18
+#define DEMUXER_CTRL_REMAP_SUB_ID 19
 
 #define SEEK_ABSOLUTE (1 << 0)
 #define SEEK_FACTOR   (1 << 1)
@@ -144,6 +148,7 @@ typedef struct {
   int non_interleaved;     // 1 if this stream is not properly interleaved,
                            // so e.g. subtitle handling must do explicit reads.
 //---------------
+  int fill_count;         // number of unsuccessful tries to get a packet
   int packs;              // number of packets in buffer
   int bytes;              // total bytes of packets in buffer
   demux_packet_t *first;  // read to first buffer after the current buffer from here
@@ -404,6 +409,7 @@ static inline int demux_getc(demux_stream_t *ds){
 void ds_free_packs(demux_stream_t *ds);
 int ds_get_packet(demux_stream_t *ds,unsigned char **start);
 int ds_get_packet_pts(demux_stream_t *ds, unsigned char **start, double *pts);
+int ds_get_packet_pts_endpts(demux_stream_t *ds, unsigned char **start, double *pts, double *endpts);
 int ds_get_packet_sub(demux_stream_t *ds,unsigned char **start,
                       double *pts, double *endpts);
 double ds_get_next_pts(demux_stream_t *ds);
@@ -485,6 +491,7 @@ int demuxer_sub_track_by_lang(demuxer_t* demuxer, char* lang);
 // for subtitles, it is the first track with default attribute
 // for audio, additionally, the first track is selected if no track has default attribute set
 int demuxer_default_audio_track(demuxer_t* d);
+int demuxer_default_video_track(demuxer_t* d);
 int demuxer_default_sub_track(demuxer_t* d);
 
 #endif /* MPLAYER_DEMUXER_H */

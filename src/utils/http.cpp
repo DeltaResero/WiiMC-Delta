@@ -30,6 +30,7 @@
 //#define http_memalign memalign
 
 #include "mem2_manager.h"
+#include "tls.h"
 #define http_malloc(x) mem2_malloc(x, MEM2_OTHER)
 #define http_free(x) mem2_free(x, MEM2_OTHER)
 #define http_memalign(x,y) mem2_memalign(x,y, MEM2_OTHER)
@@ -37,7 +38,7 @@
 #define MAX_SIZE (1024*1024*15)
 
 extern "C" {
-#include "mplayer/stream/url.h"
+#include "stream/url.h"
 }
 
 #define TCP_CONNECT_TIMEOUT     13  // 13 secs to make a connection
@@ -48,6 +49,31 @@ extern "C" {
 #define TCP_BLOCK_SIZE          2048
 #define HTTP_TIMEOUT            35000 // 35 secs to get an http response
 #define IOS_O_NONBLOCK          0x04
+#define TLS_HANDSHAKE_TIMEOUT   15000 // 15 secs for the TLS handshake
+
+// a connected socket, with TLS on top for https
+typedef struct
+{
+    s32 s;
+    wiimc_tls *tls;
+} http_conn;
+
+static s32 conn_read(const http_conn *c, void *buf, u32 len)
+{
+    return c->tls ? tls_read(c->tls, buf, len) : net_read(c->s, buf, len);
+}
+
+static s32 conn_write(const http_conn *c, const void *buf, u32 len)
+{
+    return c->tls ? tls_write(c->tls, buf, len) : net_write(c->s, buf, len);
+}
+
+static void conn_close(http_conn *c)
+{
+    tls_close(c->tls);
+    c->tls = NULL;
+    net_close(c->s);
+}
 
 static int _httoi(const char *value)
 {
@@ -170,7 +196,7 @@ static s32 tcp_connect(char *host, const u16 port)
     return s;
 }
 
-static int tcp_readln(const s32 s, char *buf, const u16 max_length)
+static int tcp_readln(const http_conn *s, char *buf, const u16 max_length)
 {
     s32 res = -1;
     s32 ret;
@@ -182,7 +208,7 @@ static int tcp_readln(const s32 s, char *buf, const u16 max_length)
         if (ticks_to_millisecs(diff_ticks(start_time, gettime())) > HTTP_TIMEOUT)
             break;
 
-        ret = net_read(s, &buf[c], 1);
+        ret = conn_read(s, &buf[c], 1);
 
         if (ret == -EAGAIN)
         {
@@ -206,7 +232,7 @@ static int tcp_readln(const s32 s, char *buf, const u16 max_length)
     return res;
 }
 
-static u32 tcp_read(const s32 s, u8 *buffer, const u32 length)
+static u32 tcp_read(const http_conn *s, u8 *buffer, const u32 length)
 {
     char *p;
     u32 left, block, received, step=0;
@@ -230,7 +256,7 @@ static u32 tcp_read(const s32 s, u8 *buffer, const u32 length)
         if (block > TCP_RECV_SIZE)
             block = TCP_RECV_SIZE;
 
-        res = net_read(s, p, block);
+        res = conn_read(s, p, block);
 
         if (res == -EAGAIN)
         {
@@ -254,7 +280,7 @@ static u32 tcp_read(const s32 s, u8 *buffer, const u32 length)
     return received;
 }
 
-static u32 tcp_write(const s32 s, const u8 *buffer, const u32 length)
+static u32 tcp_write(const http_conn *s, const u8 *buffer, const u32 length)
 {
     const u8 *p;
     u32 left, block, sent, step=0;
@@ -278,9 +304,9 @@ static u32 tcp_write(const s32 s, const u8 *buffer, const u32 length)
         if (block > TCP_SEND_SIZE)
             block = TCP_SEND_SIZE;
 
-        res = net_write(s, p, block);
+        res = conn_write(s, p, block);
 
-        if ((res == 0) || (res == -56))
+        if ((res == 0) || (res == -56) || (res == -EAGAIN))
         {
             usleep(20 * 1000);
             continue;
@@ -314,6 +340,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
     char *http_host=NULL;
     char *http_path=NULL;
     u16 http_port;
+    bool https;
     URL_t *tmpurl;
 
     u32 http_status = 404;
@@ -343,19 +370,36 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
     strcpy(http_host, tmpurl->hostname);
     strcpy(http_path, tmpurl->file);
     http_port = tmpurl->port;
+    https = tmpurl->protocol && strcasecmp(tmpurl->protocol, "https") == 0;
 
     if(http_port == 0)
-        http_port = 80;
+        http_port = https ? 443 : 80;
 
     url_free(tmpurl);
 
-    int s = tcp_connect(http_host, http_port);
+    http_conn conn = { -1, NULL };
+    http_conn *s = &conn;
 
-    if (s < 0)
+    conn.s = tcp_connect(http_host, http_port);
+
+    if (conn.s < 0)
     {
         free(http_path);
         free(http_host);
         return 0;
+    }
+
+    if (https)
+    {
+        // the server's certificate must check out against WiiMC's CA bundle
+        conn.tls = tls_connect(conn.s, http_host, TLS_HANDSHAKE_TIMEOUT);
+        if (!conn.tls)
+        {
+            net_close(conn.s);
+            free(http_path);
+            free(http_host);
+            return 0;
+        }
     }
     char *request = NULL;
     char *r;
@@ -376,7 +420,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
     if(res == 0) // can't send request to server
     {
-        net_close(s);
+        conn_close(s);
         return 0;
     }
 
@@ -406,7 +450,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
     if (http_status != 200)
     {
         free(line);
-        net_close(s);
+        conn_close(s);
 
         if((http_status == 301 || http_status == 302) && redirect[0] != 0 && total_redirects < 5)  //only 5 redirects allowed
         {
@@ -426,7 +470,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
     else if (content_length > maxsize)
     {
         free(line);
-        net_close(s);
+        conn_close(s);
         return 0;
     }
 
@@ -445,7 +489,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
                 {
                     http_status = 404;
                     free(line);
-                    net_close(s);
+                    conn_close(s);
                     return sizeread;
                 }
 
@@ -464,7 +508,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
                 {
                     http_status = 404;
                     free(line);
-                    net_close(s);
+                    conn_close(s);
                     return sizeread;
                 }
             } while(content_length > 0);
@@ -518,7 +562,7 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
             CancelAction();
     }
 
-    net_close(s);
+    conn_close(s);
 
     if (content_length < maxsize && sizeread != content_length)
     {

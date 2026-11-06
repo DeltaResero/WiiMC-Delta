@@ -65,6 +65,13 @@ int vo_vsync = 0;
 int vo_fs = 0;
 int vo_fsmode = 0;
 float vo_panscan = 0.0f;
+float vo_border_pos_x = 0.5;
+float vo_border_pos_y = 0.5;
+int vo_fs_border_l = 0;
+int vo_fs_border_r = 0;
+int vo_fs_border_t = 0;
+int vo_fs_border_b = 0;
+int vo_rotate;
 int vo_ontop = 0;
 int vo_adapter_num=0;
 int vo_refresh_rate=0;
@@ -93,12 +100,11 @@ char *vo_wintitle;
 extern const vo_functions_t video_out_mga;
 extern const vo_functions_t video_out_xmga;
 extern const vo_functions_t video_out_x11;
-extern const vo_functions_t video_out_xvmc;
 extern const vo_functions_t video_out_vdpau;
 extern const vo_functions_t video_out_xv;
 extern const vo_functions_t video_out_gl_nosw;
 extern const vo_functions_t video_out_gl;
-extern const vo_functions_t video_out_gl2;
+extern const vo_functions_t video_out_gl_tiled;
 extern const vo_functions_t video_out_matrixview;
 extern const vo_functions_t video_out_dga;
 extern const vo_functions_t video_out_sdl;
@@ -122,7 +128,6 @@ extern const vo_functions_t video_out_directx;
 extern const vo_functions_t video_out_kva;
 extern const vo_functions_t video_out_dxr2;
 extern const vo_functions_t video_out_dxr3;
-extern const vo_functions_t video_out_ivtv;
 extern const vo_functions_t video_out_v4l2;
 extern const vo_functions_t video_out_jpeg;
 extern const vo_functions_t video_out_gif89a;
@@ -168,6 +173,9 @@ const vo_functions_t* const video_out_drivers[] =
         &video_out_kva,
 #endif
 #ifdef CONFIG_COREVIDEO
+#ifdef CONFIG_GL
+        &video_out_gl_nosw,
+#endif
         &video_out_corevideo,
 #endif
 #ifdef CONFIG_QUARTZ
@@ -197,10 +205,12 @@ const vo_functions_t* const video_out_drivers[] =
 #ifdef CONFIG_XV
         &video_out_xv,
 #endif
-#ifdef CONFIG_X11
+#ifndef CONFIG_COREVIDEO
 #ifdef CONFIG_GL
         &video_out_gl_nosw,
 #endif
+#endif
+#ifdef CONFIG_X11
         &video_out_x11,
         &video_out_xover,
 #endif
@@ -210,8 +220,8 @@ const vo_functions_t* const video_out_drivers[] =
 #ifdef CONFIG_GL
         &video_out_gl,
 #endif
-#if defined(CONFIG_GL_WIN32) || defined(CONFIG_GL_X11)
-        &video_out_gl2,
+#if defined(CONFIG_GL_WIN32) || defined(CONFIG_GL_X11) || defined(CONFIG_GL_OSX)
+        &video_out_gl_tiled,
 #endif
 #ifdef CONFIG_DGA
         &video_out_dga,
@@ -240,9 +250,6 @@ const vo_functions_t* const video_out_drivers[] =
 #endif
 #ifdef CONFIG_DXR3
         &video_out_dxr3,
-#endif
-#ifdef CONFIG_IVTV
-        &video_out_ivtv,
 #endif
 #ifdef CONFIG_V4L2_DECODER
         &video_out_v4l2,
@@ -274,10 +281,6 @@ const vo_functions_t* const video_out_drivers[] =
         &video_out_gekko,
 #endif
         &video_out_null,
-        // should not be auto-selected
-#if CONFIG_XVMC
-        &video_out_xvmc,
-#endif
         &video_out_mpegpes,
 #ifdef CONFIG_YUV4MPEG
         &video_out_yuv4mpeg,
@@ -322,15 +325,20 @@ const vo_functions_t* init_best_video_out(char** vo_list){
     // first try the preferred drivers, with their optional subdevice param:
     if(vo_list && vo_list[0])
       while(vo_list[0][0]){
-        char* vo=strdup(vo_list[0]);
+        char* buffer=strdup(vo_list[0]);
+        char *vo = buffer;
         vo_subdevice=strchr(vo,':');
+        if(vo_subdevice){
+            vo_subdevice[0]=0;
+            ++vo_subdevice;
+        }
         if (!strcmp(vo, "pgm"))
             mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_PGM_HasBeenReplaced);
         if (!strcmp(vo, "md5"))
             mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_MD5_HasBeenReplaced);
-        if(vo_subdevice){
-            vo_subdevice[0]=0;
-            ++vo_subdevice;
+        if (!strcmp(vo, "gl2")) {
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_VO_GL2_HasBeenRenamed);
+            vo = "gl_tiled";
         }
         for(i=0;video_out_drivers[i];i++){
             const vo_functions_t* video_driver=video_out_drivers[i];
@@ -339,13 +347,13 @@ const vo_functions_t* init_best_video_out(char** vo_list){
                 // name matches, try it
                 if(!video_driver->preinit(vo_subdevice))
                 {
-                    free(vo);
+                    free(buffer);
                     return video_driver; // success!
                 }
             }
         }
         // continue...
-        free(vo);
+        free(buffer);
         ++vo_list;
         if(!(vo_list[0])) return NULL; // do NOT fallback to others
       }
@@ -404,6 +412,7 @@ int lookup_keymap_table(const struct mp_keymap *map, int key) {
  *        and destination rectangle like Direct3D and VDPAU
  */
 static void src_dst_split_scaling(int src_size, int dst_size, int scaled_src_size,
+                                  float bpos,
                                   int *src_start, int *src_end, int *dst_start, int *dst_end) {
   if (scaled_src_size > dst_size) {
     int border = src_size * (scaled_src_size - dst_size) / scaled_src_size;
@@ -416,7 +425,7 @@ static void src_dst_split_scaling(int src_size, int dst_size, int scaled_src_siz
   } else {
     *src_start = 0;
     *src_end   = src_size;
-    *dst_start = (dst_size - scaled_src_size) / 2;
+    *dst_start = apply_border_pos(dst_size, scaled_src_size, bpos);
     *dst_end   = *dst_start + scaled_src_size;
   }
 }
@@ -453,12 +462,14 @@ void calc_src_dst_rects(int src_width, int src_height, struct vo_rect *src, stru
     scaled_width  += vo_panscan_x;
     scaled_height += vo_panscan_y;
     if (borders) {
-      borders->left = (vo_dwidth  - scaled_width ) / 2;
-      borders->top  = (vo_dheight - scaled_height) / 2;
+      borders->left = apply_border_pos(vo_dwidth,  scaled_width,  vo_border_pos_x);
+      borders->top  = apply_border_pos(vo_dheight, scaled_height, vo_border_pos_y);
+      borders->right  = vo_dwidth  - scaled_width  - borders->left;
+      borders->bottom = vo_dheight - scaled_height - borders->top;
     }
-    src_dst_split_scaling(src_width, vo_dwidth, scaled_width,
+    src_dst_split_scaling(src_width, vo_dwidth, scaled_width, vo_border_pos_x,
                           &src->left, &src->right, &dst->left, &dst->right);
-    src_dst_split_scaling(src_height, vo_dheight, scaled_height,
+    src_dst_split_scaling(src_height, vo_dheight, scaled_height, vo_border_pos_y,
                           &src->top, &src->bottom, &dst->top, &dst->bottom);
   }
   src->left += crop->left; src->right  += crop->left;

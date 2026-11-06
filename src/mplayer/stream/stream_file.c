@@ -26,14 +26,20 @@
 #if HAVE_SETMODE
 #include <io.h>
 #endif
+#ifdef __MINGW32__
+#include <windows.h>
+#include <share.h>
+#endif
 
 #include "mp_msg.h"
 #include "stream.h"
 #include "help_mp.h"
 #include "m_option.h"
 #include "m_struct.h"
+#include "osdep/osdep.h"
+#include "libmpdemux/demuxer.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* filename;
   char *filename2;
 } stream_priv_dflts = {
@@ -56,6 +62,8 @@ static const struct m_struct_st stream_opts = {
 
 static int fill_buffer(stream_t *s, char* buffer, int max_len){
   int r = read(s->fd,buffer,max_len);
+  // We are certain this is EOF, do not retry
+  if (max_len && r == 0) s->eof = 1;
   return (r <= 0) ? -1 : r;
 }
 
@@ -72,7 +80,7 @@ static int write_buffer(stream_t *s, char* buffer, int len) {
   return len;
 }
 
-static int seek(stream_t *s,off_t newpos) {
+static int seek(stream_t *s, int64_t newpos) {
   s->pos = newpos;
   if(lseek(s->fd,s->pos,SEEK_SET)<0) {
     s->eof=1;
@@ -81,7 +89,7 @@ static int seek(stream_t *s,off_t newpos) {
   return 1;
 }
 
-static int seek_forward(stream_t *s,off_t newpos) {
+static int seek_forward(stream_t *s, int64_t newpos) {
   if(newpos<s->pos){
     mp_msg(MSGT_STREAM,MSGL_INFO,"Cannot seek backward in linear streams!\n");
     return 0;
@@ -104,7 +112,7 @@ static int control(stream_t *s, int cmd, void *arg) {
       size = lseek(s->fd, 0, SEEK_END);
       lseek(s->fd, s->pos, SEEK_SET);
       if(size != (off_t)-1) {
-        *((off_t*)arg) = size;
+        *(uint64_t*)arg = size;
         return 1;
       }
     }
@@ -112,10 +120,28 @@ static int control(stream_t *s, int cmd, void *arg) {
   return STREAM_UNSUPPORTED;
 }
 
+#ifdef __MINGW32__
+static int win32_open(const char *fname, int m, int omode)
+{
+    int fd = -1;
+    wchar_t *fname_w = utf8_to_wide_char(fname);
+    if (!fname_w) goto fallback;
+
+    fd = _wsopen(fname_w, m, SH_DENYNO, omode);
+    free(fname_w);
+
+    if (fd != -1 || (m & O_CREAT))
+        return fd;
+
+fallback:
+    return _sopen(fname, m, SH_DENYNO, omode);
+}
+#endif
+
 static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   int f;
   mode_t m = 0;
-  off_t len;
+  int64_t len;
   unsigned char *filename;
   struct stream_priv_s* p = (struct stream_priv_s*)opts;
 
@@ -123,6 +149,8 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     m = O_RDONLY;
   else if(mode == STREAM_WRITE)
     m = O_RDWR|O_CREAT|O_TRUNC;
+  else if (mode == STREAM_APPEND)
+    m = O_RDWR|O_CREAT|O_APPEND;
   else {
     mp_msg(MSGT_OPEN,MSGL_ERR, "[file] Unknown open mode %d\n",mode);
     m_struct_free(&stream_opts,opts);
@@ -166,10 +194,12 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     }
   } else {
       mode_t openmode = S_IRUSR|S_IWUSR;
-#ifndef __MINGW32__
+#ifdef __MINGW32__
+      f = win32_open(filename, m, openmode);
+#else
       openmode |= S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
-#endif
       f=open(filename,m, openmode);
+#endif
     if(f<0) {
       mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_FileNotFound,filename);
       m_struct_free(&stream_opts,opts);
@@ -193,6 +223,13 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     stream->type = STREAMTYPE_FILE;
   }
 
+  // support sdp:// also via FFmpeg if live555 was not compiled in
+  if (stream->url && !strncmp(stream->url, "sdp://", 6)) {
+    *file_format = DEMUXER_TYPE_LAVF;
+    stream->type = STREAMTYPE_SDP;
+    stream->flags = STREAM_NON_CACHEABLE;
+  }
+
   mp_msg(MSGT_OPEN,MSGL_V,"[file] File size is %"PRId64" bytes\n", (int64_t)len);
 
   stream->fd = f;
@@ -211,7 +248,7 @@ const stream_info_t stream_info_file = {
   "Albeu",
   "based on the code from ??? (probably Arpi)",
   open_f,
-  { "file", "", NULL },
+  { "file", "", "sdp", NULL },
   &stream_opts,
   1 // Urls are an option string
 };

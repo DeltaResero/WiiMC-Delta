@@ -35,6 +35,8 @@
 #include "m_option.h"
 #include "m_struct.h"
 
+#include "libavutil/mathematics.h"
+
 static struct vf_priv_s {
         uint8_t *buf[2];
         float hue;
@@ -76,7 +78,7 @@ static void (*process)(uint8_t *udst, uint8_t *vdst, uint8_t *usrc, uint8_t *vsr
 
 /* FIXME: add packed yuv version of process */
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
 {
         mp_image_t *dmpi;
 
@@ -107,7 +109,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
                         vf->priv->hue, vf->priv->saturation);
         }
 
-        return vf_next_put_image(vf,dmpi, pts);
+        return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static int control(struct vf_instance *vf, int request, void* data)

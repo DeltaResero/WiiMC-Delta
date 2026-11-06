@@ -16,6 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,7 +28,6 @@
 #include <sys/wait.h>
 #endif
 #include <fcntl.h>
-#include <strings.h>
 #include <assert.h>
 
 #include "config.h"
@@ -36,6 +36,7 @@
 #include <winsock2.h>
 #endif
 
+#include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "osdep/shmem.h"
@@ -108,6 +109,9 @@ static const stream_info_t* const auto_open_streams[] = {
 #endif
   &stream_info_rtp,
   &stream_info_udp,
+#ifdef CONFIG_FFMPEG
+  &stream_info_ffmpeg,
+#endif
   &stream_info_http2,
 #endif
 #ifdef CONFIG_DVBIN
@@ -141,9 +145,6 @@ static const stream_info_t* const auto_open_streams[] = {
 #endif
 #ifdef CONFIG_LIBBLURAY
   &stream_info_bluray,
-#endif
-#ifdef CONFIG_FFMPEG
-  &stream_info_ffmpeg,
 #endif
 
   &stream_info_null,
@@ -184,7 +185,7 @@ static stream_t* open_stream_plugin(const stream_info_t* sinfo, const char* file
     }
   }
   s = new_stream(-2,-2);
-  s->capture_file = NULL;
+  s->capture_stream = NULL;
   s->url=strdup(filename);
   s->flags |= mode;
   *ret = sinfo->open(s,mode,arg,file_format);
@@ -222,23 +223,19 @@ static stream_t* open_stream_plugin(const stream_info_t* sinfo, const char* file
 
 
 stream_t* open_stream_full(const char* filename,int mode, char** options, int* file_format) {
-  int i,j,l,r;
-  const stream_info_t* sinfo;
-  stream_t* s;
-  char *redirected_url = NULL;
+  int i,j;
 
   for(i = 0 ; auto_open_streams[i] ; i++) {
-    sinfo = auto_open_streams[i];
-    if(!sinfo->protocols) {
-      mp_msg(MSGT_OPEN,MSGL_WARN, MSGTR_StreamProtocolNULL, sinfo->name);
-      continue;
-    }
+    const stream_info_t *sinfo = auto_open_streams[i];
     for(j = 0 ; sinfo->protocols[j] ; j++) {
-      l = strlen(sinfo->protocols[j]);
+      int l = strlen(sinfo->protocols[j]);
       // l == 0 => Don't do protocol matching (ie network and filenames)
       if((l == 0 && !strstr(filename, "://")) ||
-         ((strncasecmp(sinfo->protocols[j],filename,l) == 0) &&
+         ((av_strncasecmp(sinfo->protocols[j],filename,l) == 0) &&
                       (strncmp("://",filename+l,3) == 0))) {
+        int r;
+        char *redirected_url = NULL;
+        stream_t* s;
         *file_format = DEMUXER_TYPE_UNKNOWN;
         s = open_stream_plugin(sinfo,filename,mode,options,file_format,&r,
                                 &redirected_url);
@@ -277,11 +274,11 @@ stream_t* open_output_stream(const char* filename, char** options) {
 
 void stream_capture_do(stream_t *s)
 {
-  if (fwrite(s->buffer, s->buf_len, 1, s->capture_file) < 1) {
+  if (stream_write_buffer(s->capture_stream, s->buffer, s->buf_len) != s->buf_len) {
     mp_msg(MSGT_GLOBAL, MSGL_ERR, MSGTR_StreamErrorWritingCapture,
            strerror(errno));
-    fclose(s->capture_file);
-    s->capture_file = NULL;
+    free_stream(s->capture_stream);
+    s->capture_stream = NULL;
   }
 }
 
@@ -290,7 +287,7 @@ static int stream_reconnect(stream_t *s)
 #define MAX_RECONNECT_RETRIES 5
 #define RECONNECT_SLEEP_MS 1000
     int retry = 0;
-    off_t pos = s->pos;
+    int64_t pos = s->pos;
     // Seeking is used as a hack to make network streams
     // reopen the connection, ideally they would implement
     // e.g. a STREAM_CTRL_RECONNECT to do this
@@ -411,10 +408,28 @@ int stream_fill_buffer(stream_t *s){
     return 0;
   s->buf_pos=0;
   s->buf_len=len;
+  while (s->buf_len < STREAM_BUFFER_MIN) {
+    int have = s->buf_len;
+    assert(s->buf_len + STREAM_BUFFER_MIN < STREAM_BUFFER_SIZE);
+    len = stream_read_internal(s, s->buffer + s->buf_len, STREAM_BUFFER_MIN);
+    if (len <= 0) {
+#ifdef GEKKO
+      // CE's error handling in stream_read_internal() empties the
+      // buffer, which would lose what the earlier reads put in it
+      s->buf_pos = 0;
+      s->buf_len = have;
+#endif
+      break;
+    }
+    s->buf_len += len;
+  }
+  // since the first read succeeded we are
+  // definitely not at EOF yet
+  s->eof = 0;
 //  printf("[%d]",len);fflush(stdout);
-  if (s->capture_file)
+  if (s->capture_stream)
     stream_capture_do(s);
-  return len;
+  return s->buf_len;
 }
 
 int stream_write_buffer(stream_t *s, unsigned char *buf, int len) {
@@ -434,7 +449,7 @@ int stream_write_buffer(stream_t *s, unsigned char *buf, int len) {
   return rd;
 }
 
-int stream_seek_internal(stream_t *s, off_t newpos)
+int stream_seek_internal(stream_t *s, int64_t newpos)
 {
 if(newpos==0 || newpos!=s->pos){
   switch(s->type){
@@ -482,9 +497,9 @@ if(newpos==0 || newpos!=s->pos){
   return -1;
 }
 
-int stream_seek_long(stream_t *s,off_t pos){
+int stream_seek_long(stream_t *s, int64_t pos){
   int res;
-off_t newpos=0;
+  int64_t newpos=0;
 
 //  if( mp_msg_test(MSGT_STREAM,MSGL_DBG3) ) printf("seek_long to 0x%X\n",(unsigned int)pos);
 
@@ -499,7 +514,7 @@ off_t newpos=0;
   if(s->sector_size)
       newpos = (pos/s->sector_size)*s->sector_size;
   else
-      newpos = pos&(~((off_t)STREAM_BUFFER_SIZE-1));
+      newpos = pos&(~((int64_t)STREAM_BUFFER_SIZE-1));
 
 if( mp_msg_test(MSGT_STREAM,MSGL_DBG3) ){
   mp_msg(MSGT_STREAM,MSGL_DBG3, "s->pos=%"PRIX64"  newpos=%"PRIX64"  new_bufpos=%"PRIX64"  buflen=%X  \n",
@@ -532,7 +547,6 @@ while(stream_fill_buffer(s) > 0 && pos >= 0) {
 
 void stream_reset(stream_t *s){
   if(s->eof){
-    s->pos=0;
     s->buf_pos=s->buf_len=0;
     s->eof=0;
   }
@@ -588,14 +602,15 @@ stream_t* new_stream(int fd,int type){
   return s;
 }
 
-void free_stream(stream_t *s){
+int free_stream(stream_t *s){
+  int res = 0;
 //  printf("\n*** free_stream() called ***\n");
 #ifdef CONFIG_STREAM_CACHE
     cache_uninit(s);
 #endif
-  if (s->capture_file) {
-    fclose(s->capture_file);
-    s->capture_file = NULL;
+  if (s->capture_stream) {
+    res |= free_stream(s->capture_stream);
+    s->capture_stream = NULL;
   }
 
   if(s->close) s->close(s);
@@ -605,7 +620,7 @@ void free_stream(stream_t *s){
        network socket and file */
     if(s->url && strstr(s->url,"://"))
       closesocket(s->fd);
-    else close(s->fd);
+    else res |= close(s->fd);
   }
 #if HAVE_WINSOCK2_H
   mp_msg(MSGT_STREAM,MSGL_V,"WINSOCK2 uninit\n");
@@ -616,6 +631,7 @@ void free_stream(stream_t *s){
   //free(s->priv);
   free(s->url);
   free(s);
+  return res;
 }
 
 stream_t* new_ds_stream(demux_stream_t *ds) {
@@ -758,3 +774,106 @@ uint8_t *stream_read_until(stream_t *s, uint8_t *mem, int max,
   if(s->eof && ptr == mem) return NULL;
   return mem;
 }
+
+int parse_chapter_range(const m_option_t *conf, const char *range) {
+  const char *s;
+  char *t;
+  if (!range)
+    return M_OPT_MISSING_PARAM;
+  s = range;
+  dvd_chapter = 1;
+  dvd_last_chapter = 0;
+  if(*range && isdigit(*range)) {
+    dvd_chapter = strtol(range, (char **) &s, 10);
+    if(range == s) {
+      mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+      return M_OPT_INVALID;
+    }
+  }
+  if(*s == 0)
+    return 0;
+  else if(*s != '-') {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  ++s;
+  if(*s == 0)
+      return 0;
+  if(! isdigit(*s)) {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  dvd_last_chapter = strtol(s, &t, 10);
+  if (s == t || *t) {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  return 0;
+}
+
+#ifdef __MINGW32__
+wchar_t *utf8_to_wide_char(const char *utf8)
+{
+    int conv_size;
+    wchar_t *wide_char = NULL;
+
+    int wide_char_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8, -1, wide_char, 0);
+    if (wide_char_size < 0) goto err_out;
+
+    wide_char = calloc(wide_char_size, sizeof(*wide_char));
+    if (!wide_char) goto err_out;
+
+    conv_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8, -1, wide_char, wide_char_size);
+    if (conv_size <= 0) goto err_out;
+
+    return wide_char;
+
+err_out:
+    free(wide_char);
+
+    return 0;
+}
+
+static char *wide_char_to_local_windows_code_page(const wchar_t *wide_char)
+{
+    int conv_size;
+
+    char *ansi = NULL;
+
+    int ansi_size = WideCharToMultiByte(CP_ACP, 0, wide_char, -1, NULL, 0, NULL, NULL);
+    if (ansi_size < 0) goto err_out;
+
+    ansi = calloc(ansi_size, sizeof(*ansi));
+    if (!ansi) goto err_out;
+
+    conv_size = WideCharToMultiByte(CP_ACP, 0, wide_char, -1, ansi, ansi_size, NULL, NULL);
+    if (conv_size < 0) goto err_out;
+
+    return ansi;
+
+err_out:
+    free(ansi);
+
+    return 0;
+}
+
+char *utf8_to_local_windows_code_page(const char *utf8)
+{
+    char *windows_local_code_page = NULL;
+
+    wchar_t *wide_char = utf8_to_wide_char(utf8);
+    if (!wide_char) goto err_out;
+
+    windows_local_code_page = wide_char_to_local_windows_code_page(wide_char);
+    if (!windows_local_code_page) goto err_out;
+
+    free(wide_char);
+
+    return windows_local_code_page;
+
+err_out:
+    free(wide_char);
+    free(windows_local_code_page);
+    return NULL;
+}
+#endif

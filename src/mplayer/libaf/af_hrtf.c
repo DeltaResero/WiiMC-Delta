@@ -26,6 +26,8 @@
 #include <inttypes.h>
 
 #include <math.h>
+#include <libavutil/common.h>
+#include <libavutil/mathematics.h>
 
 #include "mp_msg.h"
 #include "af.h"
@@ -277,8 +279,13 @@ static inline void update_ch(af_hrtf_t *s, short *in, const int k)
     }
 
     /* We need to update the bass compensation delay line, too. */
-    s->ba_l[k] = in[0] + in[4] + in[2];
-    s->ba_r[k] = in[4] + in[1] + in[3];
+    // TODO: should this use lf/cf/rf etc. instead?
+    s->ba_l[k] = in[0];
+    s->ba_r[k] = in[1];
+    if (s->decode_mode == HRTF_MIX_51) {
+        s->ba_l[k] += in[4] + in[2];
+        s->ba_r[k] += in[4] + in[3];
+    }
 }
 
 /* Initialization and runtime control */
@@ -542,16 +549,16 @@ static af_data_t* play(struct af_instance_s *af, af_data_t *data)
               perception.  Note: Too much will destroy the acoustic space
               and may even result in headaches. */
            diff = STEXPAND2 * (left - right);
-           out[0] = (int16_t)(left  + diff);
-           out[1] = (int16_t)(right - diff);
+           out[0] = av_clip_int16(left  + diff);
+           out[1] = av_clip_int16(right - diff);
            break;
         case HRTF_MIX_MATRIX2CH:
            /* Do attempt any stereo expansion with matrix encoded
               sources.  The L, R channels are already stereo expanded
               by the steering, any further stereo expansion will sound
               very unnatural. */
-           out[0] = (int16_t)left;
-           out[1] = (int16_t)right;
+           out[0] = av_clip_int16(left);
+           out[1] = av_clip_int16(right);
            break;
         }
 
@@ -660,7 +667,7 @@ static int af_open(af_instance_t* af)
 }
 
 /* Description of this filter */
-af_info_t af_info_hrtf = {
+const af_info_t af_info_hrtf = {
     "HRTF Headphone",
     "hrtf",
     "ylai",

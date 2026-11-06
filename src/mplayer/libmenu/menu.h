@@ -47,7 +47,7 @@ struct  menu_s {
   void (*read_cmd)(menu_t* menu,int cmd);
   int (*read_key)(menu_t* menu,int cmd);
   void (*close)(menu_t* menu);
-  struct m_struct_st* priv_st;
+  const struct m_struct_st* priv_st;
   struct menu_priv_s* priv;
   int show; // Draw it ?
   int cl; // Close request (user sent a close cmd or
@@ -82,11 +82,11 @@ typedef struct menu_info_s {
 #define MENU_CMD_CLICK 11
 
 /// Global init/uninit
-int menu_init(struct MPContext *mpctx, char* cfg_file);
+int menu_init(struct MPContext *mpctx, const char* cfg_file);
 void menu_uninit(void);
 
 /// Open a menu defined in the config file
-menu_t* menu_open(char *name);
+menu_t* menu_open(const char *name);
 
 void menu_draw(menu_t* menu,mp_image_t* mpi);
 void menu_read_cmd(menu_t* menu,int cmd);

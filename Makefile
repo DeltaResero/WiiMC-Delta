@@ -38,11 +38,14 @@ CFLAGS		=	-g -O3 -Wall $(MACHDEP) $(INCLUDE) $(FREETYPE_CFLAGS) \
 CXXFLAGS	=	$(CFLAGS)
 LDFLAGS		=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 LDFLAGS		+=	-L../buildtools
+# src/utils/tls.c shares one parsed CA bundle with FFmpeg's connections
+LDFLAGS		+=	-Wl,--wrap=mbedtls_x509_crt_parse_file,--wrap=mbedtls_ssl_conf_ca_chain
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lavutil \
+LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lswresample -lavutil \
+                        -lmbedtls -lmbedx509 -lmbedcrypto \
                         -ljpeg -ldi -liso9660 -liconv -lpng -lz -lmxml $(FREETYPE_LIBS) \
                         -lfat -lwiiuse -lbte -logc -ltinysmb
 
@@ -79,12 +82,26 @@ LIBSRC		:=	$(CURDIR)/src/lib
 EXTBUILD	:=	$(CURDIR)/$(BUILD)/external-build
 export EXTPREFIX :=	$(CURDIR)/$(BUILD)/external
 EXTLIBS		:=	$(EXTPREFIX)/lib/libntfs.a $(EXTPREFIX)/lib/libiconv.a
+# mbedTLS: library sources split into the three archives upstream builds
+MBEDTLS		:=	$(LIBSRC)/mbedtls
+MBEDTLSLIBS	:=	$(EXTPREFIX)/lib/libmbedtls.a $(EXTPREFIX)/lib/libmbedx509.a $(EXTPREFIX)/lib/libmbedcrypto.a
+MBEDTLS_SRC	:=	$(notdir $(wildcard $(MBEDTLS)/library/*.c))
+MBEDTLS_X509	:=	$(filter x509%.c pkcs7.c,$(MBEDTLS_SRC))
+MBEDTLS_TLS	:=	$(filter ssl%.c mps%.c debug.c net_sockets.c,$(MBEDTLS_SRC))
+MBEDTLS_CRYPTO	:=	$(filter-out $(MBEDTLS_X509) $(MBEDTLS_TLS),$(MBEDTLS_SRC))
+mbedtls_objs	=	$(patsubst %.c,$(EXTBUILD)/mbedtls/%.o,$(1))
+EXTLIBS		+=	$(MBEDTLSLIBS)
 # libraries built in this tree, so the DOL relinks when one of them changes
-export LINKDEPS	:=	$(MPLAYER)/libmplayerwii.a $(MPLAYER)/ffmpeg/libavformat/libavformat.a \
-				$(MPLAYER)/ffmpeg/libavcodec/libavcodec.a $(MPLAYER)/ffmpeg/libswscale/libswscale.a \
-				$(MPLAYER)/ffmpeg/libavutil/libavutil.a $(EXTLIBS)
+export LINKDEPS	=	$(MPLAYER)/libmplayerwii.a $(FFMPEGLIBS) $(EXTLIBS)
 EXTCONFIGURE	:=	--quiet --host=powerpc-eabi --prefix=$(EXTPREFIX) --disable-shared \
 				--enable-static --disable-nls CFLAGS="-O2 $(MACHDEP) -fno-asynchronous-unwind-tables"
+# FFmpeg 9.0.2 (src/lib/ffmpeg) is configured and built out of tree, with
+# the options in src/lib/ffmpeg-wii.mak, and installed with the others
+include $(LIBSRC)/ffmpeg-wii.mak
+FFSRC		:=	$(LIBSRC)/ffmpeg
+FFBUILD		:=	$(EXTBUILD)/ffmpeg
+FFMPEGLIBS	:=	$(foreach lib,avformat avcodec swscale swresample avutil,$(EXTPREFIX)/lib/lib$(lib).a)
+FFMPEGFILES	:=	$(wildcard $(addprefix $(FFSRC)/,lib*/*.[chS] lib*/*/*.[chS] lib*/*/*/*.[chS]))
 NTFSOBJS	:=	$(patsubst %.c,$(EXTBUILD)/libntfs/%.o,$(notdir $(wildcard src/lib/libntfs/source/*.c)))
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -133,17 +150,13 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 
 export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 				-L$(EXTPREFIX)/lib \
-				-L$(MPLAYER)/ \
-				-L$(MPLAYER)/ffmpeg/libavcodec \
-				-L$(MPLAYER)/ffmpeg/libavformat \
-				-L$(MPLAYER)/ffmpeg/libavutil \
-				-L$(MPLAYER)/ffmpeg/libswscale
+				-L$(MPLAYER)/
 
 export OUTPUT	:=	$(CURDIR)/$(TARGETDIR)/$(TARGET)
 .PHONY: $(BUILD) clean forwarder
 
 #---------------------------------------------------------------------------------
-$(BUILD): $(EXTLIBS)
+$(BUILD): $(EXTLIBS) $(FFMPEGLIBS)
 	@[ -d $(TARGETDIR) ] || mkdir -p $(TARGETDIR)
 	cd src/mplayer; $(MAKE) -f Makefile; cd ../..
 	@[ -d $@ ] || mkdir -p $@
@@ -170,6 +183,48 @@ $(EXTPREFIX)/lib/libiconv.a:
 	$(MAKE) -C $(EXTBUILD)/libiconv/lib install-lib libdir=$(EXTPREFIX)/lib includedir=$(EXTPREFIX)/include
 	cp $(EXTBUILD)/libiconv/include/iconv.h.inst $(EXTPREFIX)/include/iconv.h
 
+# mbedTLS, configured by its committed include/mbedtls/mbedtls_config.h;
+# libmbedcrypto also gets the Wii's clock and entropy source
+MBEDTLS_CFLAGS	:=	-O2 -Wall $(MACHDEP) -fno-asynchronous-unwind-tables \
+				-I$(MBEDTLS)/include -I$(LIBOGC_INC)
+
+$(EXTBUILD)/mbedtls/%.o: $(MBEDTLS)/library/%.c $(MBEDTLS)/include/mbedtls/mbedtls_config.h
+	@mkdir -p $(@D)
+	$(CC) $(MBEDTLS_CFLAGS) -c $< -o $@
+
+$(EXTBUILD)/mbedtls/platform_wii.o: $(LIBSRC)/mbedtls-wii/platform_wii.c $(MBEDTLS)/include/mbedtls/mbedtls_config.h
+	@mkdir -p $(@D)
+	$(CC) $(MBEDTLS_CFLAGS) -c $< -o $@
+
+$(EXTPREFIX)/lib/libmbedcrypto.a: $(call mbedtls_objs,$(MBEDTLS_CRYPTO)) $(EXTBUILD)/mbedtls/platform_wii.o
+$(EXTPREFIX)/lib/libmbedx509.a: $(call mbedtls_objs,$(MBEDTLS_X509))
+$(EXTPREFIX)/lib/libmbedtls.a: $(call mbedtls_objs,$(MBEDTLS_TLS))
+# headers are installed once, not by each archive rule, so parallel jobs
+# don't copy over each other
+MBEDTLSHDR	:=	$(EXTPREFIX)/include/mbedtls/mbedtls_config.h
+$(MBEDTLSHDR): $(wildcard $(MBEDTLS)/include/mbedtls/*.h $(MBEDTLS)/include/psa/*.h)
+	@mkdir -p $(EXTPREFIX)/include
+	rm -rf $(EXTPREFIX)/include/mbedtls $(EXTPREFIX)/include/psa
+	cp -r $(MBEDTLS)/include/mbedtls $(MBEDTLS)/include/psa $(EXTPREFIX)/include/
+
+$(MBEDTLSLIBS): $(MBEDTLSHDR)
+	@mkdir -p $(@D)
+	rm -f $@
+	$(AR) -rc $@ $(filter %.o,$^)
+
+# FFmpeg 9: reconfigured from scratch when its options change, rebuilt and
+# reinstalled when any of its sources change. VPATH is WiiMC's, not FFmpeg's.
+$(FFBUILD)/ffbuild/config.mak: $(LIBSRC)/ffmpeg-wii.mak $(FFSRC)/configure $(MBEDTLSLIBS)
+	@rm -rf $(FFBUILD); mkdir -p $(FFBUILD)
+	cd $(FFBUILD) && $(FFSRC)/configure $(FFMPEG_CONFIGURE) > configure.log || { tail -30 configure.log; false; }
+
+$(firstword $(FFMPEGLIBS)): $(FFBUILD)/ffbuild/config.mak $(FFMPEGFILES)
+	$(MAKE) -C $(FFBUILD) VPATH=
+	$(MAKE) -C $(FFBUILD) VPATH= install
+
+$(wordlist 2,$(words $(FFMPEGLIBS)),$(FFMPEGLIBS)): $(firstword $(FFMPEGLIBS))
+	@:
+
 #---------------------------------------------------------------------------------
 # the channel forwarder in extras/, which links the libntfs built here
 forwarder: $(EXTPREFIX)/lib/libntfs.a
@@ -186,7 +241,7 @@ clean:
 	$(BUILD)/*.o $(BUILD)/*.s
 	@rm -fr $(OUTPUT).elf $(OUTPUT).dol
 	rm -rf $(EXTPREFIX) $(EXTBUILD)
-	cd src/mplayer; $(MAKE) -f Makefile clean
+	cd src/mplayer; $(MAKE) -f Makefile wiiclean
 	$(MAKE) -C extras/forwarder clean
 
 #---------------------------------------------------------------------------------

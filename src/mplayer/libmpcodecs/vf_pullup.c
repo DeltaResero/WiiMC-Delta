@@ -104,7 +104,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi)
 }
 #endif
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
 {
     struct pullup_context *c = vf->priv->ctx;
     struct pullup_buffer *b;
@@ -230,7 +230,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
             dmpi->qstride = mpi->qstride;
             dmpi->qscale_type = mpi->qscale_type;
         }
-        return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE);
+        return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
     }
     dmpi = vf_get_image(vf->next, mpi->imgfmt,
         MP_IMGTYPE_EXPORT, MP_IMGFLAG_ACCEPT_STRIDE,
@@ -249,7 +249,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
         dmpi->qstride = mpi->qstride;
         dmpi->qscale_type = mpi->qscale_type;
     }
-    ret = vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE);
+    ret = vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
     pullup_release_frame(f);
     return ret;
 }
@@ -270,7 +270,10 @@ static int config(struct vf_instance *vf,
     int width, int height, int d_width, int d_height,
     unsigned int flags, unsigned int outfmt)
 {
-    if (height&3) return 0;
+    if (height&3) {
+        mp_msg(MSGT_VFILTER, MSGL_ERR, "height must be divisible by four\n");
+        return 0;
+    }
     return vf_next_config(vf, width, height, d_width, d_height, flags, outfmt);
 }
 

@@ -29,6 +29,8 @@
 #include <assert.h>
 #endif
 
+#include "libavutil/common.h"
+#include "libavutil/avstring.h"
 #include "m_config.h"
 #include "m_option.h"
 #include "mp_msg.h"
@@ -109,10 +111,9 @@ static int show_profile(m_option_t *opt, char* name, char *param)
                p->desc ? p->desc : "");
     config->profile_depth++;
     for (i = 0; i < p->num_opts; i++) {
-        char spc[config->profile_depth + 1];
-        for (j = 0; j < config->profile_depth; j++)
-            spc[j] = ' ';
-        spc[config->profile_depth] = '\0';
+        char spc[MAX_PROFILE_DEPTH + 1];
+        memset(spc, ' ', MAX_PROFILE_DEPTH);
+        spc[FFMIN(config->profile_depth, MAX_PROFILE_DEPTH)] = '\0';
 
         mp_msg(MSGT_CFGPARSER, MSGL_INFO, "%s%s=%s\n", spc,
                p->opts[2 * i], p->opts[2 * i + 1]);
@@ -122,12 +123,11 @@ static int show_profile(m_option_t *opt, char* name, char *param)
             char *e, *list = p->opts[2 * i + 1];
             while ((e = strchr(list, ','))) {
                 int l = e-list;
-                char tmp[l+1];
                 if (!l)
                     continue;
-                memcpy(tmp, list, l);
-                tmp[l] = '\0';
+                char *tmp = av_strndup(list, l);
                 show_profile(opt, name, tmp);
+                av_freep(&tmp);
                 list = e+1;
             }
             if (list[0] != '\0')
@@ -152,7 +152,7 @@ m_config_new(void) {
   m_config_t* config;
   static int initialized = 0;
   static m_option_type_t profile_opt_type;
-  static m_option_t ref_opts[] = {
+  static const m_option_t ref_opts[] = {
     { "profile", NULL, &profile_opt_type, CONF_NOSAVE, 0, 0, NULL },
     { "show-profile", show_profile, CONF_TYPE_PRINT_FUNC, CONF_NOCFG, 0, 0, NULL },
     { "list-options", list_options, CONF_TYPE_PRINT_FUNC, CONF_NOCFG, 0, 0, NULL },
@@ -389,9 +389,9 @@ m_config_get_co(const m_config_t *config, char *arg) {
     int l = strlen(co->name) - 1;
     if((co->opt->type->flags & M_OPT_TYPE_ALLOW_WILDCARD) &&
        (co->name[l] == '*')) {
-      if(strncasecmp(co->name,arg,l) == 0)
+      if(av_strncasecmp(co->name,arg,l) == 0)
         return co;
-    } else if(strcasecmp(co->name,arg) == 0)
+    } else if(av_strcasecmp(co->name,arg) == 0)
       return co;
   }
   return NULL;
@@ -448,9 +448,9 @@ m_config_parse_option(const m_config_t *config, char *arg, char *param, int set)
       int l = strlen(co->name) + 1 + strlen(lst[2*i]) + 1;
       if(r >= 0) {
         // Build the full name
-        char n[l];
-        sprintf(n,"%s:%s",co->name,lst[2*i]);
+        char *n = av_asprintf("%s:%s",co->name,lst[2*i]);
         sr = m_config_parse_option(config,n,lst[2*i+1],set);
+        av_freep(&n);
         if(sr < 0){
           if(sr == M_OPT_UNKNOWN){
             mp_msg(MSGT_CFGPARSER, MSGL_ERR,MSGTR_InvalidSuboption,co->name,lst[2*i]);

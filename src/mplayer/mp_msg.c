@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "libavutil/avstring.h"
 #include "osdep/getch2.h"
 
 #ifdef CONFIG_ICONV
@@ -41,8 +42,12 @@ int mp_msg_color = 0;
 int mp_msg_module = 0;
 #ifdef CONFIG_ICONV
 char *mp_msg_charset = NULL;
+// only used to simplify freeing get_term_charset
+// result, even when it was overwritten by command-line options.
+char *term_charset_ptr_to_free = NULL;
 static char *old_charset = NULL;
 static iconv_t msgiconv;
+static iconv_t inv_msgiconv = (iconv_t)(-1);
 #endif
 
 const char* filename_recode(const char* filename)
@@ -50,13 +55,12 @@ const char* filename_recode(const char* filename)
 #if !defined(CONFIG_ICONV) || !defined(MSG_CHARSET)
     return filename;
 #else
-    static iconv_t inv_msgiconv = (iconv_t)(-1);
     static char recoded_filename[MSGSIZE_MAX];
     size_t filename_len, max_path;
     char* precoded;
     if (!mp_msg_charset ||
-        !strcasecmp(mp_msg_charset, MSG_CHARSET) ||
-        !strcasecmp(mp_msg_charset, "noconv"))
+        !av_strcasecmp(mp_msg_charset, MSG_CHARSET) ||
+        !av_strcasecmp(mp_msg_charset, "noconv"))
         return filename;
     if (inv_msgiconv == (iconv_t)(-1)) {
         inv_msgiconv = iconv_open(MSG_CHARSET, mp_msg_charset);
@@ -85,8 +89,23 @@ void mp_msg_init(void){
     mp_msg_levels[MSGT_IDENTIFY] = -1; // no -identify output by default
 #ifdef CONFIG_ICONV
     mp_msg_charset = getenv("MPLAYER_CHARSET");
-    if (!mp_msg_charset)
-      mp_msg_charset = get_term_charset();
+    if (!mp_msg_charset) {
+      free(term_charset_ptr_to_free); // could assert that is is NULL instead
+      mp_msg_charset = term_charset_ptr_to_free = get_term_charset();
+    }
+#endif
+}
+
+void mp_msg_uninit(void)
+{
+#ifdef CONFIG_ICONV
+    if (old_charset) {
+        free(old_charset);
+        iconv_close(msgiconv);
+    }
+    if (inv_msgiconv != (iconv_t)(-1)) iconv_close(inv_msgiconv);
+    free(term_charset_ptr_to_free);
+    term_charset_ptr_to_free = NULL;
 #endif
 }
 
@@ -197,7 +216,7 @@ void mp_msg_va(int mod, int lev, const char *format, va_list va){
     tmp[MSGSIZE_MAX-1] = 0;
 
 #if defined(CONFIG_ICONV) && defined(MSG_CHARSET)
-    if (mp_msg_charset && strcasecmp(mp_msg_charset, "noconv")) {
+    if (mp_msg_charset && av_strcasecmp(mp_msg_charset, "noconv")) {
       char tmp2[MSGSIZE_MAX];
       size_t inlen = strlen(tmp), outlen = MSGSIZE_MAX;
       char *in = tmp, *out = tmp2;

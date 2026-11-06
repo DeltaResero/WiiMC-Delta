@@ -36,10 +36,14 @@
 #include <errno.h>
 
 #include "libavutil/avutil.h"
+#include "libavutil/common.h"
 #include "osdep/shmem.h"
 #include "osdep/timer.h"
 #if defined(__MINGW32__)
 #include <windows.h>
+#ifdef _MSC_VER
+#include <process.h>
+#endif
 static void ThreadProc( void *s );
 #elif defined(__OS2__)
 #define INCL_DOS
@@ -107,15 +111,16 @@ typedef struct {
   // callback
   stream_t* stream;
   volatile int control;
-  volatile unsigned control_uint_arg;
+  volatile uint64_t control_uint_arg;
   volatile double control_double_arg;
+  volatile char *control_char_p_arg;
   volatile struct stream_lang_req control_lang_arg;
   volatile int control_res;
   volatile double stream_time_length;
   volatile double stream_time_pos;
 } cache_vars_t;
 
-float cache_fill_status=0;
+float cache_fill_level=0;
 
 static void cache_flush(cache_vars_t *s)
 {
@@ -193,7 +198,7 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
   getWeird = 0;
 
 #ifndef GEKKO
-  cache_fill_status=(s->max_filepos-s->read_filepos)/(s->buffer_size / 100);
+  cache_fill_level=(s->max_filepos-s->read_filepos)/(s->buffer_size / 100);
 #endif
   return total;
 }
@@ -203,7 +208,7 @@ static int cache_fill(cache_vars_t *s)
 #ifdef GEKKO
   if(!s || s->eof)
   {
-      cache_fill_status=-1;
+      cache_fill_level=-1;
           return 0;
   }
 #endif
@@ -242,8 +247,8 @@ static int cache_fill(cache_vars_t *s)
   if(space<s->fill_limit){
 //    printf("Buffer is full (%d bytes free, limit: %d)\n",space,s->fill_limit);
 #ifdef GEKKO
-          if(s->eof) cache_fill_status=-1;
-        else cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
+          if(s->eof) cache_fill_level=-1;
+        else cache_fill_level=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
 #endif
     return 0; // no fill...
   }
@@ -301,18 +306,18 @@ static int cache_fill(cache_vars_t *s)
                 else
                 {
                   //retry if we have cache
-                  cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
-                  if(cache_fill_status<5)
+                  cache_fill_level=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
+                  if(cache_fill_level<5)
                   {
                         s->eof=1;
-                        cache_fill_status=-1;
-                        printf("error: %i cache_fill_status<5  eof=1\n",s->stream->error);
+                        cache_fill_level=-1;
+                        printf("error: %i cache_fill_level<5  eof=1\n",s->stream->error);
                   }
                   else
                   {
                         extern char fileplaying[MAXPATHLEN];
                         //s->eof=0;
-                                printf("retry read (%f): %i -> %s \n",cache_fill_status,s->stream->error,fileplaying);
+                                printf("retry read (%f): %i -> %s \n",cache_fill_level,s->stream->error,fileplaying);
 
                                 if(s->stream->error>3 && strncmp(fileplaying,"smb",3)==0)//only reset network in samba, maybe we can check internet streams later, samba can reconnect
                                         CheckMplayerNetwork();
@@ -321,7 +326,7 @@ static int cache_fill(cache_vars_t *s)
         }
         else
         {
-                cache_fill_status=-1;
+                cache_fill_level=-1;
                 printf("error. eof = 1\n");
                 s->eof=1;
         }
@@ -336,8 +341,8 @@ static int cache_fill(cache_vars_t *s)
       s->offset+=s->buffer_size;
   }
 #ifdef GEKKO
-  if(s->eof) cache_fill_status=-1;
-  else cache_fill_status=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
+  if(s->eof) cache_fill_level=-1;
+  else cache_fill_level=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
 #endif
   return len;
 
@@ -346,6 +351,7 @@ static int cache_fill(cache_vars_t *s)
 static int cache_execute_control(cache_vars_t *s) {
   double double_res;
   unsigned uint_res;
+  uint64_t uint64_res;
   int needs_flush = 0;
   static u64 last;
   u64 now;
@@ -396,15 +402,24 @@ static int cache_execute_control(cache_vars_t *s) {
     case STREAM_CTRL_SET_ANGLE:
       needs_flush = 1;
       uint_res = s->control_uint_arg;
+    case STREAM_CTRL_GET_NUM_TITLES:
     case STREAM_CTRL_GET_NUM_CHAPTERS:
+    case STREAM_CTRL_GET_CURRENT_TITLE:
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     case STREAM_CTRL_GET_NUM_ANGLES:
     case STREAM_CTRL_GET_ANGLE:
       s->control_res = s->stream->control(s->stream, s->control, &uint_res);
       s->control_uint_arg = uint_res;
       break;
+    case STREAM_CTRL_GET_SIZE:
+      s->control_res = s->stream->control(s->stream, s->control, &uint64_res);
+      s->control_uint_arg = uint64_res;
+      break;
     case STREAM_CTRL_GET_LANG:
       s->control_res = s->stream->control(s->stream, s->control, (void *)&s->control_lang_arg);
+      break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      s->control_res = s->stream->control(s->stream, s->control, &s->control_char_p_arg);
       break;
     default:
       s->control_res = STREAM_UNSUPPORTED;
@@ -536,7 +551,7 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
   int res = -1;
   cache_vars_t* s;
 #ifdef GEKKO
-  cache_fill_status=-1;
+  cache_fill_level=-1;
 #endif
   if (stream->flags & STREAM_NON_CACHEABLE) {
     //mp_msg(MSGT_CACHE,MSGL_STATUS,"\rThis stream is non-cacheable\n");
@@ -711,6 +726,14 @@ int cache_stream_fill_buffer(stream_t *s){
 
 }
 
+int cache_fill_status(stream_t *s) {
+  cache_vars_t *cv;
+  if (!s || !s->cache_data)
+    return -1;
+  cv = s->cache_data;
+  return (cv->max_filepos-cv->read_filepos)/(cv->buffer_size / 100);
+}
+
 int cache_stream_seek_long(stream_t *stream,off_t pos){
   cache_vars_t* s;
   off_t newpos;
@@ -768,12 +791,19 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
       return s->stream_time_pos != MP_NOPTS_VALUE ? STREAM_OK : STREAM_UNSUPPORTED;
     case STREAM_CTRL_GET_LANG:
       s->control_lang_arg = *(struct stream_lang_req *)arg;
+    case STREAM_CTRL_GET_NUM_TITLES:
     case STREAM_CTRL_GET_NUM_CHAPTERS:
+    case STREAM_CTRL_GET_CURRENT_TITLE:
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     case STREAM_CTRL_GET_ASPECT_RATIO:
     case STREAM_CTRL_GET_NUM_ANGLES:
     case STREAM_CTRL_GET_ANGLE:
+    case STREAM_CTRL_GET_SIZE:
     case -2:
+      s->control = cmd;
+      break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      s->control_char_p_arg = *(char **)arg;
       s->control = cmd;
       break;
     default:
@@ -804,14 +834,22 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
     case STREAM_CTRL_GET_ASPECT_RATIO:
       *(double *)arg = s->control_double_arg;
       break;
+    case STREAM_CTRL_GET_NUM_TITLES:
     case STREAM_CTRL_GET_NUM_CHAPTERS:
+    case STREAM_CTRL_GET_CURRENT_TITLE:
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     case STREAM_CTRL_GET_NUM_ANGLES:
     case STREAM_CTRL_GET_ANGLE:
       *(unsigned *)arg = s->control_uint_arg;
       break;
+    case STREAM_CTRL_GET_SIZE:
+      *(uint64_t *)arg = s->control_uint_arg;
+      break;
     case STREAM_CTRL_GET_LANG:
       *(struct stream_lang_req *)arg = s->control_lang_arg;
+      break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      *(char **)arg = (char *)s->control_char_p_arg;
       break;
   }
   return s->control_res;
@@ -873,10 +911,10 @@ void refillcache(stream_t *stream,float min)
         float old=0;
         t1 = GetTimerMS();
 
-    while(cache_fill_status<min)
+    while(cache_fill_level<min)
     {
-                //printf("Cache fill: %5.2f%%  \n",(float)(100.0*(float)(cache_fill_status)/(float)(min)));
-        ShowProgress("Buffering...", (int)cache_fill_status, (int)min);
+                //printf("Cache fill: %5.2f%%  \n",(float)(100.0*(float)(cache_fill_level)/(float)(min)));
+        ShowProgress("Buffering...", (int)cache_fill_level, (int)min);
                 if(s->eof) break; // file is smaller than prefill size
 
                 if(out==0)out=stream_check_interrupt(PREFILL_SLEEP_TIME);
@@ -893,19 +931,19 @@ void refillcache(stream_t *stream,float min)
                   }
 
                 }
-                //printf("Cache fill: %5.2f%%  \n",cache_fill_status);
-                if(cache_fill_status > 5 && out)
+                //printf("Cache fill: %5.2f%%  \n",cache_fill_level);
+                if(cache_fill_level > 5 && out)
                 {
-                        //printf("break Cache fill: %5.2f%%  \n",cache_fill_status);
+                        //printf("break Cache fill: %5.2f%%  \n",cache_fill_level);
                         return ;
                 }
 
                 //not needed, for security
-                if(old<cache_fill_status)t1 = GetTimerMS();
+                if(old<cache_fill_level)t1 = GetTimerMS();
             if(GetTimerMS()-t1>1500) return;
-                old=cache_fill_status;
+                old=cache_fill_level;
                 usleep(50);
     }
-    //printf("end Cache fill: %5.2f%%  \n",cache_fill_status);
+    //printf("end Cache fill: %5.2f%%  \n",cache_fill_level);
 }
 #endif

@@ -180,6 +180,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi){
     if(mpi->flags&MP_IMGFLAG_PRESERVE) return; // don't change
     if(mpi->imgfmt!=vf->priv->outfmt) return; // colorspace differ
     // ok, we can do pp in-place (or pp disabled):
+    mpi->priv =
     vf->dmpi=vf_get_image(vf->next,mpi->imgfmt,
                           mpi->type, mpi->flags, mpi->w, mpi->h);
     mpi->planes[0]=vf->dmpi->planes[0];
@@ -194,10 +195,13 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi){
     mpi->flags|=MP_IMGFLAG_DIRECT;
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
     mp_image_t *dmpi;
 
-    if(!(mpi->flags&MP_IMGFLAG_DIRECT)){
+    if(mpi->flags&MP_IMGFLAG_DIRECT) {
+        vf->dmpi = mpi->priv;
+        mpi->priv = NULL;
+    } else {
         // no DR, so get a new image! hope we'll get DR buffer:
         vf->dmpi=vf_get_image(vf->next,vf->priv->outfmt,
                               MP_IMGTYPE_TEMP, MP_IMGFLAG_ACCEPT_STRIDE,
@@ -219,7 +223,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 
     vf_clone_mpi_attributes(dmpi, mpi);
 
-    return vf_next_put_image(vf,dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static void uninit(struct vf_instance *vf){

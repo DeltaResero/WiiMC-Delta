@@ -18,6 +18,7 @@
 
 #if defined(__MINGW32__) || defined(__CYGWIN__)
 #include <windows.h>
+#include <windef.h>
 #endif
 #include <stdlib.h>
 #include "stream/stream.h"
@@ -76,10 +77,12 @@ void print_version(const char* name)
     GetCpuCaps(&gCpuCaps);
 #if ARCH_X86
     mp_msg(MSGT_CPLAYER, MSGL_V,
-           "CPUflags:  MMX: %d MMX2: %d 3DNow: %d 3DNowExt: %d SSE: %d SSE2: %d SSSE3: %d\n",
+           "CPUflags:  MMX: %d MMX2: %d 3DNow: %d 3DNowExt: %d SSE: %d SSE2: %d SSE3: %d SSSE3: %d SSE4: %d SSE4.2: %d AVX: %d\n",
            gCpuCaps.hasMMX, gCpuCaps.hasMMX2,
            gCpuCaps.has3DNow, gCpuCaps.has3DNowExt,
-           gCpuCaps.hasSSE, gCpuCaps.hasSSE2, gCpuCaps.hasSSSE3);
+           gCpuCaps.hasSSE, gCpuCaps.hasSSE2, gCpuCaps.hasSSE3,
+           gCpuCaps.hasSSSE3, gCpuCaps.hasSSE4, gCpuCaps.hasSSE42,
+           gCpuCaps.hasAVX);
 #if CONFIG_RUNTIME_CPUDETECT
     mp_msg(MSGT_CPLAYER, MSGL_V, "Compiled with runtime CPU detection.\n");
 #else
@@ -96,9 +99,17 @@ if (HAVE_SSE)
     mp_msg(MSGT_CPLAYER,MSGL_V," SSE");
 if (HAVE_SSE2)
     mp_msg(MSGT_CPLAYER,MSGL_V," SSE2");
+if (HAVE_SSE3)
+    mp_msg(MSGT_CPLAYER,MSGL_V," SSE3");
 if (HAVE_SSSE3)
     mp_msg(MSGT_CPLAYER,MSGL_V," SSSE3");
-if (HAVE_CMOV)
+if (HAVE_SSE4)
+    mp_msg(MSGT_CPLAYER,MSGL_V," SSE4");
+if (HAVE_SSE42)
+    mp_msg(MSGT_CPLAYER,MSGL_V," SSE4.2");
+if (HAVE_AVX)
+    mp_msg(MSGT_CPLAYER,MSGL_V," AVX");
+if (HAVE_I686)
     mp_msg(MSGT_CPLAYER,MSGL_V," CMOV");
     mp_msg(MSGT_CPLAYER,MSGL_V,"\n");
 #endif /* CONFIG_RUNTIME_CPUDETECT */
@@ -278,6 +289,15 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
             if (type == 'd') {
                 if (d_dvdsub->demuxer->teletext) {
                     uint8_t *p = packet;
+                    if (len == 3124) { // wtv subtitle-only format
+                        while (len >= 42) {
+                            teletext_control(d_dvdsub->demuxer->teletext,
+                                TV_VBI_CONTROL_DECODE_LINE, p);
+                            p   += 42;
+                            len -= 42;
+                        }
+                        return;
+                    }
                     p++;
                     len--;
                     while (len >= 46) {
@@ -407,6 +427,16 @@ int select_audio(demuxer_t* demuxer, int audio_id, char* audio_lang)
     return demuxer->audio->id;
 }
 
+int select_video(demuxer_t* demuxer, int video_id)
+{
+    if (video_id == -1)
+        video_id = demuxer_default_video_track(demuxer);
+    if (video_id != -1) // -1 (automatic) is the default behaviour of demuxers
+        demuxer_switch_video(demuxer, video_id);
+
+    return demuxer->video->id;
+}
+
 /* Parse -noconfig common to both programs */
 int disable_system_conf=0;
 int disable_user_conf=0;
@@ -447,17 +477,72 @@ const m_option_t noconfig_opts[] = {
     {NULL, NULL, 0, 0, 0, 0, NULL}
 };
 
-/**
- * Initialization code to be run at the very start, must not depend
- * on option values.
- */
-void common_preinit(void)
+#ifdef __MINGW32__
+static int get_win32_cmdline(int *argc_ptr, char **argv_ptr[])
 {
-    InitTimer();
-    srand(GetTimerMS());
+    int i;
+    int argv_size, size;
+    int argc_n;
+    char **argv_n;
+    LPWSTR *argv_w = NULL;
+    void *buffer = NULL;
+    char *strs, *strs_end;
 
-    mp_msg_init();
+    HMODULE kernel32 = GetModuleHandle("Kernel32.dll");
+    HMODULE shell32  = GetModuleHandle("shell32.dll");
+    int (WINAPI *wc2mb)(UINT, DWORD, LPCWSTR, int, LPSTR, int, LPCSTR, LPBOOL) = NULL;
+    LPCWSTR (WINAPI *getCmdlW)(void) = NULL;
+    LPWSTR *(WINAPI *cmdl2argv)(LPCWSTR, int *) = NULL;
+
+    if (!kernel32 || !shell32)
+        goto err_out;
+    wc2mb = GetProcAddress(kernel32, "WideCharToMultiByte");
+    getCmdlW = GetProcAddress(kernel32, "GetCommandLineW");
+    cmdl2argv = GetProcAddress(shell32, "CommandLineToArgvW");
+    if (!wc2mb || !getCmdlW || !cmdl2argv)
+        goto err_out;
+
+    argv_w = cmdl2argv(getCmdlW(), &argc_n);
+    if (!argv_w || argc_n < 0 || argc_n >= INT_MAX / sizeof(char *))
+        goto err_out;
+
+    size = argv_size = (argc_n + 1) * sizeof(char *);
+    for (i = 0; i < argc_n; i++) {
+        int conv_size = wc2mb(CP_UTF8, 0, argv_w[i], -1, NULL, 0, NULL, NULL);
+        if (conv_size < 0 || conv_size > INT_MAX - size)
+            goto err_out;
+        size += conv_size;
+    }
+
+    buffer = calloc(1, size);
+    if (!buffer)
+        goto err_out;
+    argv_n = buffer;
+    strs_end = strs = buffer;
+    strs += argv_size;
+    strs_end += size;
+
+    for (i = 0; i < argc_n; i++) {
+        int conv_size = wc2mb(CP_UTF8, 0, argv_w[i], -1,
+                              strs, strs_end - strs, NULL, NULL);
+        if (conv_size < 0 || conv_size > strs_end - strs)
+            goto err_out;
+        argv_n[i] = strs;
+        strs += conv_size;
+    }
+    argv_n[i] = NULL;
+
+    *argc_ptr = argc_n;
+    *argv_ptr = argv_n;
+    LocalFree(argv_w);
+    return 0;
+
+err_out:
+    free(buffer);
+    LocalFree(argv_w);
+    return -1;
 }
+#endif
 
 /**
  * Code to fix any kind of insane defaults some OS might have.
@@ -467,8 +552,8 @@ static void sanitize_os(void)
 {
 #if defined(__MINGW32__) || defined(__CYGWIN__)
     HMODULE kernel32 = GetModuleHandle("Kernel32.dll");
-    BOOL WINAPI (*setDEP)(DWORD) = NULL;
-    BOOL WINAPI (*setDllDir)(LPCTSTR) = NULL;
+    BOOL (WINAPI *setDEP)(DWORD) = NULL;
+    BOOL (WINAPI *setDllDir)(LPCTSTR) = NULL;
     if (kernel32) {
         setDEP = GetProcAddress(kernel32, "SetProcessDEPPolicy");
         setDllDir = GetProcAddress(kernel32, "SetDllDirectoryA");
@@ -483,6 +568,25 @@ static void sanitize_os(void)
 }
 
 /**
+ * Initialization code to be run at the very start, must not depend
+ * on option values.
+ */
+void common_preinit(int *argc_ptr, char **argv_ptr[])
+{
+#ifdef __MINGW32__
+    get_win32_cmdline(argc_ptr, argv_ptr);
+#else
+    (void)argc_ptr;
+    (void)argv_ptr;
+#endif
+    sanitize_os();
+    InitTimer();
+    srand(GetTimerMS());
+
+    mp_msg_init();
+}
+
+/**
  * Initialization code to be run after command-line parsing.
  */
 int common_init(void)
@@ -491,14 +595,10 @@ int common_init(void)
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL)
     set_path_env();
 #endif
-    sanitize_os();
 
 #ifdef CONFIG_PRIORITY
     set_priority();
 #endif
-
-    if (codec_path)
-        set_codec_path(codec_path);
 
     /* Check codecs.conf. */
     if (!codecs_file || !parse_codec_cfg(codecs_file)) {
@@ -534,8 +634,10 @@ int common_init(void)
             char *desc_path = get_path("font/font.desc");
             vo_font = read_font_desc(desc_path, font_factor, verbose>1);
             free(desc_path);
+#ifndef GEKKO
             if (!vo_font)
                 vo_font = read_font_desc(MPLAYER_DATADIR "/font/font.desc", font_factor, verbose>1);
+#endif
         }
         if (sub_font_name)
             sub_font = read_font_desc(sub_font_name, font_factor, verbose>1);
@@ -550,6 +652,28 @@ int common_init(void)
     ass_library = ass_init();
 #endif
     return 1;
+}
+
+void common_uninit(void)
+{
+    spudec_free(vo_spudec);
+    vo_spudec = NULL;
+#ifdef CONFIG_FREETYPE
+    current_module = "uninit_font";
+    if (sub_font && sub_font != vo_font)
+        free_font_desc(sub_font);
+    sub_font = NULL;
+    if (vo_font)
+        free_font_desc(vo_font);
+    vo_font = NULL;
+    done_freetype();
+#endif
+    free_osd_list();
+
+#ifdef CONFIG_ASS
+    ass_library_done(ass_library);
+    ass_library = NULL;
+#endif
 }
 
 /// Returns a_pts

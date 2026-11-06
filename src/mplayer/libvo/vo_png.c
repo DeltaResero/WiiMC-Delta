@@ -36,6 +36,8 @@
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "subopt-helper.h"
 #include "libavcodec/avcodec.h"
@@ -91,8 +93,7 @@ static void png_mkdir(char *buf, int verbose) {
                     exit_player(EXIT_ERROR);
                 }
 
-                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s - %s\n", info.short_name,
-                        buf, MSGTR_VO_DirExistsAndIsWritable);
+                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s: %s\n", info.short_name, MSGTR_VO_OutputDirectory, buf);
                 break;
 
             default:
@@ -125,15 +126,18 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 
 
     if (avctx && png_format != format) {
-        avcodec_close(avctx);
-        av_freep(&avctx);
+        avcodec_free_context(&avctx);
     }
 
     if (!avctx) {
         avctx = avcodec_alloc_context3(NULL);
         avctx->compression_level = z_compression;
         avctx->pix_fmt = imgfmt2pixfmt(format);
-        if (avcodec_open2(avctx, avcodec_find_encoder(CODEC_ID_PNG), NULL) < 0) {
+        avctx->width = width;
+        avctx->height = height;
+        avctx->time_base.num = 1;
+        avctx->time_base.den = 1;
+        if (avcodec_open2(avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL) < 0) {
             uninit();
             return -1;
         }
@@ -144,11 +148,11 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 
 
 static uint32_t draw_image(mp_image_t* mpi){
-    AVFrame pic;
-    int buffersize;
+    AVFrame *pic;
     int res;
     char buf[100];
     FILE *outfile;
+    AVPacket pkt;
 
     // if -dr or -slices then do nothing:
     if(mpi->flags&(MP_IMGFLAG_DIRECT|MP_IMGFLAG_DRAW_CALLBACK)) return VO_TRUE;
@@ -160,26 +164,33 @@ static uint32_t draw_image(mp_image_t* mpi){
         return 1;
     }
 
+    pic = av_frame_alloc();
     avctx->width = mpi->w;
     avctx->height = mpi->h;
-    pic.data[0] = mpi->planes[0];
-    pic.linesize[0] = mpi->stride[0];
-    buffersize = mpi->w * mpi->h * 8;
-    if (outbuffer_size < buffersize) {
-        av_freep(&outbuffer);
-        outbuffer = av_malloc(buffersize);
-        outbuffer_size = buffersize;
+    pic->width  = mpi->w;
+    pic->height = mpi->h;
+    pic->format = imgfmt2pixfmt(png_format);
+    pic->data[0] = mpi->planes[0];
+    pic->linesize[0] = mpi->stride[0];
+    av_init_packet(&pkt);
+    res = avcodec_send_frame(avctx, pic);
+    if (res >= 0) {
+        res = avcodec_receive_packet(avctx, &pkt);
+        if (res == AVERROR(EAGAIN)) {
+            avcodec_send_frame(avctx, NULL);
+            res = avcodec_receive_packet(avctx, &pkt);
+        }
     }
-    res = avcodec_encode_video(avctx, outbuffer, outbuffer_size, &pic);
+    av_frame_free(&pic);
 
-    if(res < 0){
+    if (res < 0) {
             mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);
-            fclose(outfile);
-            return 1;
+    } else {
+        fwrite(pkt.data, pkt.size, 1, outfile);
     }
 
-    fwrite(outbuffer, res, 1, outfile);
     fclose(outfile);
+    av_packet_unref(&pkt);
 
     return VO_TRUE;
 }
@@ -187,16 +198,6 @@ static uint32_t draw_image(mp_image_t* mpi){
 static void draw_osd(void){}
 
 static void flip_page (void){}
-
-static int draw_frame(uint8_t * src[])
-{
-    return -1;
-}
-
-static int draw_slice( uint8_t *src[],int stride[],int w,int h,int x,int y )
-{
-    return -1;
-}
 
 static int
 query_format(uint32_t format)
@@ -212,8 +213,7 @@ query_format(uint32_t format)
 }
 
 static void uninit(void){
-    avcodec_close(avctx);
-    av_freep(&avctx);
+    avcodec_free_context(&avctx);
     av_freep(&outbuffer);
     outbuffer_size = 0;
     free(png_outdir);
@@ -247,7 +247,6 @@ static int preinit(const char *arg)
     if (subopt_parse(arg, subopts) != 0) {
         return -1;
     }
-    avcodec_register_all();
     return 0;
 }
 

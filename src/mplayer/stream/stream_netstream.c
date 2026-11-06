@@ -64,7 +64,7 @@
 #include "stream_netstream.h"
 #include "tcp.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* host;
   int port;
   char* url;
@@ -106,7 +106,8 @@ static int lock_fd(int fd) {
              strerror(errno));
       return 0;
     }
-  } while(0);
+    break;
+  } while(1);
   mp_msg(MSGT_STREAM,MSGL_DBG2, "Locked (%d)\n",getpid());
 #else
 printf("FIXME? should lock here\n");
@@ -156,7 +157,7 @@ static mp_net_stream_packet_t* send_net_stream_cmd(stream_t *s,uint16_t cmd,char
   case NET_STREAM_OK:
     return pack;
   case NET_STREAM_ERROR:
-    if(pack->len > sizeof(mp_net_stream_packet_t))
+    if(pack->len > 0)
       mp_msg(MSGT_STREAM,MSGL_ERR, "Fill buffer failed: %s\n",pack->data);
     else
       mp_msg(MSGT_STREAM,MSGL_ERR, "Fill buffer failed\n");
@@ -171,30 +172,28 @@ static mp_net_stream_packet_t* send_net_stream_cmd(stream_t *s,uint16_t cmd,char
 
 static int fill_buffer(stream_t *s, char* buffer, int max_len){
   uint16_t len = le2me_16(max_len);
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_FILL_BUFFER,(char*)&len,2);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_FILL_BUFFER,(char*)&len,2);
   if(!pack) {
     return -1;
   }
-  len = pack->len - sizeof(mp_net_stream_packet_t);
+  len = pack->len;
   if(len > max_len) {
     mp_msg(MSGT_STREAM,MSGL_ERR, "Got a too big a packet %d / %d\n",len,max_len);
-    free(pack);
-    return 0;
+    goto err_out;
   }
   if(len > 0)
     memcpy(buffer,pack->data,len);
   free(pack);
   return len;
+err_out:
+  free(pack);
+  return 0;
 }
 
 
-static int seek(stream_t *s,off_t newpos) {
-  uint64_t pos = le2me_64((uint64_t)newpos);
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_SEEK,(char*)&pos,8);
+static int seek(stream_t *s, int64_t newpos) {
+  uint64_t pos = le2me_64(newpos);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_SEEK,(char*)&pos,8);
   if(!pack) {
     return 0;
   }
@@ -204,9 +203,7 @@ static int seek(stream_t *s,off_t newpos) {
 }
 
 static int net_stream_reset(struct stream *s) {
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_RESET,NULL,0);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_RESET,NULL,0);
   if(!pack) {
     return 0;
   }
@@ -223,9 +220,7 @@ static int control(struct stream *s,int cmd,void* arg) {
 }
 
 static void close_s(struct stream *s) {
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_CLOSE,NULL,0);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_CLOSE,NULL,0);
   free(pack);
 }
 
@@ -262,8 +257,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     goto error;
   }
 
-  if(pack->len != sizeof(mp_net_stream_packet_t) +
-     sizeof(mp_net_stream_opened_t)) {
+  if(pack->len != sizeof(mp_net_stream_opened_t)) {
     mp_msg(MSGT_OPEN,MSGL_ERR, "Invalid open response packet len (%d bytes)\n",pack->len);
     free(pack);
     goto error;

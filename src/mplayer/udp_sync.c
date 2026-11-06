@@ -19,10 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #ifndef GEKKO
+
+#define _BSD_SOURCE
+
 #include "config.h"
 
 #if !HAVE_WINSOCK2_H
 #include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -30,7 +34,6 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <string.h>
-#include <strings.h>
 #include <netdb.h>
 #include <signal.h>
 #else
@@ -110,7 +113,11 @@ static int get_udp(int blocking, double *master_position)
         servaddr.sin_family      = AF_INET;
         servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
         servaddr.sin_port        = htons(udp_port);
-        bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+        if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
+            closesocket(sockfd);
+            sockfd = -1;
+            return -1;
+        }
 
         setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 

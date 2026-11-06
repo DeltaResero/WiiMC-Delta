@@ -51,7 +51,7 @@
 
 typedef struct {
     off_t offset;
-    int size;
+    uint16_t size;
     uint8_t type;
     uint8_t is_packet_start;
     float pts;
@@ -62,7 +62,7 @@ typedef struct {
     float last_audio_pts;
     float last_video_pts;
     float video_pts_after_prebytes;
-    int video_size_after_prebytes;
+    uint16_t video_size_after_prebytes;
     uint8_t prebytes_delivered;
     uint8_t just_synced;
     uint8_t synced_stream_id;
@@ -140,13 +140,12 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
 
 
 
-    priv=malloc(sizeof(pva_priv_t));
+    priv=calloc(1, sizeof(pva_priv_t));
 
     if(demuxer->stream->type!=STREAMTYPE_FILE) demuxer->seekable=0;
     else demuxer->seekable=1;
 
     demuxer->priv=priv;
-    memset(demuxer->priv,0,sizeof(pva_priv_t));
 
     if(!pva_sync(demuxer))
     {
@@ -156,6 +155,7 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
 
     //printf("priv->just_synced %s after initial sync!\n",priv->just_synced?"set":"UNSET");
 
+    demuxer->video->id = 0;
     demuxer->video->sh=sh_video;
 
     //printf("demuxer->stream->end_pos= %d\n",demuxer->stream->end_pos);
@@ -171,7 +171,6 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
     */
 
     sh_video->format=0x10000002;
-    sh_video->ds=demuxer->video;
 
     /*
     printf("demuxer->video->id==%d\n",demuxer->video->id);
@@ -181,7 +180,6 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
     demuxer->audio->id = 0;
     demuxer->audio->sh=sh_audio;
     sh_audio->format=0x50;
-    sh_audio->ds=demuxer->audio;
 
     demuxer->movi_start=0;
     demuxer->movi_end=demuxer->stream->end_pos;

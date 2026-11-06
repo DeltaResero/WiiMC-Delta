@@ -284,10 +284,9 @@ static void adjust_font_scale(ASS_Track* track)
 }
 #endif
 
-void ass_configure(ASS_Renderer* priv, int w, int h, int unscaled) {
+static void ass_configure(ASS_Renderer* priv, int w, int h, int unscaled) {
     int hinting;
     ass_set_frame_size(priv, w, h);
-    ass_set_margins(priv, ass_top_margin, ass_bottom_margin, 0, 0);
     ass_set_use_margins(priv, ass_use_margins);
 #ifdef GEKKO
     adjust_font_scale(ass_track);
@@ -301,7 +300,7 @@ void ass_configure(ASS_Renderer* priv, int w, int h, int unscaled) {
     ass_set_line_spacing(priv, ass_line_spacing);
 }
 
-void ass_configure_fonts(ASS_Renderer* priv) {
+static void ass_configure_fonts(ASS_Renderer* priv) {
     char *dir, *path, *family;
     dir = get_path("fonts");
     //if (font_fontconfig < 0 && sub_font_name) path = strdup(sub_font_name);
@@ -313,7 +312,7 @@ void ass_configure_fonts(ASS_Renderer* priv) {
     else if (font_fontconfig >= 0 && font_name) family = strdup(font_name);
     else family = 0;
 
-        ass_set_fonts(priv, path, family, font_fontconfig, NULL, 1);
+        ass_set_fonts(priv, path, family, font_fontconfig >= 0, NULL, 1);
 
     free(dir);
     free(path);
@@ -333,6 +332,7 @@ static void message_callback(int level, const char *format, va_list va, void *ct
         mp_msg(MSGT_ASS, level, "[ass] %s\n", str);
         free(str);
     }
+    va_end(dst);
 }
 
 /**
@@ -358,21 +358,6 @@ ASS_Library* ass_init(void) {
 int ass_force_reload = 0; // flag set if global ass-related settings were changed
 //extern int use_nocorrect;
 
-ASS_Image* ass_mp_render_frame(ASS_Renderer *priv, ASS_Track* track, long long now, int* detect_change) {
-    if (ass_force_reload) {
-#ifdef GEKKO
-        adjust_font_scale(track);
-        // test correct_pts
-        //++use_nocorrect;
-#endif
-        ass_set_margins(priv, ass_top_margin, ass_bottom_margin, 0, 0);
-        ass_set_use_margins(priv, ass_use_margins);
-        ass_set_font_scale(priv, ass_font_scale);
-        ass_force_reload = 0;
-    }
-    return ass_render_frame(priv, track, now, detect_change);
-}
-
 /* EOSD source for ASS subtitles. */
 
 static ASS_Renderer *ass_renderer;
@@ -380,18 +365,20 @@ static int prev_visibility;
 
 static void eosd_ass_update(struct mp_eosd_source *src, const struct mp_eosd_settings *res, double ts)
 {
-    long long ts_ms = (ts + sub_delay) * 1000 + .5;
+    long long ts_ms = (ts - sub_delay) * 1000 + .5;
     ASS_Image *aimg;
     struct mp_eosd_image *img;
-    if (res->changed || !src->initialized) {
+    if (res->changed || !src->initialized || ass_force_reload) {
         double dar = (double) (res->w - res->ml - res->mr) / (res->h - res->mt - res->mb);
         ass_configure(ass_renderer, res->w, res->h, res->unscaled);
-        ass_set_margins(ass_renderer, res->mt, res->mb, res->ml, res->mr);
+        ass_set_margins(ass_renderer, res->mt + ass_top_margin, res->mb + ass_bottom_margin, res->ml, res->mr);
         ass_set_aspect_ratio(ass_renderer, dar, (double)res->srcw / res->srch);
+        ass_set_storage_size(ass_renderer, res->srcw, res->srch);
         src->initialized = 1;
+        ass_force_reload = 0;
     }
     aimg = sub_visibility && ass_track && ts != MP_NOPTS_VALUE ?
-        ass_mp_render_frame(ass_renderer, ass_track, ts_ms, &src->changed) :
+        ass_render_frame(ass_renderer, ass_track, ts_ms, &src->changed) :
         NULL;
     if (!aimg != !src->images)
         src->changed = 2;

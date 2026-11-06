@@ -71,3 +71,70 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
 - Version: GNU FriBidi 0.19.2; in WiiMC since its first commit
 - Licence: LGPL 2.1 or later (`COPYING`)
 - Lays out right-to-left text, such as Arabic and Hebrew.
+
+## FFmpeg
+
+- Upstream: https://git.ffmpeg.org/ffmpeg.git
+- Version: FFmpeg 9.0.2 (tag `n9.0.2`, commit
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8`)
+- Fetched: 2026-11-03
+- Licence: LGPL 2.1 or later (`COPYING.LGPLv2.1`, `LICENSE.md`); WiiMC
+  builds it with the GPL parts enabled, which makes the result GPL.
+- Trimmed to what WiiMC's build reads: the sources and headers its objects
+  are compiled from, the build machinery (`configure`, `ffbuild/`, the
+  library Makefiles and version scripts), the component lists `configure`
+  scans, the libraries' public headers, and the licence and release files.
+  1,689 of the 10,424 files remain. A build of the trimmed tree compiles
+  to the same code as one of the whole tree.
+
+Local changes:
+
+- `Makefile` includes the Makefiles of `tools/`, `fftools/`, `doc/` and
+  `tests/` only if they exist, since the trim removes those directories.
+- `libavutil/tx_template.c`: with `FF_TX_SMALL_SR_TABLES` the static
+  split-radix tables and their codelets stop at 2^15 points instead of
+  2^17. Longer power-of-two transforms use the generic codelets.
+- `libavcodec/h264*.c`: with `FF_H264_8BIT_ONLY` the H.264 DSP,
+  prediction, IDCT and qpel functions are built for 8-bit video only, and
+  the SPS parser turns away a stream of any other bit depth.
+- `libavutil/tx.c`: with `FF_TX_FLOAT_ONLY` only the float transforms are
+  listed, so the double and int32 ones aren't linked, and `av_tx_init()`
+  returns `AVERROR(ENOSYS)` for those types.
+- `configure`: the PowerPC probe for `dcbzl` only runs when the option is
+  still on, so `--disable-dcbzl` takes effect.
+- `libavformat/matroskadec.c`, `libavformat/demux.c`: with
+  `FF_LEAN_ATTACHMENTS` the Matroska demuxer lets go of its own copy of an
+  attachment once the stream holds it, and an attachment stream's internal
+  codec context gets no copy.
+- `libavcodec/h274.c`, `libswscale/utils.c`: with `FF_HEAP_TABLES` the
+  H.274 film grain database is allocated the first time a stream needs it,
+  and swscale allocates its XYZ gamma tables as it does with `CONFIG_SMALL`.
+- `libavformat/tls_mbedtls.c`: the parts for listen mode, WHIP and DTLS
+  are only built when mbedTLS has the features they need, which WiiMC's
+  TLS 1.2 client configuration leaves out.
+- `libavformat/network.h`: with `FF_NO_MSG_NOSIGNAL` sends go out without
+  `MSG_NOSIGNAL`. libogc defines it, but the Wii's IOS fails any send that
+  has it.
+
+## mbedTLS
+
+- Upstream: https://github.com/Mbed-TLS/mbedtls (3.6 LTS branch)
+- Version: Mbed TLS 3.6.7 (`mbedtls-3.6.7.tar.bz2` from the GitHub release)
+- SHA-256 of the tarball:
+  `a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6`
+- Fetched: 2026-11-03
+- Licence: Apache 2.0 or GPL 2.0 or later, at the user's choice
+  (`LICENSE`); WiiMC takes it under GPL 2.0 or later.
+- Trimmed to the library: `include/`, `library/`, `LICENSE` and
+  `README.md`.
+
+Local changes:
+
+- `include/mbedtls/mbedtls_config.h` is WiiMC's configuration: a TLS 1.2
+  client (ECDHE-RSA, ECDHE-ECDSA and RSA key exchange; AES-GCM, AES-CBC and
+  ChaCha20-Poly1305; P-256, P-384, P-521 and X25519; SHA-1 to SHA-512),
+  X.509 certificate parsing, PEM, and CA files from SD or USB. Server
+  records up to 16 KiB are accepted; the client's own are at most 4 KiB.
+- `src/lib/mbedtls-wii/platform_wii.c`, outside the vendored tree and built
+  into `libmbedcrypto.a`, supplies the millisecond clock and the entropy
+  source for the Wii.

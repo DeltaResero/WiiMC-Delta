@@ -40,6 +40,7 @@
 #include "vf.h"
 
 #include "libvo/fastmemcpy.h"
+#include "libavutil/common.h"
 #include "libavutil/mem.h"
 
 extern const vf_info_t vf_info_1bpp;
@@ -196,10 +197,10 @@ static const vf_info_t* const filter_list[]={
     &vf_info_hue,
 #ifdef CONFIG_FFMPEG_A
     &vf_info_spp,
-    &vf_info_uspp,
+//    &vf_info_uspp, // TODO: does not currently build
     &vf_info_fspp,
     &vf_info_qp,
-    &vf_info_mcdeint,
+//    &vf_info_mcdeint, //TODO: vf_mcdeint is deactivated because it doesn't build after latest FFmpeg major bumps
 #endif
     &vf_info_yuvcsp,
     &vf_info_kerndeint,
@@ -279,10 +280,9 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
   mp_image_t* mpi=NULL;
   int w2;
   int number = (mp_imgtype >> 16) - 1;
+  int missing_palette;
 
 #ifdef MP_DEBUG
-  assert(w == -1 || w >= vf->w);
-  assert(h == -1 || h >= vf->h);
   assert(vf->w > 0);
   assert(vf->h > 0);
 #endif
@@ -292,11 +292,18 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
   if (w == -1) w = vf->w;
   if (h == -1) h = vf->h;
 
+  if (w < 0 || h < 0 || w > INT_MAX - 32) {
+      mp_msg(MSGT_DECVIDEO, MSGL_ERR, "vf_get_image: unreasonable picture size\n");
+      return NULL;
+  }
+
   w2=(mp_imgflag&MP_IMGFLAG_ACCEPT_ALIGNED_STRIDE)?FFALIGN(w, 32):w;
 
   if(vf->put_image==vf_next_put_image){
       // passthru mode, if the filter uses the fallback/default put_image() code
-      return vf_get_image(vf->next,outfmt,mp_imgtype,mp_imgflag,w,h);
+      mpi = vf_get_image(vf->next,outfmt,mp_imgtype,mp_imgflag,w,h);
+      mpi->usage_count++;
+      return mpi;
   }
 
   // Note: we should call libvo first to check if it supports direct rendering
@@ -342,8 +349,10 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
     mpi->number = number;
     break;
   }
-  if(mpi){
-    int missing_palette = !(mpi->flags & MP_IMGFLAG_RGB_PALETTE) && (mp_imgflag & MP_IMGFLAG_RGB_PALETTE);
+
+  if (!mpi)
+    return NULL;
+
     mpi->type=mp_imgtype;
     mpi->w=vf->w; mpi->h=vf->h;
     // keep buffer allocation status & color flags only:
@@ -352,15 +361,20 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
     // accept restrictions, draw_slice and palette flags only:
     mpi->flags|=mp_imgflag&(MP_IMGFLAGMASK_RESTRICTIONS|MP_IMGFLAG_DRAW_CALLBACK|MP_IMGFLAG_RGB_PALETTE);
     if(!vf->draw_slice) mpi->flags&=~MP_IMGFLAG_DRAW_CALLBACK;
-    if(mpi->width!=w2 || mpi->height!=h || missing_palette){
+    missing_palette = !(mpi->flags & MP_IMGFLAG_RGB_PALETTE) && (mp_imgflag & MP_IMGFLAG_RGB_PALETTE);
+    if(mpi->width!=w2 || mpi->height!=h || mpi->imgfmt != outfmt || missing_palette){
 //      printf("vf.c: MPI parameters changed!  %dx%d -> %dx%d   \n", mpi->width,mpi->height,w2,h);
         if(mpi->flags&MP_IMGFLAG_ALLOCATED){
-            if(mpi->width<w2 || mpi->height<h || missing_palette){
+            if(mpi->width<w2 || mpi->height<h || mpi->imgfmt != outfmt || missing_palette){
                 // need to re-allocate buffer memory:
                 av_freep(&mpi->planes[0]);
                 if (mpi->flags & MP_IMGFLAG_RGB_PALETTE)
                     av_freep(&mpi->planes[1]);
+                mpi->planes[1] = NULL;
+                mpi->planes[2] = NULL;
+                mpi->planes[3] = NULL;
                 mpi->flags&=~MP_IMGFLAG_ALLOCATED;
+                mpi->bpp = 0;
                 mp_msg(MSGT_VFILTER,MSGL_V,"vf.c: have to REALLOCATE buffer memory in vf_%s :(\n",
                        vf->info->name);
             }
@@ -403,6 +417,11 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
           }
 
           mp_image_alloc_planes(mpi);
+          if (!(mpi->flags & MP_IMGFLAG_ALLOCATED)) { // allocation failed
+              mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "vf_get_image: allocation of image planes failed!\n");
+              return NULL;
+          }
+
 //        printf("clearing img!\n");
           vf_mpi_clear(mpi,0,0,mpi->width,mpi->height);
         }
@@ -427,7 +446,6 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
     }
 
   mpi->qscale = NULL;
-  }
   mpi->usage_count++;
   // TODO: figure out what is going on with EXPORT types
   if (mpi->usage_count > 1 && mpi->type != MP_IMGTYPE_EXPORT)
@@ -493,12 +511,13 @@ vf_instance_t* vf_open_filter(vf_instance_t* next, const char *name, char **args
       l += 1 + strlen(args[2*i]) + 1 + strlen(args[2*i+1]);
     l += strlen(name);
     {
-      char str[l+1];
+      char *str = malloc(l+1);
       char* p = str;
       p += sprintf(str,"%s",name);
       for(i = 0 ; args && args[2*i] ; i++)
         p += sprintf(p," %s=%s",args[2*i],args[2*i+1]);
       mp_msg(MSGT_VFILTER,MSGL_INFO,MSGTR_OpeningVideoFilter "[%s]\n",str);
+      free(str);
     }
   } else if(strcmp(name,"vo")) {
     if(args && strcmp(args[0],"_oldargs_") == 0)
@@ -696,14 +715,14 @@ int vf_next_query_format(struct vf_instance *vf, unsigned int fmt){
     return flags;
 }
 
-int vf_next_put_image(struct vf_instance *vf,mp_image_t *mpi, double pts){
+int vf_next_put_image(struct vf_instance *vf,mp_image_t *mpi, double pts, double endpts){
     mpi->usage_count--;
     if (mpi->usage_count < 0) {
         mp_msg(MSGT_VFILTER, MSGL_V, "Bad mp_image usage count %i in vf_%s (type %i)\n",
                mpi->usage_count, vf->info->name, mpi->type);
         mpi->usage_count = 0;
     }
-    return vf->next->put_image(vf->next,mpi, pts);
+    return vf->next->put_image(vf->next,mpi, pts, endpts);
 }
 
 void vf_next_draw_slice(struct vf_instance *vf,unsigned char** src, int * stride,int w, int h, int x, int y){
@@ -751,6 +770,7 @@ vf_instance_t* append_filters(vf_instance_t* last){
 
 void vf_uninit_filter(vf_instance_t* vf){
     if(vf->uninit) vf->uninit(vf);
+    else free(vf->priv);
     free_mp_image(vf->imgctx.static_images[0]);
     free_mp_image(vf->imgctx.static_images[1]);
     free_mp_image(vf->imgctx.temp_images[0]);

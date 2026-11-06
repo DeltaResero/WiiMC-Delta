@@ -33,6 +33,7 @@ extern int frame_dropping;
 extern int slave_mode;
 extern int player_idle_mode;
 extern int use_menu;
+extern float heartbeat_interval;
 
 extern float  audio_delay;
 extern double start_pts;
@@ -41,6 +42,8 @@ extern int progbar_align;
 /* for the GUI */
 extern int auto_quality;
 extern int disable_gui_conf;
+
+extern int allow_playlist_parsing;
 
 extern int capture_dump;
 extern int stream_dump_type;

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pnm.c 33433 2011-05-07 21:15:13Z reimar $
+ * $Id$
  *
  * pnm protocol implementation
  * based upon code from joschka
@@ -33,11 +33,11 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <inttypes.h>
 #if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <sys/socket.h>
+#include <sys/time.h>
 //#include <netinet/in.h>
 //#include <netdb.h>
 #else
@@ -670,7 +670,10 @@ static int pnm_get_stream_chunk(pnm_t *p) {
   {
     int size=AV_RB16(&p->buffer[1]);
 
-    rm_read (p->s, &p->buffer[8], size-5);
+    if (size > sizeof(p->buffer) - 4) size = sizeof(p->buffer) - 4;
+    if (size > 5)
+      rm_read (p->s, &p->buffer[8], size-5);
+
     p->buffer[size+3]=0;
     mp_msg(MSGT_OPEN, MSGL_WARN, "input_pnm: got message from server while reading stream:\n%s\n", &p->buffer[3]);
     return -1;
@@ -829,7 +832,6 @@ static int pnm_streaming_read( int fd, char *buffer, int size, streaming_ctrl_t 
 static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   int fd;
   pnm_t *pnm;
-  URL_t *url;
 
   mp_msg(MSGT_OPEN, MSGL_INFO, "STREAM_PNM, URL: %s\n", stream->url);
   stream->streaming_ctrl = streaming_ctrl_new();
@@ -837,9 +839,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     return STREAM_ERROR;
 
   stream->streaming_ctrl->bandwidth = network_bandwidth;
-  url = url_new(stream->url);
-  stream->streaming_ctrl->url = check4proxies(url);
-  //url_free(url);
+  stream->streaming_ctrl->url = url_new_with_proxy(stream->url);
 
   fd = connect2Server( stream->streaming_ctrl->url->hostname,
     stream->streaming_ctrl->url->port ? stream->streaming_ctrl->url->port : 7070,1 );

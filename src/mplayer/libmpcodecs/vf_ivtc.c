@@ -27,7 +27,7 @@
 #include "img_format.h"
 #include "mp_image.h"
 #include "vf.h"
-#include "libavutil/x86_cpu.h"
+#include "mpx86asm.h"
 #include "libvo/fastmemcpy.h"
 
 
@@ -58,7 +58,7 @@ enum {
     F_SHOW
 };
 
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
 static void block_diffs_MMX(struct metrics *m, unsigned char *old, unsigned char *new, int os, int ns)
 {
     int i;
@@ -452,10 +452,10 @@ static int do_put_image(struct vf_instance *vf, mp_image_t *dmpi)
     }
 
     p->outframes++;
-    return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE);
+    return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
 {
     int ret=0;
     struct vf_priv_s *p = vf->priv;
@@ -534,7 +534,7 @@ static int vf_open(vf_instance_t *vf, char *args)
     p->first = 1;
     if (args) sscanf(args, "%d", &p->drop);
     block_diffs = block_diffs_C;
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
     if(gCpuCaps.hasMMX) block_diffs = block_diffs_MMX;
 #endif
     return 1;

@@ -27,7 +27,7 @@
 #include "img_format.h"
 #include "mp_image.h"
 #include "vf.h"
-#include "libavutil/x86_cpu.h"
+#include "mpx86asm.h"
 #include "libvo/fastmemcpy.h"
 
 
@@ -37,7 +37,7 @@ struct vf_priv_s {
     int max, last, cnt;
 };
 
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
 static int diff_MMX(unsigned char *old, unsigned char *new, int os, int ns)
 {
     volatile short out[4];
@@ -82,8 +82,8 @@ static int diff_MMX(unsigned char *old, unsigned char *new, int os, int ns)
 static int diff_C(unsigned char *old, unsigned char *new, int os, int ns)
 {
     int x, y, d=0;
-    for (y = 8; y; y--) {
-        for (x = 8; x; x--) {
+    for (y = 0; y < 8; y++) {
+        for (x = 0; x < 8; x++) {
             d += abs(new[x] - old[x]);
         }
         new += ns;
@@ -128,7 +128,7 @@ static int diff_to_drop(int hi, int lo, float frac, mp_image_t *old, mp_image_t 
         new->w*(new->bpp/8), new->h, old->stride[0], new->stride[0]);
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
 {
     mp_image_t *dmpi;
 
@@ -161,7 +161,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
             mpi->chroma_width, mpi->chroma_height,
             dmpi->stride[2], mpi->stride[2]);
     }
-    return vf_next_put_image(vf, dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static void uninit(struct vf_instance *vf)
@@ -182,7 +182,7 @@ static int vf_open(vf_instance_t *vf, char *args)
     p->frac = 0.33;
     if (args) sscanf(args, "%d:%d:%d:%f", &p->max, &p->hi, &p->lo, &p->frac);
     diff = diff_C;
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
     if(gCpuCaps.hasMMX) diff = diff_MMX;
 #endif
     return 1;

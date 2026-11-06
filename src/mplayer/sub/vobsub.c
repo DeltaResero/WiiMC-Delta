@@ -40,6 +40,9 @@
 #include "path.h"
 #include "unrar_exec.h"
 #include "libavutil/common.h"
+#include "libavutil/avstring.h"
+#include "libavutil/intreadwrite.h"
+#include "osdep/osdep.h"
 
 // Record the original -vobsubid set by commandline, since vobsub_id will be
 // overridden if slang match any of vobsub streams.
@@ -66,7 +69,7 @@ static rar_stream_t *rar_open(const char *const filename,
         errno = EINVAL;
         return NULL;
     }
-    stream = malloc(sizeof(rar_stream_t));
+    stream = calloc(1, sizeof(rar_stream_t));
     if (stream == NULL)
         return NULL;
     /* first try normal access */
@@ -113,7 +116,7 @@ static rar_stream_t *rar_open(const char *const filename,
                     int demanded_ext_len = strlen (demanded_ext);
                     for (i = 0, lp = list; i < num_files; i++, lp = lp->next) {
                         name_len = strlen (lp->item.Name);
-                        if (name_len >= demanded_ext_len && !strcasecmp (lp->item.Name + name_len - demanded_ext_len, demanded_ext)) {
+                        if (name_len >= demanded_ext_len && !av_strcasecmp (lp->item.Name + name_len - demanded_ext_len, demanded_ext)) {
                             rc = unrar_exec_get(&stream->data, &stream->size,
                                                 lp->item.Name, rar_filename);
                             if (rc)
@@ -136,12 +139,12 @@ static rar_stream_t *rar_open(const char *const filename,
     return stream;
 }
 
-static int rar_close(rar_stream_t *stream)
+static void rar_close(rar_stream_t *stream)
 {
     if (stream->file)
-        return fclose(stream->file);
+        fclose(stream->file);
     free(stream->data);
-    return 0;
+    free(stream);
 }
 
 static int rar_eof(rar_stream_t *stream)
@@ -320,7 +323,7 @@ static int mpeg_eof(mpeg_t *mpeg)
     return rar_eof(mpeg->stream);
 }
 
-static off_t mpeg_tell(mpeg_t *mpeg)
+static uint64_t mpeg_tell(mpeg_t *mpeg)
 {
     return rar_tell(mpeg->stream);
 }
@@ -480,7 +483,7 @@ static int mpeg_run(mpeg_t *mpeg)
 
 typedef struct {
     unsigned int pts100;
-    off_t filepos;
+    uint64_t filepos;
     unsigned int size;
     unsigned char *data;
 } packet_t;
@@ -647,7 +650,7 @@ static int vobsub_add_id(vobsub_t *vob, const char *id, size_t idlen,
     return 0;
 }
 
-static int vobsub_add_timestamp(vobsub_t *vob, off_t filepos, int ms)
+static int vobsub_add_timestamp(vobsub_t *vob, uint64_t filepos, int ms)
 {
     packet_queue_t *queue;
     packet_t *pkt;
@@ -695,7 +698,7 @@ static int vobsub_parse_id(vobsub_t *vob, const char *line)
 static int vobsub_parse_timestamp(vobsub_t *vob, const char *line)
 {
     int h, m, s, ms;
-    off_t filepos;
+    uint64_t filepos;
     if (sscanf(line, " %02d:%02d:%02d:%03d, filepos: %09"PRIx64"",
                &h, &m, &s, &ms, &filepos) != 5)
         return -1;
@@ -837,8 +840,7 @@ int vobsub_parse_ifo(void* this, const char *const name, unsigned int *palette,
         } else if (memcmp(block, ifo_magic, strlen(ifo_magic) + 1))
             mp_msg(MSGT_VOBSUB, MSGL_ERR, "VobSub: Bad magic in IFO header\n");
         else {
-            unsigned long pgci_sector = block[0xcc] << 24 | block[0xcd] << 16
-                | block[0xce] << 8 | block[0xcf];
+            unsigned pgci_sector = AV_RB32(block + 0xcc);
             int standard = (block[0x200] & 0x30) >> 4;
             int resolution = (block[0x201] & 0x0c) >> 2;
             *height = standard ? 576 : 480;
@@ -870,12 +872,12 @@ int vobsub_parse_ifo(void* this, const char *const name, unsigned int *palette,
                 || rar_read(block, sizeof(block), 1, fd) != 1)
                 mp_msg(MSGT_VOBSUB, MSGL_ERR, "VobSub: Can't read IFO PGCI\n");
             else {
-                unsigned long idx;
-                unsigned long pgc_offset = block[0xc] << 24 | block[0xd] << 16
-                    | block[0xe] << 8 | block[0xf];
+                unsigned idx;
+                unsigned pgc_offset = AV_RB32(block + 0xc);
+                pgc_offset = FFMIN(pgc_offset, sizeof(block) - 0xa4 - 4*16);
                 for (idx = 0; idx < 16; ++idx) {
                     unsigned char *p = block + pgc_offset + 0xa4 + 4 * idx;
-                    palette[idx] = p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
+                    palette[idx] = AV_RB32(p);
                 }
                 if (vob)
                     vob->have_palette = 1;
@@ -946,7 +948,7 @@ void *vobsub_open(const char *const name, const char *const ifo,
             } else {
                 long last_pts_diff = 0;
                 while (!mpeg_eof(mpg)) {
-                    off_t pos = mpeg_tell(mpg);
+                    uint64_t pos = mpeg_tell(mpg);
                     if (mpeg_run(mpg) < 0) {
                         if (!mpeg_eof(mpg))
                             mp_msg(MSGT_VOBSUB, MSGL_ERR, "VobSub: mpeg_run error\n");
@@ -1227,35 +1229,34 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
                       unsigned int orig_width, unsigned int orig_height,
                       const char *id, unsigned int index)
 {
-    vobsub_out_t *result = NULL;
-    char *filename;
-    filename = malloc(strlen(basename) + 5);
-    if (filename) {
-        result = malloc(sizeof(vobsub_out_t));
-        if (result) {
-            result->aid = index;
-            strcpy(filename, basename);
-            strcat(filename, ".sub");
-            result->fsub = fopen(filename, "ab");
-            if (result->fsub == NULL)
-                perror("Error: vobsub_out_open subtitle file open failed");
-            strcpy(filename, basename);
-            strcat(filename, ".idx");
-            result->fidx = fopen(filename, "ab");
-            if (result->fidx) {
-                if (ftell(result->fidx) == 0) {
-                    create_idx(result, palette, orig_width, orig_height);
-                    /* Make the selected language the default language */
-                    fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
-                }
-                fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
-                /* So that we can check the file now */
-                fflush(result->fidx);
-            } else
-                perror("Error: vobsub_out_open index file open failed");
-            free(filename);
-        }
+    vobsub_out_t *result = calloc(1, sizeof(*result));
+    char *filename = malloc(strlen(basename) + 5);
+    if (!filename || !result) {
+        free(filename);
+        free(result);
+        return NULL;
     }
+    result->aid = index;
+    strcpy(filename, basename);
+    strcat(filename, ".sub");
+    result->fsub = fopen(filename, "ab");
+    if (result->fsub == NULL)
+        perror("Error: vobsub_out_open subtitle file open failed");
+    strcpy(filename, basename);
+    strcat(filename, ".idx");
+    result->fidx = fopen(filename, "ab");
+    if (result->fidx) {
+        if (ftell(result->fidx) == 0) {
+            create_idx(result, palette, orig_width, orig_height);
+            /* Make the selected language the default language */
+            fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
+        }
+        fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
+        /* So that we can check the file now */
+        fflush(result->fidx);
+    } else
+        perror("Error: vobsub_out_open index file open failed");
+    free(filename);
     return result;
 }
 

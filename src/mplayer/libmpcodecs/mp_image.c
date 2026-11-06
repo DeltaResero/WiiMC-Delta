@@ -18,6 +18,7 @@
 
 #include "config.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,12 +34,30 @@
 #include "mp_msg.h"
 
 void mp_image_alloc_planes(mp_image_t *mpi) {
+  /* This condition is stricter than needed, but I want to be sure that every
+   * calculation step can fit in int32_t. This assumption is true over most of
+   * the code, so this acts as a safeguard for other image size calulations. */
+  if ((unsigned int)mpi->height + 2 > INT_MAX ||
+      (int64_t)mpi->width*(mpi->height+2) > INT_MAX ||
+      (int64_t)mpi->bpp*mpi->width*(mpi->height+2) > INT_MAX) {
+      mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+      return;
+  }
   // IF09 - allocate space for 4. plane delta info - unused
   if (mpi->imgfmt == IMGFMT_IF09) {
+    if ((int64_t)mpi->chroma_width*mpi->chroma_height > INT_MAX ||
+        mpi->bpp*mpi->width*(mpi->height+2)/8 > INT_MAX - mpi->chroma_width*mpi->chroma_height) {
+        mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+        return;
+  }
     mpi->planes[0]=av_malloc(mpi->bpp*mpi->width*(mpi->height+2)/8+
                             mpi->chroma_width*mpi->chroma_height);
-  } else
-    mpi->planes[0]=av_malloc(mpi->bpp*mpi->width*(mpi->height+2)/8);
+  } else {
+    // for odd width round up to be on the safe side,
+    // required in particular for planar formats
+    int alloc_w = mpi->width + (mpi->width & 1);
+    mpi->planes[0]=av_malloc(mpi->bpp*alloc_w*(mpi->height+2)/8);
+  }
   if (mpi->flags&MP_IMGFLAG_PLANAR) {
     int bpp = IMGFMT_IS_YUVP16(mpi->imgfmt)? 2 : 1;
     // YV12/I420/YVU9/IF09. feel free to add other planar formats here...
@@ -121,9 +140,25 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
         mpi->flags|=MP_IMGFLAG_SWAPPED;
         return;
     }
+    if (IMGFMT_IS_XYZ(out_fmt)) {
+        mpi->bpp=3*((IMGFMT_XYZ_DEPTH(out_fmt) + 7) & ~7);
+        return;
+    }
     mpi->num_planes=3;
     if (out_fmt == IMGFMT_GBR24P) {
         mpi->bpp=24;
+        mpi->flags|=MP_IMGFLAG_PLANAR;
+        return;
+    } else if (out_fmt == IMGFMT_GBR10P) {
+        mpi->bpp=30;
+        mpi->flags|=MP_IMGFLAG_PLANAR;
+        return;
+    } else if (out_fmt == IMGFMT_GBR12P) {
+        mpi->bpp=36;
+        mpi->flags|=MP_IMGFLAG_PLANAR;
+        return;
+    } else if (out_fmt == IMGFMT_GBR14P) {
+        mpi->bpp=42;
         mpi->flags|=MP_IMGFLAG_PLANAR;
         return;
     }
@@ -133,6 +168,11 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
         mpi->bpp = mp_get_chroma_shift(out_fmt, &mpi->chroma_x_shift, &mpi->chroma_y_shift, NULL);
         mpi->chroma_width  = mpi->width  >> mpi->chroma_x_shift;
         mpi->chroma_height = mpi->height >> mpi->chroma_y_shift;
+        // ensure enough space for odd sizes
+        if ((mpi->chroma_width << mpi->chroma_x_shift) < mpi->width)
+            ++mpi->chroma_width;
+        if ((mpi->chroma_height << mpi->chroma_y_shift) < mpi->height)
+            ++mpi->chroma_height;
     }
     switch(out_fmt){
     case IMGFMT_I420:
@@ -152,28 +192,50 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
     case IMGFMT_440P:
     case IMGFMT_444P16_LE:
     case IMGFMT_444P16_BE:
+    case IMGFMT_444P14_LE:
+    case IMGFMT_444P14_BE:
+    case IMGFMT_444P12_LE:
+    case IMGFMT_444P12_BE:
     case IMGFMT_444P10_LE:
     case IMGFMT_444P10_BE:
     case IMGFMT_444P9_LE:
     case IMGFMT_444P9_BE:
     case IMGFMT_422P16_LE:
     case IMGFMT_422P16_BE:
+    case IMGFMT_422P14_LE:
+    case IMGFMT_422P14_BE:
+    case IMGFMT_422P12_LE:
+    case IMGFMT_422P12_BE:
     case IMGFMT_422P10_LE:
     case IMGFMT_422P10_BE:
     case IMGFMT_422P9_LE:
     case IMGFMT_422P9_BE:
     case IMGFMT_420P16_LE:
     case IMGFMT_420P16_BE:
+    case IMGFMT_420P14_LE:
+    case IMGFMT_420P14_BE:
+    case IMGFMT_420P12_LE:
+    case IMGFMT_420P12_BE:
     case IMGFMT_420P10_LE:
     case IMGFMT_420P10_BE:
     case IMGFMT_420P9_LE:
     case IMGFMT_420P9_BE:
+    case IMGFMT_440P12_LE:
+    case IMGFMT_440P12_BE:
+    case IMGFMT_440P10_LE:
+    case IMGFMT_440P10_BE:
         return;
+    case IMGFMT_Y16_LE:
+    case IMGFMT_Y16_BE:
+        mpi->bpp=16;
     case IMGFMT_Y800:
     case IMGFMT_Y8:
         /* they're planar ones, but for easier handling use them as packed */
         mpi->flags&=~MP_IMGFLAG_PLANAR;
         mpi->num_planes=1;
+        return;
+    case IMGFMT_Y8A:
+        mpi->num_planes=2;
         return;
     case IMGFMT_UYVY:
         mpi->flags|=MP_IMGFLAG_SWAPPED;
@@ -189,7 +251,7 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
         mpi->bpp=12;
         mpi->num_planes=2;
         mpi->chroma_width=(mpi->width>>0);
-        mpi->chroma_height=(mpi->height>>1);
+        mpi->chroma_height=(mpi->height+1)>>1;
         mpi->chroma_x_shift=0;
         mpi->chroma_y_shift=1;
         return;
@@ -210,7 +272,7 @@ mp_image_t* new_mp_image(int w,int h){
 void free_mp_image(mp_image_t* mpi){
     if(!mpi) return;
     if(mpi->flags&MP_IMGFLAG_ALLOCATED){
-        /* becouse we allocate the whole image in once */
+        /* because we allocate the whole image at once */
         av_free(mpi->planes[0]);
         if (mpi->flags & MP_IMGFLAG_RGB_PALETTE)
             av_free(mpi->planes[1]);

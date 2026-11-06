@@ -32,6 +32,7 @@
 #endif
 
 #include "libavutil/avutil.h"
+#include "libavutil/mem.h"
 #include "img_format.h"
 #include "mp_image.h"
 #include "vf.h"
@@ -104,7 +105,7 @@ static int allocStuff(FilterParam *f, int width, int height){
     swsF.lumH= swsF.lumV= vec;
     swsF.chrH= swsF.chrV= NULL;
     f->preFilterContext= sws_getContext(
-        width, height, PIX_FMT_GRAY8, width, height, PIX_FMT_GRAY8, SWS_POINT, &swsF, NULL, NULL);
+        width, height, AV_PIX_FMT_GRAY8, width, height, AV_PIX_FMT_GRAY8, SWS_POINT, &swsF, NULL, NULL);
 
     sws_freeVec(vec);
     vec = sws_getGaussianVec(f->strength, 5.0);
@@ -240,7 +241,7 @@ if((x/32)&1){
     }
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
     int cw= mpi->w >> mpi->chroma_x_shift;
     int ch= mpi->h >> mpi->chroma_y_shift;
 
@@ -254,7 +255,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
     blur(dmpi->planes[1], mpi->planes[1], cw    , ch   , dmpi->stride[1], mpi->stride[1], &vf->priv->chroma);
     blur(dmpi->planes[2], mpi->planes[2], cw    , ch   , dmpi->stride[2], mpi->stride[2], &vf->priv->chroma);
 
-    return vf_next_put_image(vf,dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 //===========================================================================//

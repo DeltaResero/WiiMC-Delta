@@ -75,13 +75,15 @@ void init_vo_spudec(struct stream *stream, struct sh_video *sh_video, struct sh_
 void update_subtitles(struct sh_video *sh_video, double refpts, demux_stream_t *d_dvdsub, int reset);
 void update_teletext(struct sh_video *sh_video, demuxer_t *demuxer, int reset);
 int select_audio(demuxer_t* demuxer, int audio_id, char* audio_lang);
+int select_video(demuxer_t* demuxer, int video_id);
 void set_osd_subtitle(subtitle *subs);
 
 int cfg_inc_verbose(m_option_t *conf);
 int cfg_include(m_option_t *conf, const char *filename);
 
-void common_preinit(void);
+void common_preinit(int *argc_ptr, char **argv_ptr[]);
 int common_init(void);
+void common_uninit(void);
 
 double calc_a_pts(struct sh_audio *sh_audio, demux_stream_t *d_audio);
 

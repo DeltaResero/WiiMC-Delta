@@ -34,6 +34,7 @@
 #include "libvo/fastmemcpy.h"
 
 #include "libavutil/avutil.h"
+#include "libavutil/common.h"
 
 /* Functions used by play to convert the input audio to the correct
    format */
@@ -44,15 +45,15 @@
 #include "af_format_alaw.h"
 
 // Switch endianness
-static void endian(void* in, void* out, int len, int bps);
+static void endian(const void* in, void* out, int len, int bps);
 // From signed to unsigned and the other way
 static void si2us(void* data, int len, int bps);
 // Change the number of bits per sample
-static void change_bps(void* in, void* out, int len, int inbps, int outbps);
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps);
 // From float to int signed
-static void float2int(float* in, void* out, int len, int bps);
+static void float2int(const float* in, void* out, int len, int bps);
 // From signed int to float
-static void int2float(void* in, float* out, int len, int bps);
+static void int2float(const void* in, float* out, int len, int bps);
 
 static af_data_t* play(struct af_instance_s* af, af_data_t* data);
 static af_data_t* play_swapendian(struct af_instance_s* af, af_data_t* data);
@@ -77,14 +78,14 @@ static int check_format(int format)
 {
   char buf[256];
   switch(format & AF_FORMAT_SPECIAL_MASK){
-  case(AF_FORMAT_IMA_ADPCM):
-  case(AF_FORMAT_MPEG2):
-  case(AF_FORMAT_AC3):
-    mp_msg(MSGT_AFILTER, MSGL_ERR, "[format] Sample format %s not yet supported \n",
-         af_fmt2str(format,buf,256));
-    return AF_ERROR;
+  case 0:
+  case AF_FORMAT_MU_LAW:
+  case AF_FORMAT_A_LAW:
+    return AF_OK;
   }
-  return AF_OK;
+  mp_msg(MSGT_AFILTER, MSGL_ERR, "[format] Sample format %s not yet supported \n",
+         af_fmt2str(format,buf,256));
+  return AF_ERROR;
 }
 
 // Initialization and runtime control
@@ -95,14 +96,23 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     char buf1[256];
     char buf2[256];
     af_data_t *data = arg;
+    int supported_ac3 = 0;
 
     // Make sure this filter isn't redundant
     if(af->data->format == data->format &&
        af->data->bps == data->bps)
       return AF_DETACH;
 
+    // A bit complex because we can convert AC3
+    // to generic iec61937 but not the other way
+    // round.
+    if (AF_FORMAT_IS_AC3(af->data->format))
+      supported_ac3 = AF_FORMAT_IS_AC3(data->format);
+    else if (AF_FORMAT_IS_IEC61937(af->data->format))
+      supported_ac3 = AF_FORMAT_IS_IEC61937(data->format);
+
     // Allow trivial AC3-endianness conversion
-    if (!AF_FORMAT_IS_AC3(af->data->format) || !AF_FORMAT_IS_AC3(data->format))
+    if (!supported_ac3)
     // Check for errors in configuration
     if((AF_OK != check_bps(data->bps)) ||
        (AF_OK != check_format(data->format)) ||
@@ -110,9 +120,10 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
        (AF_OK != check_format(af->data->format)))
       return AF_ERROR;
 
+    af_fmt2str(data->format,buf1,256);
+    af_fmt2str(af->data->format,buf2,256);
     mp_msg(MSGT_AFILTER, MSGL_V, "[format] Changing sample format from %s to %s\n",
-           af_fmt2str(data->format,buf1,256),
-           af_fmt2str(af->data->format,buf2,256));
+           buf1, buf2);
 
     af->data->rate = data->rate;
     af->data->nch  = data->nch;
@@ -131,16 +142,14 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
         (af->data->format == AF_FORMAT_S16_NE))
     {
         mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
-           af_fmt2str(data->format,buf1,256),
-           af_fmt2str(af->data->format,buf2,256));
+           buf1, buf2);
         af->play = play_float_s16;
     }
     if ((data->format == AF_FORMAT_S16_NE) &&
         (af->data->format == AF_FORMAT_FLOAT_NE))
     {
         mp_msg(MSGT_AFILTER, MSGL_V, "[format] Accelerated %s to %s conversion\n",
-           af_fmt2str(data->format,buf1,256),
-           af_fmt2str(af->data->format,buf2,256));
+           buf1, buf2);
         af->play = play_s16_float;
     }
     return AF_OK;
@@ -327,7 +336,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_format = {
+const af_info_t af_info_format = {
   "Sample format conversion",
   "format",
   "Anders",
@@ -336,7 +345,7 @@ af_info_t af_info_format = {
   af_open
 };
 
-static inline uint32_t load24bit(void* data, int pos) {
+static inline uint32_t load24bit(const void* data, int pos) {
 #if HAVE_BIGENDIAN
   return (((uint32_t)((uint8_t*)data)[3*pos])<<24) |
          (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
@@ -361,7 +370,7 @@ static inline void store24bit(void* data, int pos, uint32_t expanded_value) {
 }
 
 // Function implementations used by play
-static void endian(void* in, void* out, int len, int bps)
+static void endian(const void* in, void* out, int len, int bps)
 {
   register int i;
   switch(bps){
@@ -404,7 +413,7 @@ static void si2us(void* data, int len, int bps)
   } while (i += bps);
 }
 
-static void change_bps(void* in, void* out, int len, int inbps, int outbps)
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps)
 {
   register int i;
   switch(inbps){
@@ -475,60 +484,86 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
   }
 }
 
-static void float2int(float* in, void* out, int len, int bps)
+static void float2int(const float* in, void* out, int len, int bps)
 {
   float f;
   register int i;
   switch(bps){
   case(1):
     for(i=0;i<len;i++)
-      ((int8_t *)out)[i] = av_clip_int8(lrintf(128.0 * in[i]));
+      ((int8_t *)out)[i] = av_clip_int8(lrintf(128.0f * in[i]));
     break;
   case(2):
+#if HAVE_NEON && !ARCH_AARCH64
+    {
+    const float *in_end = in + len;
+    while (in < in_end - 7) {
+      __asm__(
+          "vld1.32 {q0,q1}, [%0]!\n\t"
+          "vcvt.s32.f32 q0, q0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vcvt.s32.f32 q1, q1, #31\n\t"
+          "vqrshrn.s32  d1, q1, #15\n\t"
+          "vst1.16 {q0}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "q0", "q1", "memory");
+    }
+    while (in < in_end) {
+      __asm__(
+          "vld1.32 {d0[0]}, [%0]!\n\t"
+          "vcvt.s32.f32 d0, d0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vst1.16 {d0[0]}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "d0", "memory");
+    }
+    }
+#else
     for(i=0;i<len;i++)
-      ((int16_t*)out)[i] = av_clip_int16(lrintf(32768.0 * in[i]));
+      ((int16_t*)out)[i] = av_clip_int16(lrintf(32768.0f * in[i]));
+#endif
     break;
   case(3):
     for(i=0;i<len;i++){
-      f = in[i] * 8388608;
+      f = in[i] * 8388608.0f;
       store24bit(out, i,   av_clip(lrintf(f), -1*(1<<23), (1<<23)-1) << 8);
     }
     break;
   case(4):
     for(i=0;i<len;i++){
       f = in[i];
-      if (f <= -1.0)
+      if (f <= -1.0f)
         ((int32_t*)out)[i] = INT_MIN;
       else
-      if (f >=  1.0)//no need to use corrected constant, rounding won't cause overflow
+      if (f >=  1.0f)//no need to use corrected constant, rounding won't cause overflow
         ((int32_t*)out)[i] = INT_MAX;
       else
-        ((int32_t*)out)[i] = lrintf(f*2147483648.0);
+        ((int32_t*)out)[i] = lrintf(f*2147483648.0f);
 
     }
     break;
   }
 }
 
-static void int2float(void* in, float* out, int len, int bps)
+static void int2float(const void* in, float* out, int len, int bps)
 {
   register int i;
   switch(bps){
   case(1):
     for(i=0;i<len;i++)
-      out[i]=(1.0/128.0)*((int8_t*)in)[i];
+      out[i]=(1.0f/128.0f)*((int8_t*)in)[i];
     break;
   case(2):
     for(i=0;i<len;i++)
-      out[i]=(1.0/32768.0)*((int16_t*)in)[i];
+      out[i]=(1.0f/32768.0f)*((int16_t*)in)[i];
     break;
   case(3):
     for(i=0;i<len;i++)
-      out[i]=(1.0/2147483648.0)*((int32_t)load24bit(in, i));
+      out[i]=(1.0f/2147483648.0f)*((int32_t)load24bit(in, i));
     break;
   case(4):
     for(i=0;i<len;i++)
-      out[i]=(1.0/2147483648.0)*((int32_t*)in)[i];
+      out[i]=(1.0f/2147483648.0f)*((int32_t*)in)[i];
     break;
   }
 }

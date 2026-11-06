@@ -30,7 +30,9 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#ifndef GEKKO
 #include <sys/uio.h>
+#endif
 #if HAVE_SYS_MMAN_H
 #include <sys/mman.h>
 #endif

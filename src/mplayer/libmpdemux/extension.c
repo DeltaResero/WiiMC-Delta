@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "stream/stream.h"
 #include "demuxer.h"
@@ -84,6 +85,7 @@ static struct {
         { "mac", DEMUXER_TYPE_LAVF },
         { "str", DEMUXER_TYPE_LAVF },
         { "cdg", DEMUXER_TYPE_LAVF },
+        { "tak", DEMUXER_TYPE_LAVF },
 
 // At least the following are hacks against broken autodetection
 // that should not be there
@@ -99,7 +101,7 @@ int demuxer_type_by_filename(char* filename){
 //    mp_msg(MSGT_CPLAYER,MSGL_DBG2,"Extension: %s\n", extension );
     // Look for the extension in the extensions table
     for( i=0 ; i<(sizeof(extensions_table)/sizeof(extensions_table[0])) ; i++ ) {
-      if( !strcasecmp(extension, extensions_table[i].extension) ) {
+      if( !av_strcasecmp(extension, extensions_table[i].extension) ) {
         mp_msg(MSGT_OPEN, MSGL_V, "Trying demuxer %d based on filename extension\n",extensions_table[i].demuxer_type);
         return extensions_table[i].demuxer_type;
       }

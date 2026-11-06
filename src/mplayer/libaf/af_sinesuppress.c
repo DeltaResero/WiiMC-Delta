@@ -28,6 +28,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "libavutil/mathematics.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -175,7 +176,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_sinesuppress = {
+const af_info_t af_info_sinesuppress = {
     "Sine Suppress",
     "sinesuppress",
     "Michael Niedermayer",

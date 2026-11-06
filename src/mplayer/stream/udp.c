@@ -20,6 +20,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#define _BSD_SOURCE
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -28,13 +30,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <ctype.h>
 #if !defined(GEKKO)
 #if !HAVE_WINSOCK2_H
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #else
 #include <winsock2.h>
@@ -81,7 +83,7 @@ udp_open_socket (URL_t *url)
   if (isalpha (url->hostname[0]))
   {
 #if !HAVE_WINSOCK2_H
-    hp = (struct hostent *) gethostbyname (url->hostname);
+    hp = gethostbyname (url->hostname);
     if (!hp)
     {
       mp_msg (MSGT_NETWORK, MSGL_ERR,
@@ -89,8 +91,8 @@ udp_open_socket (URL_t *url)
       closesocket (socket_server_fd);
       return -1;
     }
-    memcpy ((void *) &server_address.sin_addr.s_addr,
-            (void *) hp->h_addr_list[0], hp->h_length);
+    memcpy (&server_address.sin_addr.s_addr,
+            hp->h_addr_list[0], hp->h_length);
 #else
     server_address.sin_addr.s_addr = htonl (INADDR_ANY);
 #endif /* HAVE_WINSOCK2_H */
@@ -129,7 +131,7 @@ udp_open_socket (URL_t *url)
 #if HAVE_WINSOCK2_H
   if (isalpha (url->hostname[0]))
   {
-    hp = (struct hostent *) gethostbyname (url->hostname);
+    hp = gethostbyname (url->hostname);
     if (!hp)
     {
       mp_msg (MSGT_NETWORK, MSGL_ERR,
@@ -137,13 +139,13 @@ udp_open_socket (URL_t *url)
       closesocket (socket_server_fd);
       return -1;
     }
-    memcpy ((void *) &server_address.sin_addr.s_addr,
-            (void *) hp->h_addr, hp->h_length);
+    memcpy (&server_address.sin_addr.s_addr,
+            hp->h_addr, hp->h_length);
   }
   else
   {
     unsigned int addr = inet_addr (url->hostname);
-    memcpy ((void *) &server_address.sin_addr, (void *) &addr, sizeof (addr));
+    memcpy (&server_address.sin_addr, &addr, sizeof (addr));
   }
 #endif /* HAVE_WINSOCK2_H */
 

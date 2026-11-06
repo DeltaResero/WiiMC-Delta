@@ -23,10 +23,8 @@
 #include <inttypes.h>
 #include <ft2build.h>
 #include FT_GLYPH_H
-#ifndef GEKKO
-#include <strings.h>
-#endif
 
+#include "libavutil/avstring.h"
 #include "ass_library.h"
 #include "ass.h"
 #include "ass_utils.h"
@@ -117,11 +115,51 @@ char parse_bool(char *str)
 {
     while (*str == ' ' || *str == '\t')
         str++;
-    if (!strncasecmp(str, "yes", 3))
+    if (!av_strncasecmp(str, "yes", 3))
         return 1;
     else if (strtol(str, NULL, 10) > 0)
         return 1;
     return 0;
+}
+
+int parse_ycbcr_matrix(char *str)
+{
+    while (*str == ' ' || *str == '\t')
+        str++;
+    if (*str == '\0')
+        return YCBCR_DEFAULT;
+
+    char *end = str + strlen(str);
+    while (end[-1] == ' ' || end[-1] == '\t')
+        end--;
+
+    // Trim a local copy of the input that we know is safe to
+    // modify. The buffer is larger than any valid string + NUL,
+    // so we can simply chop off the rest of the input.
+    char buffer[16];
+    size_t n = FFMIN(end - str, sizeof buffer - 1);
+    strncpy(buffer, str, n);
+    buffer[n] = '\0';
+
+    if (!av_strcasecmp(buffer, "none"))
+        return YCBCR_NONE;
+    if (!av_strcasecmp(buffer, "tv.601"))
+        return YCBCR_BT601_TV;
+    if (!av_strcasecmp(buffer, "pc.601"))
+        return YCBCR_BT601_PC;
+    if (!av_strcasecmp(buffer, "tv.709"))
+        return YCBCR_BT709_TV;
+    if (!av_strcasecmp(buffer, "pc.709"))
+        return YCBCR_BT709_PC;
+    if (!av_strcasecmp(buffer, "tv.240m"))
+        return YCBCR_SMPTE240M_TV;
+    if (!av_strcasecmp(buffer, "pc.240m"))
+        return YCBCR_SMPTE240M_PC;
+    if (!av_strcasecmp(buffer, "tv.fcc"))
+        return YCBCR_FCC_TV;
+    if (!av_strcasecmp(buffer, "pc.fcc"))
+        return YCBCR_FCC_PC;
+    return YCBCR_UNKNOWN;
 }
 
 void ass_msg(ASS_Library *priv, int lvl, char *fmt, ...)
@@ -162,6 +200,30 @@ unsigned ass_utf8_get_char(char **str)
     return c;
 }
 
+/**
+ * \brief find style by name
+ * \param track track
+ * \param name style name
+ * \return index in track->styles
+ * Returnes 0 if no styles found => expects at least 1 style.
+ * Parsing code always adds "Default" style in the end.
+ */
+int lookup_style(ASS_Track *track, char *name)
+{
+    int i;
+    if (*name == '*')
+        ++name;                 // FIXME: what does '*' really mean ?
+    for (i = track->n_styles - 1; i >= 0; --i) {
+        if (strcmp(track->styles[i].Name, name) == 0)
+            return i;
+    }
+    i = track->default_style;
+    ass_msg(track->library, MSGL_WARN,
+            "[%p]: Warning: no style named '%s' found, using '%s'",
+            track, name, track->styles[i].Name);
+    return i;                   // use the first style
+}
+
 #ifdef CONFIG_ENCA
 void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
                           int buflen, char *preferred_language,
@@ -183,16 +245,17 @@ void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
     for (i = 0; i < langcnt; i++) {
         const char *tmp;
 
-        if (strcasecmp(languages[i], preferred_language) != 0)
+        if (av_strcasecmp(languages[i], preferred_language) != 0)
             continue;
         analyser = enca_analyser_alloc(languages[i]);
         encoding = enca_analyse_const(analyser, buffer, buflen);
         tmp = enca_charset_name(encoding.charset, ENCA_NAME_STYLE_ICONV);
+        enca_analyser_free(analyser);
         if (tmp && encoding.charset != ENCA_CS_UNKNOWN) {
             detected_sub_cp = strdup(tmp);
             ass_msg(library, MSGL_INFO, "ENCA detected charset: %s", tmp);
+            break;
         }
-        enca_analyser_free(analyser);
     }
 
     free(languages);

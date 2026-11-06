@@ -336,10 +336,6 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi){
 
 static void start_slice(struct vf_instance *vf, mp_image_t *mpi){
 //    printf("start_slice called! flag=%d\n",mpi->flags&MP_IMGFLAG_DRAW_CALLBACK);
-    if(!vf->next->draw_slice){
-        mpi->flags&=~MP_IMGFLAG_DRAW_CALLBACK;
-        return;
-    }
     // they want slices!!! allocate the buffer.
     if(!mpi->priv)
         mpi->priv=vf->dmpi=vf_get_image(vf->next,mpi->imgfmt,
@@ -347,8 +343,6 @@ static void start_slice(struct vf_instance *vf, mp_image_t *mpi){
             MP_IMGTYPE_TEMP, mpi->flags,
             FFMAX(vf->priv->exp_w, mpi->width +vf->priv->exp_x),
             FFMAX(vf->priv->exp_h, mpi->height+vf->priv->exp_y));
-    if(!(vf->dmpi->flags&MP_IMGFLAG_DRAW_CALLBACK))
-        mp_msg(MSGT_VFILTER, MSGL_WARN, MSGTR_MPCODECS_WarnNextFilterDoesntSupportSlices); // shouldn't happen.
     vf->priv->first_slice = 1;
 }
 
@@ -404,25 +398,32 @@ static void draw_slice(struct vf_instance *vf,
     vf->priv->first_slice = 0;
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
     if (vf->priv->passthrough) {
       mp_image_t *dmpi = vf_get_image(vf->next, IMGFMT_MPEGPES,
                                       MP_IMGTYPE_EXPORT, 0, mpi->w, mpi->h);
       dmpi->planes[0]=mpi->planes[0];
-      return vf_next_put_image(vf,dmpi, pts);
+      return vf_next_put_image(vf, dmpi, pts, endpts);
     }
 
     if(mpi->flags&MP_IMGFLAG_DIRECT || mpi->flags&MP_IMGFLAG_DRAW_CALLBACK){
+        int full_w = FFMIN(mpi->width,  vf->priv->exp_w);
+        int full_h = FFMIN(mpi->height, vf->priv->exp_h);
         vf->dmpi=mpi->priv;
         if(!vf->dmpi) { mp_msg(MSGT_VFILTER, MSGL_WARN, MSGTR_MPCODECS_FunWhydowegetNULL); return 0; }
         mpi->priv=NULL;
 #ifdef OSD_SUPPORT
         if(vf->priv->osd) draw_osd(vf,mpi->w,mpi->h);
 #endif
+        // padding for use by decoder needs to be cleared
+        if (mpi->w < full_w)
+            vf_mpi_clear(mpi, mpi->w, 0, full_w - mpi->w, full_h);
+        if (mpi->h < full_h)
+            vf_mpi_clear(mpi, 0, mpi->h, full_w, full_h - mpi->h);
         // we've used DR, so we're ready...
         if(!(mpi->flags&MP_IMGFLAG_PLANAR))
             vf->dmpi->planes[1] = mpi->planes[1]; // passthrough rgb8 palette
-        return vf_next_put_image(vf,vf->dmpi, pts);
+        return vf_next_put_image(vf, vf->dmpi, pts, endpts);
     }
 
     // hope we'll get DR buffer:
@@ -454,7 +455,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 #ifdef OSD_SUPPORT
     if(vf->priv->osd) draw_osd(vf,mpi->w,mpi->h);
 #endif
-    return vf_next_put_image(vf,vf->dmpi, pts);
+    return vf_next_put_image(vf, vf->dmpi, pts, endpts);
 }
 
 //===========================================================================//

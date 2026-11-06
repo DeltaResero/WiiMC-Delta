@@ -22,6 +22,7 @@
 #include <inttypes.h>
 
 #include "config.h"
+#include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
 
@@ -35,7 +36,7 @@
 //===========================================================================//
 
 // commented out 16 and 15 bit output support, because the conversion
-// routines are incorrrect.  they assume the palette to be of the same
+// routines are incorrect.  They assume the palette to be of the same
 // depth as the output, which is incorrect. --Joey
 
 static const unsigned int bgr_list[]={
@@ -76,6 +77,7 @@ static unsigned int find_best(struct vf_instance *vf, unsigned int fmt){
     unsigned int best=0;
     int ret;
     const unsigned int* p;
+    // output RGB vs. BGR must match palette format
     if(fmt==IMGFMT_BGR8) p=bgr_list;
     else if(fmt==IMGFMT_RGB8) p=rgb_list;
     else return 0;
@@ -110,7 +112,7 @@ static int config(struct vf_instance *vf,
     return vf_next_config(vf,width,height,d_width,d_height,flags,vf->priv->fmt);
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
     mp_image_t *dmpi;
     uint8_t *old_palette = mpi->planes[1];
 
@@ -139,16 +141,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
                 palette8torgb16(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         case 24:
-            if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
-            else
-                sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
+            sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         case 32:
-            if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
-            else
-                sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
+            sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         }
     } else {
@@ -165,23 +161,17 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
                     palette8torgb16(src,dst,mpi->w,mpi->planes[1]);
                 break;
             case 24:
-                if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                    sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
-                else
-                    sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
+                sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
                 break;
             case 32:
-                if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                    sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
-                else
-                    sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
+                sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
                 break;
             }
         }
     }
     mpi->planes[1] = old_palette;
 
-    return vf_next_put_image(vf,dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 //===========================================================================//
@@ -207,14 +197,14 @@ static int vf_open(vf_instance_t *vf, char *args){
     for(i=0;i<256;i++) gray_pal[i]=0x01010101*i;
     if (args)
     {
-        if (!strcasecmp(args,"rgb15")) vf->priv->fmt=IMGFMT_RGB15; else
-        if (!strcasecmp(args,"rgb16")) vf->priv->fmt=IMGFMT_RGB16; else
-        if (!strcasecmp(args,"rgb24")) vf->priv->fmt=IMGFMT_RGB24; else
-        if (!strcasecmp(args,"rgb32")) vf->priv->fmt=IMGFMT_RGB32; else
-        if (!strcasecmp(args,"bgr15")) vf->priv->fmt=IMGFMT_BGR15; else
-        if (!strcasecmp(args,"bgr16")) vf->priv->fmt=IMGFMT_BGR16; else
-        if (!strcasecmp(args,"bgr24")) vf->priv->fmt=IMGFMT_BGR24; else
-        if (!strcasecmp(args,"bgr32")) vf->priv->fmt=IMGFMT_BGR32; else
+        if (!av_strcasecmp(args,"rgb15")) vf->priv->fmt=IMGFMT_RGB15; else
+        if (!av_strcasecmp(args,"rgb16")) vf->priv->fmt=IMGFMT_RGB16; else
+        if (!av_strcasecmp(args,"rgb24")) vf->priv->fmt=IMGFMT_RGB24; else
+        if (!av_strcasecmp(args,"rgb32")) vf->priv->fmt=IMGFMT_RGB32; else
+        if (!av_strcasecmp(args,"bgr15")) vf->priv->fmt=IMGFMT_BGR15; else
+        if (!av_strcasecmp(args,"bgr16")) vf->priv->fmt=IMGFMT_BGR16; else
+        if (!av_strcasecmp(args,"bgr24")) vf->priv->fmt=IMGFMT_BGR24; else
+        if (!av_strcasecmp(args,"bgr32")) vf->priv->fmt=IMGFMT_BGR32; else
         {
             mp_msg(MSGT_VFILTER, MSGL_WARN, MSGTR_MPCODECS_UnknownFormatName, args);
             return 0;

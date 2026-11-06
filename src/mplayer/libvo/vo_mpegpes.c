@@ -54,6 +54,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "libmpdemux/mpeg_packetizer.h"
 
@@ -147,8 +148,9 @@ static int preinit(const char *arg){
         }
         return 0;
     }
+#else
+    if (!arg) arg = "grab.mpg";
 #endif
-    arg = (arg ? arg : "grab.mpg");
     mp_msg(MSGT_VO,MSGL_INFO, "Saving PES stream to %s\n", arg);
     vo_mpegpes_fd=open(arg,O_WRONLY|O_CREAT,0666);
     if(vo_mpegpes_fd<0){
@@ -214,12 +216,6 @@ static int draw_frame(uint8_t * src[])
 static void flip_page (void)
 {
 }
-
-static int draw_slice(uint8_t *srcimg[], int stride[], int w,int h,int x0,int y0)
-{
-    return 0;
-}
-
 
 static int
 query_format(uint32_t format)

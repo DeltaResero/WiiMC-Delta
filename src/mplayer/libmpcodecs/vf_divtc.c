@@ -26,7 +26,7 @@
 #include "mp_msg.h"
 #include "cpudetect.h"
 #include "libavutil/common.h"
-#include "libavutil/x86_cpu.h"
+#include "mpx86asm.h"
 #include "mpbswap.h"
 
 #include "img_format.h"
@@ -52,7 +52,7 @@ struct vf_priv_s
  * diff_MMX and diff_C stolen from vf_decimate.c
  */
 
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
 static int diff_MMX(unsigned char *old, unsigned char *new, int os, int ns)
    {
    volatile short out[4];
@@ -168,7 +168,7 @@ static unsigned int checksum_plane(unsigned char *p, unsigned char *z,
       t=be2me_32(wsum);
 #endif
 
-      for(sum^=(t<<shift|t>>(32-shift)); p<e;)
+      for(sum^=(t<<shift|t>>((32-shift)&31)); p<e;)
          sum^=*p++<<(shift=(shift-8)&31);
       }
 
@@ -258,7 +258,7 @@ static int match(struct vf_priv_s *p, int *diffs,
    return m;
    }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
    {
    mp_image_t *dmpi, *tmpi=0;
    int n, m, f, newphase;
@@ -373,12 +373,12 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
             imgop(copyop, tmpi, mpi, 0);
             imgop(deghost_plane, tmpi, dmpi, p->deghost);
             imgop(copyop, dmpi, mpi, 0);
-            return vf_next_put_image(vf, tmpi, MP_NOPTS_VALUE);
+            return vf_next_put_image(vf, tmpi, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
             }
       }
 
    imgop(copyop, dmpi, mpi, 0);
-   return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE);
+   return vf_next_put_image(vf, dmpi, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
    }
 
 static int analyze(struct vf_priv_s *p)
@@ -414,7 +414,7 @@ static int analyze(struct vf_priv_s *p)
       n++;
       }
 
-   if(!n)
+   if(n <= 15)
       {
       mp_msg(MSGT_VFILTER, MSGL_FATAL, "%s: Empty 2-pass log file.\n",
              vf_info_divtc.name);
@@ -703,7 +703,7 @@ static int vf_open(vf_instance_t *vf, char *args)
       goto nomem;
 
    diff = diff_C;
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
    if(gCpuCaps.hasMMX) diff = diff_MMX;
 #endif
 

@@ -31,14 +31,14 @@ static inline u32 read32(u32 addr)
 {
         u32 x;
 
-        asm volatile("lwz %0,0(%1) ; sync" : "=r"(x) : "b"(0xc0000000 | addr));
+        __asm__ volatile("lwz %0,0(%1) ; sync" : "=r"(x) : "b"(0xc0000000 | addr));
 
         return x;
 }
 
 static inline void write32(u32 addr, u32 x)
 {
-        asm("stw %0,0(%1) ; eieio" : : "r"(x), "b"(0xc0000000 | addr));
+        __asm__("stw %0,0(%1) ; eieio" : : "r"(x), "b"(0xc0000000 | addr));
 }
 
 static inline void aveSetDirection(u32 dir)

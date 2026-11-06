@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <ctype.h>
+
 #include "libavutil/common.h"
 #include "libavutil/aes.h"
 #include "libavutil/sha.h"
@@ -101,7 +102,7 @@ struct bd_priv {
     stream_t     *title_file;
     struct AVAES *aescbc;
     struct AVAES *aeseed;
-    off_t         pos;
+    int64_t       pos;
     struct uks    uks;
     int           nr_lang_maps;
     struct lang_map *lang_maps;
@@ -117,7 +118,7 @@ static void bd_stream_close(stream_t *s)
     free(bd);
 }
 
-static int bd_stream_seek(stream_t *s, off_t pos)
+static int bd_stream_seek(stream_t *s, int64_t pos)
 {
     struct bd_priv *bd = s->priv;
 
@@ -140,28 +141,54 @@ static void id2str(const uint8_t *id, int idlen, char dst[ID_STR_LEN])
     int i;
     idlen = FFMIN(idlen, 20);
     for (i = 0; i < idlen; i++)
-        snprintf(dst + 2*i, 3, "%02"PRIX8, id[i]);
+        snprintf(dst + 2*i, 3, "%02"PRIx8, id[i]);
 }
 
 static int find_vuk(struct bd_priv *bd, const uint8_t discid[20])
 {
     char line[1024];
-    char filename[PATH_MAX];
     const char *home;
     int vukfound = 0;
     stream_t *file;
     char idstr[ID_STR_LEN];
+    id2str(discid, 20, idstr);
 
     // look up discid in KEYDB.cfg to get VUK
     home = getenv("HOME");
-    snprintf(filename, sizeof(filename), "%s/.dvdcss/KEYDB.cfg", home);
+    char *filename = av_asprintf("%s/.cache/aacs/vuk/%s", home, idstr);
     file = open_stream(filename, NULL, NULL);
+    av_freep(&filename);
+    if (file) {
+        vukfound = 1;
+        memset(line, 0, sizeof(line));
+        vukfound &= stream_read(file, line, 32) == 32;
+        vukfound &= sscanf(line,      "%16"SCNx64, &bd->vuk.u64[0]) == 1;
+        vukfound &= sscanf(line + 16, "%16"SCNx64, &bd->vuk.u64[1]) == 1;
+        bd->vuk.u64[0] = av_be2ne64(bd->vuk.u64[0]);
+        bd->vuk.u64[1] = av_be2ne64(bd->vuk.u64[1]);
+        free_stream(file);
+        if (vukfound)
+            return 1;
+    }
+    filename = av_asprintf("%s/.config/aacs/keydb.cfg", home);
+    file = open_stream(filename, NULL, NULL);
+    if (!file) {
+        av_freep(&filename);
+        filename = av_asprintf("%s/.config/aacs/KEYDB.cfg", home);
+        file = open_stream(filename, NULL, NULL);
+    }
+    if (!file) {
+        av_freep(&filename);
+        filename = av_asprintf("%s/.dvdcss/KEYDB.cfg", home);
+        file = open_stream(filename, NULL, NULL);
+    }
     if (!file) {
         mp_msg(MSGT_OPEN,MSGL_ERR,
                "Cannot open VUK database file %s\n", filename);
+        av_freep(&filename);
         return 0;
     }
-    id2str(discid, 20, idstr);
+    av_freep(&filename);
     while (stream_read_line(file, line, sizeof(line), 0)) {
         char *vst;
 
@@ -175,7 +202,9 @@ static int find_vuk(struct bd_priv *bd, const uint8_t discid[20])
         // or         I | I-Key
         // can be followed by ; and comment
 
-        if (strncasecmp(line, idstr, 40))
+        if (strlen(line) < 40) continue;
+        // Do not care whether it starts with 0x or not
+        if (av_strncasecmp(line, idstr, 40) && av_strncasecmp(line + 2, idstr, 40))
             continue;
         mp_msg(MSGT_OPEN, MSGL_V, "KeyDB found Entry for DiscID:\n%s\n", line);
 
@@ -184,6 +213,7 @@ static int find_vuk(struct bd_priv *bd, const uint8_t discid[20])
             break;
         vst += 6;
         while (isspace(*vst)) vst++;
+        if (vst[0] == '0' && vst[1] == 'x') vst += 2;
         if (sscanf(vst,      "%16"SCNx64, &bd->vuk.u64[0]) != 1)
             continue;
         if (sscanf(vst + 16, "%16"SCNx64, &bd->vuk.u64[1]) != 1)
@@ -192,6 +222,8 @@ static int find_vuk(struct bd_priv *bd, const uint8_t discid[20])
         bd->vuk.u64[1] = av_be2ne64(bd->vuk.u64[1]);
         vukfound = 1;
     }
+    if (!vukfound)
+        mp_msg(MSGT_OPEN, MSGL_V, "Failed to find KeyDB Entry for DiscID:\n%s\n", line);
     free_stream(file);
     return vukfound;
 }
@@ -205,23 +237,25 @@ static int bd_get_uks(struct bd_priv *bd)
     struct AVAES *a;
     struct AVSHA *asha;
     stream_t *file;
-    char filename[PATH_MAX];
     uint8_t discid[20];
     char idstr[ID_STR_LEN];
 
-    snprintf(filename, sizeof(filename), BD_UKF_PATH, bd->device);
+    char *filename = av_asprintf(BD_UKF_PATH, bd->device);
     file = open_stream(filename, NULL, NULL);
     if (!file) {
         mp_msg(MSGT_OPEN, MSGL_ERR,
                "Cannot open file %s to get UK and DiscID\n", filename);
+        av_freep(&filename);
         return 0;
     }
     file_size = file->end_pos;
     if (file_size <= 0 || file_size > 10 * 1024* 1024) {
         mp_msg(MSGT_OPEN, MSGL_ERR, "File %s too large\n", filename);
+        av_freep(&filename);
         free_stream(file);
         return 0;
     }
+    av_freep(&filename);
     buf = av_malloc(file_size);
     stream_read(file, buf, file_size);
     free_stream(file);
@@ -275,7 +309,7 @@ static int bd_get_uks(struct bd_priv *bd)
 }
 
 // NOTE: we assume buf is sufficiently aligned to 64 bit read/writes
-static off_t bd_read(struct bd_priv *bd, uint8_t *buf, int len)
+static int64_t bd_read(struct bd_priv *bd, uint8_t *buf, int len)
 {
     int read_len;
     int unit_offset = bd->pos % BD_UNIT_SIZE;
@@ -354,6 +388,7 @@ static int is_audio_type(int type)
     case 4:
     case 0x0f:
     case 0x11:
+    case 0x80:
     case 0x81:
     case 0x8A:
     case 0x82:
@@ -412,15 +447,16 @@ static void get_clipinf(struct bd_priv *bd)
 {
     int i;
     int langmap_offset, index_offset, end_offset;
-    char filename[PATH_MAX];
     stream_t *file;
 
-    snprintf(filename, sizeof(filename), BD_CLIPINF_PATH, bd->device, bd->title);
+    char *filename = av_asprintf(BD_CLIPINF_PATH, bd->device, bd->title);
     file = open_stream(filename, NULL, NULL);
     if (!file) {
         mp_msg(MSGT_OPEN, MSGL_ERR, "Cannot open clipinf %s\n", filename);
+        av_freep(&filename);
         return;
     }
+    av_freep(&filename);
     if (stream_read_qword(file) != AV_RB64("HDMV0200")) {
         mp_msg(MSGT_OPEN, MSGL_ERR, "Unknown clipinf format\n");
         return;
@@ -470,7 +506,7 @@ static int bd_stream_control(stream_t *s, int cmd, void *arg)
 
 static int bd_stream_open(stream_t *s, int mode, void* opts, int* file_format)
 {
-    char filename[PATH_MAX];
+    char *filename;
 
     struct stream_priv_s* p = opts;
     struct bd_priv *bd = calloc(1, sizeof(*bd));
@@ -507,9 +543,10 @@ static int bd_stream_open(stream_t *s, int mode, void* opts, int* file_format)
     // set up AES key from uk
     av_aes_init(bd->aeseed, bd->uks.keys[0].u8, 128, 0);
 
-    snprintf(filename, sizeof(filename), BD_M2TS_PATH, bd->device, bd->title);
+    filename = av_asprintf(BD_M2TS_PATH, bd->device, bd->title);
     mp_msg(MSGT_OPEN, MSGL_STATUS, "Opening %s\n", filename);
     bd->title_file = open_stream(filename, NULL, NULL);
+    av_freep(&filename);
     if (!bd->title_file)
         return STREAM_ERROR;
     s->end_pos = bd->title_file->end_pos;

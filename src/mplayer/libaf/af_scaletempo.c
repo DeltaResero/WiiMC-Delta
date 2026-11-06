@@ -290,7 +290,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   switch(cmd){
   case AF_CONTROL_REINIT:{
     af_data_t* data = (af_data_t*)arg;
-    float srate = data->rate / 1000;
+    float srate = data->rate / 1000.0f;
     int nch = data->nch;
     int bps;
     int use_int = 0;
@@ -333,6 +333,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       s->samples_standing = s->bytes_standing / bps;
       s->output_overlap   = NULL;
     } else {
+      int old_overlap = s->bytes_overlap;
       s->samples_overlap  = frames_overlap * nch;
       s->bytes_overlap    = frames_overlap * nch * bps;
       s->bytes_standing   = s->bytes_stride - s->bytes_overlap;
@@ -343,7 +344,10 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
         mp_msg(MSGT_AFILTER, MSGL_FATAL, "[scaletempo] Out of memory\n");
         return AF_ERROR;
       }
-      memset(s->buf_overlap, 0, s->bytes_overlap);
+      // not necessarily correct, but keeping old data if possible
+      // avoids clicks when changing speed.
+      if (s->bytes_overlap != old_overlap)
+        memset(s->buf_overlap, 0, s->bytes_overlap);
       if (use_int) {
         int32_t* pb = s->table_blend;
         int64_t blend = 0;
@@ -451,14 +455,13 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   }
   case AF_CONTROL_SCALETEMPO_AMOUNT | AF_CONTROL_SET:{
     s->scale = *(float*)arg;
-    s->scale = s->speed * s->scale_nominal;
     return AF_OK;
   }
   case AF_CONTROL_SCALETEMPO_AMOUNT | AF_CONTROL_GET:
     *(float*)arg = s->scale;
     return AF_OK;
   case AF_CONTROL_COMMAND_LINE:{
-    strarg_t speed = {};
+    strarg_t speed = { 0 };
     opt_t subopts[] = {
       {"scale",   OPT_ARG_FLOAT, &s->scale_nominal, NULL},
       {"stride",  OPT_ARG_FLOAT, &s->ms_stride, NULL},
@@ -561,7 +564,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_scaletempo = {
+const af_info_t af_info_scaletempo = {
   "Scale audio tempo while maintaining pitch",
   "scaletempo",
   "Robert Juliano",

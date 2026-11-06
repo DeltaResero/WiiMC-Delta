@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "config.h"
 #include "mp_msg.h"
@@ -73,6 +74,7 @@ typedef enum
     VIDEO_H264  = 0x10000005,
     VIDEO_AVC   = mmioFOURCC('a', 'v', 'c', '1'),
     VIDEO_DIRAC = mmioFOURCC('d', 'r', 'a', 'c'),
+    VIDEO_HEVC  = mmioFOURCC('H', 'E', 'V', 'C'),
     VIDEO_VC1   = mmioFOURCC('W', 'V', 'C', '1'),
     AUDIO_MP2       = 0x50,
     AUDIO_A52       = 0x2000,
@@ -82,6 +84,7 @@ typedef enum
     AUDIO_AAC_LATM  = mmioFOURCC('M', 'P', '4', 'L'),
     AUDIO_TRUEHD    = mmioFOURCC('T', 'R', 'H', 'D'),
     AUDIO_S302M     = mmioFOURCC('B', 'S', 'S', 'D'),
+    AUDIO_PCM_BR    = mmioFOURCC('B', 'P', 'C', 'M'),
     SPU_DVD     = 0x3000000,
     SPU_DVB     = 0x3000001,
     SPU_TELETEXT    = 0x3000002,
@@ -243,6 +246,12 @@ typedef struct {
     int last_sid;
     char packet[TS_FEC_PACKET_SIZE];
     TS_stream_info vstr, astr;
+#ifdef GEKKO
+    int rate_init;
+    off_t rate_pos0;    // where the first video (or audio) timestamp was read
+    double rate_pts0;
+    double rate;        // bytes per second of the whole multiplex
+#endif
 } ts_priv_t;
 
 
@@ -258,6 +267,7 @@ static int IS_AUDIO(es_stream_type_t type)
     case AUDIO_MP2:
     case AUDIO_A52:
     case AUDIO_LPCM_BE:
+    case AUDIO_PCM_BR:
     case AUDIO_AAC:
     case AUDIO_AAC_LATM:
     case AUDIO_DTS:
@@ -277,6 +287,7 @@ static int IS_VIDEO(es_stream_type_t type)
     case VIDEO_H264:
     case VIDEO_AVC:
     case VIDEO_DIRAC:
+    case VIDEO_HEVC:
     case VIDEO_VC1:
         return 1;
     }
@@ -295,7 +306,7 @@ static int IS_SUB(es_stream_type_t type)
     return 0;
 }
 
-static int ts_parse(demuxer_t *demuxer, ES_stream_t *es, unsigned char *packet, int probe);
+static int ts_parse(demuxer_t *demuxer, ES_stream_t *es, int probe);
 
 static uint8_t get_packet_size(const unsigned char *buf, int size)
 {
@@ -334,7 +345,7 @@ try_fec:
 }
 
 static int parse_avc_sps(uint8_t *buf, int len, int *w, int *h);
-static inline uint8_t *pid_lang_from_pmt(ts_priv_t *priv, int pid);
+static uint8_t *pid_lang_from_pmt(ts_priv_t *priv, int pid);
 
 static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
 {
@@ -351,20 +362,19 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
         {
             sh->needs_parsing = 1;
             sh->format = IS_AUDIO(es->type) ? es->type : es->subtype;
-            sh->ds = demuxer->audio;
 
             priv->ts.streams[es->pid].id = priv->last_aid;
             priv->ts.streams[es->pid].sh = sh;
             priv->ts.streams[es->pid].type = TYPE_AUDIO;
             mp_msg(MSGT_DEMUX, MSGL_V, "\r\nADDED AUDIO PID %d, type: %x stream n. %d\r\n", es->pid, sh->format, priv->last_aid);
             priv->last_aid++;
-        }
 
-        if(es->extradata && es->extradata_len)
-        {
-            sh->wf = malloc(sizeof(*sh->wf) + es->extradata_len);
-            sh->wf->cbSize = es->extradata_len;
-            memcpy(sh->wf + 1, es->extradata, es->extradata_len);
+            if(es->extradata && es->extradata_len)
+            {
+                sh->wf = malloc(sizeof(*sh->wf) + es->extradata_len);
+                sh->wf->cbSize = es->extradata_len;
+                memcpy(sh->wf + 1, es->extradata, es->extradata_len);
+            }
         }
     }
 
@@ -374,7 +384,6 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
         if(sh)
         {
             sh->format = IS_VIDEO(es->type) ? es->type : es->subtype;
-            sh->ds = demuxer->video;
 
             priv->ts.streams[es->pid].id = priv->last_vid;
             priv->ts.streams[es->pid].sh = sh;
@@ -528,7 +537,7 @@ static int ts_check_file(demuxer_t * demuxer)
 }
 
 
-static inline int32_t progid_idx_in_pmt(ts_priv_t *priv, uint16_t progid)
+static int32_t progid_idx_in_pmt(ts_priv_t *priv, uint16_t progid)
 {
     int x;
 
@@ -545,7 +554,7 @@ static inline int32_t progid_idx_in_pmt(ts_priv_t *priv, uint16_t progid)
 }
 
 
-static inline int32_t progid_for_pid(ts_priv_t *priv, int pid, int32_t req)     //finds the first program listing a pid
+static int32_t progid_for_pid(ts_priv_t *priv, int pid, int32_t req)        //finds the first program listing a pid
 {
     int i, j;
     pmt_t *pmt;
@@ -575,7 +584,7 @@ static inline int32_t progid_for_pid(ts_priv_t *priv, int pid, int32_t req)     
     return -1;
 }
 
-static inline int32_t prog_pcr_pid(ts_priv_t *priv, int progid)
+static int32_t prog_pcr_pid(ts_priv_t *priv, int progid)
 {
     int i;
 
@@ -590,7 +599,7 @@ static inline int32_t prog_pcr_pid(ts_priv_t *priv, int progid)
 }
 
 
-static inline int pid_match_lang(ts_priv_t *priv, uint16_t pid, char *lang)
+static int pid_match_lang(ts_priv_t *priv, uint16_t pid, char *lang)
 {
     uint16_t i, j;
     pmt_t *pmt;
@@ -668,7 +677,6 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
     int32_t p, chosen_pid = 0;
     off_t pos=0, ret = 0, init_pos, end_pos;
     ES_stream_t es;
-    unsigned char tmp[TS_FEC_PACKET_SIZE];
     ts_priv_t *priv = (ts_priv_t*) demuxer->priv;
     struct {
         char *buf;
@@ -693,7 +701,7 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
         if(pos > end_pos || demuxer->stream->eof)
             break;
 
-        if(ts_parse(demuxer, &es, tmp, 1))
+        if(ts_parse(demuxer, &es, 1))
         {
             //Non PES-aligned A52 audio may escape detection if PMT is not present;
             //in this case we try to find at least 3 A52 syncwords
@@ -875,6 +883,8 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
             mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO VC1(pid=%d) ", param->vpid);
         else if(param->vtype == VIDEO_AVC)
             mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO AVC(NAL-H264, pid=%d) ", param->vpid);
+        else if(param->vtype == VIDEO_HEVC)
+            mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO HEVC(pid=%d) ", param->vpid);
     }
     else
     {
@@ -891,6 +901,8 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
         mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO DTS(pid=%d)", param->apid);
     else if(param->atype == AUDIO_LPCM_BE)
         mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO LPCM(pid=%d)", param->apid);
+    else if(param->atype == AUDIO_PCM_BR)
+        mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO PCMBR(pid=%d)", param->apid);
     else if(param->atype == AUDIO_AAC)
         mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO AAC(pid=%d)", param->apid);
     else if(param->atype == AUDIO_AAC_LATM)
@@ -908,7 +920,7 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
     }
 
     if(IS_SUB(param->stype))
-        mp_msg(MSGT_DEMUXER, MSGL_INFO, " SUB %s(pid=%d) ", (param->stype==SPU_DVD ? "DVD" : param->stype==SPU_DVB ? "DVB" : "Teletext"), param->spid);
+        mp_msg(MSGT_DEMUXER, MSGL_INFO, " SUB %s(pid=%d) ", (param->stype==SPU_DVD ? "DVD" : param->stype==SPU_DVB ? "DVB" : param->stype==SPU_PGS ? "PGS" : "Teletext"), param->spid);
     else
     {
         param->stype = UNKNOWN;
@@ -1017,10 +1029,7 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 
 
     demuxer->priv = priv;
-    if(demuxer->stream->type != STREAMTYPE_FILE)
-        demuxer->seekable = 1;
-    else
-        demuxer->seekable = 1;
+    demuxer->seekable = 1;
 
 
     params.atype = params.vtype = params.stype = UNKNOWN;
@@ -1048,7 +1057,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
         ts_add_stream(demuxer, priv->ts.pids[params.vpid]);
         sh_video = priv->ts.streams[params.vpid].sh;
         demuxer->video->id = priv->ts.streams[params.vpid].id;
-        sh_video->ds = demuxer->video;
         sh_video->format = params.vtype;
         demuxer->video->sh = sh_video;
     }
@@ -1061,7 +1069,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
         ts_add_stream(demuxer, priv->ts.pids[params.apid]);
         sh_audio = priv->ts.streams[params.apid].sh;
         demuxer->audio->id = priv->ts.streams[params.apid].id;
-        sh_audio->ds = demuxer->audio;
         sh_audio->format = params.atype;
         demuxer->audio->sh = sh_audio;
     }
@@ -1660,7 +1667,7 @@ static void ts_dump_streams(ts_priv_t *priv)
 }
 
 
-static inline int32_t prog_idx_in_pat(ts_priv_t *priv, uint16_t progid)
+static int32_t prog_idx_in_pat(ts_priv_t *priv, uint16_t progid)
 {
     int x;
 
@@ -1677,7 +1684,7 @@ static inline int32_t prog_idx_in_pat(ts_priv_t *priv, uint16_t progid)
 }
 
 
-static inline int32_t prog_id_in_pat(ts_priv_t *priv, uint16_t pid)
+static int32_t prog_id_in_pat(ts_priv_t *priv, uint16_t pid)
 {
     int x;
 
@@ -1750,7 +1757,6 @@ static int parse_pat(ts_priv_t * priv, int is_start, unsigned char *buff, int si
     unsigned char *base;
     int entries, i;
     uint16_t progid;
-    struct pat_progs_t *tmp;
     ts_section_t *section;
 
     section = &(priv->pat.section);
@@ -1784,14 +1790,14 @@ static int parse_pat(ts_priv_t * priv, int is_start, unsigned char *buff, int si
 
         if((idx = prog_idx_in_pat(priv, progid)) == -1)
         {
-            int sz = sizeof(struct pat_progs_t) * (priv->pat.progs_cnt+1);
-            tmp = realloc_struct(priv->pat.progs, priv->pat.progs_cnt+1, sizeof(struct pat_progs_t));
-            if(tmp == NULL)
+            priv->pat.progs = realloc_struct(priv->pat.progs, priv->pat.progs_cnt+1, sizeof(struct pat_progs_t));
+            if(!priv->pat.progs)
             {
+                int sz = sizeof(struct pat_progs_t) * (priv->pat.progs_cnt+1);
+                priv->pat.progs_cnt = 0;
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "PARSE_PAT: COULDN'T REALLOC %d bytes, NEXT\n", sz);
                 break;
             }
-            priv->pat.progs = tmp;
             idx = priv->pat.progs_cnt;
             priv->pat.progs_cnt++;
         }
@@ -1807,7 +1813,7 @@ static int parse_pat(ts_priv_t * priv, int is_start, unsigned char *buff, int si
 }
 
 
-static inline int32_t es_pid_in_pmt(pmt_t * pmt, uint16_t pid)
+static int32_t es_pid_in_pmt(pmt_t * pmt, uint16_t pid)
 {
     uint16_t i;
 
@@ -2043,7 +2049,7 @@ static uint16_t parse_mp4_es_descriptor(pmt_t *pmt, uint8_t *buf, int len)
 {
     int i = 0, j = 0, k, found;
     uint8_t flag;
-    mp4_es_descr_t es, *target_es = NULL, *tmp;
+    mp4_es_descr_t es, *target_es = NULL;
 
     mp_msg(MSGT_DEMUX, MSGL_V, "PARSE_MP4ES: len=%d\n", len);
     memset(&es, 0, sizeof(mp4_es_descr_t));
@@ -2078,13 +2084,13 @@ static uint16_t parse_mp4_es_descriptor(pmt_t *pmt, uint8_t *buf, int len)
 
             if(! found)
             {
-                tmp = realloc_struct(pmt->mp4es, pmt->mp4es_cnt+1, sizeof(mp4_es_descr_t));
-                if(tmp == NULL)
+                pmt->mp4es = realloc_struct(pmt->mp4es, pmt->mp4es_cnt+1, sizeof(mp4_es_descr_t));
+                if(!pmt->mp4es)
                 {
+                    pmt->mp4es_cnt = 0;
                     fprintf(stderr, "CAN'T REALLOC MP4_ES_DESCR\n");
                     continue;
                 }
-                pmt->mp4es = tmp;
                 target_es = &(pmt->mp4es[pmt->mp4es_cnt]);
                 pmt->mp4es_cnt++;
             }
@@ -2283,7 +2289,7 @@ static int parse_descriptors(struct pmt_es_t *es, uint8_t *ptr)
         else if(ptr[j] == 0x56) // Teletext
         {
             if(descr_len >= 5) {
-                memcpy(es->lang, ptr+2, 3);
+                memcpy(es->lang, ptr+j+2, 3);
                 es->lang[3] = 0;
             }
             es->type = SPU_TELETEXT;
@@ -2364,6 +2370,10 @@ static int parse_descriptors(struct pmt_es_t *es, uint8_t *ptr)
                 {
                     es->type = AUDIO_S302M;
                 }
+                else if(d[0] == 'H' && d[1] == 'E' && d[2] == 'V' && d[3] == 'C')
+                {
+                    es->type = VIDEO_HEVC;
+                }
                 else
                     es->type = UNKNOWN;
                 mp_msg(MSGT_DEMUX, MSGL_DBG2, "FORMAT %s\n", es->format_descriptor);
@@ -2419,8 +2429,6 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
     int32_t idx, es_count, section_bytes;
     uint8_t m=0;
     int skip;
-    pmt_t *tmp;
-    struct pmt_es_t *tmp_es;
     ts_section_t *section;
     ES_stream_t *tss;
     int i;
@@ -2429,14 +2437,14 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
 
     if(idx == -1)
     {
-        int sz = (priv->pmt_cnt + 1) * sizeof(pmt_t);
-        tmp = realloc_struct(priv->pmt, priv->pmt_cnt + 1, sizeof(pmt_t));
-        if(tmp == NULL)
+        priv->pmt = realloc_struct(priv->pmt, priv->pmt_cnt + 1, sizeof(pmt_t));
+        if(!priv->pmt)
         {
+            int sz = (priv->pmt_cnt + 1) * sizeof(pmt_t);
+            priv->pmt_cnt = 0;
             mp_msg(MSGT_DEMUX, MSGL_ERR, "PARSE_PMT: COULDN'T REALLOC %d bytes, NEXT\n", sz);
             return 0;
         }
-        priv->pmt = tmp;
         idx = priv->pmt_cnt;
         memset(&(priv->pmt[idx]), 0, sizeof(pmt_t));
         priv->pmt_cnt++;
@@ -2490,14 +2498,14 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
         idx = es_pid_in_pmt(pmt, es_pid);
         if(idx == -1)
         {
-            int sz = sizeof(struct pmt_es_t) * (pmt->es_cnt + 1);
-            tmp_es = realloc_struct(pmt->es, pmt->es_cnt + 1, sizeof(struct pmt_es_t));
-            if(tmp_es == NULL)
+            pmt->es = realloc_struct(pmt->es, pmt->es_cnt + 1, sizeof(struct pmt_es_t));
+            if(!pmt->es)
             {
+                int sz = sizeof(struct pmt_es_t) * (pmt->es_cnt + 1);
+                pmt->es_cnt = 0;
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "PARSE_PMT, COULDN'T ALLOCATE %d bytes for PMT_ES\n", sz);
                 continue;
             }
-            pmt->es = tmp_es;
             idx = pmt->es_cnt;
             memset(&(pmt->es[idx]), 0, sizeof(struct pmt_es_t));
             pmt->es_cnt++;
@@ -2559,6 +2567,12 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
                 break;
             case 0x13:
                 pmt->es[idx].type = SL_SECTION;
+                break;
+            case 0x24:
+                pmt->es[idx].type = VIDEO_HEVC;
+                break;
+            case 0x80:
+                pmt->es[idx].type = AUDIO_PCM_BR;
                 break;
             case 0x81:
                 pmt->es[idx].type = AUDIO_A52;
@@ -2643,7 +2657,7 @@ static pmt_t* pmt_of_pid(ts_priv_t *priv, int pid, mp4_decoder_config_t **mp4_de
 }
 
 
-static inline int32_t pid_type_from_pmt(ts_priv_t *priv, int pid)
+static int32_t pid_type_from_pmt(ts_priv_t *priv, int pid)
 {
     int32_t pmt_idx, pid_idx, i, j;
 
@@ -2670,7 +2684,7 @@ static inline int32_t pid_type_from_pmt(ts_priv_t *priv, int pid)
 }
 
 
-static inline uint8_t *pid_lang_from_pmt(ts_priv_t *priv, int pid)
+static uint8_t *pid_lang_from_pmt(ts_priv_t *priv, int pid)
 {
     int32_t pmt_idx, pid_idx, i, j;
 
@@ -2697,6 +2711,36 @@ static inline uint8_t *pid_lang_from_pmt(ts_priv_t *priv, int pid)
 }
 
 
+#ifdef GEKKO
+// Measure the multiplex's byte rate against the timestamps of the stream
+// the player shows time from, for seeking by time.
+static void ts_note_rate(demuxer_t *demuxer, demux_stream_t *ds, double pts)
+{
+    ts_priv_t *priv = (ts_priv_t*) demuxer->priv;
+    demux_stream_t *clock = demuxer->video->sh ? demuxer->video : demuxer->audio;
+    off_t pos = stream_tell(demuxer->stream);
+    double rate;
+
+    if(ds != clock || pts == MP_NOPTS_VALUE)
+        return;
+
+    if(!priv->rate_init)
+    {
+        priv->rate_init = 1;
+        priv->rate_pos0 = pos;
+        priv->rate_pts0 = pts;
+        return;
+    }
+
+    if(pts - priv->rate_pts0 < 1 || pos <= priv->rate_pos0)
+        return;
+
+    rate = (pos - priv->rate_pos0) / (pts - priv->rate_pts0);
+    if(rate > 1000) // otherwise a discontinuity, keep the last estimate
+        priv->rate = rate;
+}
+#endif
+
 static int fill_packet(demuxer_t *demuxer, demux_stream_t *ds, demux_packet_t **dp, int *dp_offset, TS_stream_info *si)
 {
     int ret = 0;
@@ -2708,8 +2752,15 @@ static int fill_packet(demuxer_t *demuxer, demux_stream_t *ds, demux_packet_t **
     }
     if(*dp)
     {
+        double stream_pts = MP_NOPTS_VALUE;
         ret = *dp_offset;
         resize_demux_packet(*dp, ret);  //shrinked to the right size
+        if (ds == demuxer->video &&
+            stream_control(demuxer->stream, STREAM_CTRL_GET_CURRENT_TIME, (void *)&stream_pts) != STREAM_UNSUPPORTED)
+            (*dp)->stream_pts = stream_pts;
+#ifdef GEKKO
+        ts_note_rate(demuxer, ds, (*dp)->pts);
+#endif
         ds_add_packet(ds, *dp);
         mp_msg(MSGT_DEMUX, MSGL_DBG2, "ADDED %d  bytes to %s fifo, PTS=%.3f\n", ret, (ds == demuxer->audio ? "audio" : (ds == demuxer->video ? "video" : "sub")), (*dp)->pts);
         if(si)
@@ -2767,12 +2818,13 @@ static int fill_extradata(mp4_decoder_config_t * mp4_dec, ES_stream_t *tss)
 
 // 0 = EOF or no stream found
 // else = [-] number of bytes written to the packet
-static int ts_parse(demuxer_t *demuxer , ES_stream_t *es, unsigned char *packet, int probe)
+static int ts_parse(demuxer_t *demuxer , ES_stream_t *es, int probe)
 {
     ES_stream_t *tss;
     int buf_size, is_start, pid, base;
     int len, cc, cc_ok, afc, retv = 0, is_video, is_audio, is_sub;
     ts_priv_t * priv = (ts_priv_t*) demuxer->priv;
+    unsigned char *packet = priv->packet;
     stream_t *stream = demuxer->stream;
     char *p;
     demux_stream_t *ds = NULL;
@@ -3241,22 +3293,27 @@ static void reset_fifos(demuxer_t *demuxer, int a, int v, int s)
 }
 
 
+static void ts_seek_land(demuxer_t *demuxer, off_t newpos);
+#ifdef GEKKO
+static int ts_seek_time(demuxer_t *demuxer, float rel_seek_secs, int flags);
+#endif
+
 static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_delay, int flags)
 {
-    demux_stream_t *d_audio=demuxer->audio;
     demux_stream_t *d_video=demuxer->video;
-    sh_audio_t *sh_audio=d_audio->sh;
     sh_video_t *sh_video=d_video->sh;
     ts_priv_t * priv = (ts_priv_t*) demuxer->priv;
-    int i, video_stats;
+    int video_stats;
     off_t newpos;
 
     //================= seek in MPEG-TS ==========================
 
     ts_dump_streams(demuxer->priv);
-    reset_fifos(demuxer, sh_audio != NULL, sh_video != NULL, demuxer->sub->id > 0);
 
-    demux_flush(demuxer);
+#ifdef GEKKO
+    if(ts_seek_time(demuxer, rel_seek_secs, flags))
+        return;
+#endif
 
 
 
@@ -3282,6 +3339,24 @@ static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_d
             newpos += video_stats*rel_seek_secs;
     }
 
+
+    ts_seek_land(demuxer, newpos);
+}
+
+// Seek to a byte position and read on to the next point video can start
+// decoding from.
+static void ts_seek_land(demuxer_t *demuxer, off_t newpos)
+{
+    demux_stream_t *d_audio=demuxer->audio;
+    demux_stream_t *d_video=demuxer->video;
+    sh_audio_t *sh_audio=d_audio->sh;
+    sh_video_t *sh_video=d_video->sh;
+    ts_priv_t * priv = (ts_priv_t*) demuxer->priv;
+    int i;
+
+    reset_fifos(demuxer, sh_audio != NULL, sh_video != NULL, demuxer->sub->id > 0);
+
+    demux_flush(demuxer);
 
     if(newpos < demuxer->movi_start)
           newpos = demuxer->movi_start; //begininng of stream
@@ -3324,6 +3399,8 @@ static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_d
             break;
         else if(sh_video->format == VIDEO_VC1 && (i==0x10E || i==0x10F))
             break;
+        else if(sh_video->format == VIDEO_HEVC)
+            break;
         else    //H264
         {
             if((i & ~0x60) == 0x105 || (i & ~0x60) == 0x107) break;
@@ -3333,13 +3410,128 @@ static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_d
     }
 }
 
+#ifdef GEKKO
+// Seek by time: estimate the byte position from the measured byte rate,
+// then correct it from the timestamp found there, a few times at most.
+// A single estimate from the video bitrate landed seconds off target.
+static int ts_seek_time(demuxer_t *demuxer, float rel_seek_secs, int flags)
+{
+    ts_priv_t * priv = (ts_priv_t*) demuxer->priv;
+    sh_video_t *sh_video = demuxer->video->sh;
+    sh_audio_t *sh_audio = demuxer->audio->sh;
+    demux_stream_t *clock = sh_video ? demuxer->video : demuxer->audio;
+    double target, landed, err, rate, best_err = HUGE_VAL;
+    double seen[4];     // where each try landed
+    off_t tried[4];     // and from where
+    off_t pos, best_pos = 0, end = 0;
+    int i, j, last_best = 0, under = 0, stepped_back = 0;
+
+    if((flags & SEEK_FACTOR) || !priv->rate_init || priv->rate <= 0)
+        return 0;
+
+    if(flags & SEEK_ABSOLUTE)
+        target = priv->rate_pts0;
+    else if(sh_video && sh_video->pts != MP_NOPTS_VALUE)
+        target = sh_video->pts;
+    else if(!sh_video && sh_audio && sh_audio->pts != MP_NOPTS_VALUE)
+        // the decoder's position; the audio stream's own pts isn't kept
+        target = sh_audio->pts + (sh_audio->o_bps ? sh_audio->pts_bytes / (double) sh_audio->o_bps : 0);
+    else
+        return 0;
+    target += rel_seek_secs;
+    if(target < priv->rate_pts0)
+        target = priv->rate_pts0;
+
+    if(demuxer->movi_end > demuxer->movi_start)
+        end = demuxer->movi_end;
+
+    pos = priv->rate_pos0 + (off_t) ((target - priv->rate_pts0) * priv->rate);
+
+    for(i = 0; i < 4; i++)
+    {
+        if(pos < demuxer->movi_start)
+            pos = demuxer->movi_start;
+        if(end && pos > end)
+            pos = end;
+
+        demuxer->stream->eof = 0;
+        demuxer->video->eof = 0;
+        demuxer->audio->eof = 0;
+        demuxer->sub->eof = 0;
+        ts_seek_land(demuxer, pos);
+
+        landed = clock->pts;
+        if(clock->eof || landed == MP_NOPTS_VALUE)
+        {
+            last_best = 0;
+            break;
+        }
+
+        err = landed - target;
+        mp_msg(MSGT_DEMUX, MSGL_V, "TS seek: target %.3f, try %d at %lld landed %.3f\n",
+            target, i, (long long) pos, landed);
+        // closest wins; between two equally close, the earlier one
+        last_best = fabs(err) < fabs(best_err) - 0.05 ||
+            (fabs(err) < fabs(best_err) + 0.05 && err <= best_err);
+        if(last_best)
+        {
+            best_err = err;
+            best_pos = pos;
+        }
+        if(err < 0)
+            under = 1;
+        if(fabs(err) < 1)
+            break;
+
+        // The same keyframe again: there's no closer one to find, unless
+        // every landing so far was late. Then the keyframe before the
+        // target starts further back than the byte rate says (a big
+        // I-frame), so step back a second more, once.
+        for(j = 0; j < i && fabs(landed - seen[j]) >= 0.01; j++);
+        if(j < i && (under || stepped_back))
+            break;
+
+        // Correct by the byte rate between the last two landings, which
+        // follows a variable bitrate better than the average does.
+        rate = priv->rate;
+        if(i > 0 && fabs(landed - seen[i - 1]) >= 0.01)
+        {
+            double local = (pos - tried[i - 1]) / (landed - seen[i - 1]);
+            if(local > rate / 4 && local < rate * 4)
+                rate = local;
+        }
+        seen[i] = landed;
+        tried[i] = pos;
+
+        if(j < i)
+        {
+            stepped_back = 1;
+            pos -= (off_t) ((err + 1) * rate);
+        }
+        else
+            pos -= (off_t) (err * rate);
+    }
+
+    if(best_err == HUGE_VAL)
+        return 0;   // nothing usable found: fall back to the old estimate
+
+    if(!last_best)
+    {
+        demuxer->stream->eof = 0;
+        demuxer->video->eof = 0;
+        demuxer->audio->eof = 0;
+        demuxer->sub->eof = 0;
+        ts_seek_land(demuxer, best_pos);
+    }
+    return 1;
+}
+#endif
 
 static int demux_ts_fill_buffer(demuxer_t * demuxer, demux_stream_t *ds)
 {
     ES_stream_t es;
-    ts_priv_t *priv = (ts_priv_t *)demuxer->priv;
 
-    return -ts_parse(demuxer, &es, priv->packet, 0);
+    return -ts_parse(demuxer, &es, 0);
 }
 
 

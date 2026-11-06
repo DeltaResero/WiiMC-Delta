@@ -26,6 +26,8 @@
 #include <ogc/pad.h>
 #endif
 
+#include "libavutil/mathematics.h"
+
 #include "ass_render.h"
 #include "ass_parse.h"
 
@@ -111,28 +113,36 @@ void update_font(ASS_Renderer *render_priv)
 }
 
 /**
- * \brief Change border width
- * negative value resets border to style value
+ * \brief Calculate valid border size. Makes sure the border sizes make sense.
+ *
+ * \param priv renderer state object
+ * \param border_x requested x border size
+ * \param border_y requested y border size
  */
-void change_border(ASS_Renderer *render_priv, double border_x,
-                   double border_y)
+void calc_border(ASS_Renderer *priv, double border_x, double border_y)
 {
-    int bord;
-    if (!render_priv->state.font)
-        return;
-
     if (border_x < 0 && border_y < 0) {
-        if (render_priv->state.style->BorderStyle == 1) //This makes BorderStyle=3 not work if outline is 0
-            //|| render_priv->state.style->BorderStyle == 3)
-            border_x = border_y = render_priv->state.style->Outline;
+        if (priv->state.border_style == 1) //This makes BorderStyle=3 not work if outline is 0
+            //|| priv->state.border_style == 3)
+            border_x = border_y = priv->state.style->Outline;
         else
             border_x = border_y = 1.;
     }
 
-    render_priv->state.border_x = border_x;
-    render_priv->state.border_y = border_y;
+    priv->state.border_x = border_x;
+    priv->state.border_y = border_y;
+}
 
-    bord = 64 * border_x * render_priv->border_scale;
+/**
+ * \brief Change border width
+ *
+ * \param render_priv renderer state object
+ * \param info glyph state object
+ */
+void change_border(ASS_Renderer *render_priv, double border_x, double border_y)
+{
+    int bord = 64 * border_x * render_priv->border_scale;
+
     if (bord > 0 && border_x == border_y) {
         if (!render_priv->state.stroker) {
             int error;
@@ -144,11 +154,14 @@ void change_border(ASS_Renderer *render_priv, double border_x,
                         "failed to get stroker");
                 render_priv->state.stroker = 0;
             }
+            render_priv->state.stroker_radius = -1.0;
         }
-        if (render_priv->state.stroker)
+        if (render_priv->state.stroker && render_priv->state.stroker_radius != bord) {
             FT_Stroker_Set(render_priv->state.stroker, bord,
                            FT_STROKER_LINECAP_ROUND,
                            FT_STROKER_LINEJOIN_ROUND, 0);
+            render_priv->state.stroker_radius = bord;
+        }
     } else {
         FT_Stroker_Done(render_priv->state.stroker);
         render_priv->state.stroker = 0;
@@ -236,7 +249,7 @@ static char *parse_vector_clip(ASS_Renderer *render_priv, char *p)
     drawing->scale = scale;
     drawing->scale_x = render_priv->font_scale_x * render_priv->font_scale;
     drawing->scale_y = render_priv->font_scale;
-    while (*p != ')' && *p != '}' && p != 0)
+    while (*p != ')' && *p != '}' && *p != 0)
         ass_drawing_add_char(drawing, *p++);
     skipopt(')');
 
@@ -248,7 +261,7 @@ static char *parse_vector_clip(ASS_Renderer *render_priv, char *p)
  * \param p string to parse
  * \param pwr multiplier for some tag effects (comes from \t tags)
  */
-static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
+char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
 {
     skip_to('\\');
     skip('\\');
@@ -262,7 +275,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
             val = render_priv->state.border_x * (1 - pwr) + val * pwr;
         else
             val = -1.;
-        change_border(render_priv, val, render_priv->state.border_y);
+        calc_border(render_priv, val, render_priv->state.border_y);
         render_priv->state.bm_run_id++;
     } else if (mystrcmp(&p, "ybord")) {
         double val;
@@ -270,7 +283,8 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
             val = render_priv->state.border_y * (1 - pwr) + val * pwr;
         else
             val = -1.;
-        change_border(render_priv, render_priv->state.border_x, val);
+        calc_border(render_priv, render_priv->state.border_x, val);
+        render_priv->state.bm_run_id++;
     } else if (mystrcmp(&p, "xshad")) {
         double val;
         if (mystrtod(&p, &val))
@@ -305,7 +319,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         int x0, y0, x1, y1;
         int res = 1;
         char *start = p;
-        skipopt('(');
+        skip('(');
         res &= mystrtoi(&p, &x0);
         skipopt(',');
         res &= mystrtoi(&p, &y0);
@@ -394,11 +408,10 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
     } else if (mystrcmp(&p, "bord")) {
         double val;
         if (mystrtod(&p, &val)) {
-            if (render_priv->state.border_x == render_priv->state.border_y)
                 val = render_priv->state.border_x * (1 - pwr) + val * pwr;
         } else
             val = -1.;          // reset to default
-        change_border(render_priv, val, val);
+        calc_border(render_priv, val, val);
         render_priv->state.bm_run_id++;
     } else if (mystrcmp(&p, "move")) {
         double x1, x2, y1, y2;
@@ -413,6 +426,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         mystrtod(&p, &x2);
         skip(',');
         mystrtod(&p, &y2);
+        t1 = t2 = 0;
         if (*p == ',') {
             skip(',');
             mystrtoll(&p, &t1);
@@ -422,13 +436,20 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
                    "movement6: (%f, %f) -> (%f, %f), (%" PRId64 " .. %"
                    PRId64 ")\n", x1, y1, x2, y2, (int64_t) t1,
                    (int64_t) t2);
-        } else {
+            // VSFilter
+            if (t1 > t2) {
+                double tmp = t2;
+                t2 = t1;
+                t1 = tmp;
+            }
+        }
+        if (t1 <= 0 && t2 <= 0) {
             t1 = 0;
             t2 = render_priv->state.event->Duration;
             ass_msg(render_priv->library, MSGL_DBG2,
                    "movement: (%f, %f) -> (%f, %f)", x1, y1, x2, y2);
         }
-        skip(')');
+        skipopt(')');
         delta_t = t2 - t1;
         t = render_priv->time - render_priv->state.event->Start;
         if (t < t1)
@@ -537,7 +558,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         mystrtod(&p, &v1);
         skip(',');
         mystrtod(&p, &v2);
-        skip(')');
+        skipopt(')');
         ass_msg(render_priv->library, MSGL_DBG2, "pos(%f, %f)", v1, v2);
         if (render_priv->state.evt_type == EVENT_POSITIONED) {
             ass_msg(render_priv->library, MSGL_V, "Subtitle has a new \\pos "
@@ -589,7 +610,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
             skip(',');
             mystrtoll(&p, &t4);
         }
-        skip(')');
+        skipopt(')');
         if ((render_priv->state.parsed_tags & PARSED_FADE) == 0) {
             render_priv->state.fade =
                 interpolate_alpha(render_priv->time -
@@ -603,7 +624,7 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         mystrtoi(&p, &v1);
         skip(',');
         mystrtoi(&p, &v2);
-        skip(')');
+        skipopt(')');
         ass_msg(render_priv->library, MSGL_DBG2, "org(%d, %d)", v1, v2);
         if (!render_priv->state.have_origin) {
             render_priv->state.org_x = v1;
@@ -620,9 +641,8 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         double k;
         skip('(');
         for (cnt = 0; cnt < 3; ++cnt) {
-            if (*p == '\\')
+            if (!mystrtod(&p, &v[cnt]))
                 break;
-            mystrtod(&p, &v[cnt]);
             skip(',');
         }
         if (cnt == 3) {
@@ -657,15 +677,15 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
             assert(delta_t != 0.);
             k = pow(((double) (t - t1)) / delta_t, v3);
         }
-        while (*p == '\\')
+        while (*p != ')' && *p != '}' && *p != '\0')
             p = parse_tag(render_priv, p, k);   // maybe k*pwr ? no, specs forbid nested \t's
         skip_to(')');           // in case there is some unknown tag or a comment
-        skip(')');
+        skipopt(')');
     } else if (mystrcmp(&p, "clip")) {
         char *start = p;
         int x0, y0, x1, y1;
         int res = 1;
-        skipopt('(');
+        skip('(');
         res &= mystrtoi(&p, &x0);
         skipopt(',');
         res &= mystrtoi(&p, &y0);
@@ -744,7 +764,18 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
         ass_msg(render_priv->library, MSGL_DBG2, "single c/a at %f: %c%c = %X",
                pwr, n, cmd, render_priv->state.c[cidx]);
     } else if (mystrcmp(&p, "r")) {
-        reset_render_context(render_priv);
+        char *start = p;
+        char *style;
+        skip_to('\\');
+        if (p > start) {
+            style = malloc(p - start + 1);
+            strncpy(style, start, p - start);
+            style[p - start] = '\0';
+            reset_render_context(render_priv,
+                    render_priv->track->styles + lookup_style(render_priv->track, style));
+            free(style);
+        } else
+            reset_render_context(render_priv, NULL);
     } else if (mystrcmp(&p, "be")) {
         int val;
         if (mystrtoi(&p, &val)) {
@@ -991,7 +1022,7 @@ void process_karaoke_effects(ASS_Renderer *render_priv)
 
 
 /**
- * \brief Get next ucs4 char from string, parsing and executing style overrides
+ * \brief Get next ucs4 char from string, parsing UTF-8 and escapes
  * \param str string pointer
  * \return ucs4 code of the next char
  * On return str points to the unparsed part of the string
@@ -1000,24 +1031,6 @@ unsigned get_next_char(ASS_Renderer *render_priv, char **str)
 {
     char *p = *str;
     unsigned chr;
-    if (*p == '{') {            // '\0' goes here
-        p++;
-        while (1) {
-            p = parse_tag(render_priv, p, 1.);
-            if (*p == '}') {    // end of tag
-                p++;
-                if (*p == '{') {
-                    p++;
-                    continue;
-                } else
-                    break;
-            } else if (*p != '\\')
-                ass_msg(render_priv->library, MSGL_V,
-                        "Unable to parse: '%.30s'", p);
-            if (*p == 0)
-                break;
-        }
-    }
     if (*p == '\t') {
         ++p;
         *str = p;

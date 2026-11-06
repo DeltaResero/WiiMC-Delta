@@ -286,7 +286,9 @@ static unsigned int read_golomb(unsigned char *buffer, unsigned int *init)
 {
   unsigned int x, v = 0, v2 = 0, m, len = 0, n = *init;
 
-  while(getbits(buffer, n++, 1) == 0)
+  // TODO: check exact length limit.
+  // Remaining code breaks values > 31 anyway though
+  while(getbits(buffer, n++, 1) == 0 && len < 31)
     len++;
 
   x = len + n;
@@ -299,9 +301,7 @@ static unsigned int read_golomb(unsigned char *buffer, unsigned int *init)
       v <<= 8;
   }
 
-  v2 = 1;
-  for(n = 0; n < len; n++)
-    v2 <<= 1;
+  v2 = 1u << len;
   v2 = (v2 - 1) + v;
 
   //fprintf(stderr, "READ_GOLOMB(%u), V=2^%u + %u-1 = %u\n", *init, len, v, v2);
@@ -317,7 +317,7 @@ static inline int read_golomb_s(unsigned char *buffer, unsigned int *init)
 
 static int h264_parse_vui(mp_mpeg_header_t * picture, unsigned char * buf, unsigned int n)
 {
-  unsigned int overscan, vsp_color, chroma, timing, fixed_fps;
+  unsigned int overscan, vsp_color, chroma, timing;
 
   if(getbits(buf, n++, 1))
   {
@@ -352,12 +352,11 @@ static int h264_parse_vui(mp_mpeg_header_t * picture, unsigned char * buf, unsig
     picture->timeinc_resolution = (getbits(buf, n, 8) << 24) | (getbits(buf, n+8, 8) << 16) | (getbits(buf, n+16, 8) << 8) | getbits(buf, n+24, 8);
     n += 32;
 
-    fixed_fps = getbits(buf, n, 1);
-
+    // A frame lasts two ticks whether or not the rate is fixed (H.264
+    // E.2.1); x264 leaves fixed_frame_rate_flag off, and its 29.97 fps
+    // streams in MPEG-TS were taken for 59.94 fps and played twice as fast.
     if(picture->timeinc_unit > 0 && picture->timeinc_resolution > 0)
-      picture->fps = (float) picture->timeinc_resolution / (float) picture->timeinc_unit;
-    if(fixed_fps)
-      picture->fps /= 2;
+      picture->fps = (float) picture->timeinc_resolution / (float) picture->timeinc_unit / 2;
   }
 
   //fprintf(stderr, "H264_PARSE_VUI, OVESCAN=%u, VSP_COLOR=%u, CHROMA=%u, TIMING=%u, DISPW=%u, DISPH=%u, TIMERES=%u, TIMEINC=%u, FIXED_FPS=%u\n", overscan, vsp_color, chroma, timing, picture->display_picture_width, picture->display_picture_height,
@@ -374,9 +373,9 @@ static int mp_unescape03(uint8_t *dest, const uint8_t *buf, int len)
     return 0;
 
   j = i = skip = 0;
-  while(i <= len-3)
+  while(i < len)
   {
-    if(buf[i] == 0 && buf[i+1] == 0 && buf[i+2] == 3)
+    if(i <= len-3 && buf[i] == 0 && buf[i+1] == 0 && buf[i+2] == 3)
     {
       dest[j] = dest[j+1] = 0;
       j += 2;
@@ -390,8 +389,6 @@ static int mp_unescape03(uint8_t *dest, const uint8_t *buf, int len)
       i++;
     }
   }
-  dest[j] = buf[len-2];
-  dest[j+1] = buf[len-1];
   len -= skip;
 
   return len;
@@ -401,7 +398,15 @@ int h264_parse_sps(mp_mpeg_header_t * picture, const unsigned char * inbuf, int 
 {
   unsigned int n = 0, v, i, k, mbh;
   int frame_mbs_only;
-  uint8_t *buf = malloc(len);
+  uint8_t *buf;
+  // Sanity check, should not happen in MPlayer due to limited video buffer
+  if (len > 100*1024*1024) len = 100*1024*1024;
+  // Allocate more to allow for overread.
+  // Initialize to 0xff to minimize golomb length
+  // 4kB is more than necessary, but calculating the exact
+  // value or adding more range checks is more pain than worth it.
+  buf = malloc(len + 4096);
+  memset(buf, 0xff, len + 4096);
 
   len = mp_unescape03(buf, inbuf, len);
 

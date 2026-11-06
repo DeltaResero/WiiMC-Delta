@@ -43,6 +43,7 @@
 #endif
 
 #include "libavutil/common.h"
+#include "libavutil/avstring.h"
 #include "mpbswap.h"
 #include "font_load.h"
 #include "mp_msg.h"
@@ -63,7 +64,6 @@
 #define HAVE_FREETYPE21
 #endif
 
-char *subtitle_font_encoding = NULL;
 float text_font_scale_factor = 3.5;
 float osd_font_scale_factor = 4.0;
 float subtitle_font_radius = 2.0;
@@ -115,7 +115,7 @@ static const FT_ULong osd_charcodes[OSD_CHARSET_SIZE] =
 #define f1616ToInt(x)           (((x)+0x8000)>>16)      // 16.16
 #define floatTof266(x)          ((int)((x)*(1<<6)+0.5))
 
-#define ALIGN(x)                (((x)+7)&~7)    // 8 byte align
+#define ALIGN(x)                (((x)+15)&~15)    // 16 byte align
 
 #define WARNING(msg, args...)      mp_msg(MSGT_OSD, MSGL_WARN, msg "\n", ## args)
 
@@ -357,7 +357,7 @@ static void outline0(
 }
 
 // gaussian blur
-/*void blur(
+/*static void blur(
         unsigned char *buffer,
         unsigned short *tmp2,
         int width,
@@ -795,13 +795,14 @@ static int prepare_charset(char *charmap, char *encoding, FT_ULong *charset, FT_
     charset_size = count;
 
     iconv_close(cd);
-    if (charset_size==0) {
+    if (charset_size <= 1) {
         mp_msg(MSGT_OSD, MSGL_ERR, "No characters to render!\n");
         return -1;
     }
 
     return charset_size;
 }
+#endif
 
 static int prepare_charset_unicode(FT_Face face, FT_ULong *charset, FT_ULong *charcodes) {
 #ifdef HAVE_FREETYPE21
@@ -843,13 +844,10 @@ static int prepare_charset_unicode(FT_Face face, FT_ULong *charset, FT_ULong *ch
 
     return i;
 }
-#endif
 
 static font_desc_t* init_font_desc(void)
 {
-    font_desc_t *desc;
-
-    desc = calloc(1, sizeof(*desc));
+    font_desc_t *desc = calloc(1, sizeof(*desc));
     if(!desc) return NULL;
 
     desc->dynamic = 1;
@@ -958,7 +956,7 @@ int kerning(font_desc_t *desc, int prevc, int c)
     return f266ToInt(kern.x);
 }
 
-font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
+static font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
 {
     font_desc_t *desc = NULL;
 
@@ -967,9 +965,8 @@ font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_widt
     FT_ULong *my_charset = malloc(MAX_CHARSET_SIZE * sizeof(FT_ULong)); /* characters we want to render; Unicode */
     FT_ULong *my_charcodes = malloc(MAX_CHARSET_SIZE * sizeof(FT_ULong)); /* character codes in 'encoding' */
 
-    char *charmap = "ucs-4";
     int err;
-    int charset_size;
+    int charset_size = -1;
     int i, j;
     int unicode;
 
@@ -1007,12 +1004,7 @@ font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_widt
     if (subtitle_font_ppem > 128) subtitle_font_ppem = 128;
     if (osd_font_ppem > 128) osd_font_ppem = 128;
 
-    if ((subtitle_font_encoding == NULL)
-        || (strcasecmp(subtitle_font_encoding, "unicode") == 0)) {
-        unicode = 1;
-    } else {
-        unicode = 0;
-    }
+    unicode = !subtitle_font_encoding || av_strcasecmp(subtitle_font_encoding, "unicode") == 0;
 
     desc = init_font_desc();
     if(!desc) goto err_out;
@@ -1042,24 +1034,17 @@ font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_widt
     }
     desc->face_cnt++;
 
-#ifdef CONFIG_ICONV
-    if (unicode) {
+    if (unicode)
         charset_size = prepare_charset_unicode(face, my_charset, my_charcodes);
-    } else {
-        if (subtitle_font_encoding) {
-            charset_size = prepare_charset(charmap, subtitle_font_encoding, my_charset, my_charcodes);
-        } else {
-            charset_size = prepare_charset(charmap, "iso-8859-1", my_charset, my_charcodes);
-        }
-    }
+#ifdef CONFIG_ICONV
+    else
+        charset_size = prepare_charset("ucs-4", subtitle_font_encoding, my_charset, my_charcodes);
+#endif
 
     if (charset_size < 0) {
         mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_SubFontCharsetFailed);
         goto err_out;
     }
-#else
-    goto err_out;
-#endif
 
 //    fprintf(stderr, "fg: prepare t = %f\n", GetTimer()-t);
 
@@ -1199,8 +1184,8 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
         fc_pattern = FcFontMatch(0, fc_pattern, &result);
         if (fc_pattern) {
             FcPatternDestroy(fc_pattern2);
-            FcPatternGetBool(fc_pattern, FC_SCALABLE, 0, &scalable);
-            if (scalable != FcTrue) {
+            if (FcPatternGetBool(fc_pattern, FC_SCALABLE, 0, &scalable) == FcResultMatch &&
+                scalable != FcTrue) {
                 FcPatternDestroy(fc_pattern);
                 fc_pattern = FcNameParse("sans-serif");
                 FcConfigSubstitute(0, fc_pattern, FcMatchPattern);
@@ -1210,11 +1195,13 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
                 FcPatternDestroy(fc_pattern2);
             }
             // s doesn't need to be freed according to fontconfig docs
-            FcPatternGetString(fc_pattern, FC_FILE, 0, &s);
-            FcPatternGetInteger(fc_pattern, FC_INDEX, 0, &face_index);
-            *fontp=read_font_desc_ft(s, face_index, width, height, font_scale_factor);
+            if (FcPatternGetString(fc_pattern, FC_FILE, 0, &s) == FcResultMatch &&
+                FcPatternGetInteger(fc_pattern, FC_INDEX, 0, &face_index) == FcResultMatch) {
+                *fontp=read_font_desc_ft(s, face_index, width, height, font_scale_factor);
+                FcPatternDestroy(fc_pattern);
+                return;
+            }
             FcPatternDestroy(fc_pattern);
-            return;
         }
         // Failed to match any font, try without fontconfig
         mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_FontconfigNoMatch);

@@ -19,41 +19,45 @@
 #ifndef MPLAYER_GUI_INTERFACE_H
 #define MPLAYER_GUI_INTERFACE_H
 
-#include "config.h"
-#include "libaf/af.h"
-#include "libmpdemux/stheader.h"
 #include "m_config.h"
 #include "mp_core.h"
 #include "playtree.h"
+#include "libaf/af.h"
+#include "libmpdemux/stheader.h"
 #include "stream/stream.h"
 
 // These are in support of the non-GUI files that interact with
 // the GUI and that only need to include interface.h for this.
 // ------------------------------------------------------------
-#include "cfg.h"
+#include "app/cfg.h"
 
 extern int use_gui;             // this is defined in mplayer.c
 // ------------------------------------------------------------
 
-#define GMPlayer "gmplayer"
+/// Name of the GUI binary
+#define gmplayer "gmplayer"
 
 /// gui() instructions
 enum {
-    GUI_END_FILE,
-    GUI_HANDLE_EVENTS,
+    GUI_END_PLAY,
     GUI_HANDLE_X_EVENT,
     GUI_PREPARE,
     GUI_REDRAW,
     GUI_RUN_COMMAND,
     GUI_RUN_MESSAGE,
     GUI_SETUP_VIDEO_WINDOW,
-    GUI_SET_AFILTER,
     GUI_SET_AUDIO,
     GUI_SET_CONTEXT,
-    GUI_SET_MIXER,
     GUI_SET_STATE,
     GUI_SET_STREAM,
+    GUI_SET_VOLUME_BALANCE,
     GUI_SET_VIDEO
+};
+
+/// guiPlaylist() instructions
+enum {
+    GUI_PLAYLIST_INIT,
+    GUI_PLAYLIST_ADD
 };
 
 //@{
@@ -64,14 +68,15 @@ enum {
 //@}
 
 //@{
-/// NewPlay reason
-#define GUI_FILE_SAME 1
-#define GUI_FILE_NEW  2
+/// MediumChanged reason
+#define GUI_MEDIUM_SAME 1
+#define GUI_MEDIUM_NEW  2
 //@}
 
 /// mplayer() instructions
 enum {
     MPLAYER_EXIT_GUI,
+    MPLAYER_LOAD_FONT,
     MPLAYER_SET_AUTO_QUALITY,
     MPLAYER_SET_BRIGHTNESS,
     MPLAYER_SET_CONTRAST,
@@ -93,14 +98,19 @@ enum {
 typedef struct {
     MPContext *mpcontext;
     sh_video_t *sh_video;
-    af_stream_t *afilter;
 
     int VideoWindow;
     int VideoWidth;
     int VideoHeight;
 
+    int Rotation;
+
+    char *CodecName;
+
     int StreamType;
     int AudioChannels;
+
+    int AudioPassthrough;
 
     int AudioStreams;
     stream_language_t AudioStream[32];
@@ -109,8 +119,10 @@ typedef struct {
     stream_language_t Subtitle[32];
 
     char *Filename;           // public, read access by MPlayer
+    char *Title;
     char *AudioFilename;
     char *SubtitleFilename;
+    char *ImageFilename;
 
     int Tracks;
     int Track;                // public, read access by MPlayer
@@ -128,24 +140,30 @@ typedef struct {
     float Volume;
     float Balance;
 
-    int NewPlay;              // public, read access by MPlayer
+    float LastVolume;
+    float ReplayGainVolume;
+    int MediumChanged;        // public, read access by MPlayer
+    int PlaylistNext;
+
+    int Start;
+    int Stop;
 } guiInterface_t;
 
 extern guiInterface_t guiInfo;
+
+void reset_stream_ids(void);
 
 /// @name MPlayer -> GUI
 //@{
 int gui(int what, void *data);
 void guiDone(void);
 void guiInit(void);
-int guiPlaylistAdd(play_tree_t *my_playtree, m_config_t *config);
-int guiPlaylistInitialize(play_tree_t *my_playtree, m_config_t *config, int enqueue);
+int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue);
 //@}
 
 /// @name GUI -> MPlayer
 //@{
 void mplayer(int what, float value, void *data);
-void mplayerLoadFont(void);
 void mplayerLoadSubtitle(const char *name);
 void gmp_msg(int mod, int lev, const char *format, ...);
 //@}

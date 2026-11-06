@@ -18,12 +18,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include "config.h"
+#include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
 
@@ -33,7 +35,7 @@
 #include "mf.h"
 
 static void demux_seek_mf(demuxer_t *demuxer,float rel_seek_secs,float audio_delay,int flags){
-  mf_t * mf = (mf_t *)demuxer->priv;
+  mf_t * mf = demuxer->priv;
   sh_video_t   * sh_video = demuxer->video->sh;
   int newpos = (flags & SEEK_ABSOLUTE)?0:mf->curr_frame - 1;
 
@@ -48,24 +50,27 @@ static void demux_seek_mf(demuxer_t *demuxer,float rel_seek_secs,float audio_del
 //     0 = EOF or no stream found
 //     1 = successfully read a packet
 static int demux_mf_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds){
-  mf_t         * mf;
+  mf_t         * mf = demuxer->priv;
   struct stat    fs;
   FILE         * f;
 
-  mf=(mf_t*)demuxer->priv;
   if ( mf->curr_frame >= mf->nr_of_files ) return 0;
 
-  stat( mf->names[mf->curr_frame],&fs );
+  if (stat( mf->names[mf->curr_frame],&fs ) == -1) return 0;
 //  printf( "[demux_mf] frame: %d (%s,%d)\n",mf->curr_frame,mf->names[mf->curr_frame],fs.st_size );
 
   if ( !( f=fopen( mf->names[mf->curr_frame],"rb" ) ) ) return 0;
   {
    sh_video_t     * sh_video = demuxer->video->sh;
    demux_packet_t * dp = new_demux_packet( fs.st_size );
-   if ( !fread( dp->buffer,fs.st_size,1,f ) ) return 0;
+   if ( fread( dp->buffer,1,fs.st_size,f ) != fs.st_size ) {
+        fclose(f);
+        free_demux_packet(dp);
+        return 0;
+   }
    dp->pts=mf->curr_frame / sh_video->fps;
    dp->pos=mf->curr_frame;
-   dp->flags=0;
+   dp->flags=1;
    // append packet to DS stream:
    ds_add_packet( demuxer->video,dp );
   }
@@ -121,7 +126,7 @@ static demuxer_t* demux_open_mf(demuxer_t* demuxer){
 
 
   mf=open_mf(demuxer->stream->url + 5);
-  if(!mf) return NULL;
+  if(!mf || mf->nr_of_files == 0) return NULL;
 
   if(!mf_type){
     char* p=strrchr(mf->names[0],'.');
@@ -142,15 +147,11 @@ static demuxer_t* demux_open_mf(demuxer_t* demuxer){
   sh_video = new_sh_video(demuxer, 0);
   // make sure the demuxer knows about the new video stream header
   // (even though new_sh_video() ought to take care of it)
+  demuxer->video->id = 0;
   demuxer->video->sh = sh_video;
 
-  // make sure that the video demuxer stream header knows about its
-  // parent video demuxer stream (this is getting wacky), or else
-  // video_read_properties() will choke
-  sh_video->ds = demuxer->video;
-
   for (i = 0; type2format[i].type; i++)
-    if (strcasecmp(mf_type, type2format[i].type) == 0)
+    if (av_strcasecmp(mf_type, type2format[i].type) == 0)
       break;
   if (!type2format[i].type) {
     mp_msg(MSGT_DEMUX, MSGL_INFO, "[demux_mf] unknown input file type.\n" );
@@ -189,7 +190,7 @@ static void demux_close_mf(demuxer_t* demuxer) {
 }
 
 static int demux_control_mf(demuxer_t *demuxer, int cmd, void *arg) {
-  mf_t *mf = (mf_t *)demuxer->priv;
+  mf_t *mf = demuxer->priv;
   sh_video_t *sh_video = demuxer->video->sh;
 
   switch(cmd) {

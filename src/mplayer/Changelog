@@ -1,6 +1,203 @@
 MPlayer
 
-  1.1: "We gave up on 1.0"
+  1.5: "Hope" February 27, 2022
+
+    Decoders, demuxers, streams:
+    * ffmpeg12vpdau is no longer supported by FFmpeg,
+      provide separate ffmpeg1vpdau and ffmpeg2vdpau instead
+    * live555 deprecated and disabled by default, will be removed
+      in future
+
+    GUI:
+    * Fix wrongly sized video window after leaving fullscreen mode
+    * Clear screen when switching to fullscreen mode using the x11
+      video output driver
+    * Command line option -fs is now recognized in addition to the
+      GUI option load_fullscreen
+    * Use correct visual in OpenGL video output driver for X11
+    * Provide a built-in skin so that the GUI can be used even
+      without an installed skin
+    * Native Language Support, i.e. the GUI language can be changed
+      as specified in LC_MESSAGES or LANG
+    * Minor bug fixes
+
+    Other:
+    * Building on Arm now compiles for the ISA and extensions of the
+      host CPU by default. This should avoid issues like builds on
+      e.g. Raspbian not using NEON by default.
+      Can use --enable-runtime-cpudetection to restore the previous
+      behaviour, though full runtime CPU detection is not supported.
+    * New configure option --enable-nls for Native Language Support at
+      runtime (for the moment only for the GUI and enabled by default
+      for it)
+    * macOS: Fixes for retina display, sluggish input processing
+
+  1.4: "SubCounter" April 18, 2019
+
+    Decoders, demuxers, streams:
+    * More pixel formats are supported for VP9, RSCC, Screenpresso
+    * pvr:// support for the Hauppauge HD PVR model 1212
+    * Speed up detection of mpg format while streaming (limit probe to 4 MB)
+    * demuxer: fall back to audio pts if all others are unavailable (#1928)
+    * raw video: add support for < 8bpp RGB, support for paletted raw video,
+      fix fliped raw video in non-avi containers
+    * increase -lavdopts threads limit to 32
+    * warn for badly interleaved files, and make -ni more aggressive
+    * support GBR pixel formats for HEVC
+    * FFmpeg audio decoders: g721, g732
+    * FFmpeg video decoders: more Matrox mpeg2 formats (M702-3-4-5), Truemotion
+      RT, Matrox Uncompressed SD/HD, BitJazz SheerVideo, YUY2 Lossless Codec
+      Apple Pixlet, ScreenPressor, FM Screen Capture Codec
+    * FFmpeg IFF video/image decoders: ANIM, ILBM, PBM, RGB8, RGBN
+
+    Fixes:
+    * fix more issues reported by Coverity
+    * expand error checking, and fix many memleaks
+    * fix -subcp enca: with external ASS subtitles (#2281)
+    * fix reading of bitmap fonts
+    * fix -subdelay applied inverted
+    * some fixes for video filter bmovl (#2304, #2308)
+    * fix timing of first and last frame (#2315)
+
+    Other:
+    * MPlayer can link against OpenSSL instead of GnuTLS for https support
+      (Warning: the resulting binary can not be redistributed)
+    * OSD: NV12/NV21 support
+    * video output xv: NV12/NV21 support
+    * video outputs for OSX: fix a few issues with newer OSX versions
+
+    GUI:
+    * No limitation on the number of entries in a font description file
+    * Dramatic speedup of scanning font description files
+    * Playback improvements for cue sheet playlists
+    * Implementation of audio playback utilizing ReplayGain data
+    * New symbol character 'g' and new dynamic label variable $g
+    * Skins can leave current volume unchanged at startup
+    * New configuration file: gui.gain
+    * Modern new icons for the (default) menu, the file selector,
+      the playlist and the message boxes
+    * Rearrangement of some items of the (default) menu
+    * Fix of broken evLoadAudioFile, evLoadSubtitle and evDropSubtitle
+    * Skin support for 8-bit PNGs with palette
+
+
+  1.3.0: "worksforme" February 16, 2016
+
+    Decoders, demuxers, streams:
+    * HLS streams can be played without ffmpeg:// prefix
+    * Removed internal ADPCM decoders for DK3, DK4, MS, MS ima, QT ima
+    * FFmpeg ADPCM audio decoders: THP, AICA, EA XAS, PSX, SbPro
+    * FFmpeg audio decoders: DSD, DSS sp, Interplay ACM, Zork PCM,
+      Xbox media 1 and 2, Ulead DV
+    * FFmpeg video decoders: Screenpresso, Hap, more Go2Meeting formats,
+      DXV, apng, AVS, CPiA, EA TGQ, EA TQI, Cryo HMN4, Canopus HQ, RSCC/ISCC,
+      QTrle monochrome, Canopus C210, Drastic YUYV, Cineform HD
+
+    Fixes:
+    * fix many crashes with fuzzed files
+    * fix errors for multichannels files and pulseaudio >= 6
+    * fix lot of issues reported by Coverity
+
+    Other:
+    * MPlayer now depends also on libswresample
+    * building with system FFmpeg libs is possible without a local copy of
+      of private FFmpeg headers
+    * docs building does not require FFmpeg anymore
+
+    FFmpeg:
+    * Fix compatibility with post 2.8 changes
+
+
+  1.2.1:January 24, 2016
+
+    Fixes:
+    * misc GUI fixes
+    * fix build regression in FreeBSD
+    * fix many crashes with fuzzed files
+    * fix errors for multichannels files and pulseaudio >= 6
+    Other:
+    * building with system FFmpeg libs is possible without a local copy of
+      of private FFmpeg headers
+    * docs building does not require FFmpeg anymore
+    * FFmpeg updated to 2.8.5
+
+
+  1.2: "FrameCounter" October 3, 2015
+
+    Decoders:
+    * Hardware accelerated decoding on OS X via VDA.
+    * Internal libmpeg2 disabled by default, on the assumption
+      that nobody really needs it anymore.
+
+    Other:
+    * "run" slave/keybinding command now supports expanding properties
+    * better support for > 8 bit formats in -vo gl
+    * support for XYZ color space in -vo gl
+    * -vo gl now supports OSD (not EOSD though) with GLES backend.
+    * GLES backend now uses GLES v2 with YUV support via shaders
+    * -vo gl supports rotated display without needing video filters via
+      -monitor-orientation command-line option.
+    * -vo gl now has an OSX/Cocoa backend, so it should be a better
+      alternative to -vo corevideo now.
+    * -vo gl2 renamed to -vo gl_tiled to stop people from assuming it is
+      better than -vo gl (it is in many ways worse).
+    * Fixes for DVB, teletext and closed-caption based subtitles.
+    * Support teletext and CC subtitles in WTV.
+    * Support binding keys corresponding to non-ASCII characters.
+    * Limited -endpos support for -dump*
+    * Danish messages header file renamed from help_mp-dk.h to help_mp-da.h
+      in order to comply with ISO 639 language code (configure language
+      options will now require da instead of dk)
+    * configure: options --enable-gtk1, --with-glib-config= and
+      --with-gtk-config= removed
+    * Change ID3 genre name for genre ID 67 from "Psychadelic"
+      to "Psychedelic"
+    * support for audio bin/cue images
+
+    Ports:
+    * Windows: support file names as UTF-8 in slave mode and passing
+      file names as wchar command line arguments.
+    * Android: MPlayer can be run from adb shell and display videos
+      via OpenGL ES.
+      Note that just a bit of seeking etc. would cause reproducible
+      system reboots after just a few seconds on my Galaxy S2.
+    * Android: -wid is supported. This should allow using MPlayer in slave
+      mode, a native window pointer needs to be passed as -wid. Untested.
+
+    GUI:
+    * Support for TV/DVB
+    * Various improvements of the context menu and the preferences dialog
+    * Revision of the user interface texts
+    * Console message with information on deprecated (but still supported)
+      entries in the skin configuration file
+    * New symbol character (r) and new dynamic label variables ($D, $U, $P)
+    * New items (pimage, rpotmeter)
+    * Updated skins (avifile, Blue, Blue-small, Clearlooks, Corelian,
+      disappearer, mentalic, mplayer_red, nativeRed, neutron, phony, plastic,
+      slim, softgrip, standard, trium, tvisor, xanim)
+    * Video can be rotated
+    * New GUI message: evSetRotation
+    * GUI now officially needs GTK+ and GLib versions 2 (it hadn't compiled
+      with versions 1 for quite some time)
+    * Support for audio and video bin/cue image playback
+    * Support for Audio CD / (Super) Video CD / DVD image and DVD copy playback
+      through the respective scheme (cd://, vcd://, dvd://)
+    * Support for arbitrary non-binary data file cue sheets (i.e. cue sheets
+      describing playlists for data files containing multiple titles)
+
+    FFmpeg:
+    * Version 2.8 with local patches
+
+  1.1.1: May 5, 2013
+
+    Security:
+    * disable unsafe playlist parsing
+    * security fixes in asx parser
+    Other:
+    * FFmpeg updated to 0.11
+
+
+  1.1: "We gave up on 1.0" June 10, 2012
 
     Decoders:
     * FFmpeg AAC decoder is now preferred over libfaad2 and the internal
@@ -36,9 +233,10 @@ MPlayer
     MEncoder:
     * -force-key-frames option to set explicit seek points.
 
+
 MPlayer (1.0)
 
-  rc4: "Yes We Can"
+  rc4: "Yes We Can" January 30, 2011
 
     GUI: Changes towards removing the GUI
     * The GUI will no longer display any error or warning messages.

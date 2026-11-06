@@ -21,10 +21,12 @@
 
 #include "stream.h"
 
-extern float cache_fill_status;
+// fill level in percent, -1 at the end of the stream; set by the cache thread
+extern float cache_fill_level;
 
 void cache_uninit(stream_t *s);
 int cache_do_control(stream_t *stream, int cmd, void *arg);
+int cache_fill_status(stream_t *s);
 int stream_error(stream_t *stream);
 
 #endif /* MPLAYER_CACHE2_H */

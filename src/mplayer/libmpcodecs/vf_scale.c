@@ -32,9 +32,11 @@
 #include "fmt-conversion.h"
 #include "mpbswap.h"
 
+#include "libavutil/opt.h"
 #include "libswscale/swscale.h"
 #include "vf_scale.h"
 
+#include "av_opts.h"
 #include "m_option.h"
 #include "m_struct.h"
 
@@ -68,6 +70,10 @@ static const unsigned int outfmt_list[]={
     IMGFMT_444P,
     IMGFMT_444P16_LE,
     IMGFMT_444P16_BE,
+    IMGFMT_444P14_LE,
+    IMGFMT_444P14_BE,
+    IMGFMT_444P12_LE,
+    IMGFMT_444P12_BE,
     IMGFMT_444P10_LE,
     IMGFMT_444P10_BE,
     IMGFMT_444P9_LE,
@@ -75,6 +81,10 @@ static const unsigned int outfmt_list[]={
     IMGFMT_422P,
     IMGFMT_422P16_LE,
     IMGFMT_422P16_BE,
+    IMGFMT_422P14_LE,
+    IMGFMT_422P14_BE,
+    IMGFMT_422P12_LE,
+    IMGFMT_422P12_BE,
     IMGFMT_422P10_LE,
     IMGFMT_422P10_BE,
     IMGFMT_422P9_LE,
@@ -83,10 +93,18 @@ static const unsigned int outfmt_list[]={
     IMGFMT_I420,
     IMGFMT_420P16_LE,
     IMGFMT_420P16_BE,
+    IMGFMT_420P14_LE,
+    IMGFMT_420P14_BE,
+    IMGFMT_420P12_LE,
+    IMGFMT_420P12_BE,
     IMGFMT_420P10_LE,
     IMGFMT_420P10_BE,
     IMGFMT_420P9_LE,
     IMGFMT_420P9_BE,
+    IMGFMT_440P12_LE,
+    IMGFMT_440P12_BE,
+    IMGFMT_440P10_LE,
+    IMGFMT_440P10_BE,
     IMGFMT_420A,
     IMGFMT_422A,
     IMGFMT_444A,
@@ -105,6 +123,12 @@ static const unsigned int outfmt_list[]={
     IMGFMT_BGR24,
     IMGFMT_RGB24,
     IMGFMT_GBR24P,
+    IMGFMT_GBR10PLE,
+    IMGFMT_GBR10PBE,
+    IMGFMT_GBR12PLE,
+    IMGFMT_GBR12PBE,
+    IMGFMT_GBR14PLE,
+    IMGFMT_GBR14PBE,
     IMGFMT_RGB48LE,
     IMGFMT_RGB48BE,
     IMGFMT_BGR16,
@@ -115,6 +139,9 @@ static const unsigned int outfmt_list[]={
     IMGFMT_RGB12,
     IMGFMT_Y800,
     IMGFMT_Y8,
+    IMGFMT_Y8A,
+    IMGFMT_Y16_LE,
+    IMGFMT_Y16_BE,
     IMGFMT_BGR8,
     IMGFMT_RGB8,
     IMGFMT_BGR4,
@@ -149,15 +176,16 @@ static int preferred_conversions[][2] = {
 static unsigned int find_best_out(vf_instance_t *vf, int in_format){
     unsigned int best=0;
     int i = -1;
-    int j = -1;
+    int normalized_format = normalize_yuvp16(in_format);
+    int j = normalized_format ? -2 : -1;
     int format = 0;
 
     // find the best outfmt:
     while (1) {
         int ret;
         if (j < 0) {
-            format = in_format;
-            j = 0;
+            format = j == -1 && normalized_format ? normalized_format : in_format;
+            j++;
         } else if (i < 0) {
             while (preferred_conversions[j][0] &&
                    preferred_conversions[j][0] != in_format)
@@ -193,14 +221,14 @@ static int config(struct vf_instance *vf,
     int round_w=0, round_h=0;
     int i;
     SwsFilter *srcFilter, *dstFilter;
-    enum PixelFormat dfmt, sfmt;
+    enum AVPixelFormat dfmt, sfmt;
 
     if(!best){
         mp_msg(MSGT_VFILTER,MSGL_WARN,"SwScale: no supported outfmt found :(\n");
         return 0;
     }
     sfmt = imgfmt2pixfmt(outfmt);
-    if (outfmt == IMGFMT_RGB8 || outfmt == IMGFMT_BGR8) sfmt = PIX_FMT_PAL8;
+    if (outfmt == IMGFMT_BGR8) sfmt = AV_PIX_FMT_PAL8;
     dfmt = imgfmt2pixfmt(best);
 
     vo_flags=vf->next->query_format(vf->next,best);
@@ -394,14 +422,14 @@ static void start_slice(struct vf_instance *vf, mp_image_t *mpi){
 
 static void scale(struct SwsContext *sws1, struct SwsContext *sws2, uint8_t *src[MP_MAX_PLANES], int src_stride[MP_MAX_PLANES],
                   int y, int h,  uint8_t *dst[MP_MAX_PLANES], int dst_stride[MP_MAX_PLANES], int interlaced){
-    const uint8_t *src2[MP_MAX_PLANES]={src[0], src[1], src[2], src[3]};
+    uint8_t *src2[MP_MAX_PLANES]={src[0], src[1], src[2], src[3]};
 #if HAVE_BIGENDIAN
     uint32_t pal2[256];
     if (src[1] && !src[2]){
         int i;
         for(i=0; i<256; i++)
             pal2[i]= bswap_32(((uint32_t*)src[1])[i]);
-        src2[1]= (const uint8_t *)pal2;
+        src2[1]= (uint8_t *)pal2;
     }
 #endif
 
@@ -411,14 +439,14 @@ static void scale(struct SwsContext *sws1, struct SwsContext *sws2, uint8_t *src
         int src_stride2[MP_MAX_PLANES]={2*src_stride[0], 2*src_stride[1], 2*src_stride[2], 2*src_stride[3]};
         int dst_stride2[MP_MAX_PLANES]={2*dst_stride[0], 2*dst_stride[1], 2*dst_stride[2], 2*dst_stride[3]};
 
-        sws_scale(sws1, src2, src_stride2, y>>1, h>>1, dst2, dst_stride2);
+        sws_scale(sws1, (const uint8_t *const *)src2, src_stride2, y>>1, h>>1, dst2, dst_stride2);
         for(i=0; i<MP_MAX_PLANES; i++){
             src2[i] += src_stride[i];
             dst2[i] += dst_stride[i];
         }
-        sws_scale(sws2, src2, src_stride2, y>>1, h>>1, dst2, dst_stride2);
+        sws_scale(sws2, (const uint8_t *const *)src2, src_stride2, y>>1, h>>1, dst2, dst_stride2);
     }else{
-        sws_scale(sws1, src2, src_stride, y, h, dst, dst_stride);
+        sws_scale(sws1, (const uint8_t *const *)src2, src_stride, y, h, dst, dst_stride);
     }
 }
 
@@ -433,7 +461,7 @@ static void draw_slice(struct vf_instance *vf,
     scale(vf->priv->ctx, vf->priv->ctx2, src, stride, y, h, dmpi->planes, dmpi->stride, vf->priv->interlaced);
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts){
     mp_image_t *dmpi=mpi->priv;
 
 //  printf("vf_scale::put_image(): processing whole frame! dmpi=%p flag=%d\n",
@@ -457,7 +485,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
 
     if(vf->priv->palette) dmpi->planes[1]=vf->priv->palette; // export palette!
 
-    return vf_next_put_image(vf,dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static int control(struct vf_instance *vf, int request, void* data){
@@ -524,7 +552,7 @@ static int control(struct vf_instance *vf, int request, void* data){
 //  supported Input formats: YV12, I420, IYUV, YUY2, UYVY, BGR32, BGR24, BGR16, BGR15, RGB32, RGB24, Y8, Y800
 
 static int query_format(struct vf_instance *vf, unsigned int fmt){
-    if (!IMGFMT_IS_HWACCEL(fmt) && imgfmt2pixfmt(fmt) != PIX_FMT_NONE) {
+    if (!IMGFMT_IS_HWACCEL(fmt) && imgfmt2pixfmt(fmt) != AV_PIX_FMT_NONE) {
         unsigned int best=find_best_out(vf, fmt);
         int flags;
         if(!best) return 0;         // no matching out-fmt
@@ -562,6 +590,7 @@ static int vf_open(vf_instance_t *vf, char *args){
 
 //global sws_flags from the command line
 int sws_flags=2;
+char *sws_opts;
 
 //global srcFilter
 static SwsFilter *src_filter= NULL;
@@ -579,7 +608,7 @@ void sws_getFlagsAndFilterFromCmdLine(int *flags, SwsFilter **srcFilterParam, Sw
         static int firstTime=1;
         *flags=0;
 
-#if ARCH_X86
+#if ARCH_X86 && HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX)
                 __asm__ volatile("emms\n\t"::: "memory"); //FIXME this should not be required but it IS (even for non-MMX versions)
 #endif
@@ -622,19 +651,39 @@ struct SwsContext *sws_getContextFromCmdLine(int srcW, int srcH, int srcFormat, 
 {
         int flags;
         SwsFilter *dstFilterParam, *srcFilterParam;
-        enum PixelFormat dfmt, sfmt;
+        struct SwsContext *ctx;
+        enum AVPixelFormat dfmt, sfmt;
 
         dfmt = imgfmt2pixfmt(dstFormat);
         sfmt = imgfmt2pixfmt(srcFormat);
-        if (srcFormat == IMGFMT_RGB8 || srcFormat == IMGFMT_BGR8) sfmt = PIX_FMT_PAL8;
+        if (srcFormat == IMGFMT_RGB8 || srcFormat == IMGFMT_BGR8) sfmt = AV_PIX_FMT_PAL8;
         sws_getFlagsAndFilterFromCmdLine(&flags, &srcFilterParam, &dstFilterParam);
 
-        return sws_getContext(srcW, srcH, sfmt, dstW, dstH, dfmt, flags, srcFilterParam, dstFilterParam, NULL);
+        ctx = sws_alloc_context();
+        if (!ctx) return NULL;
+        // set it first to allow swsopts to override/add to it
+        av_opt_set_int(ctx, "sws_flags", flags, 0);
+        if (parse_avopts(ctx, sws_opts) < 0) {
+            mp_msg(MSGT_VFILTER, MSGL_ERR, "Your options /%s/ look like gibberish to me pal.\n", sws_opts);
+            return NULL;
+        }
+        // always override these
+        av_opt_set_int(ctx, "srcw", srcW, 0);
+        av_opt_set_int(ctx, "srch", srcH, 0);
+        av_opt_set_int(ctx, "src_format", sfmt, 0);
+        av_opt_set_int(ctx, "dstw", dstW, 0);
+        av_opt_set_int(ctx, "dsth", dstH, 0);
+        av_opt_set_int(ctx, "dst_format", dfmt, 0);
+        if (sws_init_context(ctx, srcFilterParam, dstFilterParam) < 0) {
+            sws_freeContext(ctx);
+            return NULL;
+        }
+        return ctx;
 }
 
 /// An example of presets usage
 static const struct size_preset {
-  char* name;
+  const char* name;
   int w, h;
 } vf_size_presets_defs[] = {
   // TODO add more 'standard' resolutions

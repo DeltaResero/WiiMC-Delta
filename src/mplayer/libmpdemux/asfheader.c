@@ -234,7 +234,7 @@ static int get_ext_stream_properties(char *buf, int buf_len, int stream_num, str
   return 1;
 }
 
-#define CHECKDEC(l, n) if (((l) -= (n)) < 0) return 0
+#define CHECKDEC(l, n) if ((l) < (n)) return 0; (l) -= (n)
 static char* read_meta_record(ASF_meta_record_t* dest, char* buf,
     int* buf_len)
 {
@@ -340,20 +340,20 @@ static int is_drm(char* buf, int buf_len)
   return 1;
 }
 
-static int asf_init_audio_stream(demuxer_t *demuxer,struct asf_priv* asf, sh_audio_t* sh_audio, ASF_stream_header_t *streamh, int *ppos, uint8_t** buf, char *hdr, unsigned int hdr_len)
+static int asf_init_audio_stream(demuxer_t *demuxer,struct asf_priv* asf, sh_audio_t* sh_audio, ASF_stream_header_t *streamh, int pos, uint8_t* buffer, unsigned hdr_len)
 {
-  uint8_t *buffer = *buf;
-  int pos = *ppos;
-
+  if (streamh->type_size > hdr_len) return 0;
+  pos += streamh->type_size;
+  if (pos > hdr_len) return 0;
   sh_audio->wf=calloc(FFMAX(streamh->type_size, sizeof(*sh_audio->wf)), 1);
   memcpy(sh_audio->wf,buffer,streamh->type_size);
+  buffer += streamh->type_size;
+
   le2me_WAVEFORMATEX(sh_audio->wf);
   sh_audio->format=sh_audio->wf->wFormatTag;
   if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_wave_header(sh_audio->wf,MSGL_V);
   if(ASF_LOAD_GUID_PREFIX(streamh->concealment)==ASF_GUID_PREFIX_audio_conceal_interleave){
-    buffer = &hdr[pos];
-    pos += streamh->stream_size;
-    if (pos > hdr_len) return 0;
+    if (pos + 5 > hdr_len) return 0;
     asf->scrambling_h=buffer[0];
     asf->scrambling_w=(buffer[2]<<8)|buffer[1];
     asf->scrambling_b=(buffer[4]<<8)|buffer[3];
@@ -387,11 +387,8 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   int audio_streams=0;
   int video_streams=0;
   uint16_t stream_count=0;
-  int best_video = -1;
-  int best_audio = -1;
   uint64_t data_len;
   ASF_stream_header_t *streamh;
-  uint8_t *buffer;
   int audio_pos=0;
 
   if(hdr_len < 0) {
@@ -440,12 +437,11 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
       streamh = (ASF_stream_header_t *)&hdr[sh_pos];
       le2me_ASF_stream_header_t(streamh);
       audio_pos += 64; //16+16+4+4+4+16+4;
-      buffer = &hdr[audio_pos];
       sh_audio=new_sh_audio(demuxer,streamh->stream_no & 0x7F, NULL);
       sh_audio->needs_parsing = 1;
       mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "asfheader", streamh->stream_no & 0x7F);
       ++audio_streams;
-      if (!asf_init_audio_stream(demuxer, asf, sh_audio, streamh, &audio_pos, &buffer, hdr, hdr_len))
+      if (!asf_init_audio_stream(demuxer, asf, sh_audio, streamh, audio_pos, hdr + audio_pos, hdr_len))
         goto len_err_out;
       if (!get_ext_stream_properties(hdr, hdr_len, streamh->stream_no, asf, 0))
         goto len_err_out;
@@ -463,6 +459,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
     pos += sizeof(ASF_stream_header_t);
     if (pos > hdr_len) goto len_err_out;
     le2me_ASF_stream_header_t(streamh);
+    if (streamh->type_size > hdr_len) goto len_err_out;
     mp_msg(MSGT_HEADER, MSGL_V, "stream type: %s\n",
             asf_chunk_type(streamh->type));
     mp_msg(MSGT_HEADER, MSGL_V, "stream concealment: %s\n",
@@ -474,15 +471,12 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
             (unsigned long)streamh->unk1, (unsigned int)streamh->unk2);
     mp_msg(MSGT_HEADER, MSGL_V, "FILEPOS=0x%X\n", pos + start);
     // type-specific data:
-    buffer = &hdr[pos];
-    pos += streamh->type_size;
-    if (pos > hdr_len) goto len_err_out;
     switch(ASF_LOAD_GUID_PREFIX(streamh->type)){
       case ASF_GUID_PREFIX_audio_stream: {
         sh_audio_t* sh_audio=new_sh_audio(demuxer,streamh->stream_no & 0x7F, NULL);
         mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "asfheader", streamh->stream_no & 0x7F);
         ++audio_streams;
-        if (!asf_init_audio_stream(demuxer, asf, sh_audio, streamh, &pos, &buffer, hdr, hdr_len))
+        if (!asf_init_audio_stream(demuxer, asf, sh_audio, streamh, pos, hdr + pos, hdr_len))
           goto len_err_out;
         //if(demuxer->audio->id==-1) demuxer->audio->id=streamh.stream_no & 0x7F;
         break;
@@ -490,13 +484,18 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
       case ASF_GUID_PREFIX_video_stream: {
         unsigned int len;
         float asp_ratio;
+        int bih_start = 4+4+1+2;
+        uint8_t *buffer = hdr + pos;
         sh_video_t* sh_video=new_sh_video(demuxer,streamh->stream_no & 0x7F);
         mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_VideoID, "asfheader", streamh->stream_no & 0x7F);
-        len=streamh->type_size-(4+4+1+2);
+        if (streamh->type_size > hdr_len) goto len_err_out;
+        if (pos + streamh->type_size > hdr_len) goto len_err_out;
+        if (streamh->type_size < bih_start) goto len_err_out;
+        len=streamh->type_size-bih_start;
         ++video_streams;
 //        sh_video->bih=malloc(chunksize); memset(sh_video->bih,0,chunksize);
         sh_video->bih=calloc((len<sizeof(*sh_video->bih))?sizeof(*sh_video->bih):len,1);
-        memcpy(sh_video->bih,&buffer[4+4+1+2],len);
+        memcpy(sh_video->bih,&buffer[bih_start],len);
         le2me_BITMAPINFOHEADER(sh_video->bih);
         if (sh_video->bih->biSize > len && sh_video->bih->biSize > sizeof(*sh_video->bih))
                 sh_video->bih->biSize = len;
@@ -512,7 +511,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
         if (!get_ext_stream_properties(hdr, hdr_len, streamh->stream_no, asf, 1))
             goto len_err_out;
         if (get_meta(hdr, hdr_len, streamh->stream_no, &asp_ratio)) {
-          sh_video->aspect = asp_ratio * sh_video->bih->biWidth /
+          sh_video->original_aspect = asp_ratio * sh_video->bih->biWidth /
             sh_video->bih->biHeight;
         }
         sh_video->i_bps = asf->bps;
@@ -643,12 +642,12 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   }
   free(hdr);
   hdr = NULL;
+  free(streams);
+  streams = NULL;
   start = stream_tell(demuxer->stream); // start of first data chunk
   stream_read(demuxer->stream, guid_buffer, 16);
   if (memcmp(guid_buffer, asf_data_chunk_guid, 16) != 0) {
     mp_msg(MSGT_HEADER, MSGL_FATAL, MSGTR_MPDEMUX_ASFHDR_NoDataChunkAfterHeader);
-    free(streams);
-    streams = NULL;
     return 0;
   }
   // read length of chunk
@@ -658,45 +657,17 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   mp_msg(MSGT_HEADER, MSGL_V, "Found movie at 0x%X - 0x%X\n",
           (int)demuxer->movi_start, (int)demuxer->movi_end);
 
-if(streams) {
+mp_msg(MSGT_HEADER,MSGL_V,"ASF: %d audio and %d video streams found\n",audio_streams,video_streams);
   // stream selection is done in the network code, it shouldn't be done here
   // as the servers often do not care about what we requested.
-#if 0
-  uint32_t vr = 0, ar = 0,i;
-#ifdef CONFIG_NETWORKING
-  if( demuxer->stream->streaming_ctrl!=NULL ) {
-          if( demuxer->stream->streaming_ctrl->bandwidth!=0 && demuxer->stream->streaming_ctrl->data!=NULL ) {
-                  best_audio = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->audio_id;
-                  best_video = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->video_id;
-          }
-  } else
-#endif
-  for(i = 0; i < stream_count; i++) {
-    uint32_t id = streams[2*i];
-    uint32_t rate = streams[2*i+1];
-    if(demuxer->v_streams[id] && rate > vr) {
-      vr = rate;
-      best_video = id;
-    } else if(demuxer->a_streams[id] && rate > ar) {
-      ar = rate;
-      best_audio = id;
-    }
-  }
-#endif
-  free(streams);
-  streams = NULL;
-}
-
-mp_msg(MSGT_HEADER,MSGL_V,"ASF: %d audio and %d video streams found\n",audio_streams,video_streams);
 if(!audio_streams) demuxer->audio->id=-2;  // nosound
-else if(best_audio > 0 && demuxer->audio->id == -1) demuxer->audio->id=best_audio;
 if(!video_streams){
     if(!audio_streams){
         mp_msg(MSGT_HEADER,MSGL_ERR,MSGTR_MPDEMUX_ASFHDR_AudioVideoHeaderNotFound);
         return 0;
     }
     demuxer->video->id=-2; // audio-only
-} else if (best_video > 0 && demuxer->video->id == -1) demuxer->video->id = best_video;
+}
 
 #if 0
 if( mp_msg_test(MSGT_HEADER,MSGL_V) ){

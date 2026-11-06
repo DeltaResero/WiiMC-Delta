@@ -20,7 +20,7 @@
 #include "utils/gettext.h"
 
 extern "C" {
-#include "mplayer/playtree.h"
+#include "playtree.h"
 }
 
 static int *shuffleList = NULL;
@@ -98,7 +98,7 @@ int MusicPlaylistLoad()
     char ext[7];
     GetExt(browser.dir, ext);
 
-    if(IsPlaylistExt(ext) || strncmp(browser.dir, "http:", 5) == 0)
+    if(IsPlaylistExt(ext) || IsHttpUrl(browser.dir))
         f_entry->type = TYPE_PLAYLIST;
     else
         f_entry->type = TYPE_FOLDER;

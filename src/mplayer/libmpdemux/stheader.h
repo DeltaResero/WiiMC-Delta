@@ -38,6 +38,7 @@
   /* audio: last known pts value in output from decoder \
    * video: predicted/interpolated PTS of the current frame */ \
   double pts; \
+  double endpts; \
   /* codec-specific: */ \
   void* context;   /* codec-specific stuff (usually HANDLE or struct pointer) */ \
   char* lang; /* track language */ \
@@ -55,6 +56,7 @@ typedef struct sh_audio {
   int samplerate;
   int samplesize;
   int channels;
+  int channel_layout;
   int o_bps; // == samplerate*samplesize*channels   (uncompr. bytes/sec)
   int i_bps; // == bitrate  (compressed bytes/sec)
   // in buffers:
@@ -67,6 +69,9 @@ typedef struct sh_audio {
   char* a_buffer;
   int a_buffer_len;
   int a_buffer_size;
+  int a_buffer_format_change; // audio data in the input buffer is subject
+                              // to a format change but data in the old
+                              // format is still present in the out buffer
   // output buffers:
   char* a_out_buffer;
   int a_out_buffer_len;
@@ -97,15 +102,18 @@ typedef struct sh_video {
   double i_pts;   // PTS for the _next_ I/P frame
   float next_frame_time;
   double last_pts;
-  double buffered_pts[32];
+  double buffered_pts[64];
+  double buffered_endpts[64];
   int num_buffered_pts;
   // output format: (set by demuxer)
   double fps;              // frames per second (set only if constant fps)
   float frametime;        // 1/fps
-  float aspect;           // aspect ratio stored in the file (for prescaling)
+  float aspect;           // current aspect ratio (for prescaling)
+  float original_aspect;  // original aspect ratio stored in the file
   float stream_aspect;  // aspect ratio stored in the media headers (e.g. in DVD IFO files)
   int i_bps;              // == bitrate  (compressed bytes/sec)
   int disp_w,disp_h;      // display size (filled by fileformat parser)
+  int flipped_input;
   // output driver/filters: (set by libmpcodecs core)
   unsigned int outfmtidx;
   struct vf_instance *vfilter;          // the video filter chain, used for this video stream

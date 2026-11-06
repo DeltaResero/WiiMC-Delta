@@ -24,6 +24,7 @@
 #include "config.h"     /* get correct definition of HAVE_BIGENDIAN */
 #include "libavutil/common.h"
 #include "mpbswap.h"
+#include "mppacked.h"
 #include "demuxer.h"
 
 #ifndef mmioFOURCC
@@ -129,9 +130,6 @@ typedef struct {
 #define AVIIF_NOTIME        0x00000100L // this frame doesn't take any time
 #define AVIIF_COMPUSE       0x0FFF0000L // these bits are for compressor use
 
-#define FOURCC_RIFF     mmioFOURCC('R', 'I', 'F', 'F')
-#define FOURCC_LIST     mmioFOURCC('L', 'I', 'S', 'T')
-
 typedef struct
 {
     uint32_t            ckid;
@@ -153,7 +151,8 @@ typedef struct avistdindex_entry {
 } avistdindex_entry;
 
 // Standard index
-typedef struct __attribute__((packed)) avistdindex_chunk {
+MP_PACKED(
+typedef struct, avistdindex_chunk {
     char           fcc[4];       // ix##
     uint32_t  dwSize;            // size of this chunk
     uint16_t wLongsPerEntry;     // must be sizeof(aIndex[0])/sizeof(DWORD)
@@ -165,6 +164,7 @@ typedef struct __attribute__((packed)) avistdindex_chunk {
     uint32_t  dwReserved3;       // must be 0
     avistdindex_entry *aIndex;   // the actual frames
 } avistdindex_chunk;
+)
 
 
 // Base Index Form 'indx'
@@ -222,6 +222,7 @@ typedef enum {
 } VIDEO_STANDARD;
 
 #define MAKE_AVI_ASPECT(a, b) (((a)<<16)|(b))
+#define VALID_AVI_ASPECT(a) (((a)>>16) && ((a) & 0xffff))
 #define GET_AVI_ASPECT(a) ((float)((a)>>16)/(float)((a)&0xffff))
 
 /*
@@ -345,7 +346,7 @@ typedef enum {
 
 typedef struct {
   // index stuff:
-  void* idx;
+  AVIINDEXENTRY *idx;
   int idx_size;
   off_t idx_pos;
   off_t idx_pos_a;
@@ -370,8 +371,6 @@ typedef struct {
   int isodml;
   int warned_unaligned;
 } avi_priv_t;
-
-#define AVI_PRIV ((avi_priv_t*)(demuxer->priv))
 
 #define AVI_IDX_OFFSET(x) ((((uint64_t)(x)->dwFlags&0xffff0000)<<16)+(x)->dwChunkOffset)
 

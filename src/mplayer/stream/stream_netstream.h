@@ -30,19 +30,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#if !HAVE_WINSOCK2_H && !GEKKO
+#if !HAVE_WINSOCK2_H && !defined(GEKKO)
 #include <sys/socket.h>
 #endif
 
 #include "mp_msg.h"
 #include "mpbswap.h"
+#include "mppacked.h"
 #include "network.h"
 
+MP_PACKED(
 typedef struct mp_net_stream_packet_st {
   uint16_t len;
   uint8_t cmd;
   char data[0];
-} __attribute__ ((packed))  mp_net_stream_packet_t;
+}, mp_net_stream_packet_t;
+)
 
 #define PACKET_MAX_SIZE 4096
 
@@ -61,22 +64,27 @@ typedef struct mp_net_stream_packet_st {
 // Server response
 #define NET_STREAM_OK 128
 // Data returned if open is successful
+MP_PACKED(
 typedef struct mp_net_stream_opened_st {
   uint32_t file_format;
   uint32_t flags;
   uint32_t sector_size;
   uint64_t start_pos;
   uint64_t end_pos;
-}  __attribute__ ((packed))  mp_net_stream_opened_t;
+}, mp_net_stream_opened_t;
+)
 // FILL_BUFFER return the data
 // CLOSE return nothing
 #define NET_STREAM_ERROR 129
 // Data is the error message (if any ;)
+
 #ifdef GEKKO
-static int net_read_st(int fd, char* buf, int len) {
-#else
-static int net_read(int fd, char* buf, int len) {
+// libogc has its own net_read() and net_write()
+#define net_read  net_read_st
+#define net_write net_write_st
 #endif
+
+static int net_read(int fd, char* buf, int len) {
   int r = 0;
   while(len) {
     r = recv(fd,buf,len,0);
@@ -97,46 +105,32 @@ static int net_read(int fd, char* buf, int len) {
 
 static mp_net_stream_packet_t* read_packet(int fd) {
   uint16_t len;
-  mp_net_stream_packet_t* pack = malloc(sizeof(mp_net_stream_packet_t));
-#ifdef GEKKO
-  if(!net_read_st(fd,(char*)pack,sizeof(mp_net_stream_packet_t))) {
-#else
-  if(!net_read(fd,(char*)pack,sizeof(mp_net_stream_packet_t))) {
-#endif
-    free(pack);
-    return NULL;
-  }
+  mp_net_stream_packet_t* pack = calloc(1, PACKET_MAX_SIZE + 1);
+
+  if(!pack || !net_read(fd,(char*)pack,sizeof(mp_net_stream_packet_t)))
+    goto err_out;
   pack->len = le2me_16(pack->len);
 
   if(pack->len < sizeof(mp_net_stream_packet_t)) {
     mp_msg(MSGT_NETST,MSGL_WARN,"Got invalid packet (too small: %d)\n",pack->len);
-    free(pack);
-    return NULL;
+    goto err_out;
   }
   if(pack->len > PACKET_MAX_SIZE) {
     mp_msg(MSGT_NETST,MSGL_WARN,"Got invalid packet (too big: %d)\n",pack->len);
-    free(pack);
-    return NULL;
+    goto err_out;
   }
+  pack->len -= sizeof(mp_net_stream_packet_t);
   len = pack->len;
-  if(len > sizeof(mp_net_stream_packet_t)) {
-    pack = realloc(pack,len);
-    if(!pack) {
-      mp_msg(MSGT_NETST,MSGL_ERR,"Failed to get memory for the packet (%d bytes)\n",len);
-      return NULL;
-    }
-#ifdef GEKKO
-    if(!net_read_st(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
-#else
-    if(!net_read(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
-#endif
-
-      return NULL;
-  }
+  if(len > 0 && !net_read(fd,pack->data,len))
+    goto err_out;
   //  printf ("Read packet %d %d %d\n",fd,pack->cmd,pack->len);
   return pack;
+
+err_out:
+  free(pack);
+  return NULL;
 }
-#ifndef GEKKO
+
 static int net_write(int fd, char* buf, int len) {
   int w;
   while(len) {
@@ -152,7 +146,6 @@ static int net_write(int fd, char* buf, int len) {
   }
   return 1;
 }
-#endif
 
 static int write_packet(int fd, uint8_t cmd,char* data,int len) {
   mp_net_stream_packet_t* pack = malloc(len + sizeof(mp_net_stream_packet_t));

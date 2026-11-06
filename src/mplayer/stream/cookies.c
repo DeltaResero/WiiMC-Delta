@@ -27,7 +27,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifndef _MSC_VER
 #include <dirent.h>
+#endif
 #include <inttypes.h>
 #include <limits.h>
 
@@ -89,7 +91,7 @@ static int left_hand_strcmp(const char *cookie_path, const char *url_path)
 }
 
 /* Finds the start of all the columns */
-static int parse_line(char **ptr, char *cols[6])
+static int parse_line(char **ptr, char *cols[7])
 {
     int col;
     cols[0] = *ptr;
@@ -110,44 +112,49 @@ static int parse_line(char **ptr, char *cols[6])
 /* Loads a file into RAM */
 static char *load_file(const char *filename, off_t * length)
 {
-    int fd;
-    char *buffer;
+    int fd = -1;
+    char *buffer = NULL;
 
     mp_msg(MSGT_NETWORK, MSGL_V, "Loading cookie file: %s\n", filename);
 
-    fd = open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY | O_BINARY);
     if (fd < 0) {
         mp_msg(MSGT_NETWORK, MSGL_V, "Could not open");
-        return NULL;
+        goto err_out;
     }
 
     *length = lseek(fd, 0, SEEK_END);
 
     if (*length < 0) {
         mp_msg(MSGT_NETWORK, MSGL_V, "Could not find EOF");
-        return NULL;
+        goto err_out;
     }
 
     if (*length > SIZE_MAX - 1) {
         mp_msg(MSGT_NETWORK, MSGL_V, "File too big, could not malloc.");
-        return NULL;
+        goto err_out;
     }
 
     lseek(fd, 0, SEEK_SET);
 
     if (!(buffer = malloc(*length + 1))) {
         mp_msg(MSGT_NETWORK, MSGL_V, "Could not malloc.");
-        return NULL;
+        goto err_out;
     }
 
     if (read(fd, buffer, *length) != *length) {
         mp_msg(MSGT_NETWORK, MSGL_V, "Read is behaving funny.");
-        return NULL;
+        goto err_out;
     }
     close(fd);
     buffer[*length] = 0;
 
     return buffer;
+
+err_out:
+    if (fd != -1) close(fd);
+    free(buffer);
+    return NULL;
 }
 
 /* Loads a cookies.txt file into a linked list. */
@@ -155,14 +162,15 @@ static struct cookie_list_type *load_cookies_from(const char *filename,
                                                   struct cookie_list_type
                                                   *list)
 {
-    char *ptr;
+    char *ptr, *buffer;
     off_t length;
 
+    buffer =
     ptr = load_file(filename, &length);
     if (!ptr)
         return list;
 
-    while (*ptr > 0) {
+    while (*ptr) {
         char *cols[7];
         if (parse_line(&ptr, cols)) {
             struct cookie_list_type *new;
@@ -176,22 +184,28 @@ static struct cookie_list_type *load_cookies_from(const char *filename,
             list = new;
         }
     }
+    free(buffer);
     return list;
 }
 
 /* Attempt to load cookies.txt from various locations. Returns a pointer to the linked list contain the cookies. */
 static struct cookie_list_type *load_cookies(void)
 {
+    struct cookie_list_type *list = NULL;
+#ifndef _MSC_VER
     DIR *dir;
     struct dirent *ent;
-    struct cookie_list_type *list = NULL;
     char *buf;
 
     char *homedir;
+#endif
 
     if (cookies_file)
         return load_cookies_from(cookies_file, list);
 
+#ifdef _MSC_VER
+    return list;
+#else
     homedir = getenv("HOME");
     if (!homedir)
         return list;
@@ -205,11 +219,12 @@ static struct cookie_list_type *load_cookies(void)
     if (dir) {
         while ((ent = readdir(dir)) != NULL) {
             if ((ent->d_name)[0] != '.') {
-                buf = malloc(strlen(getenv("HOME")) +
-                             sizeof("/.mozilla/default/") +
-                             strlen(ent->d_name) + sizeof("cookies.txt") + 1);
-                sprintf(buf, "%s/.mozilla/default/%s/cookies.txt",
-                         getenv("HOME"), ent->d_name);
+                unsigned len = strlen(homedir) +
+                               sizeof("/.mozilla/default/") +
+                               strlen(ent->d_name) + sizeof("cookies.txt") + 1;
+                buf = malloc(len);
+                snprintf(buf, len, "%s/.mozilla/default/%s/cookies.txt",
+                         homedir, ent->d_name);
                 list = load_cookies_from(buf, list);
                 free(buf);
             }
@@ -223,6 +238,7 @@ static struct cookie_list_type *load_cookies(void)
     free(buf);
 
     return list;
+#endif
 }
 
 /* Take an HTTP_header_t, and insert the correct headers. The cookie files are read if necessary. */
@@ -288,6 +304,5 @@ cookies_set(HTTP_header_t * http_hdr, const char *domain, const char *url)
 
     if (found_cookies)
         http_set_field(http_hdr, buf);
-    else
-        free(buf);
+    free(buf);
 }

@@ -298,6 +298,10 @@ static void mov_build_index(mov_track_t* trak,int timescale){
             for(;sample<trak->samples_size;sample++){
                 if(pts<=trak->samples[sample].pts) break;
             }
+            if (sample >= trak->samples_size){
+                // skip!
+                el->frames=0; continue;
+            }
             el->start_sample=sample;
             el->pts_offset=((long long)e_pts*(long long)trak->timescale)/(long long)timescale-trak->samples[sample].pts;
             pts+=((long long)el->dur*(long long)trak->timescale)/(long long)timescale;
@@ -623,7 +627,7 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
                    // ([int32_t size,int32_t type,some data ],repeat)
                 } my_stdata;
 #endif
-                int version, adjust;
+                int version = 0, adjust;
                 int is_vorbis = 0;
                 sh->format=trak->fourcc;
 
@@ -742,16 +746,19 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
                     int fcc=char2int(trak->stdata,48);
                     // we have extra audio headers!!!
                     mp_msg(MSGT_DEMUX,MSGL_V,"Audio extra header: len=%d  fcc=0x%X\n",len,fcc);
-                    if((len >= 4) &&
-                       (char2int(trak->stdata,52) >= 12) &&
+                    if (len > 8 && len <= trak->stdata_len - 44) {
+                    if((char2int(trak->stdata,52) >= 12) &&
                        (char2int(trak->stdata,52+4) == MOV_FOURCC('f','r','m','a'))) {
+                        int frma_len = char2int(trak->stdata,52);
                         switch(char2int(trak->stdata,52+8)) {
                          case MOV_FOURCC('a','l','a','c'):
-                          if (len >= 36 + char2int(trak->stdata,52)) {
-                            sh->codecdata_len = char2int(trak->stdata,52+char2int(trak->stdata,52));
+                          if (len >= 36 && frma_len > 0 && frma_len <= len - 36) {
+                            sh->codecdata_len = char2int(trak->stdata,52+frma_len);
+                            if (sh->codecdata_len < 0 || sh->codecdata_len > len - 8 - frma_len)
+                                sh->codecdata_len = len - 8 - frma_len;
                             mp_msg(MSGT_DEMUX, MSGL_V, "MOV: Found alac atom (%d)!\n", sh->codecdata_len);
                             sh->codecdata = malloc(sh->codecdata_len);
-                            memcpy(sh->codecdata, &trak->stdata[52+char2int(trak->stdata,52)], sh->codecdata_len);
+                            memcpy(sh->codecdata, &trak->stdata[52+frma_len], sh->codecdata_len);
                           }
                           break;
                          case MOV_FOURCC('i','n','2','4'):
@@ -766,18 +773,15 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
                           }
                           break;
                          default:
-                          if (len > 8 && len + 44 <= trak->stdata_len) {
                                 sh->codecdata_len = len-8;
                                 sh->codecdata = malloc(sh->codecdata_len);
                                 memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-                          }
                         }
                     } else {
-                      if (len > 8 && len + 44 <= trak->stdata_len) {
                     sh->codecdata_len = len-8;
                     sh->codecdata = malloc(sh->codecdata_len);
                     memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-                      }
+                    }
                     }
                   }
                 }
@@ -944,7 +948,7 @@ quit_vorbis_block:
 //              if(demuxer->audio->id==-1 || demuxer->audio->id==priv->track_db){
 //                  // (auto)selected audio track:
 //                  demuxer->audio->id=priv->track_db;
-//                  demuxer->audio->sh=sh; sh->ds=demuxer->audio;
+//                  demuxer->audio->sh=sh;
 //              }
     return 1;
 }
@@ -1088,8 +1092,9 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
                         // Parse some parts of avcC, just for fun :)
                         // real parsing is done by avc1 decoder
                         mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC version: %d\n", *(trak->stdata+pos+8));
+                        if (atom_len >= 14) {
                         if (*(trak->stdata+pos+8) != 1)
-                          mp_msg(MSGT_DEMUX, MSGL_ERR, "MOV: unknown avcC version (%d). Expexct problems.\n", *(trak->stdata+pos+9));
+                          mp_msg(MSGT_DEMUX, MSGL_ERR, "MOV: unknown avcC version (%d). Expect problems.\n", *(trak->stdata+pos+9));
                         mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC profile: %d\n", *(trak->stdata+pos+9));
                         mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC profile compatibility: %d\n", *(trak->stdata+pos+10));
                         mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC level: %d\n", *(trak->stdata+pos+11));
@@ -1097,14 +1102,18 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
                         mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC number of sequence param sets: %d\n", cnt = (*(trak->stdata+pos+13) & 0x1f));
                         poffs = pos + 14;
                         for (i = 0; i < cnt; i++) {
+                          if (poffs - pos + 4 > atom_len) break;
                           mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC sps %d have length %d\n", i, AV_RB16(trak->stdata+poffs));
                           poffs += AV_RB16(trak->stdata+poffs) + 2;
                         }
-                        mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC number of picture param sets: %d\n", *(trak->stdata+poffs));
+                        if (poffs - pos < atom_len)
+                          mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC number of picture param sets: %d\n", *(trak->stdata+poffs));
                         poffs++;
                         for (i = 0; i < cnt; i++) {
+                          if (poffs - pos + 4 > atom_len) break;
                           mp_msg(MSGT_DEMUX, MSGL_V, "MOV: avcC pps %d have length %d\n", i, AV_RB16(trak->stdata+poffs));
                           poffs += AV_RB16(trak->stdata+poffs) + 2;
+                        }
                         }
                         // Copy avcC for the AVC decoder
                         // This data will be put in extradata below, where BITMAPINFOHEADER is created
@@ -1143,8 +1152,8 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
                     sh->disp_h=trak->tkdata[81]|(trak->tkdata[80]<<8);
                   } else if(sh->disp_w!=(trak->tkdata[77]|(trak->tkdata[76]<<8))){
                     // codec and display width differ... use display one for aspect
-                    sh->aspect=trak->tkdata[77]|(trak->tkdata[76]<<8);
-                    sh->aspect/=trak->tkdata[81]|(trak->tkdata[80]<<8);
+                    sh->original_aspect=trak->tkdata[77]|(trak->tkdata[76]<<8);
+                    sh->original_aspect/=trak->tkdata[81]|(trak->tkdata[80]<<8);
                   }
                 }
 
@@ -1216,7 +1225,7 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
                   else
                   {
                     mp_msg(MSGT_DEMUX, MSGL_V, "Loading palette from file\n");
-                    for (i = start; i <= end; i++)
+                    for (i = start; i <= end && hdr_ptr < trak->stdata_len - 8; i++)
                     {
                       entry = AV_RB16(&trak->stdata[hdr_ptr]);
                       hdr_ptr += 2;
@@ -1224,7 +1233,7 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
                       if (count_flag & 0x8000)
                         entry = i;
                       // only care about top 8 bits of 16-bit R, G, or B value
-                      if (entry <= palette_count && entry >= 0)
+                      if (entry < palette_count && entry >= 0)
                       {
                         palette_map[entry * 4 + 2] = trak->stdata[hdr_ptr + 0];
                         palette_map[entry * 4 + 1] = trak->stdata[hdr_ptr + 2];
@@ -1277,7 +1286,7 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
 //              if(demuxer->video->id==-1 || demuxer->video->id==priv->track_db){
 //                  // (auto)selected video track:
 //                  demuxer->video->id=priv->track_db;
-//                  demuxer->video->sh=sh; sh->ds=demuxer->video;
+//                  demuxer->video->sh=sh;
 //              }
     return 1;
 }
@@ -1310,6 +1319,10 @@ static void lschunks(demuxer_t* demuxer,int level,off_t endpos,mov_track_t* trak
                 int version = stream_read_char(demuxer->stream);
                 stream_skip(demuxer->stream, (version == 1) ? 19 : 11);
                 priv->timescale=stream_read_dword(demuxer->stream);
+                if (priv->timescale <= 0) {
+                    priv->timescale = 600;
+                    mp_msg(MSGT_DEMUX, MSGL_INFO,"MOV: invalid timescale, defaulting to %i\n", priv->timescale);
+                }
                 if (version == 1)
                     priv->duration=stream_read_qword(demuxer->stream);
                 else
@@ -1527,8 +1540,9 @@ static void lschunks(demuxer_t* demuxer,int level,off_t endpos,mov_track_t* trak
                     case MOV_FOURCC(0xa9,'s','w','r'):
                     {
                         off_t text_len = stream_read_word(demuxer->stream);
-                        char text[text_len+2+1];
-                        stream_read(demuxer->stream, (char *)&text, text_len+2);
+                        if (text_len >> 16) { udta_size = 0; break; } // eof
+                        char *text = malloc(text_len+2+1);
+                        stream_read(demuxer->stream, text, text_len+2);
                         text[text_len+2] = 0x0;
                         switch(udta_id)
                         {
@@ -1581,6 +1595,7 @@ static void lschunks(demuxer_t* demuxer,int level,off_t endpos,mov_track_t* trak
                                 mp_msg(MSGT_DEMUX, MSGL_V, " Source providers: %s\n", &text[2]);
                                 break;
                         }
+                        free(text);
                         udta_size -= 4+text_len;
                         break;
                     }
@@ -1981,7 +1996,7 @@ static demuxer_t* mov_read_header(demuxer_t* demuxer){
     if(demuxer->audio->id>=0){
         sh_audio_t* sh=demuxer->a_streams[demuxer->audio->id];
         if(sh){
-            demuxer->audio->sh=sh; sh->ds=demuxer->audio;
+            demuxer->audio->sh=sh;
         } else {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "MOV: selected audio stream (%d) does not exist\n",demuxer->audio->id);
             demuxer->audio->id=-2;
@@ -1990,7 +2005,7 @@ static demuxer_t* mov_read_header(demuxer_t* demuxer){
     if(demuxer->video->id>=0){
         sh_video_t* sh=demuxer->v_streams[demuxer->video->id];
         if(sh){
-            demuxer->video->sh=sh; sh->ds=demuxer->video;
+            demuxer->video->sh=sh;
         } else {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "MOV: selected video stream (%d) does not exist\n",demuxer->video->id);
             demuxer->video->id=-2;

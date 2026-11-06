@@ -34,6 +34,8 @@
 #include <errno.h>
 #include <inttypes.h>
 
+#include "libavutil/attributes.h"
+
 #include "config.h"
 
 #include "mp_msg.h"
@@ -435,7 +437,8 @@ static int get_media_packet (int s, int padding, streaming_ctrl_t *stream_ctrl) 
       return 0;
     }
 
-    streaming_bufferize(stream_ctrl, data, padding);
+    if (streaming_bufferize(stream_ctrl, data, padding) < 0)
+      return -1;
 
   } else {
 
@@ -531,13 +534,9 @@ static int asf_mmst_streaming_read( int fd, char *buffer, int size, streaming_ct
 
 }
 
-static int asf_mmst_streaming_seek( int fd, off_t pos, streaming_ctrl_t *streaming_ctrl )
+static int asf_mmst_streaming_seek( int av_unused fd, int64_t av_unused pos, streaming_ctrl_t * av_unused streaming_ctrl )
 {
         return -1;
-        // Shut up gcc warning
-        fd++;
-        pos++;
-        streaming_ctrl=NULL;
 }
 
 int asf_mmst_streaming_start(stream_t *stream)

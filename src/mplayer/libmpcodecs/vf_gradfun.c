@@ -39,7 +39,9 @@
 #include "vf.h"
 #include "libvo/fastmemcpy.h"
 #include "libavutil/avutil.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/common.h"
+#include "mpmem.h"
+#include "mpx86asm.h"
 
 struct vf_priv_s {
     int thresh;
@@ -51,9 +53,9 @@ struct vf_priv_s {
                       uint8_t *src, int sstride, int width);
 };
 
-static const uint16_t __attribute__((aligned(16))) pw_7f[8] = {127,127,127,127,127,127,127,127};
-static const uint16_t __attribute__((aligned(16))) pw_ff[8] = {255,255,255,255,255,255,255,255};
-static const uint16_t __attribute__((aligned(16))) dither[8][8] = {
+DECLARE_ALIGNED(16, static const uint16_t, pw_7f)[8] = {127,127,127,127,127,127,127,127};
+DECLARE_ALIGNED(16, static const uint16_t, pw_ff)[8] = {255,255,255,255,255,255,255,255};
+DECLARE_ALIGNED(16, static const uint16_t, dither)[8][8] = {
     {  0, 96, 24,120,  6,102, 30,126 },
     { 64, 32, 88, 56, 70, 38, 94, 62 },
     { 16,112,  8,104, 22,118, 14,110 },
@@ -91,7 +93,7 @@ static void blur_line_c(uint16_t *dc, uint16_t *buf, uint16_t *buf1,
     }
 }
 
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
 static void filter_line_mmx2(uint8_t *dst, uint8_t *src, uint16_t *dc,
                              int width, int thresh, const uint16_t *dithers)
 {
@@ -140,7 +142,7 @@ static void filter_line_mmx2(uint8_t *dst, uint8_t *src, uint16_t *dc,
 }
 #endif
 
-#if HAVE_SSSE3
+#if HAVE_SSSE3_INLINE
 static void filter_line_ssse3(uint8_t *dst, uint8_t *src, uint16_t *dc,
                               int width, int thresh, const uint16_t *dithers)
 {
@@ -186,9 +188,9 @@ static void filter_line_ssse3(uint8_t *dst, uint8_t *src, uint16_t *dc,
         :"memory"
     );
 }
-#endif // HAVE_SSSE3
+#endif // HAVE_SSSE3_INLINE
 
-#if HAVE_SSE2 && HAVE_6REGS
+#if HAVE_SSE2_INLINE && HAVE_6REGS
 #define BLURV(load)\
     intptr_t x = -2*width;\
     __asm__ volatile(\
@@ -231,7 +233,7 @@ static void blur_line_sse2(uint16_t *dc, uint16_t *buf, uint16_t *buf1,
         BLURV("movdqa");
     }
 }
-#endif // HAVE_6REGS && HAVE_SSE2
+#endif // HAVE_6REGS && HAVE_SSE2_INLINE
 
 static void filter(struct vf_priv_s *ctx, uint8_t *dst, uint8_t *src,
                    int width, int height, int dstride, int sstride, int r)
@@ -293,7 +295,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi)
     mpi->flags |= MP_IMGFLAG_DIRECT;
 }
 
-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
+static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts)
 {
     mp_image_t *dmpi = vf->dmpi;
     int p;
@@ -324,7 +326,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
                        dmpi->stride[p], mpi->stride[p]);
     }
 
-    return vf_next_put_image(vf, dmpi, pts);
+    return vf_next_put_image(vf, dmpi, pts, endpts);
 }
 
 static int query_format(struct vf_instance *vf, unsigned int fmt)
@@ -385,15 +387,15 @@ static int vf_open(vf_instance_t *vf, char *args)
 
     vf->priv->blur_line = blur_line_c;
     vf->priv->filter_line = filter_line_c;
-#if HAVE_SSE2 && HAVE_6REGS
+#if HAVE_SSE2_INLINE && HAVE_6REGS
     if (gCpuCaps.hasSSE2)
         vf->priv->blur_line = blur_line_sse2;
 #endif
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
     if (gCpuCaps.hasMMX2)
         vf->priv->filter_line = filter_line_mmx2;
 #endif
-#if HAVE_SSSE3
+#if HAVE_SSSE3_INLINE
     if (gCpuCaps.hasSSSE3)
         vf->priv->filter_line = filter_line_ssse3;
 #endif

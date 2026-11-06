@@ -38,6 +38,9 @@
 #include "help_mp.h"
 #include "osdep/ave-rvl.h"
 
+/* libaf/af.h had this until trunk dropped it */
+#define clamp(a,min,max) (((a)>(max))?(max):(((a)<(min))?(min):(a)))
+
 #define BUFFER_SIZE     4096
 #define BUFFER_COUNT    32
 

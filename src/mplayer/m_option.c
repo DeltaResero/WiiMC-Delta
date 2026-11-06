@@ -28,12 +28,16 @@
 #include <stdarg.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "m_option.h"
 //#include "m_config.h"
 #include "mp_msg.h"
+#include "mp_global.h"
 #include "stream/url.h"
 #include "libavutil/avstring.h"
+#include "libavutil/attributes.h"
+#include "libavutil/mem.h"
 
 // Don't free for 'production' atm
 #ifndef MP_DEBUG
@@ -47,9 +51,9 @@ const m_option_t* m_option_list_find(const m_option_t* list,const char* name) {
     int l = strlen(list[i].name) - 1;
     if((list[i].type->flags & M_OPT_TYPE_ALLOW_WILDCARD) &&
        (l > 0) && (list[i].name[l] == '*')) {
-      if(strncasecmp(list[i].name,name,l) == 0)
+      if(av_strncasecmp(list[i].name,name,l) == 0)
         return &list[i];
-    } else if(strcasecmp(list[i].name,name) == 0)
+    } else if(av_strcasecmp(list[i].name,name) == 0)
       return &list[i];
   }
   return NULL;
@@ -96,28 +100,28 @@ static char* dup_printf(const char *fmt, ...) {
 static int parse_flag(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
   if (src == M_CONFIG_FILE) {
     if(!param) return M_OPT_MISSING_PARAM;
-    if (!strcasecmp(param, "yes") ||    /* any other language? */
-        !strcasecmp(param, "on") ||
-        !strcasecmp(param, "ja") ||
-        !strcasecmp(param, "si") ||
-        !strcasecmp(param, "igen") ||
-        !strcasecmp(param, "y") ||
-        !strcasecmp(param, "j") ||
-        !strcasecmp(param, "i") ||
-        !strcasecmp(param, "tak") ||
-        !strcasecmp(param, "ja") ||
-        !strcasecmp(param, "true") ||
+    if (!av_strcasecmp(param, "yes") || /* any other language? */
+        !av_strcasecmp(param, "on") ||
+        !av_strcasecmp(param, "ja") ||
+        !av_strcasecmp(param, "si") ||
+        !av_strcasecmp(param, "igen") ||
+        !av_strcasecmp(param, "y") ||
+        !av_strcasecmp(param, "j") ||
+        !av_strcasecmp(param, "i") ||
+        !av_strcasecmp(param, "tak") ||
+        !av_strcasecmp(param, "ja") ||
+        !av_strcasecmp(param, "true") ||
         !strcmp(param, "1")) {
       if(dst) VAL(dst) = opt->max;
-    } else if (!strcasecmp(param, "no") ||
-               !strcasecmp(param, "off") ||
-               !strcasecmp(param, "nein") ||
-               !strcasecmp(param, "nicht") ||
-               !strcasecmp(param, "nem") ||
-               !strcasecmp(param, "n") ||
-               !strcasecmp(param, "nie") ||
-               !strcasecmp(param, "nej") ||
-               !strcasecmp(param, "false") ||
+    } else if (!av_strcasecmp(param, "no") ||
+               !av_strcasecmp(param, "off") ||
+               !av_strcasecmp(param, "nein") ||
+               !av_strcasecmp(param, "nicht") ||
+               !av_strcasecmp(param, "nem") ||
+               !av_strcasecmp(param, "n") ||
+               !av_strcasecmp(param, "nie") ||
+               !av_strcasecmp(param, "nej") ||
+               !av_strcasecmp(param, "false") ||
                !strcmp(param, "0")) {
       if(dst) VAL(dst) = opt->min;
     } else {
@@ -153,10 +157,9 @@ const m_option_type_t m_option_type_flag = {
 
 // Integer
 
-static int parse_int(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
+static int parse_int(const m_option_t* opt,const char *name, const char *param, void* dst, int av_unused src) {
   long long tmp_int;
   char *endptr;
-  src = 0;
 
   if (param == NULL)
     return M_OPT_MISSING_PARAM;
@@ -226,10 +229,9 @@ const m_option_type_t m_option_type_int64 = {
 #undef VAL
 #define VAL(x) (*(double*)(x))
 
-static int parse_double(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
+static int parse_double(const m_option_t* opt,const char *name, const char *param, void* dst, int av_unused src) {
   double tmp_float;
   char* endptr;
-  src = 0;
 
   if (param == NULL)
     return M_OPT_MISSING_PARAM;
@@ -275,8 +277,7 @@ static int parse_double(const m_option_t* opt,const char *name, const char *para
   return 1;
 }
 
-static char* print_double(const m_option_t* opt,  const void* val) {
-  opt = NULL;
+static char* print_double(const m_option_t* av_unused opt,  const void* val) {
   return dup_printf("%f",VAL(val));
 }
 
@@ -303,8 +304,7 @@ static int parse_float(const m_option_t* opt,const char *name, const char *param
     return r;
 }
 
-static char* print_float(const m_option_t* opt,  const void* val) {
-  opt = NULL;
+static char* print_float(const m_option_t* av_unused opt,  const void* val) {
   return dup_printf("%f",VAL(val));
 }
 
@@ -472,7 +472,7 @@ static void free_str_list(void* dst) {
 }
 
 static int str_list_add(char** add, int n,void* dst,int pre) {
-  char** lst = VAL(dst);
+  char** lst;
   int ln;
 
   if(!dst) return M_OPT_PARSER_ERR;
@@ -570,13 +570,13 @@ static int parse_str_list(const m_option_t* opt,const char *name, const char *pa
 
   if(opt->name[len-1] == '*' && ((int)strlen(name) > len - 1)) {
     const char* n = &name[len-1];
-    if(strcasecmp(n,"-add") == 0)
+    if(av_strcasecmp(n,"-add") == 0)
       op = OP_ADD;
-    else if(strcasecmp(n,"-pre") == 0)
+    else if(av_strcasecmp(n,"-pre") == 0)
       op = OP_PRE;
-    else if(strcasecmp(n,"-del") == 0)
+    else if(av_strcasecmp(n,"-del") == 0)
       op = OP_DEL;
-    else if(strcasecmp(n,"-clr") == 0)
+    else if(av_strcasecmp(n,"-clr") == 0)
       op = OP_CLR;
     else
       return M_OPT_UNKNOWN;
@@ -962,7 +962,7 @@ const m_option_type_t m_option_type_print_func = {
 static int parse_subconf(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
   char *subparam;
   char *subopt;
-  int nr = 0,i,r;
+  int nr = 0,i,r = 1;
   const m_option_t *subopts;
   const char *p;
   char** lst = NULL;
@@ -978,14 +978,12 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
 
   while(p[0])
     {
-      int sscanf_ret = 1;
       int optlen = strcspn(p, ":=");
       /* clear out */
       subopt[0] = subparam[0] = 0;
       av_strlcpy(subopt, p, optlen + 1);
       p = &p[optlen];
       if (p[0] == '=') {
-        sscanf_ret = 2;
         p = &p[1];
         if (p[0] == '"') {
           p = &p[1];
@@ -994,7 +992,8 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
           p = &p[optlen];
           if (p[0] != '"') {
             mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Terminating '\"' missing for '%s'\n", subopt);
-            return M_OPT_INVALID;
+            r = M_OPT_INVALID;
+            goto out;
           }
           p = &p[1];
         } else if (p[0] == '%') {
@@ -1002,7 +1001,8 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
           optlen = (int)strtol(p, (char**)&p, 0);
           if (!p || p[0] != '%' || (optlen > strlen(p) - 1)) {
             mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Invalid length %i for '%s'\n", optlen, subopt);
-            return M_OPT_INVALID;
+            r = M_OPT_INVALID;
+            goto out;
           }
           p = &p[1];
           av_strlcpy(subparam, p, optlen + 1);
@@ -1017,41 +1017,39 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
         p = &p[1];
       else if (p[0]) {
         mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Incorrect termination for '%s'\n", subopt);
-        return M_OPT_INVALID;
+        r = M_OPT_INVALID;
+        goto out;
       }
 
-      switch(sscanf_ret)
-        {
-        case 1:
-          subparam[0] = 0;
-        case 2:
-          for(i = 0 ; subopts[i].name ; i++) {
-            if(!strcmp(subopts[i].name,subopt)) break;
-          }
-          if(!subopts[i].name) {
-            mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
-            return M_OPT_UNKNOWN;
-          }
-          r = m_option_parse(&subopts[i],subopt,
-                             subparam[0] == 0 ? NULL : subparam,NULL,src);
-          if(r < 0) return r;
-          if(dst) {
-            lst = realloc(lst,2 * (nr+2) * sizeof(char*));
-            lst[2*nr] = strdup(subopt);
-            lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
-            memset(&lst[2*(nr+1)],0,2*sizeof(char*));
-            nr++;
-          }
-          break;
-        }
+      for(i = 0 ; subopts[i].name ; i++) {
+        if(!strcmp(subopts[i].name,subopt)) break;
+      }
+      if(!subopts[i].name) {
+        mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
+        r = M_OPT_UNKNOWN;
+        goto out;
+      }
+      r = m_option_parse(&subopts[i],subopt,
+                         subparam[0] == 0 ? NULL : subparam,NULL,src);
+      if(r < 0) goto out;
+      if(dst) {
+        lst = realloc(lst,2 * (nr+2) * sizeof(char*));
+        lst[2*nr] = strdup(subopt);
+        lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
+        memset(&lst[2*(nr+1)],0,2*sizeof(char*));
+        nr++;
+      }
     }
 
-  free(subparam);
-  free(subopt);
   if(dst)
     VAL(dst) = lst;
+  r = 1;
 
-  return 1;
+out:
+  free(subparam);
+  free(subopt);
+
+  return r;
 }
 
 const m_option_type_t m_option_type_subconfig = {
@@ -1076,18 +1074,34 @@ static struct {
 } mp_imgfmt_list[] = {
   {"444p16le", IMGFMT_444P16_LE},
   {"444p16be", IMGFMT_444P16_BE},
+  {"444p14le", IMGFMT_444P14_LE},
+  {"444p14be", IMGFMT_444P14_BE},
+  {"444p12le", IMGFMT_444P12_LE},
+  {"444p12be", IMGFMT_444P12_BE},
   {"444p10le", IMGFMT_444P10_LE},
   {"444p10be", IMGFMT_444P10_BE},
   {"444p9le",  IMGFMT_444P9_LE},
   {"444p9be",  IMGFMT_444P9_BE},
   {"422p16le", IMGFMT_422P16_LE},
   {"422p16be", IMGFMT_422P16_BE},
+  {"422p14le", IMGFMT_422P14_LE},
+  {"422p14be", IMGFMT_422P14_BE},
+  {"422p12le", IMGFMT_422P12_LE},
+  {"422p12be", IMGFMT_422P12_BE},
   {"422p10le", IMGFMT_422P10_LE},
   {"422p10be", IMGFMT_422P10_BE},
   {"422p9le",  IMGFMT_422P9_LE},
   {"422p9be",  IMGFMT_422P9_BE},
+  {"440p12le", IMGFMT_440P12_LE},
+  {"440p12be", IMGFMT_440P12_BE},
+  {"440p10le", IMGFMT_440P10_LE},
+  {"440p10be", IMGFMT_440P10_BE},
   {"420p16le", IMGFMT_420P16_LE},
   {"420p16be", IMGFMT_420P16_BE},
+  {"420p14le", IMGFMT_420P14_LE},
+  {"420p14be", IMGFMT_420P14_BE},
+  {"420p12le", IMGFMT_420P12_LE},
+  {"420p12be", IMGFMT_420P12_BE},
   {"420p10le", IMGFMT_420P10_LE},
   {"420p10be", IMGFMT_420P10_BE},
   {"420p9le",  IMGFMT_420P9_LE},
@@ -1117,8 +1131,13 @@ static struct {
   {"hm12", IMGFMT_HM12},
   {"y800", IMGFMT_Y800},
   {"y8",   IMGFMT_Y8},
+  {"y8a",  IMGFMT_Y8A},
+  {"y16be", IMGFMT_Y16_BE},
+  {"y16le", IMGFMT_Y16_LE},
   {"nv12", IMGFMT_NV12},
   {"nv21", IMGFMT_NV21},
+  {"bgr48le", IMGFMT_BGR48LE},
+  {"bgr48be", IMGFMT_BGR48BE},
   {"bgr24", IMGFMT_BGR24},
   {"bgr32", IMGFMT_BGR32},
   {"bgr16", IMGFMT_BGR16},
@@ -1146,6 +1165,14 @@ static struct {
   {"argb", IMGFMT_ARGB},
   {"bgra", IMGFMT_BGRA},
   {"abgr", IMGFMT_ABGR},
+  {"xyz12be",  IMGFMT_XYZ12LE},
+  {"xyz12le",  IMGFMT_XYZ12BE},
+  {"gbr14pbe", IMGFMT_GBR14PLE},
+  {"gbr14ple", IMGFMT_GBR14PBE},
+  {"gbr12pbe", IMGFMT_GBR12PLE},
+  {"gbr12ple", IMGFMT_GBR12PBE},
+  {"gbr10pbe", IMGFMT_GBR10PLE},
+  {"gbr10ple", IMGFMT_GBR10PBE},
   {"gbr24p", IMGFMT_GBR24P},
   {"mjpeg", IMGFMT_MJPEG},
   {"mjpg", IMGFMT_MJPEG},
@@ -1170,7 +1197,7 @@ static int parse_imgfmt(const m_option_t* opt,const char *name, const char *para
   if (sscanf(param, "0x%x", &fmt) != 1)
   {
   for(i = 0 ; mp_imgfmt_list[i].name ; i++) {
-    if(!strcasecmp(param,mp_imgfmt_list[i].name)) {
+    if(!av_strcasecmp(param,mp_imgfmt_list[i].name)) {
       fmt=mp_imgfmt_list[i].fmt;
       break;
     }
@@ -1260,7 +1287,7 @@ static int parse_afmt(const m_option_t* opt,const char *name, const char *param,
   if (sscanf(param, "0x%x", &fmt) != 1)
   {
   for(i = 0 ; mp_afmt_list[i].name ; i++) {
-    if(!strcasecmp(param,mp_afmt_list[i].name)) {
+    if(!av_strcasecmp(param,mp_afmt_list[i].name)) {
       fmt=mp_afmt_list[i].fmt;
       break;
     }
@@ -1302,7 +1329,10 @@ int parse_timestring(const char *str, double *time, char endchar)
     *time = 60*a + d;
   else if (sscanf(str, "%lf%n", &d, &len) >= 1)
     *time = d;
-  else
+  else if (av_strncasecmp(str, "nopts", 5) == 0) {
+    *time = MP_NOPTS_VALUE;
+    len = 5;
+  } else
     return 0; /* unsupported time format */
   if (str[len] && str[len] != endchar)
     return 0; /* invalid extra characters at the end */
@@ -1356,13 +1386,13 @@ static int parse_time_size(const m_option_t* opt,const char *name, const char *p
   /* End at size parsing */
   if(sscanf(param, "%lf%3s", &end_at, unit) == 2) {
     ts.type = END_AT_SIZE;
-    if(!strcasecmp(unit, "b"))
+    if(!av_strcasecmp(unit, "b"))
       ;
-    else if(!strcasecmp(unit, "kb"))
+    else if(!av_strcasecmp(unit, "kb"))
       end_at *= 1024;
-    else if(!strcasecmp(unit, "mb"))
+    else if(!av_strcasecmp(unit, "mb"))
       end_at *= 1024*1024;
-    else if(!strcasecmp(unit, "gb"))
+    else if(!av_strcasecmp(unit, "gb"))
       end_at *= 1024*1024*1024;
     else
       ts.type = END_AT_NONE;
@@ -1776,18 +1806,16 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
 
   if(opt->name[len-1] == '*' && ((int)strlen(name) > len - 1)) {
     const char* n = &name[len-1];
-    if(strcasecmp(n,"-add") == 0)
+    if(av_strcasecmp(n,"-add") == 0)
       op = OP_ADD;
-    else if(strcasecmp(n,"-pre") == 0)
+    else if(av_strcasecmp(n,"-pre") == 0)
       op = OP_PRE;
-    else if(strcasecmp(n,"-del") == 0)
+    else if(av_strcasecmp(n,"-del") == 0)
       op = OP_DEL;
-    else if(strcasecmp(n,"-clr") == 0)
+    else if(av_strcasecmp(n,"-clr") == 0)
       op = OP_CLR;
     else {
-      char prefix[len];
-      strncpy(prefix,opt->name,len-1);
-      prefix[len-1] = '\0';
+      char *prefix = av_strndup(opt->name, len-1);
       mp_msg(MSGT_VFILTER,MSGL_ERR, "Option %s: unknown postfix %s\n"
              "Supported postfixes are:\n"
              "  %s-add\n"
@@ -1799,6 +1827,7 @@ static int parse_obj_settings_list(const m_option_t* opt,const char *name,
              " Negative index can be used (i.e. -1 is the last element)\n\n"
              "  %s-clr\n"
              " Clear the current list.\n",name,n,prefix,prefix,prefix,prefix);
+      av_freep(&prefix);
 
       return M_OPT_UNKNOWN;
     }
@@ -1945,9 +1974,9 @@ const m_option_type_t m_option_type_obj_settings_list = {
 static int parse_obj_presets(const m_option_t* opt,const char *name,
                             const char *param, void* dst, int src) {
   m_obj_presets_t* obj_p = (m_obj_presets_t*)opt->priv;
-  m_struct_t *in_desc,*out_desc;
+  const m_struct_t *in_desc,*out_desc;
   int s,i;
-  unsigned char* pre;
+  const unsigned char* pre;
   char* pre_name = NULL;
 
   if(!obj_p) {
@@ -2168,10 +2197,9 @@ static int parse_custom_url(const m_option_t* opt,const char *name,
       mp_msg(MSGT_CFGPARSER, MSGL_WARN, "Option %s: This URL doesn't have a hostname part.\n",name);
       // skip
     } else {
-      char tmp[pos2-pos1+1];
-      strncpy(tmp,ptr1, pos2-pos1);
-      tmp[pos2-pos1] = '\0';
+      char *tmp = av_strndup(ptr1, pos2-pos1);
       r = m_struct_set(desc,dst,"hostname",tmp);
+      av_freep(&tmp);
       if(r < 0) {
         mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Error while setting hostname.\n",name);
         return r;

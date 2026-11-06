@@ -26,6 +26,7 @@
 #include <string.h> /* strtok */
 
 #include "config.h"
+#include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
 
@@ -103,22 +104,16 @@ static void vivo_parse_text_header(demuxer_t *demux, int header_len)
     char *opt, *param;
     int parser_in_audio_block = 0;
 
-    if (!demux->priv)
-    {
-        priv = malloc(sizeof(vivo_priv_t));
-        memset(priv, 0, sizeof(vivo_priv_t));
-        demux->priv = priv;
-        priv->supported = 0;
-    }
-
-    buf = malloc(header_len);
-    opt = malloc(header_len);
-    param = malloc(header_len);
+    // extra character for 0 termination.
+    // header_len is max 16 bit.
+    buf = calloc(1, header_len + 1);
+    opt = calloc(1, header_len + 1);
+    param = calloc(1, header_len + 1);
     stream_read(demux->stream, buf, header_len);
     i=0;
     while(i<header_len && buf[i]==0x0D && buf[i+1]==0x0A) i+=2; // skip empty lines
 
-    token = strtok(buf, (char *)&("\x0d\x0a"));
+    token = strtok(buf, "\r\n");
     while (token && (header_len>2))
     {
         header_len -= strlen(token)+2;
@@ -254,20 +249,19 @@ static int vivo_check_file(demuxer_t* demuxer){
         len+=0x80*(c-0x80);
         if(len>1024) return 0;
     }
+    if(c==-256) return 0;
     len+=c;
     mp_msg(MSGT_DEMUX,MSGL_V,"header block 1 size: %d\n",len);
     //stream_skip(demuxer->stream,len);
 
-    priv=malloc(sizeof(vivo_priv_t));
-    memset(priv,0,sizeof(vivo_priv_t));
-    demuxer->priv=priv;
+    demuxer->priv=priv=calloc(1, sizeof(vivo_priv_t));
 
 #if 0
     vivo_parse_text_header(demuxer, len);
     if (priv->supported == 0)
         return 0;
 #else
-    /* this is enought for check (for now) */
+    /* this is enough for check (for now) */
     stream_read(demuxer->stream,buf,len);
     buf[len]=0;
 //    printf("VIVO header: '%s'\n",buf);
@@ -315,8 +309,6 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
   demux->filepos=stream_tell(demux->stream);
 
   c=stream_read_char(demux->stream);
-  if (c == -256) /* EOF */
-    return 0;
 //  printf("c=%x,%02X\n",c,c&0xf0);
   if (c == 0x82)
   {
@@ -327,11 +319,20 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
       mp_msg(MSGT_DEMUX, MSGL_V, "packet 0x82(pos=%u) chunk=%x\n",
         (int)stream_tell(demux->stream), c);
   }
+  if (c == -256) /* EOF */
+    return 0;
   switch(c&0xF0){
   case 0x00: // header - skip it!
   {
       len=stream_read_char(demux->stream);
-      if(len>=0x80) len=0x80*(len-0x80)+stream_read_char(demux->stream);
+      if (len == -256) /* EOF */
+        return 0;
+      if(len>=0x80) {
+          int tmp=stream_read_char(demux->stream);
+          if (tmp == -256) /* EOF */
+            return 0;
+          len=0x80*(len-0x80)+tmp;
+      }
       mp_msg(MSGT_DEMUX, MSGL_V, "vivo extra header: %d bytes\n",len);
 #ifdef TEXTPARSE_ALL
 {
@@ -349,10 +350,14 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=128;
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->video;
       break;
   case 0x20:  // video packet
       len=stream_read_char(demux->stream);
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->video;
       break;
   case 0x30:  // audio packet
@@ -360,6 +365,8 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=40; /* 40kbps */
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->audio;
       audio_pos+=len;
       break;
@@ -368,6 +375,8 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=24; /* 24kbps */
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->audio;
       audio_pos+=len;
       break;
@@ -628,7 +637,6 @@ static demuxer_t* demux_open_vivo(demuxer_t* demuxer){
 
                 /* insert as stream */
                 demuxer->video->sh=sh;
-                sh->ds=demuxer->video;
                 demuxer->video->id=0;
 
                 /* disable seeking */
@@ -640,10 +648,11 @@ static demuxer_t* demux_open_vivo(demuxer_t* demuxer){
 }
 
 /* AUDIO init */
-if (demuxer->audio->id >= -1){
+if (demuxer->audio->id < -1) goto nosound;
   if(!ds_fill_buffer(demuxer->audio)){
     mp_msg(MSGT_DEMUX,MSGL_ERR,"VIVO: " MSGTR_MissingAudioStream);
-  } else
+    goto nosound;
+  }
 {               sh_audio_t* sh=new_sh_audio(demuxer,1, NULL);
 
                 /* Select audio codec */
@@ -656,9 +665,9 @@ if (demuxer->audio->id >= -1){
                 }
                 if (vivo_param_acodec != NULL)
                 {
-                    if (!strcasecmp(vivo_param_acodec, "g723"))
+                    if (!av_strcasecmp(vivo_param_acodec, "g723"))
                         priv->audio_codec = VIVO_AUDIO_G723;
-                    if (!strcasecmp(vivo_param_acodec, "siren"))
+                    if (!av_strcasecmp(vivo_param_acodec, "siren"))
                         priv->audio_codec = VIVO_AUDIO_SIREN;
                 }
 
@@ -728,12 +737,9 @@ if (demuxer->audio->id >= -1){
 /*sound_ok:*/
                 /* insert as stream */
                 demuxer->audio->sh=sh;
-                sh->ds=demuxer->audio;
                 demuxer->audio->id=1;
+}
 nosound:
-                return demuxer;
-}
-}
     return demuxer;
 }
 
@@ -748,7 +754,6 @@ static void demux_close_vivo(demuxer_t *demuxer)
         free(priv->producer);
         free(priv);
     }
-    return;
 }
 
 

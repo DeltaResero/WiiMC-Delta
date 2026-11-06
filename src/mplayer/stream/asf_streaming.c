@@ -42,6 +42,8 @@
 #include "network.h"
 #include "tcp.h"
 
+#include "libavutil/avstring.h"
+#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
 
 #include "libmpdemux/asfguid.h"
@@ -63,32 +65,20 @@ static int asf_read_wrapper(int fd, void *buffer, int len, streaming_ctrl_t *str
 }
 
 // We can try several protocol for asf streaming
-// * first the UDP protcol, if there is a firewall, UDP
-//   packets will not come back, so the mmsu will fail.
-// * Then we can try TCP, but if there is a proxy for
+// * First we can try TCP, but if there is a proxy for
 //   internet connection, the TCP connection will not get
 //   through
 // * Then we can try HTTP.
 //
-// Note: Using  WMP sequence  MMSU then MMST and then HTTP.
+// Note: Using  WMP sequence  MMST and then HTTP.
 
 static int asf_streaming_start( stream_t *stream, int *demuxer_type) {
   char *proto = stream->streaming_ctrl->url->protocol;
   int fd = -1;
   int port = stream->streaming_ctrl->url->port;
 
-  // Is protocol mms or mmsu?
-  if (!strcasecmp(proto, "mmsu") || !strcasecmp(proto, "mms"))
-  {
-        mp_msg(MSGT_NETWORK,MSGL_V,"Trying ASF/UDP...\n");
-        //fd = asf_mmsu_streaming_start( stream );
-        if( fd>-1 ) return fd; //mmsu support is not implemented yet - using this code
-        mp_msg(MSGT_NETWORK,MSGL_V,"  ===> ASF/UDP failed\n");
-        if( fd==-2 ) return -1;
-    }
-
   //Is protocol mms or mmst?
-  if (!strcasecmp(proto, "mmst") || !strcasecmp(proto, "mms"))
+  if (!av_strcasecmp(proto, "mmst") || !av_strcasecmp(proto, "mms"))
   {
         mp_msg(MSGT_NETWORK,MSGL_V,"Trying ASF/TCP...\n");
         fd = asf_mmst_streaming_start( stream );
@@ -99,9 +89,9 @@ static int asf_streaming_start( stream_t *stream, int *demuxer_type) {
     }
 
   //Is protocol http, http_proxy, or mms?
-  if (!strcasecmp(proto, "http_proxy") || !strcasecmp(proto, "http") ||
-    !strcasecmp(proto, "mms") || !strcasecmp(proto, "mmsh") ||
-    !strcasecmp(proto, "mmshttp"))
+  if (!av_strcasecmp(proto, "http_proxy") || !av_strcasecmp(proto, "http") ||
+    !av_strcasecmp(proto, "mms") || !av_strcasecmp(proto, "mmsh") ||
+    !av_strcasecmp(proto, "mmshttp"))
   {
         mp_msg(MSGT_NETWORK,MSGL_V,"Trying ASF/HTTP...\n");
         fd = asf_http_streaming_start( stream, demuxer_type );
@@ -196,26 +186,27 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
     // So we need to retrieve all the chunk before starting to parse the header.
  do {
      if (asf_read_wrapper(fd, &chunk, sizeof(ASF_stream_chunck_t), streaming_ctrl) <= 0)
-      return -1;
+      goto read_loop_err_out;
      // Endian handling of the stream chunk
      le2me_ASF_stream_chunck_t(&chunk);
      size = asf_streaming( &chunk, &r) - sizeof(ASF_stream_chunck_t);
      if(r) mp_msg(MSGT_NETWORK,MSGL_WARN,MSGTR_MPDEMUX_ASF_WarnDropHeader);
      if(size < 0){
       mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_ErrorParsingChunkHeader);
-        return -1;
+      goto read_loop_err_out;
      }
      if (chunk.type != ASF_STREAMING_HEADER) {
       mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_NoHeaderAtFirstChunk);
-      return -1;
+      goto read_loop_err_out;
      }
 
      // audit: do not overflow buffer_size
-     if (size > SIZE_MAX - buffer_size) return -1;
+     if (size > SIZE_MAX - buffer_size)
+      goto read_loop_err_out;
      buffer = malloc(size+buffer_size);
      if(buffer == NULL) {
       mp_msg(MSGT_NETWORK,MSGL_FATAL,MSGTR_MPDEMUX_ASF_BufferMallocFailed,size+buffer_size);
-      return -1;
+      goto read_loop_err_out;
      }
      if( chunk_buffer!=NULL ) {
         memcpy( buffer, chunk_buffer, buffer_size );
@@ -226,13 +217,13 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
      buffer_size += size;
 
      if (asf_read_wrapper(fd, buffer, size, streaming_ctrl) <= 0)
-      return -1;
+      goto read_loop_err_out;
 
      if( chunk_size2read==0 ) {
         ASF_header_t *asfh = (ASF_header_t *)buffer;
         if(size < (int)sizeof(ASF_header_t)) {
           mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_ErrChunk2Small);
-          return -1;
+          goto read_loop_err_out;
         } else mp_msg(MSGT_NETWORK,MSGL_DBG2,"Got chunk\n");
         chunk_size2read = AV_RL64(&asfh->objh.size);
         mp_msg(MSGT_NETWORK,MSGL_DBG2,"Size 2 read=%d\n", chunk_size2read);
@@ -338,7 +329,7 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
             }
         }
  }
- free(buffer);
+ free(chunk_buffer);
 
  // automatic stream selection based on bandwidth
  if (bw == 0) bw = INT_MAX;
@@ -347,16 +338,13 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
  if (asf_ctrl->n_audio) {
   // find lowest-bitrate audio stream
   a_rate = a_rates[0];
-  a_idx = 0;
   for (i = 0; i < asf_ctrl->n_audio; i++) {
    if (a_rates[i] < a_rate) {
     a_rate = a_rates[i];
-    a_idx = i;
    }
   }
   if (max_idx(asf_ctrl->n_video, v_rates, bw - a_rate) < 0) {
    // both audio and video are not possible, try video only next
-   a_idx = -1;
    a_rate = 0;
   }
  }
@@ -400,7 +388,8 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
 
 len_err_out:
  mp_msg(MSGT_NETWORK, MSGL_FATAL, MSGTR_MPDEMUX_ASF_InvalidLenInHeader);
- free(buffer);
+read_loop_err_out:
+ free(chunk_buffer);
  free(v_rates);
  free(a_rates);
  return -1;
@@ -465,12 +454,8 @@ static int asf_http_streaming_read( int fd, char *buffer, int size, streaming_ct
  return read;
 }
 
-static int asf_http_streaming_seek( int fd, off_t pos, streaming_ctrl_t *streaming_ctrl ) {
+static int asf_http_streaming_seek( int av_unused fd, int64_t av_unused pos, streaming_ctrl_t * av_unused streaming_ctrl ) {
     return -1;
-    // to shut up gcc warning
-    fd++;
-    pos++;
-    streaming_ctrl=NULL;
 }
 
 static int asf_header_check( HTTP_header_t *http_hdr ) {
@@ -485,11 +470,11 @@ static int asf_header_check( HTTP_header_t *http_hdr ) {
 
 static int asf_http_streaming_type(char *content_type, char *features, HTTP_header_t *http_hdr ) {
     if( content_type==NULL ) return ASF_Unknown_e;
-    if(     !strcasecmp(content_type, "application/octet-stream") ||
-        !strcasecmp(content_type, "application/vnd.ms.wms-hdr.asfv1") ||        // New in Corona, first request
-        !strcasecmp(content_type, "application/x-mms-framed") ||                // New in Corana, second request
-        !strcasecmp(content_type, "video/x-ms-wmv") ||
-        !strcasecmp(content_type, "video/x-ms-asf")) {
+    if(     !av_strcasecmp(content_type, "application/octet-stream") ||
+        !av_strcasecmp(content_type, "application/vnd.ms.wms-hdr.asfv1") ||        // New in Corona, first request
+        !av_strcasecmp(content_type, "application/x-mms-framed") ||                // New in Corana, second request
+        !av_strcasecmp(content_type, "video/x-ms-wmv") ||
+        !av_strcasecmp(content_type, "video/x-ms-asf")) {
 
         if( strstr(features, "broadcast") ) {
             mp_msg(MSGT_NETWORK,MSGL_V,"=====> ASF Live stream\n");
@@ -507,7 +492,7 @@ static int asf_http_streaming_type(char *content_type, char *features, HTTP_head
             if( asf_header_check( http_hdr )==0 ) {
                 mp_msg(MSGT_NETWORK,MSGL_V,"=====> ASF Plain text\n");
                 return ASF_PlainText_e;
-            } else if( (!strcasecmp(content_type, "text/html")) ) {
+            } else if( (!av_strcasecmp(content_type, "text/html")) ) {
                 mp_msg(MSGT_NETWORK,MSGL_V,"=====> HTML, MPlayer is not a browser...yet!\n");
                 return ASF_Unknown_e;
             } else {
@@ -515,15 +500,15 @@ static int asf_http_streaming_type(char *content_type, char *features, HTTP_head
                 return ASF_Redirector_e;
             }
         } else {
-            if(     (!strcasecmp(content_type, "audio/x-ms-wax")) ||
-                (!strcasecmp(content_type, "audio/x-ms-wma")) ||
-                (!strcasecmp(content_type, "video/x-ms-asf")) ||
-                (!strcasecmp(content_type, "video/x-ms-afs")) ||
-                (!strcasecmp(content_type, "video/x-ms-wmv")) ||
-                (!strcasecmp(content_type, "video/x-ms-wma")) ) {
+            if(     (!av_strcasecmp(content_type, "audio/x-ms-wax")) ||
+                (!av_strcasecmp(content_type, "audio/x-ms-wma")) ||
+                (!av_strcasecmp(content_type, "video/x-ms-asf")) ||
+                (!av_strcasecmp(content_type, "video/x-ms-afs")) ||
+                (!av_strcasecmp(content_type, "video/x-ms-wmv")) ||
+                (!av_strcasecmp(content_type, "video/x-ms-wma")) ) {
                 mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_ASFRedirector);
                 return ASF_Redirector_e;
-            } else if( !strcasecmp(content_type, "text/plain") ) {
+            } else if( !av_strcasecmp(content_type, "text/plain") ) {
                 mp_msg(MSGT_NETWORK,MSGL_V,"=====> ASF Plain text\n");
                 return ASF_PlainText_e;
             } else {
@@ -560,7 +545,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
     http_add_basic_authentication( http_hdr, url->username, url->password );
 
     // Check if we are using a proxy
-    if( !strcasecmp( url->protocol, "http_proxy" ) ) {
+    if( !av_strcasecmp( url->protocol, "http_proxy" ) ) {
         server_url = url_new( (url->file)+1 );
         if( server_url==NULL ) {
             mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_InvalidProxyURL);
@@ -594,7 +579,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
                     if(stream_id == asf_http_ctrl->audio_id) {
                         enable = 0;
                     } else {
-                        enable = 2;
+                        //enable = 2;
                         continue;
                     }
                     asf_nb_stream++;
@@ -607,7 +592,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
                     if(stream_id == asf_http_ctrl->video_id) {
                         enable = 0;
                     } else {
-                        enable = 2;
+                        //enable = 2;
                         continue;
                     }
                     asf_nb_stream++;
@@ -662,7 +647,7 @@ static int asf_http_parse_response(asf_http_streaming_ctrl_t *asf_http_ctrl, HTT
         // The pragma line can get severals attributes
         // separeted with a comma ','.
         do {
-            if( !strncasecmp( pragma, "features=", 9) ) {
+            if( !av_strncasecmp( pragma, "features=", 9) ) {
                 pragma += 9;
                 end = strstr( pragma, "," );
                 if( end==NULL ) {
@@ -715,7 +700,7 @@ static int asf_http_streaming_start( stream_t *stream, int *demuxer_type ) {
         done = 1;
         if( fd>0 ) closesocket( fd );
 
-        if( !strcasecmp( url->protocol, "http_proxy" ) ) {
+        if( !av_strcasecmp( url->protocol, "http_proxy" ) ) {
             if( url->port==0 ) url->port = 8080;
         } else {
             if( url->port==0 ) url->port = 80;
@@ -824,16 +809,12 @@ err_out:
 }
 
 static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
-    URL_t *url;
-
     stream->streaming_ctrl = streaming_ctrl_new();
     if( stream->streaming_ctrl==NULL ) {
         return STREAM_ERROR;
     }
     stream->streaming_ctrl->bandwidth = network_bandwidth;
-    url = url_new(stream->url);
-    stream->streaming_ctrl->url = check4proxies(url);
-    url_free(url);
+    stream->streaming_ctrl->url = url_new_with_proxy(stream->url);
 
     mp_msg(MSGT_OPEN, MSGL_INFO, MSGTR_MPDEMUX_ASF_InfoStreamASFURL, stream->url);
     if((!strncmp(stream->url, "http", 4)) && (*file_format!=DEMUXER_TYPE_ASF && *file_format!=DEMUXER_TYPE_UNKNOWN)) {
@@ -862,7 +843,7 @@ const stream_info_t stream_info_asf = {
  "Bertrand, Reimar Doeffinger, Albeu",
  "originally based on work by Majormms (is that code still there?)",
  open_s,
- {"mms", "mmsu", "mmst", "http", "http_proxy", "mmsh", "mmshttp", NULL},
+ {"mms", "mmst", "http", "http_proxy", "mmsh", "mmshttp", NULL},
  NULL,
  0 // Urls are an option string
 };

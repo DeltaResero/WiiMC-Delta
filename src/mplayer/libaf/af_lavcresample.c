@@ -25,21 +25,27 @@
 
 #include "config.h"
 #include "af.h"
-#include "libavcodec/avcodec.h"
 #include "libavutil/rational.h"
+#include "libswresample/swresample.h"
+#include "libavutil/channel_layout.h"
+#include "libavutil/opt.h"
+#include "libavutil/mem.h"
+#include "libavutil/common.h"
 
 // Data for specific instances of this filter
 typedef struct af_resample_s{
-    struct AVResampleContext *avrctx;
-    int16_t *in[AF_NCH];
+    struct SwrContext *swrctx;
+    uint8_t *in[1];
+    uint8_t *tmp[1];
     int in_alloc;
-    int index;
+    int tmp_alloc;
 
     int filter_length;
     int linear;
     int phase_shift;
     double cutoff;
 
+    int ctx_format;
     int ctx_out_rate;
     int ctx_in_rate;
     int ctx_filter_size;
@@ -52,6 +58,9 @@ typedef struct af_resample_s{
 // Initialization and runtime control
 static int control(struct af_instance_s* af, int cmd, void* arg)
 {
+  AVChannelLayout ch_layout;
+  enum AVSampleFormat av_format;
+
   af_resample_t* s   = (af_resample_t*)af->setup;
   af_data_t *data= (af_data_t*)arg;
   int out_rate, test_output_res; // helpers for checking input format
@@ -63,15 +72,39 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 
     af->data->nch    = data->nch;
     if (af->data->nch > AF_NCH) af->data->nch = AF_NCH;
-    af->data->format = AF_FORMAT_S16_NE;
-    af->data->bps    = 2;
-    af->mul = (double)af->data->rate / data->rate;
-    af->delay = af->data->nch * s->filter_length / min(af->mul, 1); // *bps*.5
+    if(data->format == AF_FORMAT_FLOAT_NE){
+        af->data->format = AF_FORMAT_FLOAT_NE;
+        av_format = AV_SAMPLE_FMT_FLT;
+    }else
+    {
+        af->data->format = AF_FORMAT_S16_NE;
+        av_format = AV_SAMPLE_FMT_S16;
+    }
 
-    if (s->ctx_out_rate != af->data->rate || s->ctx_in_rate != data->rate || s->ctx_filter_size != s->filter_length ||
+    af->data->bps = af_fmt2bits(af->data->format)/8;
+    af->mul = (double)af->data->rate / data->rate;
+    af->delay = af->data->nch * s->filter_length / FFMIN(af->mul, 1); // *bps*.5
+
+    av_channel_layout_default(&ch_layout, af->data->nch);
+
+    if (s->ctx_format      != af->data->format ||
+        s->ctx_out_rate != af->data->rate || s->ctx_in_rate != data->rate || s->ctx_filter_size != s->filter_length ||
         s->ctx_phase_shift != s->phase_shift || s->ctx_linear != s->linear || s->ctx_cutoff != s->cutoff) {
-        if(s->avrctx) av_resample_close(s->avrctx);
-        s->avrctx= av_resample_init(af->data->rate, /*in_rate*/data->rate, s->filter_length, s->phase_shift, s->linear, s->cutoff);
+        swr_free(&s->swrctx);
+        if((s->swrctx=swr_alloc()) == NULL) return AF_ERROR;
+        av_opt_set_int(s->swrctx, "out_sample_rate", af->data->rate, 0);
+        av_opt_set_int(s->swrctx, "in_sample_rate", data->rate, 0);
+        av_opt_set_int(s->swrctx, "filter_size", s->filter_length, 0);
+        av_opt_set_int(s->swrctx, "phase_shift", s->phase_shift, 0);
+        av_opt_set_int(s->swrctx, "linear_interp", s->linear, 0);
+        av_opt_set_double(s->swrctx, "cutoff", s->cutoff, 0);
+        if(av_opt_set_sample_fmt(s->swrctx, "in_sample_fmt",  av_format, 0) < 0) return AF_ERROR;
+        if(av_opt_set_sample_fmt(s->swrctx, "out_sample_fmt", av_format, 0) < 0) return AF_ERROR;
+        if(av_opt_set_chlayout(s->swrctx, "in_chlayout",  &ch_layout, 0) < 0) return AF_ERROR;
+        if(av_opt_set_chlayout(s->swrctx, "out_chlayout", &ch_layout, 0) < 0) return AF_ERROR;
+
+        if(swr_init(s->swrctx) < 0) return AF_ERROR;
+        s->ctx_format      = af->data->format;
         s->ctx_out_rate    = af->data->rate;
         s->ctx_in_rate     = data->rate;
         s->ctx_filter_size = s->filter_length;
@@ -89,7 +122,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   case AF_CONTROL_COMMAND_LINE:{
     s->cutoff= 0.0;
     sscanf((char*)arg,"%d:%d:%d:%d:%lf", &af->data->rate, &s->filter_length, &s->linear, &s->phase_shift, &s->cutoff);
-    if(s->cutoff <= 0.0) s->cutoff= max(1.0 - 6.5/(s->filter_length+8), 0.80);
+    if(s->cutoff <= 0.0) s->cutoff= FFMAX(1.0 - 6.5/(s->filter_length+8), 0.80);
     return AF_OK;
   }
   case AF_CONTROL_RESAMPLE_RATE | AF_CONTROL_SET:
@@ -106,11 +139,10 @@ static void uninit(struct af_instance_s* af)
         free(af->data->audio);
     free(af->data);
     if(af->setup){
-        int i;
         af_resample_t *s = af->setup;
-        if(s->avrctx) av_resample_close(s->avrctx);
-        for (i=0; i < AF_NCH; i++)
-            free(s->in[i]);
+        swr_free(&s->swrctx);
+        av_free(s->in[0]);
+        av_free(s->tmp[0]);
         free(s);
     }
 }
@@ -119,71 +151,37 @@ static void uninit(struct af_instance_s* af)
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
   af_resample_t *s = af->setup;
-  int i, j, consumed, ret;
-  int16_t *in = (int16_t*)data->audio;
-  int16_t *out;
+  int ret;
+  int8_t *in = (int8_t*)data->audio;
+  int8_t *out;
   int chans   = data->nch;
-  int in_len  = data->len/(2*chans);
+  int in_len  = data->len;
+  int bps     = data->bps;
   int out_len = in_len * af->mul + 10;
-  int16_t tmp[AF_NCH][out_len];
 
   if(AF_OK != RESIZE_LOCAL_BUFFER(af,data))
       return NULL;
 
-  out= (int16_t*)af->data->audio;
+  av_fast_malloc(&s->tmp[0], &s->tmp_alloc, FFALIGN(out_len,32));
+  if(s->tmp[0] == NULL) return NULL;
 
-  out_len= min(out_len, af->data->len/(2*chans));
+  out= (int8_t*)af->data->audio;
 
-  if(s->in_alloc < in_len + s->index){
-      s->in_alloc= in_len + s->index;
-      for(i=0; i<chans; i++){
-          s->in[i]= realloc(s->in[i], s->in_alloc*sizeof(int16_t));
-      }
-  }
+  out_len= FFMIN(out_len, af->data->len);
 
-  if(chans==1){
-      memcpy(&s->in[0][s->index], in, in_len * sizeof(int16_t));
-  }else if(chans==2){
-      for(j=0; j<in_len; j++){
-          s->in[0][j + s->index]= *(in++);
-          s->in[1][j + s->index]= *(in++);
-      }
-  }else{
-      for(j=0; j<in_len; j++){
-          for(i=0; i<chans; i++){
-              s->in[i][j + s->index]= *(in++);
-          }
-      }
-  }
-  in_len += s->index;
+  av_fast_malloc(&s->in[0], &s->in_alloc, FFALIGN(in_len,32));
+  if(s->in[0] == NULL) return NULL;
 
-  for(i=0; i<chans; i++){
-      ret= av_resample(s->avrctx, tmp[i], s->in[i], &consumed, in_len, out_len, i+1 == chans);
-  }
-  out_len= ret;
+  memcpy(s->in[0], in, in_len);
 
-  s->index= in_len - consumed;
-  for(i=0; i<chans; i++){
-      memmove(s->in[i], s->in[i] + consumed, s->index*sizeof(int16_t));
-  }
+  ret = swr_convert(s->swrctx, &s->tmp[0], out_len/chans/bps, (const uint8_t *const *)&s->in[0], in_len/chans/bps);
+  if (ret < 0) return NULL;
+  out_len= ret*chans*bps;
 
-  if(chans==1){
-      memcpy(out, tmp[0], out_len*sizeof(int16_t));
-  }else if(chans==2){
-      for(j=0; j<out_len; j++){
-          *(out++)= tmp[0][j];
-          *(out++)= tmp[1][j];
-      }
-  }else{
-      for(j=0; j<out_len; j++){
-          for(i=0; i<chans; i++){
-              *(out++)= tmp[i][j];
-          }
-      }
-  }
+  memcpy(out, s->tmp[0], out_len);
 
   data->audio = af->data->audio;
-  data->len   = out_len*chans*2;
+  data->len   = out_len;
   data->rate  = af->data->rate;
   return data;
 }
@@ -196,14 +194,14 @@ static int af_open(af_instance_t* af){
   af->mul=1;
   af->data=calloc(1,sizeof(af_data_t));
   s->filter_length= 16;
-  s->cutoff= max(1.0 - 6.5/(s->filter_length+8), 0.80);
+  s->cutoff= FFMAX(1.0 - 6.5/(s->filter_length+8), 0.80);
   s->phase_shift= 10;
 //  s->setup = RSMP_INT | FREQ_SLOPPY;
   af->setup=s;
   return AF_OK;
 }
 
-af_info_t af_info_lavcresample = {
+const af_info_t af_info_lavcresample = {
   "Sample frequency conversion using libavcodec",
   "lavcresample",
   "Michael Niedermayer",

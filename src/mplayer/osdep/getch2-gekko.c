@@ -20,6 +20,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 #include "config.h"
@@ -48,6 +49,6 @@ void getch2(void)
 
 
 char* get_term_charset(void) {
-    return "ASCII";
+    return strdup("ASCII");
 }
 

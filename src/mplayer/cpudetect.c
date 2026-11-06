@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "libavutil/x86_cpu.h"
+#include "mpx86asm.h"
 #include "config.h"
 #include "cpudetect.h"
 #include "mp_msg.h"
@@ -37,10 +37,11 @@ CpuCaps gCpuCaps;
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__APPLE__)
 #include <sys/types.h>
 #include <sys/sysctl.h>
-#elif defined(__linux__)
-#include <signal.h>
 #elif defined(__MINGW32__) || defined(__CYGWIN__)
 #include <windows.h>
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
 #elif defined(__OS2__)
 #define INCL_DOS
 #include <os2.h>
@@ -56,26 +57,18 @@ CpuCaps gCpuCaps;
 #if CONFIG_RUNTIME_CPUDETECT
 /* I believe this code works.  However, it has only been used on a PII and PIII */
 
-#if defined(__linux__) && defined(_POSIX_SOURCE) && !ARCH_X86_64
-static void sigill_handler_sse( int signal, struct sigcontext sc )
+#if defined(__linux__) && !ARCH_X86_64
+#include <signal.h>
+#include <setjmp.h>
+
+static sigjmp_buf sigill_longjmp;
+
+static void sigill_handler_sse( int signal )
 {
    mp_msg(MSGT_CPUDETECT,MSGL_V, "SIGILL, " );
-
-   /* Both the "xorps %%xmm0,%%xmm0" and "divps %xmm0,%%xmm1"
-    * instructions are 3 bytes long.  We must increment the instruction
-    * pointer manually to avoid repeated execution of the offending
-    * instruction.
-    *
-    * If the SIGILL is caused by a divide-by-zero when unmasked
-    * exceptions aren't supported, the SIMD FPU status and control
-    * word will be restored at the end of the test, so we don't need
-    * to worry about doing it here.  Besides, we may not be able to...
-    */
-   sc.eip += 3;
-
-   gCpuCaps.hasSSE=0;
+   siglongjmp(sigill_longjmp, 1);
 }
-#endif /* __linux__ && _POSIX_SOURCE */
+#endif /* __linux__ */
 
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && !ARCH_X86_64
 LONG CALLBACK win32_sig_handler_sse(EXCEPTION_POINTERS* ep)
@@ -177,14 +170,12 @@ static void check_os_katmai_support( void )
         mp_msg(MSGT_CPUDETECT,MSGL_V, gCpuCaps.hasSSE ? "yes.\n" : "no!\n" );
     }
 #elif defined(__linux__)
-#if defined(_POSIX_SOURCE)
     struct sigaction saved_sigill;
+    struct sigaction new_sigill = { .sa_handler = sigill_handler_sse };
 
     /* Save the original signal handlers.
      */
-    sigaction( SIGILL, NULL, &saved_sigill );
-
-    signal( SIGILL, (void (*)(int))sigill_handler_sse );
+    sigaction( SIGILL, &new_sigill, &saved_sigill );
 
     /* Emulate test for OSFXSR in CR4.  The OS will set this bit if it
      * supports the extended FPU save and restore required for SSE.  If
@@ -195,8 +186,10 @@ static void check_os_katmai_support( void )
     if ( gCpuCaps.hasSSE ) {
         mp_msg(MSGT_CPUDETECT,MSGL_V, "Testing OS support for SSE... " );
 
-//      __asm__ volatile ("xorps %%xmm0, %%xmm0");
-        __asm__ volatile ("xorps %xmm0, %xmm0");
+        if (sigsetjmp(sigill_longjmp, 1))
+            gCpuCaps.hasSSE = 0;
+        else
+            __asm__ volatile ("xorps %xmm0, %xmm0");
 
         mp_msg(MSGT_CPUDETECT,MSGL_V, gCpuCaps.hasSSE ? "yes.\n" : "no!\n" );
     }
@@ -209,13 +202,6 @@ static void check_os_katmai_support( void )
      * safe to go ahead and hook out the SSE code throughout Mesa.
      */
     mp_msg(MSGT_CPUDETECT,MSGL_V, "Tests of OS support for SSE %s\n", gCpuCaps.hasSSE ? "passed." : "failed!" );
-#else
-    /* We can't use POSIX signal handling to test the availability of
-     * SSE, so we disable it by default.
-     */
-    mp_msg(MSGT_CPUDETECT,MSGL_WARN, "Cannot test OS support for SSE, disabling to be safe.\n" );
-    gCpuCaps.hasSSE=0;
-#endif /* _POSIX_SOURCE */
 #else
     /* Do nothing on other platforms for now.
      */
@@ -262,6 +248,9 @@ static int has_cpuid(void)
 void
 do_cpuid(unsigned int ax, unsigned int *p)
 {
+#ifdef _MSC_VER
+    __cpuid(p, ax);
+#else
 // code from libavcodec:
     __asm__ volatile
         ("mov %%"REG_b", %%"REG_S"\n\t"
@@ -270,6 +259,7 @@ do_cpuid(unsigned int ax, unsigned int *p)
          : "=a" (p[0]), "=S" (p[1]),
            "=c" (p[2]), "=d" (p[3])
          : "0" (ax));
+#endif
 }
 
 void GetCpuCaps( CpuCaps *caps)
@@ -299,12 +289,12 @@ void GetCpuCaps( CpuCaps *caps)
 
 // see AMD64 Architecture Programmer's Manual, Volume 3: General-purpose and
 // System Instructions, Table 3-2: Effective family computation, page 120.
+        if(caps->cpuType==0xf || caps->cpuType==6)
+            caps->cpuModel |= ((regs2[0]>>16)&0xf) << 4;
         if(caps->cpuType==0xf){
             // use extended family (P4, IA64, K8)
             caps->cpuType=0xf+((regs2[0]>>20)&255);
         }
-        if(caps->cpuType==0xf || caps->cpuType==6)
-            caps->cpuModel |= ((regs2[0]>>16)&0xf) << 4;
 
         caps->cpuStepping=regs2[0] & 0xf;
 
@@ -315,6 +305,9 @@ void GetCpuCaps( CpuCaps *caps)
         caps->hasSSE2 = (regs2[3] & (1 << 26 )) >> 26; // 0x4000000
         caps->hasSSE3 = (regs2[2] & 1);        // 0x0000001
         caps->hasSSSE3 = (regs2[2] & (1 << 9 )) >>  9; // 0x0000200
+        caps->hasSSE4 = (regs2[2] & (1 << 19 )) >> 19; // 0x0080000
+        caps->hasSSE42 = (regs2[2] & (1 << 20)) >> 20; // 0x0100000
+        caps->hasAVX  = (regs2[2] & (1 << 28 )) >> 28; // 0x10000000
         caps->hasMMX2 = caps->hasSSE; // SSE cpus supports mmxext too
         cl_size = ((regs2[1] >> 8) & 0xFF)*8;
         if(cl_size) caps->cl_size = cl_size;
@@ -423,7 +416,7 @@ char *GetCpuFriendlyName(unsigned int regs[], unsigned int regs2[]){
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
-#elif defined(__AMIGAOS4__) || defined (GEKKO)
+#elif defined(__AMIGAOS4__) || defined(_WIN32) || defined(GEKKO)
 /* nothing */
 #else
 #include <signal.h>
@@ -457,7 +450,10 @@ void GetCpuCaps( CpuCaps *caps)
     caps->hasSSE2=0;
     caps->hasSSE3=0;
     caps->hasSSSE3=0;
+    caps->hasSSE4=0;
+    caps->hasSSE42=0;
     caps->hasSSE4a=0;
+    caps->hasAVX=0;
     caps->isX86=0;
     caps->hasAltiVec = 0;
 #if HAVE_ALTIVEC

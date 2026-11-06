@@ -42,6 +42,7 @@
 #include "network.h"
 #include "help_mp.h"
 
+#include "libavutil/avstring.h"
 #include "libavutil/base64.h"
 
 #ifdef GEKKO
@@ -223,7 +224,7 @@ static int scast_streaming_start(stream_t *stream) {
   int metaint;
   scast_data_t *scast_data;
   HTTP_header_t *http_hdr = stream->streaming_ctrl->data;
-  int is_ultravox = strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
+  int is_ultravox = av_strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
   if (!stream || stream->fd < 0 || !http_hdr)
     return -1;
   if (is_ultravox)
@@ -254,7 +255,6 @@ static int scast_streaming_start(stream_t *stream) {
 static int nop_streaming_start( stream_t *stream ) {
     HTTP_header_t *http_hdr = NULL;
     char *next_url=NULL;
-    URL_t *rd_url=NULL;
     int fd,ret;
     if( stream==NULL ) return -1;
 
@@ -284,12 +284,9 @@ static int nop_streaming_start( stream_t *stream ) {
                 ret=-1;
                 next_url = http_get_field( http_hdr, "Location" );
 
-                if (next_url != NULL)
-                    rd_url=url_new(next_url);
-
-                if (next_url != NULL && rd_url != NULL) {
+                if (next_url != NULL) {
                     mp_msg(MSGT_NETWORK,MSGL_STATUS,"Redirected: Using this url instead %s\n",next_url);
-                            stream->streaming_ctrl->url=check4proxies(rd_url);
+                            stream->streaming_ctrl->url=url_new_with_proxy(next_url);
                     ret=nop_streaming_start(stream); //recursively get streaming started
                 } else {
                     mp_msg(MSGT_NETWORK,MSGL_ERR,"Redirection failed\n");
@@ -389,6 +386,7 @@ http_is_header_entire( HTTP_header_t *http_hdr ) {
     if( http_hdr==NULL ) return -1;
     if( http_hdr->buffer==NULL ) return 0; // empty
 
+    if(http_hdr->buffer_size > 128*1024) return 1;
     if( strstr(http_hdr->buffer, "\r\n\r\n")==NULL &&
         strstr(http_hdr->buffer, "\n\n")==NULL ) return 0;
     return 1;
@@ -417,7 +415,7 @@ http_response_parse( HTTP_header_t *http_hdr ) {
     }
     strncpy( http_hdr->protocol, http_hdr->buffer, len );
     http_hdr->protocol[len]='\0';
-    if( !strncasecmp( http_hdr->protocol, "HTTP", 4) ) {
+    if( !av_strncasecmp( http_hdr->protocol, "HTTP", 4) ) {
         if( sscanf( http_hdr->protocol+5,"1.%d", &(http_hdr->http_minor_version) )!=1 ) {
             mp_msg(MSGT_NETWORK,MSGL_ERR,"Malformed answer. Unable to get HTTP minor version.\n");
             return -1;
@@ -433,7 +431,7 @@ http_response_parse( HTTP_header_t *http_hdr ) {
 
     // Get the reason phrase
     ptr = strstr( hdr_ptr, "\n" );
-    if( hdr_ptr==NULL ) {
+    if( ptr==NULL ) {
         mp_msg(MSGT_NETWORK,MSGL_ERR,"Malformed answer. Unable to get the reason phrase.\n");
         return -1;
     }
@@ -453,12 +451,12 @@ http_response_parse( HTTP_header_t *http_hdr ) {
     hdr_sep_len = 4;
     ptr = strstr( http_hdr->buffer, "\r\n\r\n" );
     if( ptr==NULL ) {
+        hdr_sep_len = 2;
         ptr = strstr( http_hdr->buffer, "\n\n" );
         if( ptr==NULL ) {
             mp_msg(MSGT_NETWORK,MSGL_ERR,"Header may be incomplete. No CRLF CRLF found.\n");
-            return -1;
+            hdr_sep_len = 0;
         }
-        hdr_sep_len = 2;
     }
     pos_hdr_sep = ptr-http_hdr->buffer;
 
@@ -468,7 +466,18 @@ http_response_parse( HTTP_header_t *http_hdr ) {
         ptr = hdr_ptr;
         while( *ptr!='\r' && *ptr!='\n' ) ptr++;
         len = ptr-hdr_ptr;
-        if( len==0 ) break;
+        if (len == 0 || !memchr(hdr_ptr, ':', len)) {
+            mp_msg(MSGT_NETWORK, MSGL_ERR, "Broken response header, missing ':'\n");
+            pos_hdr_sep = ptr - http_hdr->buffer;
+            hdr_sep_len = 0;
+            break;
+        }
+        if (len > 16 && !av_strncasecmp(hdr_ptr + 4, "icy-metaint:", 12))
+        {
+            mp_msg(MSGT_NETWORK, MSGL_WARN, "Server sent a severely broken icy-metaint HTTP header!\n");
+            hdr_ptr += 4;
+            len -= 4;
+        }
         field = realloc(field, len+1);
         if( field==NULL ) {
             mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MemAllocFailed);
@@ -494,25 +503,19 @@ http_response_parse( HTTP_header_t *http_hdr ) {
 
 char *
 http_build_request( HTTP_header_t *http_hdr ) {
-    char *ptr, *uri=NULL;
+    char *ptr;
     int len;
     HTTP_field_t *field;
     if( http_hdr==NULL ) return NULL;
 
     if( http_hdr->method==NULL ) http_set_method( http_hdr, "GET");
     if( http_hdr->uri==NULL ) http_set_uri( http_hdr, "/");
-    else {
-        uri = malloc(strlen(http_hdr->uri) + 1);
-        if( uri==NULL ) {
-            mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MemAllocFailed);
-            return NULL;
-        }
-        strcpy(uri,http_hdr->uri);
-    }
+    if( !http_hdr->uri || !http_hdr->method)
+        return NULL;
 
     //**** Compute the request length
     // Add the Method line
-    len = strlen(http_hdr->method)+strlen(uri)+12;
+    len = strlen(http_hdr->method)+strlen(http_hdr->uri)+12;
     // Add the fields
     field = http_hdr->first_field;
     while( field!=NULL ) {
@@ -540,7 +543,7 @@ http_build_request( HTTP_header_t *http_hdr ) {
     //*** Building the request
     ptr = http_hdr->buffer;
     // Add the method line
-    ptr += sprintf( ptr, "%s %s HTTP/1.%d\r\n", http_hdr->method, uri, http_hdr->http_minor_version );
+    ptr += sprintf( ptr, "%s %s HTTP/1.%d\r\n", http_hdr->method, http_hdr->uri, http_hdr->http_minor_version );
     field = http_hdr->first_field;
     // Add the field
     while( field!=NULL ) {
@@ -553,7 +556,6 @@ http_build_request( HTTP_header_t *http_hdr ) {
         memcpy( ptr, http_hdr->body, http_hdr->body_size );
     }
 
-    free(uri);
     return http_hdr->buffer;
 }
 
@@ -580,7 +582,7 @@ http_get_next_field( HTTP_header_t *http_hdr ) {
     while( field!=NULL ) {
         ptr = strstr( field->field_name, ":" );
         if( ptr==NULL ) return NULL;
-        if( !strncasecmp( field->field_name, http_hdr->field_search, ptr-(field->field_name) ) ) {
+        if( !av_strncasecmp( field->field_name, http_hdr->field_search, ptr-(field->field_name) ) ) {
             ptr++;  // Skip the column
             while( ptr[0]==' ' ) ptr++; // Skip the spaces if there is some
             http_hdr->field_search_pos = field->next;
@@ -768,7 +770,7 @@ static int http_streaming_start(stream_t *stream, int* file_format) {
     do
     {
         redirect = 0;
-        if (fd > 0) closesocket(fd);
+        if (fd >= 0) closesocket(fd);
         fd = http_send_request( url, 0 );
         if( fd<0 ) {
             goto err_out;
@@ -801,7 +803,7 @@ static int http_streaming_start(stream_t *stream, int* file_format) {
         print_icy_metadata(http_hdr);
 
         // Check if the response is an ICY status_code reason_phrase
-        if( !strcasecmp(http_hdr->protocol, "ICY") ||
+        if( !av_strcasecmp(http_hdr->protocol, "ICY") ||
              http_get_field(http_hdr, "Icy-MetaInt") ) {
             switch( http_hdr->status_code ) {
                 case 200: { // OK
@@ -852,7 +854,7 @@ static int http_streaming_start(stream_t *stream, int* file_format) {
                     mp_msg(MSGT_NETWORK,MSGL_V,"Content-Type: [%s]\n", content_type );
                     // Check in the mime type table for a demuxer type
                     for (i = 0; mime_type_table[i].mime_type != NULL; i++) {
-                        if( !strcasecmp( content_type, mime_type_table[i].mime_type ) ) {
+                        if( !av_strcasecmp( content_type, mime_type_table[i].mime_type ) ) {
                             *file_format = mime_type_table[i].demuxer_type;
                             res = seekable;
                             goto out;
@@ -871,20 +873,18 @@ static int http_streaming_start(stream_t *stream, int* file_format) {
                 // TODO: RFC 2616, recommand to detect infinite redirection loops
                 next_url = http_get_field( http_hdr, "Location" );
                 if( next_url!=NULL ) {
-                    int is_ultravox = strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
+                    int is_ultravox = av_strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
                     stream->streaming_ctrl->url = url_redirect( &url, next_url );
-                    if (!strcasecmp(url->protocol, "mms")) {
+                    if (url_is_protocol(url, "https") || url_is_protocol(url, "mms")) {
                         res = STREAM_REDIRECTED;
                         goto err_out;
                     }
-                    if (strcasecmp(url->protocol, "http")) {
+                    if (!url_is_protocol(url, "http")) {
                         mp_msg(MSGT_NETWORK,MSGL_ERR,"Unsupported http %d redirect to %s protocol\n", http_hdr->status_code, url->protocol);
                         goto err_out;
                     }
-                    if (is_ultravox)  {
-                        free(url->protocol);
-                        url->protocol = strdup("unsv");
-                    }
+                    if (is_ultravox)
+                        url_set_protocol(url, "unsv");
                     redirect = 1;
                 }
                 break;
@@ -900,12 +900,12 @@ static int http_streaming_start(stream_t *stream, int* file_format) {
     } while( redirect );
 
 err_out:
-    if (fd > 0) closesocket( fd );
+    if (fd >= 0) closesocket( fd );
     fd = -1;
     http_free( http_hdr );
     http_hdr = NULL;
 out:
-    stream->streaming_ctrl->data = (void*)http_hdr;
+    stream->streaming_ctrl->data = http_hdr;
     stream->fd = fd;
     return res;
 }
@@ -913,7 +913,7 @@ out:
 static int fixup_open(stream_t *stream,int seekable) {
     HTTP_header_t *http_hdr = stream->streaming_ctrl->data;
     int is_icy = http_hdr && http_get_field(http_hdr, "Icy-MetaInt");
-    int is_ultravox = strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
+    int is_ultravox = av_strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
 
     stream->type = STREAMTYPE_STREAM;
     if(!is_icy && !is_ultravox && seekable)
@@ -939,16 +939,13 @@ static int fixup_open(stream_t *stream,int seekable) {
 
 static int open_s1(stream_t *stream,int mode, void* opts, int* file_format) {
     int seekable=0;
-    URL_t *url;
 
     stream->streaming_ctrl = streaming_ctrl_new();
     if( stream->streaming_ctrl==NULL ) {
         return STREAM_ERROR;
     }
     stream->streaming_ctrl->bandwidth = network_bandwidth;
-    url = url_new(stream->url);
-    stream->streaming_ctrl->url = check4proxies(url);
-    url_free(url);
+    stream->streaming_ctrl->url = url_new_with_proxy(stream->url);
 
     mp_msg(MSGT_OPEN, MSGL_V, "STREAM_HTTP(1), URL: %s\n", stream->url);
     seekable = http_streaming_start(stream, file_format);
@@ -968,16 +965,13 @@ static int open_s1(stream_t *stream,int mode, void* opts, int* file_format) {
 
 static int open_s2(stream_t *stream,int mode, void* opts, int* file_format) {
     int seekable=0;
-    URL_t *url;
 
     stream->streaming_ctrl = streaming_ctrl_new();
     if( stream->streaming_ctrl==NULL ) {
         return STREAM_ERROR;
     }
     stream->streaming_ctrl->bandwidth = network_bandwidth;
-    url = url_new(stream->url);
-    stream->streaming_ctrl->url = check4proxies(url);
-    url_free(url);
+    stream->streaming_ctrl->url = url_new_with_proxy(stream->url);
 
     mp_msg(MSGT_OPEN, MSGL_V, "STREAM_HTTP(2), URL: %s\n", stream->url);
     seekable = http_streaming_start(stream, file_format);
