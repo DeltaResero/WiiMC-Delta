@@ -670,6 +670,11 @@ static int decode_frame_header(AVCodecContext *avctx,
         memset(s->s.h.segmentation.feat, 0, sizeof(s->s.h.segmentation.feat));
     }
     s->s.h.filter.level = get_bits(&s->gb, 6);
+#if FF_VP9_SKIP_LOOP_FILTER
+    /* honour skip_loop_filter as H.264, HEVC, and VP8 do */
+    if (avctx->skip_loop_filter >= AVDISCARD_ALL)
+        s->s.h.filter.level = 0;
+#endif
     sharp = get_bits(&s->gb, 3);
     // if sharpness changed, reinit lim/mblim LUTs. if it didn't change, keep
     // the old cache values since they are still valid
