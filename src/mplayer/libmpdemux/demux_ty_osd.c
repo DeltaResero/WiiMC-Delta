@@ -706,11 +706,11 @@ static int ty_XDSdecode( char b1, char b2 )
                // for now just print out the raw data
                // requires a 127 string array to parse
                // properly and isn't worth it.
-               sprintf ( line, "%sGENRE:", line );
+               sprintf( line + strlen( line ), "GENRE:" );
                {
                   int x;
                   for ( x = 0 ; x < TY_XDS_length ; x++ )
-                     sprintf( line, "%s %02x", line, TY_XDS_ptr[ x ] );
+                     sprintf( line + strlen( line ), " %02x", TY_XDS_ptr[ x ] );
                }
                ty_AddXDSToDisplay( line );
                break;
@@ -719,17 +719,17 @@ static int ty_XDSdecode( char b1, char b2 )
             case 0x0105:                    // current program rating
             case 0x0305:                    // future
             {
-               sprintf( line, "%sRATING: %s", line,
+               sprintf( line + strlen( line ), "RATING: %s",
                   TY_XDS_CHIP[ ( TY_XDS_ptr[ 0 ] & 0x08 ) >> 3 ]
                   [ TY_XDS_ptr[ 1 ] & 0x07 ] );
                if ( TY_XDS_ptr[ 0 ] & 0x20 )
-                  sprintf( line, "%s DIALOGUE", line );
+                  sprintf( line + strlen( line ), " DIALOGUE" );
                if ( TY_XDS_ptr[ 1 ] & 0x08 )
-                  sprintf( line, "%s LANGUAGE", line );
+                  sprintf( line + strlen( line ), " LANGUAGE" );
                if ( TY_XDS_ptr[ 1 ] & 0x10 )
-                  sprintf( line, "%s SEXUAL", line );
+                  sprintf( line + strlen( line ), " SEXUAL" );
                if ( TY_XDS_ptr[ 1 ] & 0x20 )
-                  sprintf( line, "%s VIOLENCE", line );
+                  sprintf( line + strlen( line ), " VIOLENCE" );
                ty_AddXDSToDisplay( line );
 
                // raw output for verification.
@@ -806,14 +806,14 @@ static int ty_XDSdecode( char b1, char b2 )
                timestr = ctime( &time_t );
                timestr[ strlen( timestr ) - 1 ] = 0;
 
-               sprintf( line, "%sCUR.TIME: %s ", line, timestr );
+               sprintf( line + strlen( line ), "CUR.TIME: %s ", timestr );
                if ( TY_XDS[ 3 ][ 4 ][ 0 ] )
                {
-                  sprintf( line, "%sUTC-%d", line, TIMEZONE );
-                  if (DST) sprintf( line, "%s DST", line );
+                  sprintf( line + strlen( line ), "UTC-%d", TIMEZONE );
+                  if (DST) sprintf( line + strlen( line ), " DST" );
                }
                else
-                  sprintf( line, "%sUTC", line );
+                  sprintf( line + strlen( line ), "UTC" );
 
                ty_AddXDSToDisplay( line );
 
@@ -822,9 +822,9 @@ static int ty_XDSdecode( char b1, char b2 )
 
             case 0x0704:                    //misc. local time zone
             {
-               sprintf( line, "%sTIMEZONE: UTC-%d",
-                  line, TY_XDS_ptr[ 0 ] & 0x1f );
-               if ( TY_XDS_ptr[ 0 ] & 0x20 ) sprintf( line, "%s DST", line );
+               sprintf( line + strlen( line ), "TIMEZONE: UTC-%d",
+                  TY_XDS_ptr[ 0 ] & 0x1f );
+               if ( TY_XDS_ptr[ 0 ] & 0x20 ) sprintf( line + strlen( line ), " DST" );
                ty_AddXDSToDisplay( line );
                break;
             }
