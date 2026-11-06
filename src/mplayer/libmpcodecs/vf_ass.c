@@ -840,9 +840,13 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double
 {
     struct mp_eosd_image_list images;
     eosd_render_frame(pts, &images);
-    prepare_image(vf, mpi);
     if (images.changed)
         prepare_eosd(vf, &images);
+    // With no subtitle on screen there's nothing to blend, so no copy to blend into
+    if (!ass_top_margin && !ass_bottom_margin && !eosd_image_first(&images) &&
+        !(mpi->flags & (MP_IMGFLAG_DIRECT | MP_IMGFLAG_DRAW_CALLBACK)))
+        return vf_next_put_image(vf, mpi, pts, endpts);
+    prepare_image(vf, mpi);
     vf->priv->render_frame(vf);
     return vf_next_put_image(vf, vf->dmpi, pts, endpts);
 }
