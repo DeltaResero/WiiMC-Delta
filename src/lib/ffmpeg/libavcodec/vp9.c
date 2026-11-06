@@ -465,6 +465,13 @@ static int read_colorspace_details(AVCodecContext *avctx)
     VP9Context *s = avctx->priv_data;
     int bits = avctx->profile <= 1 ? 0 : 1 + get_bits1(&s->gb); // 0:8, 1:10, 2:12
 
+#if FF_VP9_8_10BIT_ONLY
+    /* only the 8- and 10-bit DSP functions are built */
+    if (bits == 2) {
+        avpriv_report_missing_feature(avctx, "12-bit VP9 in an 8- and 10-bit build");
+        return AVERROR_PATCHWELCOME;
+    }
+#endif
     s->bpp_index = bits;
     s->s.h.bpp = 8 + bits * 2;
     s->bytesperpixel = (7 + s->s.h.bpp) >> 3;

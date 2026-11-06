@@ -28,17 +28,21 @@
 #include "libavcodec/hevc/pred_template.c"
 #undef BIT_DEPTH
 
+#if !FF_HEVC_8_10BIT_ONLY
 #define BIT_DEPTH 9
 #include "libavcodec/hevc/pred_template.c"
 #undef BIT_DEPTH
+#endif
 
 #define BIT_DEPTH 10
 #include "libavcodec/hevc/pred_template.c"
 #undef BIT_DEPTH
 
+#if !FF_HEVC_8_10BIT_ONLY
 #define BIT_DEPTH 12
 #include "libavcodec/hevc/pred_template.c"
 #undef BIT_DEPTH
+#endif
 
 void ff_hevc_pred_init(HEVCPredContext *hpc, int bit_depth)
 {
@@ -65,15 +69,19 @@ void ff_hevc_pred_init(HEVCPredContext *hpc, int bit_depth)
     hpc->ref_filter_strong  = FUNC(ref_filter_strong, depth);
 
     switch (bit_depth) {
+#if !FF_HEVC_8_10BIT_ONLY
     case 9:
         HEVC_PRED(9);
         break;
+#endif
     case 10:
         HEVC_PRED(10);
         break;
+#if !FF_HEVC_8_10BIT_ONLY
     case 12:
         HEVC_PRED(12);
         break;
+#endif
     default:
         HEVC_PRED(8);
         break;

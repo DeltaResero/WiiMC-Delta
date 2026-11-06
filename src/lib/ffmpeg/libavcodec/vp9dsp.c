@@ -92,8 +92,12 @@ av_cold void ff_vp9dsp_init(VP9DSPContext *dsp, int bpp, int bitexact)
     } else if (bpp == 10) {
         ff_vp9dsp_init_10(dsp);
     } else {
+#if FF_VP9_8_10BIT_ONLY
+        av_assert0(0);
+#else
         av_assert0(bpp == 12);
         ff_vp9dsp_init_12(dsp);
+#endif
     }
 
 #if ARCH_AARCH64

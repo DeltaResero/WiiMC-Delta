@@ -1190,6 +1190,14 @@ static int scaling_list_data(GetBitContext *gb, AVCodecContext *avctx,
 static int map_pixel_format(AVCodecContext *avctx, HEVCSPS *sps)
 {
     const AVPixFmtDescriptor *desc;
+#if FF_HEVC_8_10BIT_ONLY
+    /* only the 8- and 10-bit DSP and prediction functions are built */
+    if (sps->bit_depth == 9 || sps->bit_depth == 12) {
+        avpriv_report_missing_feature(avctx, "%d-bit HEVC in an 8- and 10-bit build",
+                                      sps->bit_depth);
+        return AVERROR_PATCHWELCOME;
+    }
+#endif
     switch (sps->bit_depth) {
     case 8:
         if (sps->chroma_format_idc == 0) sps->pix_fmt = AV_PIX_FMT_GRAY8;
