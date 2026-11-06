@@ -886,7 +886,9 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     avctx->skip_idct = skip_idct;
     avctx->skip_frame = skip_frame;
 
-    if (flags&3) {
+    if ((flags&3) == 3)
+        avctx->skip_frame = AVDISCARD_NONKEY;
+    else if (flags&3) {
         avctx->skip_frame = AVDISCARD_NONREF;
         if (flags&2)
             avctx->skip_idct = AVDISCARD_ALL;
