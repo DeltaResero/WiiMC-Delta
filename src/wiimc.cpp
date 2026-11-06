@@ -907,6 +907,24 @@ void SetMPlayerLanguages()
     wiiSetSubtitleLanguage(subtitleLang);
 }
 
+// the Wii's system language, as the two-letter code DVDs label tracks with
+const char *wiiDVDLanguage()
+{
+    switch(CONF_GetLanguage())
+    {
+        case CONF_LANG_JAPANESE:     return "ja";
+        case CONF_LANG_GERMAN:       return "de";
+        case CONF_LANG_FRENCH:       return "fr";
+        case CONF_LANG_SPANISH:      return "es";
+        case CONF_LANG_ITALIAN:      return "it";
+        case CONF_LANG_DUTCH:        return "nl";
+        case CONF_LANG_SIMP_CHINESE:
+        case CONF_LANG_TRAD_CHINESE: return "zh";
+        case CONF_LANG_KOREAN:       return "ko";
+        default:                     return "en";
+    }
+}
+
 void SetMPlayerSettings()
 {
     static float aspectRatio=-2;

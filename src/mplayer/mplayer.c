@@ -173,6 +173,7 @@ void PauseAndGotoGUI();
 bool FindNextFile(bool load);
 void SetMPlayerSettings();
 void SetMPlayerLanguages(void);
+const char *wiiDVDLanguage(void);
 bool StartDVDMotor();
 void SetLastDVDMotorTime();
 bool WakeupUSB();
@@ -3996,11 +3997,17 @@ audio_delay=0;
 
 #ifdef CONFIG_DVDREAD
     if (mpctx->stream->type == STREAMTYPE_DVD) {
+        const char *alang = audio_lang, *slang = dvdsub_lang;
+#ifdef GEKKO
+        // with no language set, use the Wii's own, as a DVD player would
+        if (!alang) alang = wiiDVDLanguage();
+        if (!slang) slang = wiiDVDLanguage();
+#endif
         current_module = "dvd lang->id";
-        if (audio_lang && audio_id == -1)
-            audio_id = dvd_aid_from_lang(mpctx->stream, audio_lang);
-        if (dvdsub_lang && dvdsub_id == -1)
-            dvdsub_id = dvd_sid_from_lang(mpctx->stream, dvdsub_lang);
+        if (alang && audio_id == -1)
+            audio_id = dvd_aid_from_lang(mpctx->stream, alang);
+        if (slang && dvdsub_id == -1)
+            dvdsub_id = dvd_sid_from_lang(mpctx->stream, slang);
         // setup global sub numbering
         mpctx->sub_counts[SUB_SOURCE_DEMUX] = dvd_number_of_subs(mpctx->stream);
         current_module = NULL;
@@ -4009,12 +4016,18 @@ audio_delay=0;
 
 #ifdef CONFIG_DVDNAV
     if (mpctx->stream->type == STREAMTYPE_DVDNAV) {
+        const char *alang = audio_lang, *slang = dvdsub_lang;
+#ifdef GEKKO
+        // with no language set, use the Wii's own, as a DVD player would
+        if (!alang) alang = wiiDVDLanguage();
+        if (!slang) slang = wiiDVDLanguage();
+#endif
         current_module = "dvdnav lang->id";
-        if (audio_lang && audio_id == -1)
-            audio_id = mp_dvdnav_aid_from_lang(mpctx->stream, audio_lang);
+        if (alang && audio_id == -1)
+            audio_id = mp_dvdnav_aid_from_lang(mpctx->stream, alang);
         dvdsub_lang_id = -3;
-        if (dvdsub_lang && dvdsub_id == -1)
-            dvdsub_lang_id = dvdsub_id = mp_dvdnav_sid_from_lang(mpctx->stream, dvdsub_lang);
+        if (slang && dvdsub_id == -1)
+            dvdsub_lang_id = dvdsub_id = mp_dvdnav_sid_from_lang(mpctx->stream, slang);
         // setup global sub numbering
         mpctx->sub_counts[SUB_SOURCE_DEMUX] = mp_dvdnav_number_of_subs(mpctx->stream);
         current_module = NULL;
