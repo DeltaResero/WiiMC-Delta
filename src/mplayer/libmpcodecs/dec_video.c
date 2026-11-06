@@ -392,6 +392,22 @@ int init_best_video_codec(sh_video_t *sh_video, char **video_codec_list,
     return 1;                   // success
 }
 
+// Is decoding using most of the time? Measured over each half second.
+static int decoder_is_busy(void)
+{
+    static unsigned window_ms;
+    static double window_usage;
+    static int busy;
+    unsigned now = GetTimerMS();
+
+    if (now - window_ms >= 500) {
+        busy = video_time_usage - window_usage > 0.7 * (now - window_ms) * 0.001;
+        window_ms = now;
+        window_usage = video_time_usage;
+    }
+    return busy;
+}
+
 void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
                    int drop_frame, double pts, double endpts, int *full_frame)
 {
@@ -401,6 +417,7 @@ void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
     double tt;
     int delay;
     int got_picture = 1;
+    int discard;
 
     mpi = mpvdec->decode(sh_video, start, in_size, drop_frame);
 
@@ -434,7 +451,9 @@ void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
             sh_video->num_buffered_pts++;
         }
     }
-    if (correct_pts && mpi && drop_frame && sh_video->num_buffered_pts > 0)
+    // Dropping a decoded frame only helps when there's time to catch up
+    discard = drop_frame && !decoder_is_busy();
+    if (correct_pts && mpi && discard && sh_video->num_buffered_pts > 0)
         sh_video->num_buffered_pts--;
 
     // some codecs are broken, and doesn't restore MMX state :(
@@ -452,7 +471,7 @@ void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
     tt = t * 0.000001f;
     video_time_usage += tt;
 
-    if (!mpi || drop_frame)
+    if (!mpi || discard)
         return NULL;            // error / skipped frame
 
     if (field_dominance == 0)
