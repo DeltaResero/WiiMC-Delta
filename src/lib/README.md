@@ -2,10 +2,11 @@
 
 devkitPro doesn't package these for the Wii, so WiiMC carries copies of
 them here, with the local changes each section lists.
-The top-level Makefile builds libntfs and libiconv into `build/external`
-(headers in `include/`, static libraries in `lib/`) before MPlayer and
-WiiMC, and never installs anything into `$DEVKITPRO`. `make clean` removes
-them.
+`CMakeLists.txt` builds them before MPlayer and WiiMC: libntfs and mbedTLS
+as its own targets, libiconv and FFmpeg with their own build systems. The
+libraries MPlayer and FFmpeg look for go into `external` in the build
+folder (headers in `include/`, static libraries in `lib/`), and nothing is
+installed into `$DEVKITPRO`.
 
 ## libntfs
 
