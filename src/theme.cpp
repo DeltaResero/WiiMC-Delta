@@ -147,15 +147,25 @@ void ThemeTint(GuiImageData *image, int theme)
 
     for (int n = 0; n < bytes; n += 64, t += 64) {
         for (int i = 0; i < 16; i++) {
-            const int pos = t[i * 2 + 1] * (THEME_RAMP - 1);
+            // Textures hold colour multiplied by alpha: tint the plain grey, then multiply again
+            const int alpha = t[i * 2];
+            if (alpha == 0)
+                continue;
+            int grey = (t[i * 2 + 1] * 255 + alpha / 2) / alpha;
+            if (grey > 255)
+                grey = 255;
+            const int pos = grey * (THEME_RAMP - 1);
             int seg = pos / 255;
             if (seg > THEME_RAMP - 2)
                 seg = THEME_RAMP - 2;
             const int f = pos - seg * 255;
             const unsigned char *a = art.ramp[seg], *b = art.ramp[seg + 1];
-            t[i * 2 + 1] = (a[0] * (255 - f) + b[0] * f + 127) / 255;
-            t[32 + i * 2] = (a[1] * (255 - f) + b[1] * f + 127) / 255;
-            t[33 + i * 2] = (a[2] * (255 - f) + b[2] * f + 127) / 255;
+            const int r = (a[0] * (255 - f) + b[0] * f + 127) / 255;
+            const int g = (a[1] * (255 - f) + b[1] * f + 127) / 255;
+            const int bl = (a[2] * (255 - f) + b[2] * f + 127) / 255;
+            t[i * 2 + 1] = (r * alpha + 127) / 255;
+            t[32 + i * 2] = (g * alpha + 127) / 255;
+            t[33 + i * 2] = (bl * alpha + 127) / 255;
         }
     }
     DCFlushRange(image->GetImage(), bytes);

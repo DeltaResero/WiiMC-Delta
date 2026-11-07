@@ -78,6 +78,7 @@ GuiImage::GuiImage(int w, int h, GXColor c)
         return;
 
     int x, y;
+    c = Menu_Premultiply(c);
 
     for(y=0; y < h; ++y)
     {

@@ -520,9 +520,9 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
             if(y >= newHeight || x >= newWidth)
             {
                 dst[offset] = 0;
-                dst[offset+1] = 255;
-                dst[offset+32] = 255;
-                dst[offset+33] = 255;
+                dst[offset+1] = 0;
+                dst[offset+32] = 0;
+                dst[offset+33] = 0;
             }
             else
             {
@@ -540,10 +540,12 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
                     else
                         pixel = &(ctx->row_pointers[y][x*4]);
 
-                    dst[offset] = pixel[3]; // Alpha
-                    dst[offset+1] = pixel[0]; // Red
-                    dst[offset+32] = pixel[1]; // Green
-                    dst[offset+33] = pixel[2]; // Blue
+                    // colour premultiplied by alpha, as the menu blends it
+                    const u32 a = pixel[3];
+                    dst[offset] = a; // Alpha
+                    dst[offset+1] = (pixel[0] * a + 127) / 255; // Red
+                    dst[offset+32] = (pixel[1] * a + 127) / 255; // Green
+                    dst[offset+33] = (pixel[2] * a + 127) / 255; // Blue
                 }
                 else
                 {
