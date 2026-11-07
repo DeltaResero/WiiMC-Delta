@@ -424,9 +424,9 @@ void GuiKeyboard::Update(GuiTrigger * t)
 
     this->ToggleFocus(t);
 
-    if(focus) // only send actions to this window if it's in focus
+    // pad/joystick navigation; the pointer owns the highlight while it's on screen
+    if(focus && !t->wpad->ir.valid)
     {
-        // pad/joystick navigation
         if(t->Right())
             this->MoveSelectionHor(1);
         else if(t->Left())
