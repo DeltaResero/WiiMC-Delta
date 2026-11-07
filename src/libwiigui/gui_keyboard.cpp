@@ -37,6 +37,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     height = 400;
     shift = 0;
     caps = 0;
+    backPressed = false;
     selectable = true;
     focus = 1; // allow focus
     alignmentHor = ALIGN_CENTRE;
@@ -307,6 +308,20 @@ void GuiKeyboard::Update(GuiTrigger * t)
     }
 
     bool update = false;
+
+    if((t->wpad->btns_d & (WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B)) ||
+        (t->pad.btns_d & PAD_BUTTON_B) || (t->cpad.data.down & CTR_BUTTON_B))
+    {
+        if(strlen(kbtextstr) > 0)
+        {
+            kbtextstr[strlen(kbtextstr)-1] = 0;
+            kbText->SetText(GetDisplayText(kbtextstr));
+        }
+        else
+        {
+            backPressed = true;
+        }
+    }
 
     if(keySpace->GetState() == STATE_CLICKED)
     {

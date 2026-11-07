@@ -2205,9 +2205,7 @@ bool OnScreenKeyboard(char *var, u32 maxlen)
 
         if(okBtn.GetState() == STATE_CLICKED)
             save = 1;
-        else if(cancelBtn.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
-                userInput[0].cpad.data.down & CTR_BUTTON_B ||
-                userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Wii U Pro Controller
+        else if(cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed) // B with no text left
             save = 0;
     }
 

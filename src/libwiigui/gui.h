@@ -956,6 +956,7 @@ class GuiKeyboard : public GuiWindow
 
         void Update(GuiTrigger * t);
         char kbtextstr[256];
+        bool backPressed; //!< B was pressed with no text left to delete
     protected:
         u32 kbtextmaxlen;
         int shift;
