@@ -7,17 +7,16 @@
 # ===================================================================
 # Build output directories
 # ===================================================================
-# Object files, embedded image headers and the external library builds
+# The CMake build folder: objects, embedded files' headers, the external
+# library builds, wiimc.elf, and wiimc.dol
 /build/
-# wiimc.elf and wiimc.dol
-/executables/
 # The forwarder's objects and embedded image headers
 /extras/forwarder/build/
 
 # ===================================================================
 # Compiled files and build artifacts
 # ===================================================================
-# MPlayer and FFmpeg build in place, next to their sources
+# MPlayer builds in place, next to its sources
 *.o
 *.d
 *.a
