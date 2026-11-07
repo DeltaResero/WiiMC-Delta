@@ -56,11 +56,6 @@ target_compile_definitions(ntfs PRIVATE HAVE_CONFIG_H)
 target_compile_options(ntfs PRIVATE -O2 -Wall -Wno-address-of-packed-member
   -fno-asynchronous-unwind-tables)
 target_include_directories(ntfs PUBLIC ${LIBSRC}/libntfs/include)
-# the channel forwarder's Makefile looks for libntfs in EXTPREFIX
-set_target_properties(ntfs PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${EXTPREFIX}/lib)
-add_custom_command(TARGET ntfs POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${LIBSRC}/libntfs/include/ntfs.h ${EXTPREFIX}/include/
-  VERBATIM)
 
 #---------------------------------------------------------------------------------
 # mbedTLS, configured by its committed include/mbedtls/mbedtls_config.h, in
@@ -266,12 +261,8 @@ add_dependencies(wiimc mplayer ffmpeg iconv)
 
 ogc_create_dol(wiimc)
 
-# the channel forwarder in extras/, which links the libntfs built here
-add_custom_target(forwarder
-  COMMAND ${EXT_ENV} DEVKITPRO=${DEVKITPRO} DEVKITPPC=${DEVKITPRO}/devkitPPC
-    make -C ${CMAKE_SOURCE_DIR}/extras/forwarder EXTPREFIX=${EXTPREFIX}
-  VERBATIM)
-add_dependencies(forwarder ntfs)
+# the channel forwarder, built only when asked for: "make forwarder"
+add_subdirectory(extras/forwarder EXCLUDE_FROM_ALL)
 
 add_custom_target(run
   COMMAND ${DEVKITPRO}/tools/bin/wiiload ${CMAKE_BINARY_DIR}/wiimc.dol

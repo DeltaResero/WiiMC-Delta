@@ -10,8 +10,6 @@
 # The CMake build folder: objects, embedded files' headers, the external
 # library builds, wiimc.elf, and wiimc.dol
 /build/
-# The forwarder's objects and embedded image headers
-/extras/forwarder/build/
 
 # ===================================================================
 # Compiled files and build artifacts
