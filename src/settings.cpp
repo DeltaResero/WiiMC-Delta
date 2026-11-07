@@ -765,7 +765,7 @@ void DefaultSettings ()
     WiiSettings.screensaverDelay = 300;
     WiiSettings.inactivityShutdown = 2;
     WiiSettings.lockFolders = 0;
-    WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
+    WiiSettings.startArea = MENU_BROWSE_VIDEOS;
     WiiSettings.artwork = 0;
     WiiSettings.artworkFolder[0] = 0;
     WiiSettings.bannerLimit = 0;
