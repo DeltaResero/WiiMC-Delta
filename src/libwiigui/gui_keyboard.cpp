@@ -111,7 +111,10 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
 
     kbText = new GuiText(GetDisplayText(kbtextstr), 20, (GXColor){255, 255, 255, 0xff});
     kbText->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
-    kbText->SetPosition(0, 13);
+    // centre the font's ascent and descent on the box, not hang the text from
+    // its top: Noto Sans has a tall ascent, which pushed g and j out the bottom
+    kbText->SetStyle(FTGX_JUSTIFY_CENTER | FTGX_ALIGN_MIDDLE);
+    kbText->SetPosition(0, 17);
     this->Append(kbText);
 
     key = new GuiImageData(keyboard_key_png);
