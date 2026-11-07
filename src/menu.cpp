@@ -3059,10 +3059,6 @@ static void *ThumbThread (void *arg)
                             mem2_free(WiiSettings.yearNum, MEM2_DESC);
                         }
                     }
-                    loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
-                    loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
-                    mem2_free(loadIndex->year, MEM2_DESC);
-                    mem2_free(loadIndex->desc, MEM2_DESC);
                     secure_type = false;
                 } else if(!bannerSSactive && loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
                     read = 0;
@@ -3118,12 +3114,9 @@ static void *ThumbThread (void *arg)
                         same_dir = false;
                         secure_type = true;
                     }
-                    loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
-                    loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
+                    mem2_free(loadIndex->image, MEM2_BROWSER);
                     loadIndex->image = mem2_strdup(actual_path, MEM2_BROWSER);
                     read = LoadFile(thumbBuffer, 880*1024, actual_path, SILENT);
-                    mem2_free(loadIndex->year, MEM2_DESC);
-                    mem2_free(loadIndex->desc, MEM2_DESC);
                     //memset(art_disp,0,strlen(art_disp));
                     //memset(art_disp_2,0,strlen(art_disp_2));
                     //memset(actual_path,0,strlen(actual_path));
