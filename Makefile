@@ -166,7 +166,7 @@ $(BUILD): $(EXTLIBS) $(FFMPEGLIBS)
 $(EXTBUILD)/libntfs/%.o: $(LIBSRC)/libntfs/source/%.c
 	@mkdir -p $(@D)
 	$(CC) -O2 -Wall -Wno-address-of-packed-member -fno-asynchronous-unwind-tables \
-		$(MACHDEP) -DHAVE_CONFIG_H -I$(LIBSRC)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
+		$(MACHDEP) -D__wii__ -DHAVE_CONFIG_H -I$(LIBSRC)/libntfs/include -I$(LIBOGC_INC) -c $< -o $@
 
 $(EXTPREFIX)/lib/libntfs.a: $(NTFSOBJS)
 	@mkdir -p $(@D) $(EXTPREFIX)/include
