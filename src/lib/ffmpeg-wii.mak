@@ -16,10 +16,10 @@ FFMPEG_DECODERS := \
 	amv avs bink ffvhuff flv h261 h263 h263i h263p h264 huffyuv iff_ilbm jpeg2000 \
 	jpegls mjpeg mjpegb mpeg1video mpeg2video mpeg4 msmpeg4v1 msmpeg4v2 \
 	msmpeg4v3 rawvideo sp5x svq1 svq3 theora thp vc1 vmdvideo vp3 vp5 vp6 vp6a \
-	vp6f vp8 wmv1 wmv2 wmv3 wnv1 \
+	vp6f vp8 vp9 hevc wmv1 wmv2 wmv3 wnv1 \
 	aac aac_latm ac3 eac3 alac amrnb ape atrac1 atrac3 binkaudio_dct \
 	binkaudio_rdft eightsvx_exp eightsvx_fib flac mlp truehd mp1 mp2 mp3 mp3adu \
-	mp3on4 mpc7 mpc8 sonic truespeech tta twinvq vmdaudio vorbis wavpack wmapro \
+	mp3on4 mpc7 mpc8 opus sonic truespeech tta twinvq vmdaudio vorbis wavpack wmapro \
 	wmav1 wmav2 wmavoice ws_snd1 \
 	adpcm_4xm adpcm_adx adpcm_ct adpcm_ea adpcm_ea_maxis_xa adpcm_ea_r1 \
 	adpcm_ea_r2 adpcm_ea_r3 adpcm_ea_xas adpcm_g722 adpcm_g726 adpcm_ima_amv adpcm_ima_apc \
@@ -50,7 +50,7 @@ FFMPEG_DEMUXERS := \
 
 FFMPEG_PARSERS := \
 	aac_latm aac ac3 adx cavsvideo dirac dnxhd dvbsub dvdsub flac h261 h263 \
-	h264 mjpeg mlp mpeg4video mpegaudio mpegvideo pnm vc1 vp3 vp8
+	h264 hevc mjpeg mlp mpeg4video mpegaudio mpegvideo opus pnm vc1 vp3 vp8 vp9
 
 FFMPEG_BSFS := \
 	aac_adtstoasc dump_extradata extract_extradata h264_mp4toannexb imx_dump_header mjpeg2jpeg \
@@ -62,6 +62,9 @@ FFMPEG_BSFS := \
 FFMPEG_WII := \
 	-DFF_TX_SMALL_SR_TABLES=1 \
 	-DFF_H264_8BIT_ONLY=1 \
+	-DFF_VP9_SKIP_LOOP_FILTER=1 \
+	-DFF_VP9_8_10BIT_ONLY=1 \
+	-DFF_HEVC_8_10BIT_ONLY=1 \
 	-DFF_TX_FLOAT_ONLY=1 \
 	-DFF_LEAN_ATTACHMENTS=1 \
 	-DFF_INDEX_BUFFER_MAX=2097152 \

@@ -84,7 +84,7 @@ Local patch, which keeps about 650 KB of tables out of MEM1:
   are compiled from, the build machinery (`configure`, `ffbuild/`, the
   library Makefiles and version scripts), the component lists `configure`
   scans, the libraries' public headers, and the licence and release files.
-  1,689 of the 10,424 files remain. A build of the trimmed tree compiles
+  1,751 of the 10,424 files remain. A build of the trimmed tree compiles
   to the same code as one of the whole tree.
 
 Local changes:
@@ -97,6 +97,16 @@ Local changes:
 - `libavcodec/h264*.c`: with `FF_H264_8BIT_ONLY` the H.264 DSP,
   prediction, IDCT and qpel functions are built for 8-bit video only, and
   the SPS parser turns away a stream of any other bit depth.
+- `libavcodec/vp9.c`, `libavcodec/vp9dsp.c`: with `FF_VP9_8_10BIT_ONLY`
+  the 12-bit DSP functions aren't referenced, so they aren't linked, and
+  the header parser turns away 12-bit streams.
+- `libavcodec/hevc/dsp.c`, `libavcodec/hevc/pred.c`, `libavcodec/hevc/ps.c`:
+  with `FF_HEVC_8_10BIT_ONLY` the DSP and prediction functions are built
+  for 8- and 10-bit video only, and the SPS parser turns away 9- and 12-bit
+  streams.
+- `libavcodec/vp9.c`: with `FF_VP9_SKIP_LOOP_FILTER` VP9 skips its loop
+  filter when `skip_loop_filter` asks for all frames, as H.264, HEVC, and
+  VP8 already do.
 - `libavutil/tx.c`: with `FF_TX_FLOAT_ONLY` only the float transforms are
   listed, so the double and int32 ones aren't linked, and `av_tx_init()`
   returns `AVERROR(ENOSYS)` for those types.
