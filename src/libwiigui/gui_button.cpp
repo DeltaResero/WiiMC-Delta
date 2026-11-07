@@ -263,8 +263,12 @@ void GuiButton::Update(GuiTrigger * t)
                 }
             }
         }
-        else if(state == STATE_SELECTED && stateChan == t->chan && stateChan != -1)
+        else if(state == STATE_SELECTED &&
+            ((stateChan == t->chan && stateChan != -1) ||
+            (stateChan == -1 && t->wpad->ir.valid)))
         {
+            // the pointer wins: while it's on screen, a D-pad highlight it
+            // isn't over goes too, so only one button is ever lit
             this->ResetState();
         }
     }
