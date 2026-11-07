@@ -142,6 +142,12 @@ ExternalProject_Add(ffmpeg
   DEPENDS mbedcrypto mbedx509 mbedtls
   LOG_CONFIGURE TRUE
   LOG_OUTPUT_ON_FAILURE TRUE)
+# keep the configure line, with its local paths, out of the binary
+ExternalProject_Add_Step(ffmpeg strip-configuration
+  COMMAND sed -i "s/^#define FFMPEG_CONFIGURATION .*/#define FFMPEG_CONFIGURATION \"\"/" config.h
+  WORKING_DIRECTORY <BINARY_DIR>
+  DEPENDEES configure
+  DEPENDERS build)
 
 #---------------------------------------------------------------------------------
 # MPlayer, with its own Makefile and the committed config.h and config.mak,
