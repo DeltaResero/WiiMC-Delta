@@ -551,7 +551,7 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
             name = (char *)ntfsGetVolumeName(mount);
 
             if(name && name[0])
-                strcpy(part[device][*devnum].name, name);
+                snprintf(part[device][*devnum].name, sizeof(part[device][*devnum].name), "%s", name);
             else
                 part[device][*devnum].name[0] = 0;
             break;
@@ -564,7 +564,7 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
             name = (char *)ext2GetVolumeName(mount);
 
             if(name && name[0])
-                strcpy(part[device][*devnum].name, name);
+                snprintf(part[device][*devnum].name, sizeof(part[device][*devnum].name), "%s", name);
             else
                 part[device][*devnum].name[0] = 0;
             break;
@@ -582,7 +582,7 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
             name = (char *)ISO9660_GetVolumeLabel(mount);
 
             if(name && name[0])
-                strcpy(part[device][*devnum].name, name);
+                snprintf(part[device][*devnum].name, sizeof(part[device][*devnum].name), "%s", name);
             else
                 strcpy(part[device][*devnum].name, "DVD");
             break;
