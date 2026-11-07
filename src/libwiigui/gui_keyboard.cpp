@@ -317,8 +317,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
         }
         keySpace->SetState(STATE_SELECTED, t->chan);
 
-        //don't reset pos
-        if(focus)
+        //don't reset pos (D-pad only: a pointer press keeps its own selection)
+        if(focus && !t->wpad->ir.valid)
         {
             int selected = this->GetSelected();
             _elements.at(selected)->SetState(STATE_SELECTED);
@@ -333,8 +333,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
         }
         keyBack->SetState(STATE_SELECTED, t->chan);
 
-        //don't reset pos
-        if(focus)
+        //don't reset pos (D-pad only: a pointer press keeps its own selection)
+        if(focus && !t->wpad->ir.valid)
         {
             int selected = this->GetSelected();
             _elements.at(selected)->SetState(STATE_SELECTED);
@@ -389,8 +389,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
                     kbText->SetText(GetDisplayText(kbtextstr));
                     keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
 
-                    //don't reset pos
-                    if(focus)
+                    //don't reset pos (D-pad only: a pointer press keeps its own selection)
+                    if(focus && !t->wpad->ir.valid)
                     {
                         int selected = this->GetSelected();
                         _elements.at(selected)->SetState(STATE_SELECTED);
