@@ -226,7 +226,7 @@ static ssize_t __out_write(struct _reent *r, void* fd, const char *ptr, size_t l
             gecko_buf_size = 0;
             memset(gecko_buf_ptr, 0, GECKO_BUFFER_SIZE);
         }
-        memcpy(gecko_buf+gecko_buf_size, ptr, len);
+        memcpy(gecko_buf_ptr + gecko_buf_size, ptr, len);
         gecko_buf_size+=len;
     }
 
