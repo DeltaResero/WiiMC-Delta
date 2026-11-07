@@ -31,6 +31,7 @@
 #include "networkop.h"
 #include "musicplaylist.h"
 #include "filebrowser.h"
+#include "theme.h"
 #include "utils/gettext.h"
 #include "utils/http.h"
 #include "utils/playlog.h"
@@ -1635,70 +1636,52 @@ error:
     }
 }
 
+// A theme given as a launch argument wins until the setting is changed
+static bool themeFromArgument = false;
+
+static void ApplyThemeSetting()
+{
+    isDynamic = WiiSettings.theme >= ThemeCount();
+    strcpy(curTheme, isDynamic ? "dynamic" : ThemeName(WiiSettings.theme));
+    ChangeTheme();
+}
+
 void ChangeTheme()
 {
-    if(curTheme[1] == 0)
-        return;
+    if(curTheme[0] == 0)
+        strcpy(curTheme, ThemeName(0));
 
     SuspendGui();
-#if 1
     if(strcmp(curTheme, "random") == 0 || strcmp(curTheme, "dynamic") == 0)
     {
-        int val = rand() % 4 + 1;
-        if(isRepeat == val) {
-            ++val;
-            if(val > 4)
-                val -= 2;
-            //printf("give me info: repeated");
-        }
-
+        int val = rand() % ThemeCount();
+        if(val == isRepeat)
+            val = (val + 1) % ThemeCount();
         isRepeat = val;
-        switch(val) {
-            case 1: sprintf(curTheme, "%s", "gray"); break;
-            case 2: sprintf(curTheme, "%s", "red"); break;
-            case 3: sprintf(curTheme, "%s", "green"); break;
-            case 4: sprintf(curTheme, "%s", "blue"); break;
-            //case 5: sprintf(curTheme, "%s", "blank"); break;
-        }
+        strcpy(curTheme, ThemeName(val));
     }
 
-    if(strcmp(curTheme, "blue") == 0)
-    {
-        bg->SetImage(bg_blue_jpg, bg_blue_jpg_size);
-        navDivider->SetImage(nav_divider_blue_png);
-        btnBottom->SetImage(button_bottom_blue_png);
-        btnBottomOver->SetImage(button_bottom_over_blue_png);
-        arrowRightSmall->SetImage(arrow_right_small_blue_png);
-    }
-    else if(strcmp(curTheme, "green") == 0)
-    {
-        bg->SetImage(bg_green_jpg, bg_green_jpg_size);
-        navDivider->SetImage(nav_divider_green_png);
-        btnBottom->SetImage(button_bottom_green_png);
-        btnBottomOver->SetImage(button_bottom_over_green_png);
-        arrowRightSmall->SetImage(arrow_right_small_green_png);
-    }
-    else if(strcmp(curTheme, "red") == 0)
-    {
-        bg->SetImage(bg_red_jpg, bg_red_jpg_size);
-        navDivider->SetImage(nav_divider_red_png);
-        btnBottom->SetImage(button_bottom_red_png);
-        btnBottomOver->SetImage(button_bottom_over_red_png);
-        arrowRightSmall->SetImage(arrow_right_small_red_png);
-    }
-    else if(strcmp(curTheme, "gray") == 0) //for dynamic option
-    {
-        bg->SetImage(bg_jpg, bg_jpg_size);
-        navDivider->SetImage(nav_divider_png);
-        btnBottom->SetImage(button_bottom_png);
-        btnBottomOver->SetImage(button_bottom_over_png);
-        arrowRightSmall->SetImage(arrow_right_small_png);
-    }
-    else if(strcmp(curTheme, "blank") == 0)
+    if(strcmp(curTheme, "blank") == 0)
     {
         bgImg->SetAlpha(0);
     }
-#endif
+    else
+    {
+        int theme = ThemeFind(curTheme);
+        if(theme < 0)
+            theme = 0;
+        bgImg->SetAlpha(200);
+        bg->SetImage(bg_sparkle_png);
+        ThemeRenderBackground(bg, theme);
+        navDivider->SetImage(nav_divider_png);
+        ThemeTint(navDivider, theme);
+        btnBottom->SetImage(button_bottom_png);
+        ThemeTint(btnBottom, theme);
+        btnBottomOver->SetImage(button_bottom_over_png);
+        ThemeTint(btnBottomOver, theme);
+        arrowRightSmall->SetImage(arrow_right_small_png);
+        ThemeTint(arrowRightSmall, theme);
+    }
     ResumeGui();
 }
 
@@ -4526,6 +4509,7 @@ static void MenuSettingsGlobal()
     else
         sprintf(options.name[i++], nulo);
     sprintf(options.name[i++], "Enhanced Resolution");
+    sprintf(options.name[i++], "Theme");
 
     options.length = i;
 
@@ -4740,6 +4724,12 @@ static void MenuSettingsGlobal()
                 else if (!WiiSettings.tiledRender)
                     wiiSetTiledOFF();
                 break;
+            case 20:
+                WiiSettings.theme++;
+                if(WiiSettings.theme > ThemeCount()) // the one past the last is Random
+                    WiiSettings.theme = 0;
+                ApplyThemeSetting();
+                break;
         }
 
         if(ret >= 0 || firstRun)
@@ -4815,6 +4805,13 @@ static void MenuSettingsGlobal()
                 case 2:
                     sprintf (options.value[19], "Auto"); break;
             }
+            if(WiiSettings.theme < ThemeCount())
+            {
+                sprintf(options.value[20], "%s", gettext(ThemeName(WiiSettings.theme)));
+                options.value[20][0] = toupper((unsigned char)options.value[20][0]);
+            }
+            else
+                sprintf(options.value[20], "%s", gettext("Random"));
 
             optionBrowser.TriggerUpdate();
         }
@@ -7527,8 +7524,7 @@ static void SetupGui()
     volumeEmpty = new GuiImageData(volume_empty_png);
     volumeLine = new GuiImageData(volume_line_png);
 
-    bg = new GuiImageData(bg_jpg, GX_TF_RGBA8);
-    bg->SetImage(bg_jpg, bg_jpg_size);
+    bg = new GuiImageData(bg_sparkle_png);
     navDivider = new GuiImageData(nav_divider_png);
     btnBottom = new GuiImageData(button_bottom_png);
     btnBottomOver = new GuiImageData(button_bottom_over_png);
@@ -7922,7 +7918,7 @@ static void SetupGui()
     //for dolphin
     //sprintf(curTheme, "%s", "red");
 
-    //For arg themes
+    themeFromArgument = curTheme[0] != 0;
     ChangeTheme();
 
     menuWindow->Append(bgImg);
@@ -8197,6 +8193,9 @@ void WiiMenu()
         menuPrevious = WiiSettings.startArea;
         menuUndo = WiiSettings.startArea;
     }
+
+    if(!themeFromArgument && WiiSettings.theme != 0)
+        ApplyThemeSetting();
 
     UpdateMenuImages(-1, menuCurrent);
 

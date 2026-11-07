@@ -326,8 +326,21 @@ static int pngu_decode (IMGCTX ctx, u32 width, u32 height, u32 stripAlpha)
         return PNGU_INVALID_WIDTH_OR_HEIGHT;
 
     // Check if color type is supported by PNGU
-    if ( (ctx->prop.imgColorType == PNGU_COLOR_TYPE_PALETTE) || (ctx->prop.imgColorType == PNGU_COLOR_TYPE_UNKNOWN) )
+    if (ctx->prop.imgColorType == PNGU_COLOR_TYPE_UNKNOWN)
         return PNGU_UNSUPPORTED_COLOR_TYPE;
+
+    // Expand palette images to RGB, with alpha when they have transparent entries
+    if (ctx->prop.imgColorType == PNGU_COLOR_TYPE_PALETTE)
+    {
+        png_set_palette_to_rgb (ctx->png_ptr);
+        if (png_get_valid (ctx->png_ptr, ctx->info_ptr, PNG_INFO_tRNS))
+        {
+            png_set_tRNS_to_alpha (ctx->png_ptr);
+            ctx->prop.imgColorType = PNGU_COLOR_TYPE_RGB_ALPHA;
+        }
+        else
+            ctx->prop.imgColorType = PNGU_COLOR_TYPE_RGB;
+    }
 
     // Scale 16 bit samples to 8 bit
     if (ctx->prop.imgBitDepth == 16)
@@ -520,9 +533,9 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
             if(y >= newHeight || x >= newWidth)
             {
                 dst[offset] = 0;
-                dst[offset+1] = 255;
-                dst[offset+32] = 255;
-                dst[offset+33] = 255;
+                dst[offset+1] = 0;
+                dst[offset+32] = 0;
+                dst[offset+33] = 0;
             }
             else
             {
@@ -540,10 +553,12 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
                     else
                         pixel = &(ctx->row_pointers[y][x*4]);
 
-                    dst[offset] = pixel[3]; // Alpha
-                    dst[offset+1] = pixel[0]; // Red
-                    dst[offset+32] = pixel[1]; // Green
-                    dst[offset+33] = pixel[2]; // Blue
+                    // colour premultiplied by alpha, as the menu blends it
+                    const u32 a = pixel[3];
+                    dst[offset] = a; // Alpha
+                    dst[offset+1] = (pixel[0] * a + 127) / 255; // Red
+                    dst[offset+32] = (pixel[1] * a + 127) / 255; // Green
+                    dst[offset+33] = (pixel[2] * a + 127) / 255; // Blue
                 }
                 else
                 {

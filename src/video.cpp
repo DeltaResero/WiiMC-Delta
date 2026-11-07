@@ -226,6 +226,29 @@ void Menu_Render()
  *
  * Draws the specified image on screen using GX
  ***************************************************************************/
+/****************************************************************************
+ * The menu's textures hold colour already multiplied by alpha, so filtering
+ * never mixes in the colour of a transparent neighbour. The video picture
+ * keeps the plain blend, so every menu draw switches and switches back.
+ ***************************************************************************/
+void Menu_BlendPremultiplied()
+{
+    GX_SetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+}
+
+void Menu_BlendStraight()
+{
+    GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+}
+
+GXColor Menu_Premultiply(GXColor c)
+{
+    c.r = (c.r * c.a + 127) / 255;
+    c.g = (c.g * c.a + 127) / 255;
+    c.b = (c.b * c.a + 127) / 255;
+    return c;
+}
+
 void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
     f32 degrees, f32 scaleX, f32 scaleY, u8 alpha, u8 format)
 {
@@ -250,6 +273,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 
     GX_SetTevOp (GX_TEVSTAGE0, GX_MODULATE);
     GX_SetVtxDesc (GX_VA_TEX0, GX_DIRECT);
+    Menu_BlendPremultiplied();
 
     Mtx m,m1,m2, mv;
     width  >>= 1;
@@ -267,19 +291,19 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 
     GX_Begin(GX_QUADS, GX_VTXFMT0,4);
     GX_Position3f32(-width, -height,  0);
-    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_Color4u8(alpha,alpha,alpha,alpha);
     GX_TexCoord2f32(0, 0);
 
     GX_Position3f32(width, -height,  0);
-    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_Color4u8(alpha,alpha,alpha,alpha);
     GX_TexCoord2f32(1, 0);
 
     GX_Position3f32(width, height,  0);
-    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_Color4u8(alpha,alpha,alpha,alpha);
     GX_TexCoord2f32(1, 1);
 
     GX_Position3f32(-width, height,  0);
-    GX_Color4u8(0xFF,0xFF,0xFF,alpha);
+    GX_Color4u8(alpha,alpha,alpha,alpha);
     GX_TexCoord2f32(0, 1);
     GX_End();
 
@@ -287,6 +311,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 
     GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
     GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+    Menu_BlendStraight();
 }
 
 /****************************************************************************
@@ -308,6 +333,8 @@ void Menu_DrawRectangle(f32 x, f32 y, f32 width, f32 height, GXColor color, u8 f
         n = 5;
     }
 
+    color = Menu_Premultiply(color);
+    Menu_BlendPremultiplied();
     GX_Begin(fmt, GX_VTXFMT0, n);
     for(long i=0; i<n; ++i)
     {
@@ -315,6 +342,7 @@ void Menu_DrawRectangle(f32 x, f32 y, f32 width, f32 height, GXColor color, u8 f
         GX_Color4u8(color.r, color.g, color.b, color.a);
     }
     GX_End();
+    Menu_BlendStraight();
 }
 
 bool safe_gc;

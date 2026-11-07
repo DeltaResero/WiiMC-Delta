@@ -21,6 +21,7 @@
  */
 
 #include "FreeTypeGX.h"
+#include "../video.h"
 #include "font_ttf.h"
 #include FT_OUTLINE_H
 
@@ -841,6 +842,8 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, f32 texWidth, f32 te
 
     GX_SetTevOp (GX_TEVSTAGE0, GX_MODULATE);
     GX_SetVtxDesc (GX_VA_TEX0, GX_DIRECT);
+    color = Menu_Premultiply(color);
+    Menu_BlendPremultiplied();
 
     GX_Begin(GX_QUADS, this->vertexIndex, 4);
     GX_Position2s16(screenX, screenY);
@@ -859,6 +862,7 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, f32 texWidth, f32 te
     GX_Color4u8(color.r, color.g, color.b, color.a);
     GX_TexCoord2f32(0.0f, 1.0f);
     GX_End();
+    Menu_BlendStraight();
 
     this->setDefaultMode();
 }
@@ -878,6 +882,8 @@ void FreeTypeGX::copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, i
 {
     GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
     GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+    color = Menu_Premultiply(color);
+    Menu_BlendPremultiplied();
 
     GX_Begin(GX_QUADS, this->vertexIndex, 4);
     GX_Position2s16(screenX, screenY);
@@ -892,6 +898,7 @@ void FreeTypeGX::copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, i
     GX_Position2s16(screenX, featureHeight + screenY);
     GX_Color4u8(color.r, color.g, color.b, color.a);
     GX_End();
+    Menu_BlendStraight();
 
     this->setDefaultMode();
 }
