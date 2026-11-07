@@ -29,6 +29,9 @@ set(MACHDEP -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float)
 set(EXTPREFIX ${CMAKE_BINARY_DIR}/external)
 file(MAKE_DIRECTORY ${EXTPREFIX}/include ${EXTPREFIX}/lib)
 
+# __FILE__ names sources relative to the repository, not the build machine
+add_compile_options(-ffile-prefix-map=${CMAKE_SOURCE_DIR}/=)
+
 if(WIIMC_CCACHE)
   find_program(CCACHE ccache REQUIRED)
   set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE})
