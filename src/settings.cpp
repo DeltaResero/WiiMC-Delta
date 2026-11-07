@@ -16,6 +16,7 @@
 
 #include "wiimc.h"
 #include "menu.h"
+#include "theme.h"
 #include "fileop.h"
 #include "filebrowser.h"
 #include "input.h"
@@ -346,6 +347,7 @@ prepareSettingsData ()
     createXMLSetting("jpegQuality", "JPEG Resample", toStr(WiiSettings.jpegQuality));
     createXMLSetting("night", "Night Filter", toStr(WiiSettings.night));
     createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
+    createXMLSetting("theme", "Theme", toStr(WiiSettings.theme));
     createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
     createXMLSetting("libass", "ASS Renderer", toStr(WiiSettings.libass));
     createXMLSetting("saveExit", "Only save to device on exit", toStr(WiiSettings.saveExit));
@@ -771,6 +773,7 @@ void DefaultSettings ()
     WiiSettings.jpegQuality = 0;
     WiiSettings.night = 0;
     WiiSettings.screenDim = CONF_GetScreenSaverMode();
+    WiiSettings.theme = 0;
     WiiSettings.doubleStrike = 0;
     WiiSettings.libass = 1;
     WiiSettings.saveExit = 1;
@@ -878,6 +881,8 @@ static void FixInvalidSettings()
         WiiSettings.jpegQuality = 0;
     if(WiiSettings.night < 0 || WiiSettings.night > 1)
         WiiSettings.night = 0;
+    if(WiiSettings.theme < 0 || WiiSettings.theme > ThemeCount())
+        WiiSettings.theme = 0;
     if(WiiSettings.screenDim < 0 || WiiSettings.screenDim > 1)
         WiiSettings.screenDim = 0;
     if(WiiSettings.doubleStrike < 0 || WiiSettings.doubleStrike > 1)
@@ -1274,6 +1279,7 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.jpegQuality, "jpegQuality");
                 loadXMLSetting(&WiiSettings.night, "night");
                 loadXMLSetting(&WiiSettings.screenDim, "screenDim");
+                loadXMLSetting(&WiiSettings.theme, "theme");
                 loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
                 loadXMLSetting(&WiiSettings.libass, "libass");
                 loadXMLSetting(&WiiSettings.saveExit, "saveExit");

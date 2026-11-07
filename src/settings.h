@@ -131,6 +131,7 @@ struct SWiiSettings {
     int     jpegQuality;
     int     night;
     int     screenDim;
+    int     theme;
     int     doubleStrike;
     int     libass;
     int     saveExit;

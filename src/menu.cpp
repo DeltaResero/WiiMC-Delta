@@ -1636,6 +1636,16 @@ error:
     }
 }
 
+// A theme given as a launch argument wins until the setting is changed
+static bool themeFromArgument = false;
+
+static void ApplyThemeSetting()
+{
+    isDynamic = WiiSettings.theme >= ThemeCount();
+    strcpy(curTheme, isDynamic ? "dynamic" : ThemeName(WiiSettings.theme));
+    ChangeTheme();
+}
+
 void ChangeTheme()
 {
     if(curTheme[0] == 0)
@@ -4499,6 +4509,7 @@ static void MenuSettingsGlobal()
     else
         sprintf(options.name[i++], nulo);
     sprintf(options.name[i++], "Enhanced Resolution");
+    sprintf(options.name[i++], "Theme");
 
     options.length = i;
 
@@ -4713,6 +4724,12 @@ static void MenuSettingsGlobal()
                 else if (!WiiSettings.tiledRender)
                     wiiSetTiledOFF();
                 break;
+            case 20:
+                WiiSettings.theme++;
+                if(WiiSettings.theme > ThemeCount()) // the one past the last is Random
+                    WiiSettings.theme = 0;
+                ApplyThemeSetting();
+                break;
         }
 
         if(ret >= 0 || firstRun)
@@ -4788,6 +4805,13 @@ static void MenuSettingsGlobal()
                 case 2:
                     sprintf (options.value[19], "Auto"); break;
             }
+            if(WiiSettings.theme < ThemeCount())
+            {
+                sprintf(options.value[20], "%s", gettext(ThemeName(WiiSettings.theme)));
+                options.value[20][0] = toupper((unsigned char)options.value[20][0]);
+            }
+            else
+                sprintf(options.value[20], "%s", gettext("Random"));
 
             optionBrowser.TriggerUpdate();
         }
@@ -7894,6 +7918,7 @@ static void SetupGui()
     //for dolphin
     //sprintf(curTheme, "%s", "red");
 
+    themeFromArgument = curTheme[0] != 0;
     ChangeTheme();
 
     menuWindow->Append(bgImg);
@@ -8168,6 +8193,9 @@ void WiiMenu()
         menuPrevious = WiiSettings.startArea;
         menuUndo = WiiSettings.startArea;
     }
+
+    if(!themeFromArgument && WiiSettings.theme != 0)
+        ApplyThemeSetting();
 
     UpdateMenuImages(-1, menuCurrent);
 
