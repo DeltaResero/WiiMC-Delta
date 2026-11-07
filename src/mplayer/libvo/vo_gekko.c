@@ -95,7 +95,10 @@ static int draw_frame(uint8_t *src[])
 
 static int inline query_format(uint32_t format)
 {
-    if (mp_get_chroma_shift(format, NULL, NULL, NULL))  // Accept any planar YUV format.
+    // Accept any 8-bit planar YUV format. Formats with more bits per sample
+    // (10-bit VP9, HEVC and AV1) go through the scale filter first: the GX
+    // textures take one byte per sample.
+    if (mp_get_chroma_shift(format, NULL, NULL, NULL) && !IMGFMT_IS_YUVP16(format))
         return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_OSD | VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN | VFCAP_ACCEPT_STRIDE | VOCAP_NOSLICES;
     else return VO_FALSE;
 }
