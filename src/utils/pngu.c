@@ -326,8 +326,21 @@ static int pngu_decode (IMGCTX ctx, u32 width, u32 height, u32 stripAlpha)
         return PNGU_INVALID_WIDTH_OR_HEIGHT;
 
     // Check if color type is supported by PNGU
-    if ( (ctx->prop.imgColorType == PNGU_COLOR_TYPE_PALETTE) || (ctx->prop.imgColorType == PNGU_COLOR_TYPE_UNKNOWN) )
+    if (ctx->prop.imgColorType == PNGU_COLOR_TYPE_UNKNOWN)
         return PNGU_UNSUPPORTED_COLOR_TYPE;
+
+    // Expand palette images to RGB, with alpha when they have transparent entries
+    if (ctx->prop.imgColorType == PNGU_COLOR_TYPE_PALETTE)
+    {
+        png_set_palette_to_rgb (ctx->png_ptr);
+        if (png_get_valid (ctx->png_ptr, ctx->info_ptr, PNG_INFO_tRNS))
+        {
+            png_set_tRNS_to_alpha (ctx->png_ptr);
+            ctx->prop.imgColorType = PNGU_COLOR_TYPE_RGB_ALPHA;
+        }
+        else
+            ctx->prop.imgColorType = PNGU_COLOR_TYPE_RGB;
+    }
 
     // Scale 16 bit samples to 8 bit
     if (ctx->prop.imgBitDepth == 16)
