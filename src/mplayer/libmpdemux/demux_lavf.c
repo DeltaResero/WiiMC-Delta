@@ -935,6 +935,13 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
             *((double *)arg) = (double)priv->avfc->duration / AV_TIME_BASE;
             return DEMUXER_CTRL_OK;
 
+        case DEMUXER_CTRL_GET_START_TIME:
+            if (priv->avfc->start_time == AV_NOPTS_VALUE)
+                return DEMUXER_CTRL_DONTKNOW;
+
+            *((double *)arg) = (double)priv->avfc->start_time / AV_TIME_BASE;
+            return DEMUXER_CTRL_OK;
+
         case DEMUXER_CTRL_GET_PERCENT_POS:
             if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
                 return DEMUXER_CTRL_DONTKNOW;

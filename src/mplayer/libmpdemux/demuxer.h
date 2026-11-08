@@ -114,6 +114,7 @@
 // Query stream IDs that the underlying device/stream would recognize
 #define DEMUXER_CTRL_REMAP_AUDIO_ID 18
 #define DEMUXER_CTRL_REMAP_SUB_ID 19
+#define DEMUXER_CTRL_GET_START_TIME 20 // seconds of the file's first timestamp
 
 #define SEEK_ABSOLUTE (1 << 0)
 #define SEEK_FACTOR   (1 << 1)
