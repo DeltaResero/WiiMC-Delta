@@ -385,28 +385,43 @@ void Draw_VIDEO()
 
 static void vblank_cb(u32 retraceCnt)
 {
-    if (flip_pending) {
-        if(sync_interlace == 1) {
-            if(!VIDEO_GetNextField()) {
-                VIDEO_SetNextFramebuffer(xfb[whichfb]);
-                VIDEO_Flush();
-                whichfb ^= 1;
-                flip_pending = false;
+    static int waited = 0;
+    static bool parity_set = false; // a field-ordered frame has been shown
+    static u32 last_flip = 0;       // retrace count of that flip
+
+    if (!flip_pending)
+        return;
+
+    // Interlaced video shows best when each frame starts on its first field.
+    // This only means something while the TV runs an interlaced mode. The
+    // field read here can stay the same on every vertical blank (seen on
+    // 480i), so it only picks the field for the first frame, waiting at most
+    // one extra blank. After that every frame keeps the same field parity as
+    // the one before, counted in vertical blanks, which always alternate.
+    if ((sync_interlace == 1 || sync_interlace == 2) &&
+        (vmode->viTVMode & 3) == VI_INTERLACE) {
+        if (parity_set) {
+            if ((retraceCnt - last_flip) & 1)
+                return;
+        } else if (waited < 1) {
+            bool bottom_next = VIDEO_GetNextField();
+
+            if ((sync_interlace == 1) == bottom_next) {
+                waited++;
+                return;
             }
-        } else if(sync_interlace == 2) {
-            if(VIDEO_GetNextField()) {
-                VIDEO_SetNextFramebuffer(xfb[whichfb]);
-                VIDEO_Flush();
-                whichfb ^= 1;
-                flip_pending = false;
-            }
-        } else {
-            VIDEO_SetNextFramebuffer(xfb[whichfb]);
-            VIDEO_Flush();
-            whichfb ^= 1;
-            flip_pending = false;
         }
+        parity_set = true;
+    } else {
+        parity_set = false;
     }
+
+    waited = 0;
+    last_flip = retraceCnt;
+    VIDEO_SetNextFramebuffer(xfb[whichfb]);
+    VIDEO_Flush();
+    whichfb ^= 1;
+    flip_pending = false;
 }
 
 void HOffset()
