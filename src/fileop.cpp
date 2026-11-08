@@ -906,8 +906,7 @@ static void UnmountPartitions(int device)
 void UnmountAllDevices()
 {
     UnmountPartitions(DEVICE_SD);
-    if(appPath[0] == 'u') // avoid unmounting usb, if sd is used.
-        UnmountPartitions(DEVICE_USB);
+    UnmountPartitions(DEVICE_USB);
 }
 
 /****************************************************************************
