@@ -71,6 +71,8 @@ extern int streamtitle_changed;
 extern int streamurl_changed;
 extern int streamname_changed;
 extern int wii_error; // to display a specific error when loading fails
+extern char wii_error_text[]; // the reason, when wii_error is 2
+extern char lavc_missing_video_feature[];
 
 // frequently used objects
 
@@ -3376,6 +3378,15 @@ static int LoadNewFile()
 
         if(wii_error == 1)
             ErrorPrompt("Resolution exceeds maximum allowed (1024x720)!");
+        else if(wii_error == 2)
+            ErrorPrompt(wii_error_text);
+        else if(lavc_missing_video_feature[0])
+        {
+            char msg[200];
+            snprintf(msg, sizeof(msg), "Unsupported: %s",
+                lavc_missing_video_feature);
+            ErrorPrompt(msg);
+        }
         else
             ErrorPrompt("Error loading file!");
 

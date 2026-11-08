@@ -20,6 +20,7 @@
 
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+#include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
 #include "mp_msg.h"
 #include "av_helpers.h"
@@ -27,6 +28,10 @@
 
 int avcodec_initialized;
 int avformat_initialized;
+
+// The last feature a video decoder reported as not implemented, for WiiMC's
+// error message. mplayer.c clears it when a file starts.
+char lavc_missing_video_feature[128];
 
 static void mp_msp_av_log_callback(void *ptr, int level, const char *fmt,
                                    va_list vl)
@@ -63,6 +68,21 @@ static void mp_msp_av_log_callback(void *ptr, int level, const char *fmt,
                 type= MSGT_DEMUXER;
             else if(s->oformat)
                 type= MSGT_MUXER;
+        }
+    }
+
+    // avpriv_report_missing_feature() logs the feature, then " is not
+    // implemented", so keep each video decoder message until that follows.
+    if (type == MSGT_DECVIDEO) {
+        static char last[128];
+        if (!strncmp(fmt, " is not implemented", 19)) {
+            av_strlcpy(lavc_missing_video_feature, last,
+                       sizeof(lavc_missing_video_feature));
+        } else {
+            va_list vc;
+            va_copy(vc, vl);
+            vsnprintf(last, sizeof(last), fmt, vc);
+            va_end(vc);
         }
     }
 
