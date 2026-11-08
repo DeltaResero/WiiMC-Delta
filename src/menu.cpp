@@ -1781,12 +1781,22 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
     {
         usleep(THREAD_SLEEP);
 
+        // A and B answer without the pointer, as on the GameCube and 3DS
+        // controllers. A takes the first button only while the pointer is off
+        // screen, so a press that just misses Cancel doesn't mean OK, and not
+        // when the D-pad is on a button, which answers through its own trigger.
+        // B takes the second button anywhere.
+        u32 wbtns = userInput[0].wpad->btns_d;
+        bool onButton = btn1.GetState() == STATE_SELECTED || btn1.GetState() == STATE_CLICKED ||
+                        btn2.GetState() == STATE_SELECTED || btn2.GetState() == STATE_CLICKED;
+
         if(btn1.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_A ||
-                userInput[0].cpad.data.down == CTR_BUTTON_A)
+                userInput[0].cpad.data.down == CTR_BUTTON_A ||
+                ((wbtns & (WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A)) && !userInput[0].wpad->ir.valid && !onButton))
             choice = 1;
         else if(btn2.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
                 userInput[0].cpad.data.down == CTR_BUTTON_B ||
-                userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Because Wii U Pro Controller...
+                (wbtns & (WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B)))
             choice = 0;
 
         if(guiShutdown)
