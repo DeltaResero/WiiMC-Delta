@@ -567,6 +567,10 @@ class GuiWindow : public GuiElement
         //!Moves the selected element to the element above or below
         //!\param d Direction to move (-1 = up, 1 = down)
         void MoveSelectionVert(int d);
+        //!Selects one element and clears every other selection, so a pointer
+        //!highlight can't be left behind when the D-pad moves on
+        //!\param n Index of the element to select
+        void SelectOnly(int n);
         //!Resets the text for all contained elements
         void ResetText();
         //!Draws all the elements in this GuiWindow
@@ -952,6 +956,7 @@ class GuiKeyboard : public GuiWindow
 
         void Update(GuiTrigger * t);
         char kbtextstr[256];
+        bool backPressed; //!< B was pressed with no text left to delete
     protected:
         u32 kbtextmaxlen;
         int shift;

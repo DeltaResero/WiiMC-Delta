@@ -226,7 +226,7 @@ static ssize_t __out_write(struct _reent *r, void* fd, const char *ptr, size_t l
             gecko_buf_size = 0;
             memset(gecko_buf_ptr, 0, GECKO_BUFFER_SIZE);
         }
-        memcpy(gecko_buf+gecko_buf_size, ptr, len);
+        memcpy(gecko_buf_ptr + gecko_buf_size, ptr, len);
         gecko_buf_size+=len;
     }
 
@@ -269,6 +269,12 @@ static void USBGeckoOutput()
 
     devoptab_list[STD_OUT] = &gecko_out;
     devoptab_list[STD_ERR] = &gecko_out;
+
+    // Printing to an unbuffered stream formats into a BUFSIZ array on the
+    // stack, and devkitPPC's BUFSIZ is 32 KB. stderr starts unbuffered, so
+    // give both streams a small buffer of their own.
+    setvbuf(stdout, NULL, _IOLBF, 1024);
+    setvbuf(stderr, NULL, _IOLBF, 1024);
 }
 
 /****************************************************************************

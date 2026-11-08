@@ -246,6 +246,7 @@ static const char * const preferred_list[] = {
     "mov,mp4,m4a,3gp,3g2,mj2",
     "mpc",
     "mpc8",
+    "mpegts", // the native TS demuxer guesses length and seeks from the peak bitrate
     "mxf",
     "ogg",
     "pva",
@@ -932,6 +933,13 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
                 return DEMUXER_CTRL_DONTKNOW;
 
             *((double *)arg) = (double)priv->avfc->duration / AV_TIME_BASE;
+            return DEMUXER_CTRL_OK;
+
+        case DEMUXER_CTRL_GET_START_TIME:
+            if (priv->avfc->start_time == AV_NOPTS_VALUE)
+                return DEMUXER_CTRL_DONTKNOW;
+
+            *((double *)arg) = (double)priv->avfc->start_time / AV_TIME_BASE;
             return DEMUXER_CTRL_OK;
 
         case DEMUXER_CTRL_GET_PERCENT_POS:

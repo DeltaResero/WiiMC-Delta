@@ -37,6 +37,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     height = 400;
     shift = 0;
     caps = 0;
+    backPressed = false;
     selectable = true;
     focus = 1; // allow focus
     alignmentHor = ALIGN_CENTRE;
@@ -110,7 +111,10 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
 
     kbText = new GuiText(GetDisplayText(kbtextstr), 20, (GXColor){255, 255, 255, 0xff});
     kbText->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
-    kbText->SetPosition(0, 13);
+    // centre the font's ascent and descent on the box, not hang the text from
+    // its top: Noto Sans has a tall ascent, which pushed g and j out the bottom
+    kbText->SetStyle(FTGX_JUSTIFY_CENTER | FTGX_ALIGN_MIDDLE);
+    kbText->SetPosition(0, 17);
     this->Append(kbText);
 
     key = new GuiImageData(keyboard_key_png);
@@ -308,6 +312,20 @@ void GuiKeyboard::Update(GuiTrigger * t)
 
     bool update = false;
 
+    if((t->wpad->btns_d & (WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B)) ||
+        (t->pad.btns_d & PAD_BUTTON_B) || (t->cpad.data.down & CTR_BUTTON_B))
+    {
+        if(strlen(kbtextstr) > 0)
+        {
+            kbtextstr[strlen(kbtextstr)-1] = 0;
+            kbText->SetText(GetDisplayText(kbtextstr));
+        }
+        else
+        {
+            backPressed = true;
+        }
+    }
+
     if(keySpace->GetState() == STATE_CLICKED)
     {
         if(strlen(kbtextstr) < kbtextmaxlen)
@@ -317,8 +335,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
         }
         keySpace->SetState(STATE_SELECTED, t->chan);
 
-        //don't reset pos
-        if(focus)
+        //don't reset pos (D-pad only: a pointer press keeps its own selection)
+        if(focus && !t->wpad->ir.valid)
         {
             int selected = this->GetSelected();
             _elements.at(selected)->SetState(STATE_SELECTED);
@@ -333,8 +351,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
         }
         keyBack->SetState(STATE_SELECTED, t->chan);
 
-        //don't reset pos
-        if(focus)
+        //don't reset pos (D-pad only: a pointer press keeps its own selection)
+        if(focus && !t->wpad->ir.valid)
         {
             int selected = this->GetSelected();
             _elements.at(selected)->SetState(STATE_SELECTED);
@@ -389,8 +407,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
                     kbText->SetText(GetDisplayText(kbtextstr));
                     keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
 
-                    //don't reset pos
-                    if(focus)
+                    //don't reset pos (D-pad only: a pointer press keeps its own selection)
+                    if(focus && !t->wpad->ir.valid)
                     {
                         int selected = this->GetSelected();
                         _elements.at(selected)->SetState(STATE_SELECTED);
@@ -409,9 +427,9 @@ void GuiKeyboard::Update(GuiTrigger * t)
 
     this->ToggleFocus(t);
 
-    if(focus) // only send actions to this window if it's in focus
+    // pad/joystick navigation; the pointer owns the highlight while it's on screen
+    if(focus && !t->wpad->ir.valid)
     {
-        // pad/joystick navigation
         if(t->Right())
             this->MoveSelectionHor(1);
         else if(t->Left())

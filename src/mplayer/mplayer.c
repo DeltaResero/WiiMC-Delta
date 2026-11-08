@@ -195,6 +195,9 @@ static void reload_subtitles();
 int controlledbygui=1;
 int pause_gui=0;
 int wii_error = 0;
+char wii_error_text[160]; // why the file can't play, when wii_error is 2
+extern char lavc_missing_video_feature[128];
+static double wiiTimeFromStart(double t);
 static int pause_low_cache=0;
 static bool thp_vid = false;
 unsigned timerFadeBlack = 0; // not an actual fade.
@@ -3720,6 +3723,8 @@ do
 }while (!filename);
 end_film_error=0;
 wii_error = 0;
+wii_error_text[0] = 0;
+lavc_missing_video_feature[0] = 0;
 controlledbygui = 0;
 
 // reset some MPlayer variables
@@ -4226,6 +4231,20 @@ stream_cache_min_percent=0.2;
         current_module = "video_read_properties";
         reinit_video_chain();
     }
+
+#ifdef GEKKO
+    // WiiMC's FFmpeg leaves out some bit depths to save space (see
+    // FF_VP9_8_10BIT_ONLY and FF_HEVC_8_10BIT_ONLY). The probe already tried
+    // the video, so stop here rather than play the sound without a picture.
+    if (mpctx->sh_video && strstr(lavc_missing_video_feature, " in an 8- and 10-bit build")) {
+        *strstr(lavc_missing_video_feature, " in an 8- and 10-bit build") = 0;
+        snprintf(wii_error_text, sizeof(wii_error_text),
+                 "%s unsupported",
+                 lavc_missing_video_feature);
+        wii_error = 2;
+        goto goto_next_file;
+    }
+#endif
 
     if (!mpctx->sh_video && !mpctx->sh_audio) {
         mp_msg(MSGT_CPLAYER, MSGL_FATAL, MSGTR_NoStreamFound);
@@ -4833,8 +4852,8 @@ total_time_usage_start=GetTimer();
                                         seek_2_sec = demuxer_get_time_length(mpctx->demuxer);
                                         http_hack = 0;
                                 }
-                                if((demuxer_get_current_time(mpctx->demuxer)+5) < seek_2_sec && !http_block) {
-                                        wiiSeek(demuxer_get_current_time(mpctx->demuxer)+5, 2);
+                                if((wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer))+5) < seek_2_sec && !http_block) {
+                                        wiiSeek(wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer))+5, 2);
                                 //      wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
 
                                         mpctx->eof = 0;
@@ -5185,7 +5204,7 @@ static void save_restore_point(char *_filename, char *_partitionlabel)
                 strncmp(_filename,"mms:",4) == 0)
                 return;
 
-        int position = demuxer_get_current_time(mpctx->demuxer);
+        int position = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
 
         if(position <= 8 || !( mpctx->demuxer->seekable))
         {
@@ -5763,6 +5782,17 @@ double wiiGetTimeLength()
         return demuxer_get_time_length(mpctx->demuxer);
 }
 
+// Timestamps in some files, MPEG-TS recordings above all, start far from zero.
+// Seeks count from the file's start, so show the position from there too.
+static double wiiTimeFromStart(double t)
+{
+        double start = 0;
+
+        if(demux_control(mpctx->demuxer, DEMUXER_CTRL_GET_START_TIME, &start) <= 0)
+                return t;
+        return t > start ? t - start : 0;
+}
+
 double wiiGetTimePos()
 {
         if(!playing_file || controlledbygui == 2)
@@ -5775,9 +5805,9 @@ double wiiGetTimePos()
                 //return 0;
 
         if (!mpctx->sh_video && mpctx->sh_audio && mpctx->audio_out)
-                return playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
+                return wiiTimeFromStart(playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out));
 
-        return demuxer_get_current_time(mpctx->demuxer);
+        return wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
 }
 
 void wiiGetTimeDisplay(char * buf)
@@ -5789,7 +5819,7 @@ void wiiGetTimeDisplay(char * buf)
                 //return;
 
         int len = demuxer_get_time_length(mpctx->demuxer);
-        int pts = demuxer_get_current_time(mpctx->demuxer);
+        int pts = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
 
         sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
                 pts/3600,(pts/60)%60,pts%60,

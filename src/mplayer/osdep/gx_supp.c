@@ -525,7 +525,12 @@ inline void DrawMPlayer()
         do VIDEO_WaitVSync();
         while (VIDEO_GetNextField());
     }
-    else*/ if(flip_pending)
+    else*/
+    // Don't draw over a frame that is still waiting for the vertical blank
+    // that shows it. Field-ordered video can make it wait two blanks, and
+    // drawing after one mixed two frames on screen. Three blanks at most, so
+    // a flip that never comes can't hang playback.
+    for(int blanks = 0; flip_pending && blanks < 3; blanks++)
         VIDEO_WaitVSync();
     //_CPU_ISR_Restore(level);
 

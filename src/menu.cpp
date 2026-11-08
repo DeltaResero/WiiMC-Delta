@@ -71,6 +71,8 @@ extern int streamtitle_changed;
 extern int streamurl_changed;
 extern int streamname_changed;
 extern int wii_error; // to display a specific error when loading fails
+extern char wii_error_text[]; // the reason, when wii_error is 2
+extern char lavc_missing_video_feature[];
 
 // frequently used objects
 
@@ -1779,12 +1781,22 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
     {
         usleep(THREAD_SLEEP);
 
+        // A and B answer without the pointer, as on the GameCube and 3DS
+        // controllers. A takes the first button only while the pointer is off
+        // screen, so a press that just misses Cancel doesn't mean OK, and not
+        // when the D-pad is on a button, which answers through its own trigger.
+        // B takes the second button anywhere.
+        u32 wbtns = userInput[0].wpad->btns_d;
+        bool onButton = btn1.GetState() == STATE_SELECTED || btn1.GetState() == STATE_CLICKED ||
+                        btn2.GetState() == STATE_SELECTED || btn2.GetState() == STATE_CLICKED;
+
         if(btn1.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_A ||
-                userInput[0].cpad.data.down == CTR_BUTTON_A)
+                userInput[0].cpad.data.down == CTR_BUTTON_A ||
+                ((wbtns & (WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A)) && !userInput[0].wpad->ir.valid && !onButton))
             choice = 1;
         else if(btn2.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
                 userInput[0].cpad.data.down == CTR_BUTTON_B ||
-                userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Because Wii U Pro Controller...
+                (wbtns & (WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B)))
             choice = 0;
 
         if(guiShutdown)
@@ -2205,9 +2217,7 @@ bool OnScreenKeyboard(char *var, u32 maxlen)
 
         if(okBtn.GetState() == STATE_CLICKED)
             save = 1;
-        else if(cancelBtn.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
-                userInput[0].cpad.data.down & CTR_BUTTON_B ||
-                userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Wii U Pro Controller
+        else if(cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed) // B with no text left
             save = 0;
     }
 
@@ -3059,10 +3069,6 @@ static void *ThumbThread (void *arg)
                             mem2_free(WiiSettings.yearNum, MEM2_DESC);
                         }
                     }
-                    loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
-                    loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
-                    mem2_free(loadIndex->year, MEM2_DESC);
-                    mem2_free(loadIndex->desc, MEM2_DESC);
                     secure_type = false;
                 } else if(!bannerSSactive && loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
                     read = 0;
@@ -3118,12 +3124,9 @@ static void *ThumbThread (void *arg)
                         same_dir = false;
                         secure_type = true;
                     }
-                    loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
-                    loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
+                    mem2_free(loadIndex->image, MEM2_BROWSER);
                     loadIndex->image = mem2_strdup(actual_path, MEM2_BROWSER);
                     read = LoadFile(thumbBuffer, 880*1024, actual_path, SILENT);
-                    mem2_free(loadIndex->year, MEM2_DESC);
-                    mem2_free(loadIndex->desc, MEM2_DESC);
                     //memset(art_disp,0,strlen(art_disp));
                     //memset(art_disp_2,0,strlen(art_disp_2));
                     //memset(actual_path,0,strlen(actual_path));
@@ -3385,6 +3388,15 @@ static int LoadNewFile()
 
         if(wii_error == 1)
             ErrorPrompt("Resolution exceeds maximum allowed (1024x720)!");
+        else if(wii_error == 2)
+            ErrorPrompt(wii_error_text);
+        else if(lavc_missing_video_feature[0])
+        {
+            char msg[200];
+            snprintf(msg, sizeof(msg), "Unsupported: %s",
+                lavc_missing_video_feature);
+            ErrorPrompt(msg);
+        }
         else
             ErrorPrompt("Error loading file!");
 

@@ -283,6 +283,22 @@ int GuiWindow::GetSelected()
     return found;
 }
 
+void GuiWindow::SelectOnly(int n)
+{
+    u32 elemSize = _elements.size();
+    for (u32 i = 0; i < elemSize; ++i)
+    {
+        try
+        {
+            if(int(i) == n)
+                _elements.at(i)->SetState(STATE_SELECTED);
+            else if(_elements.at(i)->GetState() == STATE_SELECTED)
+                _elements.at(i)->ResetState();
+        }
+        catch (const std::exception& e) { }
+    }
+}
+
 // set element to left/right as selected
 // there's probably a more clever way to do this, but this way works
 void GuiWindow::MoveSelectionHor(int dir)
@@ -349,11 +365,7 @@ void GuiWindow::MoveSelectionHor(int dir)
     // match found
     matchfound:
     if(found >= 0)
-    {
-        _elements.at(found)->SetState(STATE_SELECTED);
-        if(selected >= 0)
-            _elements.at(selected)->ResetState();
-    }
+        this->SelectOnly(found);
 }
 
 void GuiWindow::MoveSelectionVert(int dir)
@@ -400,11 +412,7 @@ void GuiWindow::MoveSelectionVert(int dir)
     // match found
     matchfound:
     if(found >= 0)
-    {
-        _elements.at(found)->SetState(STATE_SELECTED);
-        if(selected >= 0)
-            _elements.at(selected)->ResetState();
-    }
+        this->SelectOnly(found);
 }
 
 void GuiWindow::ResetText()
@@ -431,7 +439,9 @@ void GuiWindow::Update(GuiTrigger * t)
 
     this->ToggleFocus(t);
 
-    if(focus) // only send actions to this window if it's in focus
+    // only send actions to this window if it's in focus; the pointer owns the
+    // highlight while it's on screen
+    if(focus && !t->wpad->ir.valid)
     {
         // pad/joystick navigation
         if(t->Right())
