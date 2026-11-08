@@ -246,6 +246,7 @@ static const char * const preferred_list[] = {
     "mov,mp4,m4a,3gp,3g2,mj2",
     "mpc",
     "mpc8",
+    "mpegts", // the native TS demuxer guesses length and seeks from the peak bitrate
     "mxf",
     "ogg",
     "pva",
