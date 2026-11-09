@@ -60,6 +60,7 @@
 #    include <di/di.h>
 #    include <malloc.h>
 #    include "../../utils/mem2_manager.h"
+#    include <ogc/lwp_watchdog.h>
 extern bool StartDVDMotor();
 #endif
 
@@ -1164,6 +1165,59 @@ static int di_seek(dvdcss_t dvdcss, int i_blocks) {
     return dvdcss->i_pos;
 }
 
+/* With AHBPROT, libdi drives the disc through its registers, and a read
+ * the drive fails then returns 1, not a negative number. It doesn't retry,
+ * and until something reads the drive's error, every later read fails
+ * the same way. Taken for success, each failed read handed back whatever
+ * the buffer already held, and the player scanned that without end. So
+ * anything but 0 is a failure: read the error, which clears it, and try
+ * again.
+ *
+ * Read the error through the registers too. DI_GetError asks IOS, and IOS
+ * sending the drive a command while the drive sits in an error from a read
+ * IOS never saw froze the whole Wii. */
+static vu32 *const di_reg = (vu32 *)0xCD806000;
+
+static uint32_t di_request_error(void) {
+    u64 start = gettime();
+
+    while (di_reg[7] & 1) /* a command still running */
+        if (diff_ticks(start, gettime()) > millisecs_to_ticks(1000))
+            return 0xFFFFFFFF;
+
+    di_reg[0] = (di_reg[0] & 0x2A) | 0x54; /* clear the drive's interrupts */
+    di_reg[2] = 0xE0000000; /* request error */
+    di_reg[3] = 0;
+    di_reg[4] = 0;
+    di_reg[6] = 0;
+    di_reg[7] = 1; /* start, no DMA */
+
+    start = gettime();
+    while (di_reg[7] & 1)
+        if (diff_ticks(start, gettime()) > millisecs_to_ticks(1000))
+            return 0xFFFFFFFF;
+
+    di_reg[0] = (di_reg[0] & 0x2A) | 0x54;
+    return di_reg[8];
+}
+
+static int di_read_blocks(dvdcss_t dvdcss, void *bfr, int blocks) {
+    int tries;
+
+    for (tries = 0; tries < 4; tries++) {
+        int ret = DI_ReadDVD(bfr, blocks, dvdcss->i_pos);
+        uint32_t error;
+
+        if (ret == 0)
+            return 0;
+
+        error = ret > 0 ? di_request_error() : 0;
+        print_debug(dvdcss, "DI: reading %d blocks at %d failed with %d, drive error 0x%08x",
+                    blocks, dvdcss->i_pos, ret, error);
+    }
+    return -1;
+}
+
 static int di_read(dvdcss_t dvdcss, void *buffer, int blocks) {
     void *bfr;
     int ret;
@@ -1175,10 +1229,9 @@ static int di_read(dvdcss_t dvdcss, void *buffer, int blocks) {
         return -1;
     }
 
-    ret = DI_ReadDVD(bfr, blocks, dvdcss->i_pos);
+    ret = di_read_blocks(dvdcss, bfr, blocks);
 
     if (ret < 0) {
-        print_debug(dvdcss, "DI: read failed with %d", ret);
         free(bfr);
         return -1;
     }
@@ -1207,9 +1260,8 @@ static int di_readv(dvdcss_t dvdcss, struct iovec *iov, int iovcnt) {
         return -1;
     }
 
-    ret = DI_ReadDVD(bfr, len / DVDCSS_BLOCK_SIZE, dvdcss->i_pos);
+    ret = di_read_blocks(dvdcss, bfr, len / DVDCSS_BLOCK_SIZE);
     if (ret < 0) {
-        print_debug( dvdcss, "DI: readv failed with %d", ret);
         free(bfr);
         return -1;
     }
