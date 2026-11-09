@@ -502,7 +502,9 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
                 if(content_length > 0)
                 {
-                    if(sizeread+content_length > maxsize)
+                    // as a subtraction: a huge chunk size wrapped the sum
+                    // past the check, and the read ran off the buffer
+                    if(content_length > maxsize - sizeread)
                         break;
 
                     ret = tcp_read(s, (u8 *)buffer+sizeread, content_length);
