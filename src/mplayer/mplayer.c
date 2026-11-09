@@ -5830,6 +5830,14 @@ bool wiiIsPlaying()
         return playing_file;
 }
 
+// the checks wiiSeek makes before it queues a seek
+bool wiiCanSeek()
+{
+        return playing_file && mpctx->stream && mpctx->stream->seek &&
+                mpctx->demuxer && mpctx->demuxer->seekable && !thp_vid &&
+                filename && strncmp(filename, "mms:", 4) != 0;
+}
+
 void wiiMute()
 {
         mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );

@@ -970,6 +970,7 @@ static void ResumeScreensaverThread()
 }
 
 static bool videoPaused;
+static bool videoSkips = true; // the skip buttons are on the bar
 
 extern "C" void DoMPlayerGuiDraw()
 {
@@ -1000,6 +1001,21 @@ extern "C" void DoMPlayerGuiDraw()
         mainWindow->SetState(STATE_DEFAULT);
         HideVideoVolumeLevelBar();
         statusText->SetVisible(false);
+    }
+
+    // A network video can seek once its stream turns out to take ranges.
+    // The buttons were off the bar when it was last shown or hidden, which
+    // does the same to all it holds, so they're shown here to match it.
+    if(!videoSkips && wiiCanSeek())
+    {
+        videoSkips = true;
+        GuiButton *skip[2] = { videobarBackwardBtn, videobarForwardBtn };
+        for(int i = 0; i < 2; i++)
+        {
+            skip[i]->SetVisible(videobar->IsVisible());
+            skip[i]->SetState(videobar->GetState() == STATE_DISABLED ? STATE_DISABLED : STATE_DEFAULT);
+            videobar->Append(skip[i]);
+        }
     }
 
     if(videoPaused != wiiIsPaused())
@@ -8497,11 +8513,13 @@ void MPlayerMenu()
     {
         videobar->Remove(videobarBackwardBtn);
         videobar->Remove(videobarForwardBtn);
+        videoSkips = false;
     }
     else
     {
         videobar->Append(videobarBackwardBtn);
         videobar->Append(videobarForwardBtn);
+        videoSkips = true;
     }
 
     menuMode = 1; // switch to MPlayer GUI mode
