@@ -420,14 +420,29 @@ void UndoChangeMenu()
     menuPrevious = menuUndo;
 }
 
+static int menuTabClicks = 0;
+
 static void ChangeMenu(void *ptr, int menu)
 {
     GuiButton *b = (GuiButton *)ptr;
     if(b->GetState() == STATE_CLICKED)
     {
+        menuTabClicks++;
         ChangeMenu(menu);
         b->ResetState();
     }
+}
+
+// the tabs at the top: Videos, Music, DVD, Online Media, and Settings
+bool IsMenuTab(GuiElement *e)
+{
+    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn);
+}
+
+// how many times a tab was clicked, the current menu's own included
+int MenuTabClicks()
+{
+    return menuTabClicks;
 }
 
 static void ChangeMenuVideos(void *ptr) { ChangeMenu(ptr, MENU_BROWSE_VIDEOS); }

@@ -453,10 +453,16 @@ static void Show(Screen *sc)
 
     SuspendGui();
 
-    // keep the browser underneath out of reach: dialogs and the keyboard
-    // turn the whole main window back on when they close
-    mainWindow->SetState(STATE_DISABLED);
-    sc->w->SetState(STATE_DEFAULT);
+    // keep the browser underneath out of reach, but not the tabs at the
+    // top, which leave the screen. Dialogs and the keyboard turn the whole
+    // main window back on when they close.
+    mainWindow->SetState(STATE_DEFAULT);
+    for (u32 i = 0; i < mainWindow->GetSize(); i++)
+    {
+        GuiElement *e = mainWindow->GetGuiElementAt(i);
+        if (e != sc->w && !IsMenuTab(e))
+            e->SetState(STATE_DISABLED);
+    }
 
     Enable(sc->search, !l);
     sc->searchTxt->SetText(lastQuery[0] ? lastQuery : "Search YouTube...");
@@ -787,8 +793,11 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     Show(&sc);
 
     bool done = false;
+    int tabClicks = MenuTabClicks();
 
-    while (!done && !ExitRequested)
+    // a tab at the top leaves the screen: Online Media for its list, any
+    // other for its menu
+    while (!done && !ExitRequested && menuCurrent == MENU_BROWSE_ONLINEMEDIA && MenuTabClicks() == tabClicks)
     {
         usleep(THREAD_SLEEP);
 

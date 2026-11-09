@@ -11,6 +11,8 @@
 
 #include <ogcsys.h>
 
+class GuiElement;
+
 void WiiMenu();
 void SuspendGui();
 void ResumeGui();
@@ -38,6 +40,8 @@ bool VideoSettingsVisible();
 bool VideoSettingsHit(int x, int y);
 void HideVideoSettings();
 void UndoChangeMenu();
+bool IsMenuTab(GuiElement *e);
+int MenuTabClicks();
 void UpdateBrowser();
 
 void EnableVideoImg();
