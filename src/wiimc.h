@@ -67,6 +67,7 @@ void wiiSeekPos(int sec);
 void wiiFastForward();
 void wiiRewind();
 void wiiSync();
+bool wiiIsLive();
 double wiiGetTimeLength();
 double wiiGetTimePos();
 void wiiGetTimeDisplay(char *buf);

@@ -5871,6 +5871,15 @@ void wiiSync()
         wiiSeek(-2, 0);
 }
 
+// A live broadcast has no end to show, only how long it has played.
+bool wiiIsLive()
+{
+        if(!playing_file || controlledbygui == 2 || !mpctx->stream)
+                return false;
+
+        return (mpctx->stream->flags & MP_STREAM_LIVE) != 0;
+}
+
 double wiiGetTimeLength()
 {
         if(!playing_file || controlledbygui == 2)
@@ -5947,7 +5956,10 @@ void wiiGetTimeDisplay(char * buf)
         int len = demuxer_get_time_length(mpctx->demuxer);
         int pts = wiiTimeFromStart(wiiPlayTime());
 
-        if(len <= 0)
+        if(wiiIsLive())
+                sprintf(buf, "%02d:%02d:%02d / LIVE",
+                        pts/3600,(pts/60)%60,pts%60);
+        else if(len <= 0)
                 sprintf(buf, "%02d:%02d:%02d / --:--:--",
                         pts/3600,(pts/60)%60,pts%60);
         else

@@ -2637,6 +2637,21 @@ static void UpdateAudiobarModeBtn()
     }
 }
 
+// A live stream plays at its live edge, so its bar shows full. It can't
+// seek, so the bar stays disabled, and a disabled button never runs the
+// update callback that fills it: fill it here.
+static void ShowAudioProgressLive()
+{
+    audiobarProgressBtn->SetVisible(true);
+    audiobarProgressBtn->SetState(STATE_DISABLED);
+    audiobarProgressBtn->SetAlpha(255);
+    audiobarProgressLeftImg->SetVisible(true);
+    audiobarProgressMidImg->SetVisible(true);
+    audiobarProgressMidImg->SetTile(86);
+    audiobarProgressLineImg->SetVisible(false);
+    audiobarProgressRightImg->SetVisible(true);
+}
+
 void DisableVideoImg()
 {
     if(!videoImg)
@@ -3440,6 +3455,10 @@ static int LoadNewFile()
         audiobarProgressBtn->SetState(STATE_DEFAULT);
         audiobarProgressMidImg->SetVisible(true);
     }
+    else if(wiiIsLive())
+    {
+        ShowAudioProgressLive();
+    }
     else // this is a stream - hide progress bar
     {
         audiobarProgressBtn->SetVisible(false);
@@ -3735,7 +3754,11 @@ static void MenuBrowse(int menu)
                 mainWindow->Append(audiobar);
         }
 
-        if(wiiGetTimeLength() == 0)
+        if(wiiGetTimeLength() == 0 && wiiIsLive())
+        {
+            ShowAudioProgressLive();
+        }
+        else if(wiiGetTimeLength() == 0)
         {
             audiobarProgressBtn->SetVisible(false);
             audiobarProgressBtn->SetState(STATE_DISABLED);
@@ -4199,6 +4222,12 @@ static void MenuBrowse(int menu)
                     audiobarProgressBtn->SetState(STATE_DEFAULT);
                     audiobarProgressBtn->SetAlpha(255);
                 }
+            }
+            else if(wiiIsLive())
+            {
+                if(audiobarProgressBtn->GetState() != STATE_DISABLED ||
+                    !audiobarProgressRightImg->IsVisible())
+                    ShowAudioProgressLive();
             }
             else
             {
@@ -6890,7 +6919,11 @@ static void VideoProgressCallback(void *ptr)
     double percent = 0;
     double percent_2 = 0; // This fixes the seekbar delay when tiled rendering.
 
-    if(total > 0)
+    // A live stream plays at its live edge: the bar stays full. With no
+    // length, there's no place to show, so it stays empty.
+    if(wiiIsLive())
+        percent = 1;
+    else if(total > 0)
         percent = done/total;
 
     if(b->GetState() == STATE_CLICKED)
