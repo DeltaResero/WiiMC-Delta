@@ -5947,9 +5947,13 @@ void wiiGetTimeDisplay(char * buf)
         int len = demuxer_get_time_length(mpctx->demuxer);
         int pts = wiiTimeFromStart(wiiPlayTime());
 
-        sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
-                pts/3600,(pts/60)%60,pts%60,
-                len/3600,(len/60)%60,len%60);
+        if(len <= 0)
+                sprintf(buf, "%02d:%02d:%02d / --:--:--",
+                        pts/3600,(pts/60)%60,pts%60);
+        else
+                sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
+                        pts/3600,(pts/60)%60,pts%60,
+                        len/3600,(len/60)%60,len%60);
 }
 
 void wiiGetDroppedFrames(char * buf)
