@@ -38,6 +38,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     shift = 0;
     caps = 0;
     backPressed = false;
+    placeholder = NULL;
     selectable = true;
     focus = 1; // allow focus
     alignmentHor = ALIGN_CENTRE;
@@ -299,6 +300,27 @@ void GuiKeyboard::operator delete[](void *p)
     gui_free(p);
 }
 
+// Shows the typed text, or the grey placeholder while there is none
+void GuiKeyboard::ShowText()
+{
+    if(kbtextstr[0] == 0 && placeholder)
+    {
+        kbText->SetColor((GXColor){150, 150, 155, 0xff});
+        kbText->SetText(placeholder);
+    }
+    else
+    {
+        kbText->SetColor((GXColor){255, 255, 255, 0xff});
+        kbText->SetText(GetDisplayText(kbtextstr));
+    }
+}
+
+void GuiKeyboard::SetPlaceholder(const char * p)
+{
+    placeholder = p;
+    ShowText();
+}
+
 void GuiKeyboard::Update(GuiTrigger * t)
 {
     if(_elements.size() == 0 || (state == STATE_DISABLED && parentElement))
@@ -318,7 +340,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
         if(strlen(kbtextstr) > 0)
         {
             kbtextstr[strlen(kbtextstr)-1] = 0;
-            kbText->SetText(GetDisplayText(kbtextstr));
+            ShowText();
         }
         else
         {
@@ -331,7 +353,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
         if(strlen(kbtextstr) < kbtextmaxlen)
         {
             kbtextstr[strlen(kbtextstr)] = ' ';
-            kbText->SetText(kbtextstr);
+            ShowText();
         }
         keySpace->SetState(STATE_SELECTED, t->chan);
 
@@ -347,7 +369,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
         if(strlen(kbtextstr) > 0)
         {
             kbtextstr[strlen(kbtextstr)-1] = 0;
-            kbText->SetText(GetDisplayText(kbtextstr));
+            ShowText();
         }
         keyBack->SetState(STATE_SELECTED, t->chan);
 
@@ -404,7 +426,7 @@ void GuiKeyboard::Update(GuiTrigger * t)
                             kbtextstr[strlen(kbtextstr)] = keys[i][j].ch;
                         }
                     }
-                    kbText->SetText(GetDisplayText(kbtextstr));
+                    ShowText();
                     keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
 
                     //don't reset pos (D-pad only: a pointer press keeps its own selection)
