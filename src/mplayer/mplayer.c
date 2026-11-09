@@ -3000,6 +3000,12 @@ static double update_video(int *blit_frame)
             mp_msg(MSGT_CPLAYER, MSGL_V, "pts value < previous\n");
         }
         frame_time = sh_video->pts - sh_video->last_pts;
+        // A broken timestamp, or a break in the stream: show the frame
+        // after the usual time, not after the jump.
+        if (!demuxer_frame_end_is_real(mpctx->demuxer, sh_video->last_pts, sh_video->pts)) {
+            mp_msg(MSGT_CPLAYER, MSGL_V, "pts jumped %.1f s ahead\n", frame_time);
+            frame_time = sh_video->frametime > 0 && sh_video->frametime < 1 ? sh_video->frametime : 0;
+        }
         // The first frame should be displayed directly,
         // all others should get a default frame_time
         if (!frame_time && mpctx->startup_decode_retry == 0)
@@ -4625,7 +4631,9 @@ total_time_usage_start=GetTimer();
                         // try to figure out duration of last frame
                         if (correct_pts && mpctx->sh_video->endpts != MP_NOPTS_VALUE &&
                             mpctx->sh_video->pts != MP_NOPTS_VALUE &&
-                            mpctx->sh_video->endpts > mpctx->sh_video->pts) {
+                            mpctx->sh_video->endpts > mpctx->sh_video->pts &&
+                            demuxer_frame_end_is_real(mpctx->demuxer, mpctx->sh_video->pts,
+                                                      mpctx->sh_video->endpts)) {
                             frame_time = mpctx->sh_video->endpts - mpctx->sh_video->pts;
                         } else {
                             frame_time = mpctx->sh_video->frametime;

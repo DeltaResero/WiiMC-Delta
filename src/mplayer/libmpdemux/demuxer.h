@@ -450,6 +450,7 @@ int demux_control(demuxer_t *demuxer, int cmd, void *arg);
 
 double demuxer_get_current_time(demuxer_t *demuxer);
 double demuxer_get_time_length(demuxer_t *demuxer);
+int demuxer_frame_end_is_real(demuxer_t *demuxer, double pts, double end);
 int demuxer_get_percent_pos(demuxer_t *demuxer);
 int demuxer_switch_audio(demuxer_t *demuxer, int index);
 int demuxer_switch_video(demuxer_t *demuxer, int index);

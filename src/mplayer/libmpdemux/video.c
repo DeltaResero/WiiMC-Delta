@@ -649,9 +649,13 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
         // Newer FFmpeg takes r_frame_rate from the codec, which can
         // disagree with the container (H.264 declaring 23.976 fps in a
         // 29.97 fps Matroska file), so prefer the packet's own duration.
+        // Not a broken one, though, or the player waits that long for the
+        // next frame.
         if(d_video->current && d_video->current->pts != MP_NOPTS_VALUE &&
            d_video->current->endpts != MP_NOPTS_VALUE &&
-           d_video->current->endpts > d_video->current->pts){
+           d_video->current->endpts > d_video->current->pts &&
+           demuxer_frame_end_is_real(d_video->demuxer, d_video->current->pts,
+                                     d_video->current->endpts)){
           frame_time = d_video->current->endpts - d_video->current->pts;
           break;
         }

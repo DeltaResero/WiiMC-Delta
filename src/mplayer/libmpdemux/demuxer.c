@@ -1538,6 +1538,31 @@ double demuxer_get_time_length(demuxer_t *demuxer)
 }
 
 /**
+ * \brief Tells whether a frame shown at pts can really last until end.
+ *        Short durations always can. A long one is real when the frame
+ *        starts and ends inside the file, as a held still in a variable
+ *        frame rate video does. After a fast forward past the end of an
+ *        MPEG-TS file, the last frame claimed to start at 0 in a file whose
+ *        timestamps start 9 hours in. Without the file's length, as in a
+ *        live stream, where jumps in the timestamps are common, take it as
+ *        broken.
+ */
+int demuxer_frame_end_is_real(demuxer_t *demuxer, double pts, double end)
+{
+    double start = 0, length;
+
+    if (end - pts < 10.0)
+        return 1;
+    length = demuxer_get_time_length(demuxer);
+    if (length <= 0)
+        return 0;
+    // Only FFmpeg's demuxer knows the first timestamp. Taking 0 for the
+    // others can only make a real duration look broken, never the reverse.
+    demux_control(demuxer, DEMUXER_CTRL_GET_START_TIME, &start);
+    return pts >= start - 1.0 && end <= start + length + 1.0;
+}
+
+/**
  * \brief demuxer_get_current_time() returns the time of the current play in three possible ways:
  *        either when the stream reader satisfies STREAM_CTRL_GET_CURRENT_TIME (e.g. dvd)
  *        or using sh_video->pts when the former method fails
