@@ -5141,6 +5141,7 @@ goto play_next_file;
  * Wii support code
  ***************************************************************************/
 #include <ogc/system.h>
+#include <ogc/lwp_watchdog.h>
 
 #define MAX_RESTORE_POINTS 50
 
@@ -5441,8 +5442,14 @@ void PauseAndGotoGUI()
         if(mpctx->sh_video)
                 save_restore_point(fileplaying, partitionlabelplaying);
 
+        // The cache thread suspends itself between reads. One stuck waiting
+        // on a stream that stopped sending can't, and the menu waited for it
+        // until the stream sent again: go on without it after a second, and
+        // it suspends once its read returns.
         stop_cache_thread = 1;
-        while(!CacheThreadSuspended())
+        u64 suspend_start = gettime();
+        while(!CacheThreadSuspended() &&
+              ticks_to_millisecs(diff_ticks(suspend_start, gettime())) < 1000)
                 usleep(50);
 
         printf("sent control to gui\n");
@@ -5493,10 +5500,15 @@ void PauseAndGotoGUI()
         GetRelativeTime(); // ignore time that passed during pause
 }
 
+#ifdef GEKKO
+extern int getMESS; // cache2.c: gives up on a stream that stopped sending
+#endif
+
 static void low_cache_loop(void)
 {
         float percent;
-        int progress;
+        int progress, last_progress = -1;
+        u64 progress_time = gettime();
         //int brk_cmd;
         mp_cmd_t* cmd=NULL;
 
@@ -5535,8 +5547,18 @@ static void low_cache_loop(void)
 
                 progress = (int)(cache_fill_level*100.0/percent);
 
-                if(progress >= 100 || progress <= 0)
-                        break; // let's get out of here!
+                // An empty cache is just when to keep buffering. Give up only
+                // on a stream that has sent nothing for as long as the cache
+                // allows (cache2.c), which ends it.
+                if(progress > last_progress)
+                        progress_time = gettime();
+                last_progress = progress;
+                if(progress >= 100)
+                        break;
+                if(ticks_to_millisecs(diff_ticks(progress_time, gettime())) > 30000) {
+                        getMESS = 1;
+                        break;
+                }
 
                 SetBufferingStatus(progress);
 
@@ -5547,8 +5569,23 @@ static void low_cache_loop(void)
                 usleep(100);
         }
 
-        mpctx->osd_function=OSD_PLAY;
         SetBufferingStatus(0);
+
+        // Home while buffering: go to the menu now, as the pause loop does.
+        // Left in the queue, the quit came straight back here while the
+        // cache stayed low, and ran only once the stream sent again.
+        if (cmd && cmd->id == MP_CMD_QUIT)
+        {
+                cmd = mp_input_get_cmd(0,1,0);
+                run_command(mpctx, cmd);
+                mp_cmd_free(cmd);
+                cmd = NULL;
+                DrawMPlayer(); //copy screen
+                pause_gui=0;
+                PauseAndGotoGUI();
+        }
+
+        mpctx->osd_function=OSD_PLAY;
         if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
                 StartDVDMotor();
         else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
