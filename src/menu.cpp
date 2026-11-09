@@ -147,6 +147,7 @@ static GuiImageData *actionbarMid = NULL;
 static GuiImageData *actionbarRight = NULL;
 static GuiImageData *actionbarBackward = NULL;
 static GuiImageData *actionbarPause = NULL;
+static GuiImageData *actionbarStop = NULL;
 static GuiImageData *actionbarPlay = NULL;
 static GuiImageData *actionbarForward = NULL;
 static GuiImageData *actionbarRotate = NULL;
@@ -175,6 +176,7 @@ static GuiImage *videobarVolumeLevelLineImg = NULL;
 static GuiImage *videobarVolumeLevelBottomImg = NULL;
 static GuiImage *videobarBackwardImg = NULL;
 static GuiImage *videobarPauseImg = NULL;
+static GuiImage *videobarStopImg = NULL;
 static GuiImage *videobarForwardImg = NULL;
 
 static GuiTooltip *videobarVolumeTip = NULL;
@@ -187,6 +189,7 @@ static GuiButton *videobarVolumeBtn = NULL;
 static GuiButton *videobarVolumeLevelBtn = NULL;
 static GuiButton *videobarBackwardBtn = NULL;
 static GuiButton *videobarPauseBtn = NULL;
+static GuiButton *videobarStopBtn = NULL;
 static GuiButton *videobarForwardBtn = NULL;
 
 static GuiText *videobarTime = NULL;
@@ -7095,6 +7098,20 @@ static void VideoPauseCallback(void *ptr)
     }
 }
 
+// does what the Home button does: leaves the video for the menu
+static void VideoStopCallback(void *ptr)
+{
+    GuiButton *b = (GuiButton *)ptr;
+    if(b->GetState() == STATE_CLICKED)
+    {
+        b->ResetState();
+        ShutoffRumble();
+        if(wiiIsPaused())
+            wiiPause();
+        wiiGotoGui();
+    }
+}
+
 static void VideoForwardCallback(void *ptr)
 {
     GuiButton *b = (GuiButton *)ptr;
@@ -7588,6 +7605,7 @@ static void SetupGui()
     actionbarRight = new GuiImageData(actionbar_right_png);
     actionbarBackward = new GuiImageData(actionbar_backward_png);
     actionbarPause = new GuiImageData(actionbar_pause_png);
+    actionbarStop = new GuiImageData(actionbar_stop_png);
     actionbarPlay = new GuiImageData(actionbar_play_png);
     actionbarForward = new GuiImageData(actionbar_forward_png);
     actionbarRotate = new  GuiImageData(actionbar_continuous_png);
@@ -7630,6 +7648,8 @@ static void SetupGui()
     videobarPauseImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
     videobarForwardImg = new GuiImage(actionbarForward);
     videobarForwardImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
+    videobarStopImg = new GuiImage(actionbarStop);
+    videobarStopImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
 
     videobarVolumeLevelImg = new GuiImage(volumeEmpty);
     videobarVolumeLevelImg->SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
@@ -7682,7 +7702,7 @@ static void SetupGui()
     videobarVolumeBtn->SetEffectGrow();
 
     videobarBackwardBtn = new GuiButton(40, 40);
-    videobarBackwardBtn->SetPosition(-60, 4);
+    videobarBackwardBtn->SetPosition(-120, 4);
     videobarBackwardBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     videobarBackwardBtn->SetImage(videobarBackwardImg);
     //videobarBackwardBtn->SetTooltip(videobarBackwardTip);
@@ -7690,6 +7710,15 @@ static void SetupGui()
     videobarBackwardBtn->SetSelectable(false);
     videobarBackwardBtn->SetUpdateCallback(VideoBackwardCallback);
     videobarBackwardBtn->SetEffectGrow();
+
+    videobarStopBtn = new GuiButton(40, 40);
+    videobarStopBtn->SetPosition(-60, 4);
+    videobarStopBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+    videobarStopBtn->SetImage(videobarStopImg);
+    videobarStopBtn->SetTrigger(trigA);
+    videobarStopBtn->SetSelectable(false);
+    videobarStopBtn->SetUpdateCallback(VideoStopCallback);
+    videobarStopBtn->SetEffectGrow();
 
     videobarPauseBtn = new GuiButton(40, 40);
     videobarPauseBtn->SetPosition(0, 4);
@@ -7743,6 +7772,7 @@ static void SetupGui()
     videobar->Append(videobarVolumeLevelMidImg);
     videobar->Append(videobarVolumeLevelLineImg);
     videobar->Append(videobarVolumeLevelBottomImg);
+    videobar->Append(videobarStopBtn);
     videobar->Append(videobarBackwardBtn);
     videobar->Append(videobarPauseBtn);
     videobar->Append(videobarForwardBtn);
