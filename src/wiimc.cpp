@@ -33,6 +33,7 @@
 #include "musicplaylist.h"
 #include "wiimc.h"
 #include "settings.h"
+#include "youtube.h"
 
 char MPLAYER_DATADIR[512];
 char MPLAYER_CONFDIR[512];
@@ -770,8 +771,25 @@ void LoadMPlayerFile()
     while(WiiSettings.subtitleVisibility && !ParseDone())
         usleep(100);
 
+    // A video from RiiTube's YouTube lists: ask YouTube for its link here,
+    // which starts at once, and keep RiiTube's link if YouTube refuses.
+    // The link only works from this Wii and is too long for loadedFile.
+    char ytid[32];
+    char *ytlink = NULL;
+
+    if(YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
+    {
+        ytlink = (char *)malloc(4096);
+        if(ytlink && !YouTubeResolve(ytid, ytlink, 4096, NULL, 0))
+        {
+            free(ytlink);
+            ytlink = NULL;
+        }
+    }
+
     // set new file to load
-    wiiLoadFile(loadedFile, partitionlabel);
+    wiiLoadFile(ytlink ? ytlink : loadedFile, partitionlabel);
+    free(ytlink);
 
     while(controlledbygui != 0)
         usleep(100);
