@@ -33,6 +33,7 @@
 #include "musicplaylist.h"
 #include "filebrowser.h"
 #include "youtube_menu.h"
+#include "youtube.h"
 #include "theme.h"
 #include "utils/gettext.h"
 #include "utils/http.h"
@@ -7194,9 +7195,10 @@ static void VideoPauseCallback(void *ptr)
 // does what the Home button does: leaves the video for the menu
 /****************************************************************************
  * Player settings: the gear on the video bar opens a list above it with the
- * playback speed, the subtitles, and the audio track when there's more
- * than one. Like the rest of the bar it's updated and drawn by MPlayer's
- * thread.
+ * playback speed, the subtitles (a YouTube video's captions), and the audio
+ * track when there's more than one. Like the rest of the bar it's updated
+ * and drawn by MPlayer's thread; YouTube captions are fetched by the GUI
+ * thread in MPlayerMenu.
  ***************************************************************************/
 
 #define SET_ROWS 9      // rows on screen, the back row included
@@ -7241,6 +7243,24 @@ static int setCurrent = -1;         // the choice in use
 static const float speeds[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
 #define SPEEDS (int)(sizeof(speeds) / sizeof(speeds[0]))
 
+// YouTube captions: which one is shown (-1 = none), which subtitle file each
+// became once fetched (-1 = not yet), and the one the GUI thread should fetch
+static int ytCaptionShown = -1;
+static int ytCaptionFile[YT_CAPTIONS_MAX];
+static int ytCaptionSerial = -1;
+static volatile int ytCaptionWanted = -1;
+
+static void CaptionsCheck()
+{
+    if(ytCaptionSerial == YouTubeCaptionSerial())
+        return;
+    ytCaptionSerial = YouTubeCaptionSerial();
+    ytCaptionShown = -1;
+    ytCaptionWanted = -1;
+    for(int i = 0; i < YT_CAPTIONS_MAX; i++)
+        ytCaptionFile[i] = -1;
+}
+
 static int SpeedIndex()
 {
     float sp = wiiGetSpeed();
@@ -7282,19 +7302,33 @@ static void SettingsList(int page)
         setChoices = 1;
         setCurrent = 0;
 
-        static char names[SET_LIST - 1][48];
-        int n = wiiSubtitles(names, SET_LIST - 1);
-        int pos = wiiSubtitleTrack();
-        for(int i = 0; i < n; i++)
+        if(YouTubeCaptionCount() > 0)
         {
-            if(names[i][0])
-                snprintf(setChoice[setChoices], 64, "%.48s", names[i]);
-            else
-                snprintf(setChoice[setChoices], 64, "%s %d", gettext("Track"), i + 1);
-            setValue[setChoices] = i;
-            if(i == pos)
-                setCurrent = setChoices;
-            setChoices++;
+            for(int i = 0; i < YouTubeCaptionCount() && setChoices < SET_LIST; i++)
+            {
+                snprintf(setChoice[setChoices], 64, "%s", YouTubeCaptionName(i));
+                setValue[setChoices] = i;
+                if(i == ytCaptionShown)
+                    setCurrent = setChoices;
+                setChoices++;
+            }
+        }
+        else
+        {
+            static char names[SET_LIST - 1][48];
+            int n = wiiSubtitles(names, SET_LIST - 1);
+            int pos = wiiSubtitleTrack();
+            for(int i = 0; i < n; i++)
+            {
+                if(names[i][0])
+                    snprintf(setChoice[setChoices], 64, "%.48s", names[i]);
+                else
+                    snprintf(setChoice[setChoices], 64, "%s %d", gettext("Track"), i + 1);
+                setValue[setChoices] = i;
+                if(i == pos)
+                    setCurrent = setChoices;
+                setChoices++;
+            }
         }
     }
     else if(page == PAGE_AUDIO)
@@ -7317,7 +7351,7 @@ static void SettingsList(int page)
 static bool SubtitlesExist()
 {
     static char names[1][48];
-    return wiiSubtitles(names, 1) > 0;
+    return YouTubeCaptionCount() > 0 || wiiSubtitles(names, 1) > 0;
 }
 
 static bool AudioTracksExist()
@@ -7344,6 +7378,8 @@ static void ShowSettingsPage(int page)
     int r = 0;
     char buf[64];
 
+    CaptionsCheck();
+
     // showing a window shows and enables all it holds, so first the panel,
     // then each row as this page needs it
     settingsPanel->SetVisible(true);
@@ -7361,7 +7397,8 @@ static void ShowSettingsPage(int page)
         if(SubtitlesExist())
         {
             SettingsList(PAGE_SUBS);
-            SettingsRow(r++, "Subtitles", setChoice[setCurrent >= 0 ? setCurrent : 0], ACT_SUBS, false);
+            SettingsRow(r++, YouTubeCaptionCount() > 0 ? "Captions" : "Subtitles",
+                setChoice[setCurrent >= 0 ? setCurrent : 0], ACT_SUBS, false);
         }
         if(AudioTracksExist())
         {
@@ -7372,8 +7409,10 @@ static void ShowSettingsPage(int page)
     }
     else
     {
-        static const char *titles[] = { "", "Playback speed", "Subtitles", "Audio track" };
+        static const char *titles[] = { "", "Playback speed", NULL, "Audio track" };
         const char *title = titles[page];
+        if(page == PAGE_SUBS)
+            title = YouTubeCaptionCount() > 0 ? "Captions" : "Subtitles";
 
         snprintf(buf, sizeof(buf), "< %s", gettext(title));
         SettingsRow(r++, buf, NULL, ACT_BACK, false);
@@ -7437,6 +7476,25 @@ static void SettingsPick(int c)
         wiiSetAudioTrack(setValue[c]);
         wiiSync(); // as the D-pad's audio switch does: a seek puts it back in step
     }
+    else if(setPage == PAGE_SUBS && YouTubeCaptionCount() > 0)
+    {
+        int i = setValue[c];
+        if(i < 0)
+        {
+            wiiSetSubtitleTrack(-1);
+            ytCaptionShown = -1;
+        }
+        else if(ytCaptionFile[i] >= 0)
+        {
+            wiiShowSubtitleFile(ytCaptionFile[i]);
+            ytCaptionShown = i;
+        }
+        else
+        {
+            ytCaptionShown = i;
+            ytCaptionWanted = i; // MPlayerMenu fetches it
+        }
+    }
     else if(setPage == PAGE_SUBS)
     {
         wiiSetSubtitleTrack(setValue[c]);
@@ -7474,6 +7532,26 @@ static void VideoSettingsUpdate()
             SettingsPick(a);
         break;
     }
+}
+
+// the GUI thread's part: fetch the YouTube captions asked for, and show them
+static void VideoSettingsFetch()
+{
+    int i = ytCaptionWanted;
+    if(i < 0)
+        return;
+    ytCaptionWanted = -1;
+
+    char file[MAXPATHLEN];
+    snprintf(file, sizeof(file), "%s/captions.utf8", appPath); // ".utf8": MPlayer skips the codepage
+
+    if(!YouTubeCaptionSave(i, file))
+    {
+        if(ytCaptionShown == i)
+            ytCaptionShown = -1;
+        return;
+    }
+    ytCaptionFile[i] = wiiLoadSubtitleFile(file);
 }
 
 static void VideoSettingsCallback(void *ptr)
@@ -8944,10 +9022,13 @@ void MPlayerMenu()
     videobarPauseImg->SetImage(actionbarPause);
     videobarPauseTip->SetText("Pause");
 
-    while(controlledbygui == 0)
+    for(int tick = 0; controlledbygui == 0; tick++)
     {
+        VideoSettingsFetch();
+        usleep(100000);
+        if(tick % 5)
+            continue;
         CheckSleepTimer();
-        usleep(500000);
 
         if(isInserted[DEVICE_DVD] && dvdLastUsed && wiiIsPaused() &&
             diff_sec(dvdLastUsed, gettime()) > 60)

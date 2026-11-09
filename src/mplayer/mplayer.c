@@ -5930,6 +5930,30 @@ int wiiSubtitleTrack()
         return mpctx->global_sub_pos;
 }
 
+void wiiShowSubtitleFile(int n)
+{
+        wiiQueueInt(MP_CMD_SUB_VISIBILITY, "sub_visibility", 1);
+        wiiQueueInt(MP_CMD_SUB_FILE, "sub_file", n);
+}
+
+// Loads a subtitle file and shows it. Returns its place among the loaded
+// files, which wiiShowSubtitleFile takes to show it again later.
+int wiiLoadSubtitleFile(const char *file)
+{
+        int n = mpctx->set_of_sub_size;
+        mp_cmd_t *cmd = calloc(1, sizeof(*cmd));
+
+        cmd->id = MP_CMD_SUB_LOAD;
+        av_strlcpy(cmd->name, "sub_load", sizeof(cmd->name));
+        cmd->nargs = 1;
+        cmd->args[0].type = MP_CMD_ARG_STRING;
+        cmd->args[0].v.s = strdup(file);
+        cmd->args[1].type = -1;
+        mp_input_queue_cmd(cmd);
+        wiiShowSubtitleFile(n);
+        return n;
+}
+
 void wiiMute()
 {
         mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );

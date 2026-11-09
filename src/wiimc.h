@@ -67,6 +67,8 @@ void wiiSetAudioTrack(int aid);
 int wiiSubtitles(char (*name)[48], int max);
 int wiiSubtitleTrack();
 void wiiSetSubtitleTrack(int pos);
+int wiiLoadSubtitleFile(const char *file);
+void wiiShowSubtitleFile(int n);
 bool wiiIsPlaying();
 void wiiMute();
 void wiiSetSeekBackward(int sec);
