@@ -3011,6 +3011,15 @@ static double update_video(int *blit_frame)
     return frame_time;
 }
 
+#ifdef GEKKO
+// a DVD in the drive; an ISO or a VIDEO_TS folder sets dvd_device to its path
+static int playing_disc(void)
+{
+  return (strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) &&
+         (!dvd_device || strcmp(dvd_device, "/dev/di") == 0);
+}
+#endif
+
 static void pause_loop(void)
 {
 #ifdef GEKKO
@@ -3064,7 +3073,7 @@ static void pause_loop(void)
 
   if(controlledbygui != 2 && cmd && cmd->id != MP_CMD_QUIT)
   {
-          if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
+          if(playing_disc())
             StartDVDMotor();
           else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
@@ -5475,7 +5484,7 @@ void PauseAndGotoGUI()
 
         mpctx->osd_function = OSD_PLAY;
 
-        if ((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0)/* && !dvd_device*/)
+        if (playing_disc())
                 StartDVDMotor();
         else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
@@ -5549,7 +5558,7 @@ static void low_cache_loop(void)
 
         mpctx->osd_function=OSD_PLAY;
         SetBufferingStatus(0);
-        if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
+        if(playing_disc())
                 StartDVDMotor();
         else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
