@@ -6320,6 +6320,8 @@ void wiiSetProperty(int command, float value)
                         av_strlcpy(cmd->name, "sub", sizeof(cmd->name)); break;
                 case MP_CMD_SUB_STEP:
                         av_strlcpy(cmd->name, "sub_step", sizeof(cmd->name)); break;
+                case MP_CMD_SPEED_SET:
+                        av_strlcpy(cmd->name, "speed_set", sizeof(cmd->name)); break;
         }
 
         switch(command)

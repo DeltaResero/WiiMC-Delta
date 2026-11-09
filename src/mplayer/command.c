@@ -2755,6 +2755,13 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
         case MP_CMD_SPEED_SET:{
                 float v = cmd->args[0].v.f;
                 playback_speed = v;
+#ifdef GEKKO
+                // keep the pitch, as YouTube does: without scaletempo the
+                // chain resamples, which plays higher when faster
+                if (sh_audio && mpctx->mixer.afilter &&
+                    !af_get(mpctx->mixer.afilter, "scaletempo"))
+                    af_add(mpctx->mixer.afilter, "scaletempo");
+#endif
                 reinit_audio_chain();
                 set_osd_msg(OSD_MSG_SPEED, 1, osd_duration, MSGTR_OSDSpeed,
                             playback_speed);
