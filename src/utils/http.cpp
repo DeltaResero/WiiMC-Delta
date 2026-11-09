@@ -19,7 +19,7 @@
 #include <sys/errno.h>
 #include <fcntl.h>
 #include <ctype.h>
-
+#include <zlib.h>
 
 #include "menu.h"
 #include "http.h"
@@ -335,11 +335,78 @@ static u32 tcp_write(const http_conn *s, const u8 *buffer, const u32 length)
     return left == 0;
 }
 
+// the value of a header line when its name matches, ignoring case
+static const char *header_value(const char *line, const char *name)
+{
+    size_t n = strlen(name);
+
+    if (strncasecmp(line, name, n) != 0 || line[n] != ':')
+        return NULL;
+
+    line += n + 1;
+    while (*line == ' ' || *line == '\t')
+        line++;
+    return line;
+}
+
+// reads a whole body, chunked or not, into dst; stops at cap
+static u32 read_body(const http_conn *s, bool chunked, u32 content_length, char *dst, u32 cap)
+{
+    if (!chunked)
+        return tcp_read(s, (u8 *)dst, content_length < cap ? content_length : cap);
+
+    char line[64];
+    u32 size = 0;
+
+    while (tcp_readln(s, line, sizeof(line) - 1) == 0)
+    {
+        u32 len = _httoi(line);
+        if (len == 0 || size + len > cap)
+            break;
+
+        u32 got = tcp_read(s, (u8 *)dst + size, len);
+        size += got;
+
+        if (got != len || tcp_readln(s, line, sizeof(line) - 1) != 0) // chunk boundary
+            break;
+    }
+    return size;
+}
+
+// unpacks a gzip body into buffer, keeping only what fits in maxsize
+static u32 gunzip(const char *in, u32 insize, char *buffer, u32 maxsize)
+{
+    z_stream z;
+    memset(&z, 0, sizeof(z));
+
+    if (inflateInit2(&z, 16 + MAX_WBITS) != Z_OK)
+        return 0;
+
+    z.next_in = (Bytef *)in;
+    z.avail_in = insize;
+    z.next_out = (Bytef *)buffer;
+    z.avail_out = maxsize;
+
+    int ret = inflate(&z, Z_FINISH);
+    u32 size = maxsize - z.avail_out;
+    inflateEnd(&z);
+
+    // a full buffer, or a reply cut short, still gives the part unpacked
+    if (ret != Z_STREAM_END && ret != Z_BUF_ERROR)
+        return 0;
+    return size;
+}
+
+#define MAX_GZIP_SIZE (1024*1024)
+
 /****************************************************************************
  * http_request
- * Retrieves the specified URL, and stores it in the specified file or buffer
+ * Retrieves the specified URL, and stores it in the specified file or buffer.
+ * With a body it sends a POST of JSON. headers adds whole header lines, each
+ * ending in \r\n. With gzip it accepts a gzip reply, unpacked into the buffer.
  ***************************************************************************/
-static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool silent, int total_redirects)
+static u32 http_request(const char *url, FILE *hfile, char *buffer, u32 maxsize, bool silent, int total_redirects,
+    const char *body, const char *headers, bool gzip)
 {
     u32 res = 0;
     char *http_host=NULL;
@@ -359,18 +426,18 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
     if (url == NULL || (hfile == NULL && buffer == NULL))
         return 0;
 
-    tmpurl = url_new(url);
+    tmpurl = url_new((char *)url);
 
     if (tmpurl == NULL)
         return 0;
 
-    if(strlen(tmpurl->hostname) >= 1024 || strlen(tmpurl->file) >= 1024)
+    if(strlen(tmpurl->hostname) >= 1024 || strlen(tmpurl->file) >= 2048)
     {
         url_free(tmpurl);
         return 0;
     }
     http_host = (char*) malloc(1024);
-    http_path = (char*) malloc(1024);
+    http_path = (char*) malloc(2048);
 
     strcpy(http_host, tmpurl->hostname);
     strcpy(http_path, tmpurl->file);
@@ -406,18 +473,29 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
             return 0;
         }
     }
-    char *request = NULL;
-    char *r;
 
-    request = (char*) malloc(1024);
-    r = request;
+    size_t bodylen = body ? strlen(body) : 0;
+    size_t reqsize = strlen(http_path) + strlen(http_host) + (headers ? strlen(headers) : 0) + 512;
+    char *request = (char*) malloc(reqsize);
+    char *r = request;
+    char *end = request + reqsize;
 
-    r += sprintf(r, "GET %s HTTP/1.1\r\n", http_path);
-    r += sprintf(r, "Host: %s\r\n", http_host);
-    r += sprintf(r, "User-Agent: %s/%s (IOS%d)\r\n", APPNAME, APPVERSION, IOS_GetVersion());
-    r += sprintf(r, "Cache-Control: no-cache\r\n\r\n");
+    r += snprintf(r, end - r, "%s %s HTTP/1.1\r\n", body ? "POST" : "GET", http_path);
+    r += snprintf(r, end - r, "Host: %s\r\n", http_host);
+    if (!headers || !strstr(headers, "User-Agent:"))
+        r += snprintf(r, end - r, "User-Agent: %s/%s (IOS%d)\r\n", APPNAME, APPVERSION, IOS_GetVersion());
+    if (gzip)
+        r += snprintf(r, end - r, "Accept-Encoding: gzip\r\n");
+    if (body)
+        r += snprintf(r, end - r, "Content-Type: application/json\r\nContent-Length: %u\r\n", (unsigned)bodylen);
+    if (headers)
+        r += snprintf(r, end - r, "%s", headers);
+    r += snprintf(r, end - r, "Connection: close\r\nCache-Control: no-cache\r\n\r\n");
 
     res = tcp_write(s, (u8 *) request, strlen(request));
+
+    if (res && body)
+        res = tcp_write(s, (const u8 *) body, bodylen);
 
     free(request);
     free(http_path);
@@ -431,14 +509,16 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
     char *line = NULL;
     char *redirect = NULL;
-    char encoding[128] = { 0 };
+    const char *v;
     bool chunked = false;
-    redirect = (char*) malloc(1024);
-    line = (char*) malloc(1055);
-    for (linecount = 0; linecount < 32; linecount++)
+    bool gzipped = false;
+    redirect = (char*) malloc(2048);
+    redirect[0] = 0;
+    line = (char*) malloc(2079);
+    for (linecount = 0; linecount < 64; linecount++)
     {
-        memset(line,0,1055);
-        if (tcp_readln(s, line, 1054) != 0)
+        memset(line,0,2079);
+        if (tcp_readln(s, line, 2078) != 0)
         {
             http_status = 404;
             break;
@@ -447,9 +527,15 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
             break;
 
         sscanf(line, "HTTP/1.%*u %u", &http_status);
-        sscanf(line, "Content-Length: %u", &content_length);
-        sscanf(line, "Location: %s", redirect);
-        sscanf(line, "Transfer-Encoding: %s", encoding);
+
+        if ((v = header_value(line, "Content-Length")))
+            content_length = strtoul(v, NULL, 10);
+        else if ((v = header_value(line, "Location")))
+            snprintf(redirect, 2048, "%s", v);
+        else if ((v = header_value(line, "Transfer-Encoding")))
+            chunked = strncasecmp(v, "chunked", 7) == 0;
+        else if ((v = header_value(line, "Content-Encoding")))
+            gzipped = strncasecmp(v, "gzip", 4) == 0;
     }
 
     if (http_status != 200)
@@ -459,13 +545,41 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
         if((http_status == 301 || http_status == 302) && redirect[0] != 0 && total_redirects < 5)  //only 5 redirects allowed
         {
-            u32 ret = http_request(redirect, hfile, buffer, maxsize, silent, total_redirects+1);
+            u32 ret = http_request(redirect, hfile, buffer, maxsize, silent, total_redirects+1, body, headers, gzip);
             free(redirect);
             return ret;
         }
+        free(redirect);
         return 0;
     }
     free(redirect);
+
+    // gzip was asked for and sent: read it all, then unpack into the buffer
+    if (gzipped && gzip && buffer != NULL)
+    {
+        free(line);
+
+        char *z = (char *) malloc(MAX_GZIP_SIZE);
+        if (!z)
+        {
+            conn_close(s);
+            return 0;
+        }
+
+        if(!silent)
+            ShowAction("Downloading...");
+
+        // anything past MAX_GZIP_SIZE is left unread
+        u32 zsize = read_body(s, chunked, chunked ? 0 : content_length, z, MAX_GZIP_SIZE);
+        conn_close(s);
+
+        sizeread = zsize ? gunzip(z, zsize, buffer, maxsize) : 0;
+        free(z);
+
+        if(!silent)
+            CancelAction();
+        return sizeread;
+    }
 
     // length unknown - just read as much as we can
     if(content_length == 0)
@@ -479,53 +593,18 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
         return 0;
     }
 
-    chunked = !(strcmp("chunked",encoding));
     if (buffer != NULL)
     {
+        free(line);
+
         if(!silent)
             ShowAction("Downloading...");
 
+        sizeread = read_body(s, chunked, content_length, buffer, maxsize);
+
         if(chunked)
-        {
-            u32 ret;
-            do
-            {
-                if (tcp_readln(s, line, 1054) != 0) // read chunk size
-                {
-                    http_status = 404;
-                    free(line);
-                    conn_close(s);
-                    return sizeread;
-                }
-
-                content_length = _httoi(line);
-
-                if(content_length > 0)
-                {
-                    // as a subtraction: a huge chunk size wrapped the sum
-                    // past the check, and the read ran off the buffer
-                    if(content_length > maxsize - sizeread)
-                        break;
-
-                    ret = tcp_read(s, (u8 *)buffer+sizeread, content_length);
-                    if(ret<=0) break;
-                    sizeread += ret;
-                }
-                if (tcp_readln(s, line, 1054) != 0)  // read \r\n (chunk boundary)
-                {
-                    http_status = 404;
-                    free(line);
-                    conn_close(s);
-                    return sizeread;
-                }
-            } while(content_length > 0);
             content_length = sizeread;
-        }
-        else
-        {
-            free(line);
-            sizeread = tcp_read(s, (u8 *)buffer, content_length);
-        }
+
         if(!silent)
             CancelAction();
     }
@@ -581,5 +660,10 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
 u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool silent)
 {
-    return http_request(url, hfile, buffer, maxsize, silent, 0);
+    return http_request(url, hfile, buffer, maxsize, silent, 0, NULL, NULL, false);
+}
+
+u32 http_fetch(const char *url, const char *body, const char *headers, char *buffer, u32 maxsize)
+{
+    return http_request(url, NULL, buffer, maxsize, true, 0, body, headers, true);
 }
