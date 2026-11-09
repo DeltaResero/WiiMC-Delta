@@ -33,6 +33,7 @@
     "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n"
 
 #define RIITUBE_VIDEO "http://riitube.rc24.xyz/video/wii/?q="
+#define RIITUBE_LIST "http://riitube.rc24.xyz/wiimc/"
 
 static char visitor[1024]; // about 450 characters in November 2026
 
@@ -146,6 +147,52 @@ int YouTubePlaylist(const char *playlistId, YtItem *items, int max)
     char id[80];
     snprintf(id, sizeof(id), "VL%s", playlistId);
     return YouTubeBrowse(id, NULL, items, max);
+}
+
+// a list from RiiTube, its videos marked as such on their cards
+static int RiiTubeItems(const char *url, YtItem *items, int max, char *next, size_t nextsize)
+{
+    u32 len;
+    char *reply = Fetch(url, NULL, NULL, &len);
+    if (!reply)
+        return 0;
+
+    int count = YtParseRiiTube(reply, len, items, max, next, nextsize);
+    free(reply);
+
+    for (int i = 0; i < count; i++)
+        snprintf(items[i].channel, sizeof(items[i].channel), "via RiiTube");
+    return count;
+}
+
+int RiiTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize)
+{
+    // a later page is the link RiiTube gave for it
+    if (page[0])
+        return strncmp(page, RIITUBE_LIST, strlen(RIITUBE_LIST)) == 0 ?
+            RiiTubeItems(page, items, max, next, nextsize) : 0;
+
+    size_t size = strlen(RIITUBE_LIST) + 4 + 3 * strlen(query) + 1;
+    char *url = (char *)malloc(size);
+    if (!url)
+        return 0;
+
+    char *w = url + sprintf(url, RIITUBE_LIST "?q=");
+    for (const unsigned char *r = (const unsigned char *)query; *r; r++)
+    {
+        if ((*r >= 'A' && *r <= 'Z') || (*r >= 'a' && *r <= 'z') || (*r >= '0' && *r <= '9') ||
+            *r == '-' || *r == '_' || *r == '.' || *r == '~')
+            *w++ = *r;
+        else if (*r == ' ')
+            *w++ = '+';
+        else
+            w += sprintf(w, "%%%02X", *r);
+    }
+    *w = 0;
+
+    int count = RiiTubeItems(url, items, max, next, nextsize);
+    free(url);
+    return count;
 }
 
 int YouTubeSuggest(const char *text, char (*out)[96], int max)

@@ -66,4 +66,8 @@ bool YouTubeRiiTubeId(const char *url, char *id, size_t size);
 // RiiTube's link for a video, used when YouTube refuses
 void YouTubeRiiTubeUrl(const char *videoId, char *url, size_t size);
 
+// RiiTube's search, for when YouTube's lists can't be had (page is "" for
+// the first, or the next link from the page before)
+int RiiTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize);
+
 #endif

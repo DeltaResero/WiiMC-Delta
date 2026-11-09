@@ -825,6 +825,101 @@ size_t YtCaptionsToSrt(const char *xml, size_t len, char *out, size_t size)
     return n;
 }
 
+// RiiTube's search comes as Navi-X lines: type=, name=, URL=, thumb=
+static bool starts(const char *p, const char *le, const char *s)
+{
+    size_t n = strlen(s);
+    return (size_t)(le - p) >= n && memcmp(p, s, n) == 0;
+}
+
+static void copy_line(const char *p, const char *le, char *out, size_t size)
+{
+    size_t n = le - p;
+    if (n >= size)
+        n = size - 1;
+    memcpy(out, p, n);
+    out[n] = 0;
+}
+
+// the video ID in a RiiTube video link, .../video/wii/?q=ID
+static bool riitube_id(const char *p, const char *le, char *id, size_t size)
+{
+    static const char key[] = "/video/wii/?q=";
+    size_t k = sizeof(key) - 1;
+
+    for (; p + k <= le; p++)
+    {
+        if (memcmp(p, key, k) != 0)
+            continue;
+        p += k;
+        size_t n = 0;
+        while (p + n < le && p[n] != '&')
+        {
+            char c = p[n];
+            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '-'))
+                return false;
+            n++;
+        }
+        if (n == 0 || n >= size)
+            return false;
+        memcpy(id, p, n);
+        id[n] = 0;
+        return true;
+    }
+    return false;
+}
+
+int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *next, size_t nextsize)
+{
+    const char *p = text, *e = text + len;
+    char name[256] = "";
+    bool nextPage = false;
+    int count = 0;
+
+    if (next && nextsize)
+        next[0] = 0;
+
+    while (p < e)
+    {
+        const char *le = (const char *)memchr(p, '\n', e - p);
+        const char *after = le ? le + 1 : e;
+        if (!le)
+            le = e;
+        if (le > p && le[-1] == '\r')
+            le--;
+
+        if (starts(p, le, "name="))
+        {
+            copy_line(p + 5, le, name, sizeof(name));
+            nextPage = strncmp(name, "Next page", 9) == 0;
+        }
+        else if (starts(p, le, "URL="))
+        {
+            const char *u = p + 4;
+            if (nextPage)
+            {
+                if (next && nextsize)
+                    copy_line(u, le, next, nextsize);
+            }
+            else if (name[0] && count < max)
+            {
+                YtItem *it = &items[count];
+                memset(it, 0, sizeof(*it));
+                if (riitube_id(u, le, it->id, sizeof(it->id)))
+                {
+                    snprintf(it->title, sizeof(it->title), "%s", name);
+                    tidy(it->title);
+                    count++;
+                }
+            }
+            name[0] = 0;
+            nextPage = false;
+        }
+        p = after;
+    }
+    return count;
+}
+
 void YtJsonEscape(const char *s, char *out, size_t size)
 {
     size_t n = 0;

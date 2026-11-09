@@ -68,6 +68,11 @@ typedef struct
 int YtParseAdaptive(const char *json, size_t len, int maxHeight, char *vurl, size_t vsize, int *height,
     YtAudioTrack *audio, int maxAudio);
 
+// The videos on a page of RiiTube's search for WiiMC, with only their ID
+// and title. next gets the link to the following page, or "". Returns the
+// number of items stored.
+int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *next, size_t nextsize);
+
 // Writes s into out as a JSON string's contents, escaped
 void YtJsonEscape(const char *s, char *out, size_t size);
 

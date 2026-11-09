@@ -42,6 +42,7 @@ typedef struct
     char title[160];      // shown above the cards
     char query[QUERY_MAX + 1]; // what was searched for, or "" for a page
     char next[1024];      // the token for the next page of a search
+    bool riitube;         // the list came from RiiTube: YouTube's couldn't be had
     YtItem items[LIST_MAX];
     u8 *thumb[LIST_MAX];  // each thumbnail's JPEG, once fetched
     int thumbsize[LIST_MAX];
@@ -51,20 +52,22 @@ typedef struct
 } YtList;
 
 // YouTube's own pages, as its Explore menu lists them, less the paid ones
-// and the games; Live waits until live streams can play
+// and the games; Live waits until live streams can play. RiiTube has no
+// such pages, so it's searched for the topic instead.
 static const struct
 {
     const char *name;
     const char *browseId;   // NULL: not yet
     const char *params;
+    const char *topic;      // what to search RiiTube for
     const u8 *icon;
 } tiles[TILES] = {
-    { "Music", "UC-9-kyTW8ZkZNDHQJ6FgpwQ", NULL, yt_icon_music_png },
-    { "Gaming", "UCOpNcN46UbXVtpKMrmU4Abg", NULL, yt_icon_gaming_png },
-    { "Podcasts", "FEpodcasts_destination", "qgcCCAE=", yt_icon_podcasts_png },
-    { "News", "UCYfdidRxbB8Qhf0Nx7ioOYw", NULL, yt_icon_news_png },
-    { "Sports", "UCEgdi0XIXXZ-qJOFPf4JSKw", NULL, yt_icon_sports_png },
-    { "Live", NULL, NULL, yt_icon_live_png },
+    { "Music", "UC-9-kyTW8ZkZNDHQJ6FgpwQ", NULL, "music", yt_icon_music_png },
+    { "Gaming", "UCOpNcN46UbXVtpKMrmU4Abg", NULL, "gaming", yt_icon_gaming_png },
+    { "Podcasts", "FEpodcasts_destination", "qgcCCAE=", "podcast", yt_icon_podcasts_png },
+    { "News", "UCYfdidRxbB8Qhf0Nx7ioOYw", NULL, "news", yt_icon_news_png },
+    { "Sports", "UCEgdi0XIXXZ-qJOFPf4JSKw", NULL, "sports", yt_icon_sports_png },
+    { "Live", NULL, NULL, NULL, yt_icon_live_png },
 };
 
 // kept between visits, so the screen comes back as it was after a video
@@ -548,8 +551,14 @@ static void Show(Screen *sc)
 }
 
 // opens a new list on top: a search, a page, or a playlist
+// a tile's page as RiiTube has it: a search for its topic
+static void RiiTubeTitle(char *title, size_t size, const char *name)
+{
+    snprintf(title, size, "%s on RiiTube", name);
+}
+
 static void Open(Screen *sc, const char *query, const char *browseId, bool playlist, const char *title,
-    const char *params = NULL)
+    const char *params = NULL, const char *topic = NULL)
 {
     if (depth >= LEVELS)
         return;
@@ -570,10 +579,26 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
         l->count = YouTubeBrowse(browseId, params, l->items, LIST_MAX);
     CancelAction();
 
+    // YouTube's list couldn't be had: RiiTube's search, for the query or
+    // for the page's topic
+    if (l->count == 0 && (query || topic))
+    {
+        ShowAction("Trying RiiTube...");
+        if (!query)
+        {
+            snprintf(l->query, sizeof(l->query), "%s", topic);
+            RiiTubeTitle(l->title, sizeof(l->title), title);
+        }
+        l->count = RiiTubeSearch(l->query, "", l->items, LIST_MAX, l->next, sizeof(l->next));
+        CancelAction();
+        l->riitube = l->count > 0;
+    }
+
     if (l->count == 0)
     {
         free(l);
-        ErrorPrompt(query ? "No results, or YouTube couldn't be reached." : "YouTube couldn't be reached.");
+        ErrorPrompt(query ? "No results, or YouTube and RiiTube couldn't be reached." :
+            "YouTube and RiiTube couldn't be reached.");
         Show(sc);
         return;
     }
@@ -596,7 +621,8 @@ static void More(YtList *l)
 
     ShowAction("Loading...");
     YtItem *more = (YtItem *)malloc(sizeof(YtItem) * (LIST_MAX - l->count));
-    int n = more ? YouTubeSearch(l->query, next, more, LIST_MAX - l->count, next, sizeof(next)) : 0;
+    int n = !more ? 0 : l->riitube ? RiiTubeSearch(l->query, next, more, LIST_MAX - l->count, next, sizeof(next)) :
+        YouTubeSearch(l->query, next, more, LIST_MAX - l->count, next, sizeof(next));
     CancelAction();
 
     LWP_MutexLock(lock);
@@ -874,7 +900,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                     Show(&sc);
                 }
                 else
-                    Open(&sc, NULL, tiles[i].browseId, false, tiles[i].name, tiles[i].params);
+                    Open(&sc, NULL, tiles[i].browseId, false, tiles[i].name, tiles[i].params, tiles[i].topic);
             }
         }
 
