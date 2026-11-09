@@ -56,6 +56,7 @@
 #include "actionbar_playlist_png.h"
 #include "actionbar_right_png.h"
 #include "actionbar_shuffle_png.h"
+#include "actionbar_settings_png.h"
 #include "actionbar_single_png.h"
 #include "actionbar_stop_png.h"
 #include "actionbar_volume_png.h"

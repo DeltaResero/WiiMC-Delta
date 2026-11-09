@@ -3748,6 +3748,10 @@ play_next_file:
 
 #ifdef GEKKO
 usleep(100);
+
+// each file starts at normal speed: the audio chain is built again for it,
+// without the scaletempo filter a faster speed added to the last one
+playback_speed = 1.0;
 if(filename)
 {
   free(filename);
@@ -5836,6 +5840,94 @@ bool wiiCanSeek()
         return playing_file && mpctx->stream && mpctx->stream->seek &&
                 mpctx->demuxer && mpctx->demuxer->seekable && !thp_vid &&
                 filename && strncmp(filename, "mms:", 4) != 0;
+}
+
+/****************************************************************************
+ * The player settings on the video bar: playback speed, audio track, and
+ * subtitles. They run in MPlayer's own thread, from the bar's update, so
+ * they may read mpctx; changes go through the command queue.
+ ***************************************************************************/
+
+float wiiGetSpeed()
+{
+        return playback_speed;
+}
+
+static void wiiQueueInt(int id, const char *name, int value)
+{
+        mp_cmd_t *cmd = calloc(1, sizeof(*cmd));
+        cmd->id = id;
+        av_strlcpy(cmd->name, name, sizeof(cmd->name));
+        cmd->nargs = 1;
+        cmd->args[0].type = MP_CMD_ARG_INT;
+        cmd->args[0].v.i = value;
+        cmd->args[1].type = -1;
+        mp_input_queue_cmd(cmd);
+}
+
+// the audio tracks, as MPlayer's ids (aid) and names; returns how many
+int wiiAudioTracks(int *aid, char (*name)[48], int max)
+{
+        int i, n = 0;
+
+        if(!playing_file || !mpctx->demuxer)
+                return 0;
+
+        for(i = 0; i < MAX_A_STREAMS && n < max; i++)
+        {
+                sh_audio_t *sh = mpctx->demuxer->a_streams[i];
+                if(!sh)
+                        continue;
+                aid[n] = sh->aid;
+                if(sh->lang && sh->lang[0])
+                        snprintf(name[n], 48, "%d (%s)", n + 1, sh->lang);
+                else
+                        snprintf(name[n], 48, "%d", n + 1);
+                n++;
+        }
+        return n;
+}
+
+// the aid of the track playing, or -1
+int wiiAudioTrack()
+{
+        int id;
+
+        if(!playing_file || !mpctx->demuxer || !mpctx->demuxer->audio)
+                return -1;
+        id = mpctx->demuxer->audio->id;
+        if(id < 0 || id >= MAX_A_STREAMS || !mpctx->demuxer->a_streams[id])
+                return -1;
+        return ((sh_audio_t *)mpctx->demuxer->a_streams[id])->aid;
+}
+
+void wiiSetAudioTrack(int aid)
+{
+        wiiQueueInt(MP_CMD_SWITCH_AUDIO, "switch_audio", aid);
+}
+
+int mp_subtitle_names(MPContext *mpctx, char (*name)[48], int max); // command.c
+
+int wiiSubtitles(char (*name)[48], int max)
+{
+        if(!playing_file)
+                return 0;
+        return mp_subtitle_names(mpctx, name, max);
+}
+
+// pos is a subtitle's place in MPlayer's list of them all, or -1 for none
+void wiiSetSubtitleTrack(int pos)
+{
+        if(pos >= 0)
+                wiiQueueInt(MP_CMD_SUB_VISIBILITY, "sub_visibility", 1);
+        wiiQueueInt(MP_CMD_SUB_SELECT, "sub_select", pos);
+}
+
+int wiiSubtitleTrack()
+{
+        if(!playing_file)
+                return -1;
+        return mpctx->global_sub_pos;
 }
 
 void wiiMute()

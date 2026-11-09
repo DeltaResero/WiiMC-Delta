@@ -235,7 +235,14 @@ void MPlayerInput()
             if(screenwidth > 640)
                 xoffset = 90;
 
-            if(!drawGui || (y < 360 &&
+            // with the player settings open, A above the bar closes them,
+            // and A on them is theirs
+            if(drawGui && VideoSettingsVisible())
+            {
+                if(y < 360 && !VideoSettingsHit(x, y))
+                    HideVideoSettings();
+            }
+            else if(!drawGui || (y < 360 &&
                 (!VideoVolumeLevelBarVisible() || !(x > xoffset && x < xoffset+100 && y > 180))))
             {
                 wiiPause();
@@ -465,6 +472,7 @@ void MPlayerInput()
     {
         drawGui = false;
         HideVideoVolumeLevelBar();
+        HideVideoSettings();
         ShutoffRumble();
 
     //  rumbleRandEnable = false;

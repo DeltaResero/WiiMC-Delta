@@ -14,6 +14,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <math.h>
 #include <map>
 #include <wiiuse/wpad.h>
 #include <di/di.h>
@@ -39,6 +40,7 @@
 
 extern "C" {
 #include "stream/url.h"
+#include "input/input.h" // MP_CMD_SPEED_SET
 }
 
 u32 getipbyname(char *domain)
@@ -148,6 +150,7 @@ static GuiImageData *actionbarRight = NULL;
 static GuiImageData *actionbarBackward = NULL;
 static GuiImageData *actionbarPause = NULL;
 static GuiImageData *actionbarStop = NULL;
+static GuiImageData *actionbarSettings = NULL;
 static GuiImageData *actionbarPlay = NULL;
 static GuiImageData *actionbarForward = NULL;
 static GuiImageData *actionbarRotate = NULL;
@@ -177,6 +180,7 @@ static GuiImage *videobarVolumeLevelBottomImg = NULL;
 static GuiImage *videobarBackwardImg = NULL;
 static GuiImage *videobarPauseImg = NULL;
 static GuiImage *videobarStopImg = NULL;
+static GuiImage *videobarSettingsImg = NULL;
 static GuiImage *videobarForwardImg = NULL;
 
 static GuiTooltip *videobarVolumeTip = NULL;
@@ -190,6 +194,7 @@ static GuiButton *videobarVolumeLevelBtn = NULL;
 static GuiButton *videobarBackwardBtn = NULL;
 static GuiButton *videobarPauseBtn = NULL;
 static GuiButton *videobarStopBtn = NULL;
+static GuiButton *videobarSettingsBtn = NULL;
 static GuiButton *videobarForwardBtn = NULL;
 
 static GuiText *videobarTime = NULL;
@@ -971,6 +976,7 @@ static void ResumeScreensaverThread()
 
 static bool videoPaused;
 static bool videoSkips = true; // the skip buttons are on the bar
+static void VideoSettingsUpdate();
 
 extern "C" void DoMPlayerGuiDraw()
 {
@@ -989,6 +995,7 @@ extern "C" void DoMPlayerGuiDraw()
     mainWindow->Update(&userInput[2]);
     mainWindow->Update(&userInput[1]);
     mainWindow->Update(&userInput[0]);
+    VideoSettingsUpdate();
 
     if(mainWindow->IsVisible() && wiiInDVDMenu())
     {
@@ -1000,6 +1007,7 @@ extern "C" void DoMPlayerGuiDraw()
         mainWindow->SetVisible(true);
         mainWindow->SetState(STATE_DEFAULT);
         HideVideoVolumeLevelBar();
+        HideVideoSettings();
         statusText->SetVisible(false);
     }
 
@@ -7115,6 +7123,306 @@ static void VideoPauseCallback(void *ptr)
 }
 
 // does what the Home button does: leaves the video for the menu
+/****************************************************************************
+ * Player settings: the gear on the video bar opens a list above it with the
+ * playback speed, the subtitles, and the audio track when there's more
+ * than one. Like the rest of the bar it's updated and drawn by MPlayer's
+ * thread.
+ ***************************************************************************/
+
+#define SET_ROWS 9      // rows on screen, the back row included
+#define SET_ROW_H 30
+#define SET_W 340
+#define SET_LIST 40     // most choices one list holds
+
+class SettingsPanel : public GuiWindow
+{
+    public:
+        SettingsPanel() : GuiWindow(SET_W, SET_ROW_H) { }
+        void Draw()
+        {
+            if(!this->IsVisible())
+                return;
+            Menu_DrawRectangle(this->GetLeft(), this->GetTop(), this->GetWidth(),
+                this->GetHeight(), (GXColor){ 24, 24, 28, 230 }, 1);
+            for(int i = 0; i < SET_ROWS; i++)
+                if(row[i]->IsVisible() && row[i]->GetState() == STATE_SELECTED)
+                    Menu_DrawRectangle(row[i]->GetLeft(), row[i]->GetTop(), row[i]->GetWidth(),
+                        row[i]->GetHeight(), (GXColor){ 255, 255, 255, 40 }, 1);
+            GuiWindow::Draw();
+        }
+        GuiButton *row[SET_ROWS];
+        GuiText *label[SET_ROWS];
+        GuiText *value[SET_ROWS];
+};
+
+static SettingsPanel *settingsPanel = NULL;
+
+enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO };
+enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6 };
+
+static int setPage = PAGE_MAIN;
+static int setFirst = 0;            // first choice on screen when a list is longer
+static int setAction[SET_ROWS];     // ACT_*, or the choice a row picks
+static char setChoice[SET_LIST][64];
+static int setValue[SET_LIST];      // a speed's index, a subtitle's place, an audio id
+static int setChoices = 0;
+static int setCurrent = -1;         // the choice in use
+
+static const float speeds[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
+#define SPEEDS (int)(sizeof(speeds) / sizeof(speeds[0]))
+
+static int SpeedIndex()
+{
+    float sp = wiiGetSpeed();
+    int best = 2;
+    for(int i = 0; i < SPEEDS; i++)
+        if(fabsf(speeds[i] - sp) < fabsf(speeds[best] - sp))
+            best = i;
+    return best;
+}
+
+static void SpeedName(int i, char *buf, int size)
+{
+    if(speeds[i] == 1.0f)
+        snprintf(buf, size, "%s", gettext("Normal"));
+    else
+        snprintf(buf, size, "%g", speeds[i]);
+}
+
+// fills setChoice/setValue/setCurrent for a page's list
+static void SettingsList(int page)
+{
+    setChoices = 0;
+    setCurrent = -1;
+
+    if(page == PAGE_SPEED)
+    {
+        for(int i = 0; i < SPEEDS; i++)
+        {
+            SpeedName(i, setChoice[i], 64);
+            setValue[i] = i;
+        }
+        setChoices = SPEEDS;
+        setCurrent = SpeedIndex();
+    }
+    else if(page == PAGE_SUBS)
+    {
+        snprintf(setChoice[0], 64, "%s", gettext("Off"));
+        setValue[0] = -1;
+        setChoices = 1;
+        setCurrent = 0;
+
+        static char names[SET_LIST - 1][48];
+        int n = wiiSubtitles(names, SET_LIST - 1);
+        int pos = wiiSubtitleTrack();
+        for(int i = 0; i < n; i++)
+        {
+            if(names[i][0])
+                snprintf(setChoice[setChoices], 64, "%.48s", names[i]);
+            else
+                snprintf(setChoice[setChoices], 64, "%s %d", gettext("Track"), i + 1);
+            setValue[setChoices] = i;
+            if(i == pos)
+                setCurrent = setChoices;
+            setChoices++;
+        }
+    }
+    else if(page == PAGE_AUDIO)
+    {
+        static char names[SET_LIST][48];
+        int aid[SET_LIST];
+        int n = wiiAudioTracks(aid, names, SET_LIST);
+        int cur = wiiAudioTrack();
+        for(int i = 0; i < n; i++)
+        {
+            snprintf(setChoice[i], 64, "%s %.48s", gettext("Track"), names[i]);
+            setValue[i] = aid[i];
+            if(aid[i] == cur)
+                setCurrent = i;
+        }
+        setChoices = n;
+    }
+}
+
+static bool SubtitlesExist()
+{
+    static char names[1][48];
+    return wiiSubtitles(names, 1) > 0;
+}
+
+static bool AudioTracksExist()
+{
+    static char names[2][48];
+    int aid[2];
+    return wiiAudioTracks(aid, names, 2) > 1;
+}
+
+static void SettingsRow(int r, const char *label, const char *value, int action, bool current)
+{
+    GXColor white = (GXColor){ 255, 255, 255, 255 };
+    GXColor blue = (GXColor){ 110, 180, 255, 255 };
+    settingsPanel->label[r]->SetText(label);
+    settingsPanel->label[r]->SetColor(current ? blue : white);
+    settingsPanel->value[r]->SetText(value);
+    settingsPanel->row[r]->SetVisible(true);
+    settingsPanel->row[r]->SetState(STATE_DEFAULT);
+    setAction[r] = action;
+}
+
+static void ShowSettingsPage(int page)
+{
+    int r = 0;
+    char buf[64];
+
+    // showing a window shows and enables all it holds, so first the panel,
+    // then each row as this page needs it
+    settingsPanel->SetVisible(true);
+    settingsPanel->SetState(STATE_DEFAULT);
+
+    if(page != setPage)
+        setFirst = 0;
+    setPage = page;
+
+    if(page == PAGE_MAIN)
+    {
+        SpeedName(SpeedIndex(), buf, sizeof(buf));
+        SettingsRow(r++, "Playback speed", buf, ACT_SPEED, false);
+
+        if(SubtitlesExist())
+        {
+            SettingsList(PAGE_SUBS);
+            SettingsRow(r++, "Subtitles", setChoice[setCurrent >= 0 ? setCurrent : 0], ACT_SUBS, false);
+        }
+        if(AudioTracksExist())
+        {
+            SettingsList(PAGE_AUDIO);
+            SettingsRow(r++, "Audio track", setCurrent >= 0 ? setChoice[setCurrent] : "",
+                ACT_AUDIO, false);
+        }
+    }
+    else
+    {
+        static const char *titles[] = { "", "Playback speed", "Subtitles", "Audio track" };
+        const char *title = titles[page];
+
+        snprintf(buf, sizeof(buf), "< %s", gettext(title));
+        SettingsRow(r++, buf, NULL, ACT_BACK, false);
+
+        SettingsList(page);
+        if(setFirst >= setChoices)
+            setFirst = 0;
+
+        int room = SET_ROWS - 1;
+        bool more = setChoices - setFirst > room;
+        int shown = more ? room - 1 : setChoices - setFirst;
+
+        for(int i = 0; i < shown; i++)
+        {
+            int c = setFirst + i;
+            SettingsRow(r++, setChoice[c], NULL, c, c == setCurrent);
+        }
+        if(more)
+            SettingsRow(r++, "More...", NULL, ACT_MORE, false);
+    }
+
+    for(int i = r; i < SET_ROWS; i++)
+    {
+        settingsPanel->row[i]->SetVisible(false);
+        settingsPanel->row[i]->SetState(STATE_DISABLED);
+        setAction[i] = ACT_NONE;
+    }
+
+    settingsPanel->SetSize(SET_W, r * SET_ROW_H + 8);
+}
+
+bool VideoSettingsVisible()
+{
+    return settingsPanel && settingsPanel->IsVisible();
+}
+
+// whether the pointer at x, y is on the open panel
+bool VideoSettingsHit(int x, int y)
+{
+    return VideoSettingsVisible() &&
+        x >= settingsPanel->GetLeft() && x < settingsPanel->GetLeft() + settingsPanel->GetWidth() &&
+        y >= settingsPanel->GetTop() && y < settingsPanel->GetTop() + settingsPanel->GetHeight();
+}
+
+void HideVideoSettings()
+{
+    if(!settingsPanel)
+        return;
+    settingsPanel->SetVisible(false);
+    settingsPanel->SetState(STATE_DISABLED);
+}
+
+static void SettingsPick(int c)
+{
+    if(setPage == PAGE_SPEED)
+    {
+        wiiSetProperty(MP_CMD_SPEED_SET, speeds[setValue[c]]);
+    }
+    else if(setPage == PAGE_AUDIO)
+    {
+        wiiSetAudioTrack(setValue[c]);
+        wiiSync(); // as the D-pad's audio switch does: a seek puts it back in step
+    }
+    else if(setPage == PAGE_SUBS)
+    {
+        wiiSetSubtitleTrack(setValue[c]);
+    }
+    HideVideoSettings();
+}
+
+// called after the video bar's update, in MPlayer's thread
+static void VideoSettingsUpdate()
+{
+    if(!VideoSettingsVisible())
+        return;
+
+    for(int r = 0; r < SET_ROWS; r++)
+    {
+        if(settingsPanel->row[r]->GetState() != STATE_CLICKED)
+            continue;
+        settingsPanel->row[r]->ResetState();
+
+        int a = setAction[r];
+        if(a == ACT_SPEED)
+            ShowSettingsPage(PAGE_SPEED);
+        else if(a == ACT_SUBS)
+            ShowSettingsPage(PAGE_SUBS);
+        else if(a == ACT_AUDIO)
+            ShowSettingsPage(PAGE_AUDIO);
+        else if(a == ACT_BACK)
+            ShowSettingsPage(PAGE_MAIN);
+        else if(a == ACT_MORE)
+        {
+            setFirst += SET_ROWS - 2;
+            ShowSettingsPage(setPage);
+        }
+        else if(a >= 0)
+            SettingsPick(a);
+        break;
+    }
+}
+
+static void VideoSettingsCallback(void *ptr)
+{
+    GuiButton *b = (GuiButton *)ptr;
+    if(b->GetState() == STATE_CLICKED)
+    {
+        b->ResetState();
+        if(VideoSettingsVisible())
+            HideVideoSettings();
+        else
+        {
+            HideVideoVolumeLevelBar();
+            ShowSettingsPage(PAGE_MAIN);
+        }
+    }
+}
+
 static void VideoStopCallback(void *ptr)
 {
     GuiButton *b = (GuiButton *)ptr;
@@ -7622,6 +7930,7 @@ static void SetupGui()
     actionbarBackward = new GuiImageData(actionbar_backward_png);
     actionbarPause = new GuiImageData(actionbar_pause_png);
     actionbarStop = new GuiImageData(actionbar_stop_png);
+    actionbarSettings = new GuiImageData(actionbar_settings_png);
     actionbarPlay = new GuiImageData(actionbar_play_png);
     actionbarForward = new GuiImageData(actionbar_forward_png);
     actionbarRotate = new  GuiImageData(actionbar_continuous_png);
@@ -7727,6 +8036,41 @@ static void SetupGui()
     videobarBackwardBtn->SetUpdateCallback(VideoBackwardCallback);
     videobarBackwardBtn->SetEffectGrow();
 
+    videobarSettingsImg = new GuiImage(actionbarSettings);
+    videobarSettingsImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
+    videobarSettingsBtn = new GuiButton(40, 40);
+    videobarSettingsBtn->SetPosition(70, 4); // 60 from the volume, as the others are spaced
+    videobarSettingsBtn->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+    videobarSettingsBtn->SetImage(videobarSettingsImg);
+    videobarSettingsBtn->SetTrigger(trigA);
+    videobarSettingsBtn->SetSelectable(false);
+    videobarSettingsBtn->SetUpdateCallback(VideoSettingsCallback);
+    videobarSettingsBtn->SetEffectGrow();
+
+    settingsPanel = new SettingsPanel;
+    settingsPanel->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+    settingsPanel->SetPosition(20, -84); // just above the bar
+    for(int i = 0; i < SET_ROWS; i++)
+    {
+        settingsPanel->label[i] = new GuiText(NULL, 18, (GXColor){255, 255, 255, 255});
+        settingsPanel->label[i]->SetAlignment(ALIGN_LEFT, ALIGN_MIDDLE);
+        settingsPanel->label[i]->SetPosition(12, 0);
+        settingsPanel->label[i]->SetMaxWidth(SET_W - 24);
+        settingsPanel->value[i] = new GuiText(NULL, 18, (GXColor){190, 190, 195, 255});
+        settingsPanel->value[i]->SetAlignment(ALIGN_RIGHT, ALIGN_MIDDLE);
+        settingsPanel->value[i]->SetPosition(-12, 0);
+        settingsPanel->value[i]->SetMaxWidth(SET_W - 160); // past the longest label
+        settingsPanel->row[i] = new GuiButton(SET_W, SET_ROW_H);
+        settingsPanel->row[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+        settingsPanel->row[i]->SetPosition(0, 4 + i * SET_ROW_H);
+        settingsPanel->row[i]->SetLabel(settingsPanel->label[i], 0);
+        settingsPanel->row[i]->SetLabel(settingsPanel->value[i], 1);
+        settingsPanel->row[i]->SetTrigger(trigA);
+        settingsPanel->row[i]->SetSelectable(false);
+        settingsPanel->Append(settingsPanel->row[i]);
+    }
+    HideVideoSettings();
+
     videobarStopBtn = new GuiButton(40, 40);
     videobarStopBtn->SetPosition(-60, 4);
     videobarStopBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
@@ -7788,6 +8132,7 @@ static void SetupGui()
     videobar->Append(videobarVolumeLevelMidImg);
     videobar->Append(videobarVolumeLevelLineImg);
     videobar->Append(videobarVolumeLevelBottomImg);
+    videobar->Append(videobarSettingsBtn);
     videobar->Append(videobarStopBtn);
     videobar->Append(videobarBackwardBtn);
     videobar->Append(videobarPauseBtn);
@@ -7796,6 +8141,7 @@ static void SetupGui()
     videobar->Append(videobarDropped);
     videobar->Append(videobarMemory);
     videobar->Append(videobarFPS);
+    videobar->Append(settingsPanel);
 
     videobar->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
     videobar->SetPosition(0, -30);
@@ -8508,6 +8854,7 @@ void MPlayerMenu()
     mainWindow->SetState(STATE_DISABLED);
 
     HideVideoVolumeLevelBar();
+    HideVideoSettings();
 
     if(IsHttpUrl(loadedFile))
     {

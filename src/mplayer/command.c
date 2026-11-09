@@ -3538,3 +3538,49 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
     }
     return brk_cmd;
 }
+
+#ifdef GEKKO
+/* For the player settings on WiiMC's video bar: a name for each subtitle, in
+ * the order of the "sub" property. A file's name, or the language a demuxer
+ * or VobSub gives; empty when there's none. Returns how many there are. */
+int mp_subtitle_names(MPContext *mpctx, char (*name)[48], int max)
+{
+    int pos, n;
+
+    if (!mpctx->demuxer)
+        return 0;
+    update_global_sub_size(mpctx);
+    n = FFMIN(mpctx->global_sub_size, max);
+
+    for (pos = 0; pos < n; pos++) {
+        int idx = pos;
+        int src = sub_source_and_index_by_pos(mpctx, &idx);
+        const char *s = NULL;
+
+        if (src == SUB_SOURCE_SUBS) {
+#ifdef CONFIG_ASS
+            if (mpctx->set_of_ass_tracks[idx] && mpctx->set_of_ass_tracks[idx]->name)
+                s = mpctx->set_of_ass_tracks[idx]->name;
+            else
+#endif
+            if (mpctx->set_of_subtitles[idx])
+                s = mpctx->set_of_subtitles[idx]->filename;
+            if (s)
+                s = mp_basename(s);
+        } else if (src == SUB_SOURCE_VOBSUB && vo_vobsub) {
+            s = vobsub_get_id(vo_vobsub, vobsub_get_id_by_index(vo_vobsub, idx));
+        } else if (src == SUB_SOURCE_DEMUX) {
+            int i;
+            for (i = 0; i < MAX_S_STREAMS; i++) {
+                sh_sub_t *sh = mpctx->demuxer->s_streams[i];
+                if (sh && sh->sid == idx) {
+                    s = sh->lang;
+                    break;
+                }
+            }
+        }
+        av_strlcpy(name[pos], s ? s : "", 48);
+    }
+    return n;
+}
+#endif
