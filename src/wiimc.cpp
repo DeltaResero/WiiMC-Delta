@@ -777,6 +777,8 @@ void LoadMPlayerFile()
     char ytid[32];
     char *ytlink = NULL;
 
+    YouTubeClearCaptions(); // only a YouTube video has any
+
     if(YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
     {
         ytlink = (char *)malloc(4096);

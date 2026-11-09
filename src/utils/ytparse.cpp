@@ -574,6 +574,189 @@ bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char
     return false;
 }
 
+int YtParseCaptions(const char *json, size_t len, YtCaption *out, int max)
+{
+    const char *e = json + len;
+    const char *tracks = path(json, e, "captions.playerCaptionsTracklistRenderer.captionTracks");
+    int n = 0;
+    char kind[16];
+
+    // two passes: the uploader's tracks, then the automatic (kind "asr") ones
+    for (int pass = 0; pass < 2 && tracks; pass++)
+    {
+        for (int i = 0; n < max; i++)
+        {
+            const char *t = element(tracks, e, i);
+            if (!t)
+                break;
+            getstr(member(t, e, "kind"), e, kind, sizeof(kind));
+            if ((strcmp(kind, "asr") == 0) != (pass == 1))
+                continue;
+            if (!getstr(member(t, e, "baseUrl"), e, out[n].url, sizeof(out[n].url)) ||
+                strncmp(out[n].url, "https://", 8) != 0)
+                continue;
+            text(member(t, e, "name"), e, out[n].name, sizeof(out[n].name));
+            if (!out[n].name[0])
+                getstr(member(t, e, "languageCode"), e, out[n].name, sizeof(out[n].name));
+            n++;
+        }
+    }
+    return n;
+}
+
+// an attribute's number in a tag that runs from p to e, or -1 when it's
+// missing or too big to be a time in milliseconds
+static long xml_num(const char *p, const char *e, const char *name)
+{
+    size_t n = strlen(name);
+    for (; p + n + 2 < e; p++)
+    {
+        if (p[-1] != ' ' || memcmp(p, name, n) != 0 || p[n] != '=' || p[n + 1] != '"')
+            continue;
+
+        const char *q = p + n + 2;
+        long v = 0;
+        if (q >= e || *q < '0' || *q > '9')
+            return -1;
+        for (; q < e && *q >= '0' && *q <= '9'; q++)
+        {
+            if (v > 99999999) // past 27 hours
+                return -1;
+            v = v * 10 + (*q - '0');
+        }
+        return v;
+    }
+    return -1;
+}
+
+// the text between p and e without tags, with entities decoded; returns length
+static size_t xml_text(const char *p, const char *e, char *out, size_t size)
+{
+    size_t n = 0;
+
+    while (p < e && n + 5 < size)
+    {
+        if (*p == '<')
+        {
+            const char *gt = (const char *)memchr(p, '>', e - p);
+            if (!gt)
+                break;
+            if (e - p >= 4 && strncmp(p, "<br", 3) == 0)
+                out[n++] = '\n';
+            p = gt + 1;
+            continue;
+        }
+        if (*p == '&')
+        {
+            const char *semi = (const char *)memchr(p, ';', e - p < 10 ? e - p : 10);
+            if (semi)
+            {
+                unsigned cp = 0;
+                if (p[1] == '#')
+                    cp = p[2] == 'x' ? strtoul(p + 3, NULL, 16) : strtoul(p + 2, NULL, 10);
+                else if (strncmp(p, "&amp;", 5) == 0) cp = '&';
+                else if (strncmp(p, "&lt;", 4) == 0) cp = '<';
+                else if (strncmp(p, "&gt;", 4) == 0) cp = '>';
+                else if (strncmp(p, "&quot;", 6) == 0) cp = '"';
+                else if (strncmp(p, "&apos;", 6) == 0) cp = '\'';
+                if (cp > 0 && cp < 0x110000 && !(cp >= 0xD800 && cp < 0xE000))
+                {
+                    put_utf8(out, &n, cp);
+                    p = semi + 1;
+                    continue;
+                }
+            }
+        }
+        if (*p != '\r')
+            out[n++] = *p;
+        p++;
+    }
+    out[n] = 0;
+
+    // trim spaces and line breaks at both ends
+    size_t a = 0;
+    while (out[a] == ' ' || out[a] == '\n')
+        a++;
+    while (n > a && (out[n - 1] == ' ' || out[n - 1] == '\n'))
+        n--;
+    memmove(out, out + a, n - a);
+    n -= a;
+    out[n] = 0;
+    return n;
+}
+
+static void srt_time(char *buf, size_t size, long ms)
+{
+    snprintf(buf, size, "%02ld:%02ld:%02ld,%03ld", ms / 3600000, ms / 60000 % 60, ms / 1000 % 60, ms % 1000);
+}
+
+size_t YtCaptionsToSrt(const char *xml, size_t len, char *out, size_t size)
+{
+    const char *e = xml + len;
+    const char *p = xml;
+    size_t n = 0;
+    int count = 0;
+    char line[1024];
+
+    out[0] = 0;
+    while (p < e)
+    {
+        // the next <p ...>
+        const char *tag = NULL;
+        for (; p + 3 < e; p++)
+            if (p[0] == '<' && p[1] == 'p' && (p[2] == ' ' || p[2] == '>'))
+            {
+                tag = p;
+                break;
+            }
+        if (!tag)
+            break;
+        const char *gt = (const char *)memchr(tag, '>', e - tag);
+        if (!gt)
+            break;
+        long t = xml_num(tag + 2, gt, "t");
+        long d = xml_num(tag + 2, gt, "d");
+
+        const char *body = gt + 1;
+        const char *close = body;
+        while (close + 4 <= e && strncmp(close, "</p>", 4) != 0)
+            close++;
+        if (close + 4 > e)
+            break;
+        p = close + 4;
+
+        if (t < 0 || d <= 0 || gt[-1] == '/')
+            continue;
+        if (!xml_text(body, close, line, sizeof(line)))
+            continue;
+
+        // end where the next timed line starts, if that's sooner
+        long end = t + d;
+        const char *q = p;
+        for (; q + 3 < e; q++)
+            if (q[0] == '<' && q[1] == 'p' && q[2] == ' ')
+            {
+                const char *qgt = (const char *)memchr(q, '>', e - q);
+                long nt = qgt ? xml_num(q + 2, qgt, "t") : -1;
+                if (nt > t && nt < end)
+                    end = nt;
+                break;
+            }
+
+        char a[24], b[24];
+        srt_time(a, sizeof(a), t);
+        srt_time(b, sizeof(b), end);
+        int k = snprintf(out + n, size - n, "%d\n%s --> %s\n%s\n\n", ++count, a, b, line);
+        if (k < 0 || (size_t)k >= size - n)
+        {
+            out[n] = 0;
+            break;
+        }
+        n += k;
+    }
+    return n;
+}
+
 void YtJsonEscape(const char *s, char *out, size_t size)
 {
     size_t n = 0;

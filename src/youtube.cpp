@@ -31,6 +31,11 @@
 
 static char visitor[1024]; // about 450 characters in November 2026
 
+// the captions of the video last resolved
+static YtCaption *captions = NULL;
+static int captionCount = 0;
+static int captionSerial = 0;
+
 // a reply from YouTube in a new buffer, which the caller frees; NULL on failure
 static char *Fetch(const char *url, const char *body, const char *headers, u32 *len)
 {
@@ -175,7 +180,68 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
         return false;
 
     bool ok = YtParsePlayer(reply, len, url, urlsize, reason, reasonsize);
+
+    YouTubeClearCaptions();
+    if (ok)
+    {
+        if (!captions)
+            captions = (YtCaption *)malloc(YT_CAPTIONS_MAX * sizeof(YtCaption));
+        if (captions)
+            captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
+    }
     free(reply);
+    return ok;
+}
+
+void YouTubeClearCaptions()
+{
+    captionCount = 0;
+    captionSerial++;
+}
+
+int YouTubeCaptionCount()
+{
+    return captionCount;
+}
+
+int YouTubeCaptionSerial()
+{
+    return captionSerial;
+}
+
+const char *YouTubeCaptionName(int i)
+{
+    return i >= 0 && i < captionCount ? captions[i].name : "";
+}
+
+bool YouTubeCaptionSave(int i, const char *file)
+{
+    if (i < 0 || i >= captionCount)
+        return false;
+
+    u32 len;
+    char *xml = Fetch(captions[i].url, NULL, BROWSER_HEADERS, &len);
+    if (!xml)
+        return false;
+
+    // SubRip takes about as much room as YouTube's XML; leave plenty
+    size_t size = len * 2 + 4096;
+    char *srt = (char *)malloc(size);
+    size_t n = srt ? YtCaptionsToSrt(xml, len, srt, size) : 0;
+    free(xml);
+
+    bool ok = false;
+    if (n > 0)
+    {
+        FILE *f = fopen(file, "wb");
+        if (f)
+        {
+            ok = fwrite(srt, 1, n, f) == n;
+            if (fclose(f) != 0)
+                ok = false;
+        }
+    }
+    free(srt);
     return ok;
 }
 

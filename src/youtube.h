@@ -29,6 +29,17 @@ int YouTubeSuggest(const char *text, char (*out)[96], int max);
 // works from the address that asked for it)
 bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason, size_t reasonsize);
 
+// The captions of the video YouTubeResolve last found, until
+// YouTubeClearCaptions. The serial number changes whenever the list does.
+#define YT_CAPTIONS_MAX 30
+void YouTubeClearCaptions();
+int YouTubeCaptionCount();
+int YouTubeCaptionSerial();
+const char *YouTubeCaptionName(int i);
+
+// Downloads caption track i and saves it to file as SubRip
+bool YouTubeCaptionSave(int i, const char *file);
+
 // The video ID from a RiiTube video link, or false when it isn't one
 bool YouTubeRiiTubeId(const char *url, char *id, size_t size);
 
