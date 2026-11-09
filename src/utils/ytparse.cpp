@@ -343,7 +343,8 @@ static void first_text(const char *obj, const char *e, const char *const *keys, 
         text(member(obj, e, keys[i]), e, out, size);
 }
 
-// videoRenderer, gridVideoRenderer, compactVideoRenderer, playlistVideoRenderer
+// videoRenderer, gridVideoRenderer, compactVideoRenderer, playlistVideoRenderer, and
+// videoCardRenderer (the Gaming channel page)
 static bool video_item(const char *vr, const char *e, YtItem *it)
 {
     if (!getstr(member(vr, e, "videoId"), e, it->id, sizeof(it->id)) || !it->id[0])
@@ -351,7 +352,7 @@ static bool video_item(const char *vr, const char *e, YtItem *it)
 
     text(member(vr, e, "title"), e, it->title, sizeof(it->title));
 
-    static const char *const channel[] = { "ownerText", "longBylineText", "shortBylineText", NULL };
+    static const char *const channel[] = { "ownerText", "longBylineText", "shortBylineText", "bylineText", NULL };
     first_text(vr, e, channel, it->channel, sizeof(it->channel));
 
     text(member(vr, e, "lengthText"), e, it->length, sizeof(it->length));
@@ -363,7 +364,7 @@ static bool video_item(const char *vr, const char *e, YtItem *it)
         text(path(ov, e, "thumbnailOverlayTimeStatusRenderer.text"), e, it->length, sizeof(it->length));
     }
 
-    static const char *const views[] = { "viewCountText", "shortViewCountText", "videoInfo", NULL };
+    static const char *const views[] = { "viewCountText", "shortViewCountText", "videoInfo", "metadataText", NULL };
     first_text(vr, e, views, it->views, sizeof(it->views));
     text(member(vr, e, "publishedTimeText"), e, it->age, sizeof(it->age));
 
@@ -473,7 +474,8 @@ int YtParseItems(const char *json, size_t len, YtItem *items, int max, char *nex
 {
     static const char *const keys[] = {
         "\"videoRenderer\"", "\"gridVideoRenderer\"", "\"compactVideoRenderer\"",
-        "\"playlistVideoRenderer\"", "\"lockupViewModel\"", "\"continuationItemRenderer\"", NULL
+        "\"playlistVideoRenderer\"", "\"videoCardRenderer\"", "\"lockupViewModel\"",
+        "\"continuationItemRenderer\"", NULL
     };
     const char *p = json, *e = json + len;
     int count = 0, which = 0;
