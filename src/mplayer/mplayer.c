@@ -163,6 +163,7 @@ bool halve_fps = true;
 
 extern int prev_dxs, prev_dys;
 extern int stop_cache_thread;
+extern int getMESS; // cache2.c: gives up on a stream that stopped sending
 
 int monospaced = 0;
 int alt_font = 0;
@@ -3976,7 +3977,8 @@ audio_delay=0;
     initialized_flags |= INITIALIZED_STREAM;
 
 #ifdef GEKKO
-  strcpy(fileplaying, filename);
+  // a YouTube link runs past MAXPATHLEN; only its start is ever looked at
+  snprintf(fileplaying, sizeof(fileplaying), "%s", filename);
   strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying));
   partitionlabelplaying[sizeof(partitionlabelplaying)-1] = '\0';
 #endif
@@ -4831,8 +4833,9 @@ total_time_usage_start=GetTimer();
             current_module = "pause";
 
 #ifdef GEKKO
-        //low cache
-        if (mpctx->osd_function != OSD_PAUSE && stream_cache_size > 0.0 && stream_cache_min_percent> 1.0 && cache_fill_level<6.0 && cache_fill_level>=0.0)
+        //low cache, unless the stream was given up: then its reads come
+        //back empty and playback ends
+        if (mpctx->osd_function != OSD_PAUSE && stream_cache_size > 0.0 && stream_cache_min_percent> 1.0 && cache_fill_level<6.0 && cache_fill_level>=0.0 && !getMESS)
         {
                 pause_low_cache=1;
                 mpctx->osd_function = OSD_PAUSE;
@@ -5566,10 +5569,6 @@ void PauseAndGotoGUI()
 
         GetRelativeTime(); // ignore time that passed during pause
 }
-
-#ifdef GEKKO
-extern int getMESS; // cache2.c: gives up on a stream that stopped sending
-#endif
 
 static void low_cache_loop(void)
 {
