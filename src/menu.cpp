@@ -2412,7 +2412,6 @@ int lp3 = 0;
 */
 
 // these are used in cache2.c, move 'em, and name them better geez
-int getWeird = 0;
 //int getMESS = 0;
 int cntReconnect = 0;
 

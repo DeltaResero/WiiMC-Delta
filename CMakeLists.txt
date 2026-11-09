@@ -258,9 +258,11 @@ if(WIIMC_EXT2)
   list(APPEND WIIMC_FS_LIBS ext2fs)
 endif()
 
-# src/utils/tls.c shares one parsed CA bundle with FFmpeg's connections
+# src/utils/tls.c shares one parsed CA bundle with FFmpeg's connections, and
+# src/networkop.cpp runs host name lookups one at a time
 target_link_options(wiimc PRIVATE -g -Wl,-Map,${CMAKE_BINARY_DIR}/wiimc.map
-  -Wl,--wrap=mbedtls_x509_crt_parse_file,--wrap=mbedtls_ssl_conf_ca_chain)
+  -Wl,--wrap=mbedtls_x509_crt_parse_file,--wrap=mbedtls_ssl_conf_ca_chain
+  -Wl,--wrap=net_gethostbyname)
 target_link_libraries(wiimc PRIVATE
   ${MPLAYER}/libmplayerwii.a ${FFMPEG_LIBS}
   mbedtls mbedx509 mbedcrypto

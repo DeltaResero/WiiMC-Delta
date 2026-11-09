@@ -174,7 +174,12 @@ static s32 tcp_connect(char *host, const u16 port)
     {
         hp = net_gethostbyname (host);
         if (!hp || !(hp->h_addrtype == PF_INET))
-            return errno;
+        {
+            // errno can be zero or positive here, which the caller would
+            // take for a socket and then close someone else's
+            net_close(s);
+            return -1;
+        }
 
         memcpy((char *) &sa.sin_addr, hp->h_addr_list[0], hp->h_length);
     }
@@ -497,7 +502,9 @@ static u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool 
 
                 if(content_length > 0)
                 {
-                    if(sizeread+content_length > maxsize)
+                    // as a subtraction: a huge chunk size wrapped the sum
+                    // past the check, and the read ran off the buffer
+                    if(content_length > maxsize - sizeread)
                         break;
 
                     ret = tcp_read(s, (u8 *)buffer+sizeread, content_length);

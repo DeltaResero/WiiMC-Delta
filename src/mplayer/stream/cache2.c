@@ -86,6 +86,7 @@ extern void ShowProgress (const char *msg, int done, int total);
 #include "stream.h"
 #include "cache2.h"
 #include "mp_global.h"
+#include "input/input.h"
 
 typedef struct {
   // constats:
@@ -128,27 +129,43 @@ static void cache_flush(cache_vars_t *s)
   s->min_filepos=s->max_filepos=s->read_filepos; // drop cache content :(
 }
 
+// getMESS gives up on a stream that stopped sending: reads return nothing,
+// so the player ends it, and the cache thread, stuck waiting on the network,
+// is left behind (cache_uninit). Then the music menu reconnects a radio
+// station after a while (waitReload).
 extern int getMESS;
-extern int getWeird;
 extern int waitReload;
 extern int cntReconnect;
+extern int controlledbygui;
+extern int copyScreen;
+
+// Playback is stopping, or leaving for the menu: quit is next in the
+// command queue (looked at, not taken: other commands stay put), or quit
+// has run and wants one more frame drawn for the menu's background.
+static int leaving_playback(void)
+{
+  mp_cmd_t *cmd;
+
+  if(controlledbygui == 2 || copyScreen == 1)
+    return 1;
+  cmd = mp_input_get_cmd(0, 0, 1);
+  return cmd && cmd->id == MP_CMD_QUIT;
+}
+
+// How long a stream may send nothing before it's given up. A server that
+// converts the video as it goes, or a busy one, can pause for seconds.
+#define STALL_LIMIT_MS 30000
 
 static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 {
   int total=0;
+  u64 wait_start=0;
 
   while(size>0 ){
     int pos,newb,len;
 
-        if(getMESS != 0) { //this loop is significant but not all there is to the bug
-                //getWeird = size; //2048
-                return 0;
-        }
-        if(getWeird > 80) { //assume no longer playing audio
-                getWeird = 0;
-                getMESS = 1; //forces 3 loops to exit, allowing mplayer to still work
-        }
-        ++getWeird;
+        if(getMESS != 0)
+                return total;
 
   //printf("CACHE2_READ: 0x%X <= 0x%X <= 0x%X  \n",s->min_filepos,s->read_filepos,s->max_filepos);
 
@@ -156,10 +173,20 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
         // eof?
         if(s->eof) break;
 
-        // waiting for buffer fill...
+        // waiting for buffer fill, unless playback is stopping, or the
+        // stream has sent nothing for too long
+        if(leaving_playback())
+                return total;
+        if(!wait_start)
+                wait_start=gettime();
+        else if(ticks_to_millisecs(diff_ticks(wait_start, gettime())) > STALL_LIMIT_MS) {
+                getMESS = 1;
+                return total;
+        }
         usec_sleep(READ_USLEEP_TIME); // 10ms
         continue; // try again...
     }
+    wait_start=0;
     newb=s->max_filepos-s->read_filepos; // new bytes in the buffer
 
 //    printf("*** newb: %d bytes ***\n",newb);
@@ -194,11 +221,15 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 
   }
 
-  //reset
-  getWeird = 0;
-
 #ifndef GEKKO
   cache_fill_level=(s->max_filepos-s->read_filepos)/(s->buffer_size / 100);
+#else
+  // The cache thread works out the fill level as it fills. While a network
+  // stream sends nothing, it waits on the network and the level stays where
+  // it was as the player empties the cache, so the player never stops to
+  // buffer. Work it out here too.
+  if(s->stream->type == STREAMTYPE_STREAM && !s->eof)
+    cache_fill_level=(s->max_filepos-s->read_filepos)*100.0/s->buffer_size;
 #endif
   return total;
 }
@@ -486,17 +517,20 @@ void cache_uninit(stream_t *s) {
   {
     cache_do_control(s, -2, NULL);
     stop_cache_thread = 1;
+    u64 wait_start = gettime();
     while(!CacheThreadSuspended()) {
           usleep(50);
-          if(getMESS != 0) { //significant loop
-                //if(getWeird == 8)
-                        //getWeird = 9;
+          // The cache thread is stuck waiting on a stream that stopped
+          // sending: leave it, and what it uses, behind, well within the
+          // 6 s the exit thread allows. A stream that was given up gets
+          // reconnected later; one stopped by the user doesn't.
+          if(getMESS != 0 || ticks_to_millisecs(diff_ticks(wait_start, gettime())) > 2000) {
+                if(getMESS != 0) {
+                        waitReload = 1;
+                        ++cntReconnect;
+                }
                 getMESS = 0;
-                waitReload = 1; //this flag allows a reload after some time has passed to reconnect stream
-                ++cntReconnect;
-                //s->eof = 1; //does not make a diff
                 return;
-                //break; //frequent dsi crash
           }
         }
   }
@@ -811,7 +845,8 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
   }
   while (s->control != -1) {
         usec_sleep(CONTROL_SLEEP_TIME);
-        if(getMESS != 0) //significant loop
+        // the cache thread may be stuck waiting on a silent stream
+        if(getMESS != 0 || leaving_playback())
                 return 0;
   }
 

@@ -333,6 +333,9 @@ int stream_read_internal(stream_t *s, void *buf, int len)
     len= s->fill_buffer ? s->fill_buffer(s, buf, len) : 0;
   }
 #ifdef GEKKO
+  // count empty reads in a row, not in all the reads since WiiMC started
+  if(len>0)
+    _try=0;
   if(len==0)
   {
          printf("stream error len==0, try: %i\n",_try);
