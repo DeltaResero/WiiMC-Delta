@@ -46,6 +46,10 @@
 #include "tcp.h"
 #include "http.h"
 #include "cookies.h"
+
+#ifdef GEKKO
+extern int controlledbygui;
+#endif
 #include "url.h"
 
 /* Variables for the command line option -user, -passwd, -bandwidth,
@@ -470,6 +474,16 @@ nop_streaming_read( int fd, char *buffer, int size, streaming_ctrl_t *stream_ctr
     if( len<size ) {
         int ret;
         ret = recv( fd, buffer+len, size-len, 0 );
+#ifdef GEKKO
+        // IOS reports a receive that timed out, or ran short of buffers, as
+        // an error while the connection still stands: a server slow to send,
+        // such as one converting the video as it goes. Taken as the end, it
+        // stopped the video, so try again for a while first.
+        for( int tries = 0; ret<0 && tries<100 && controlledbygui!=2; tries++ ) {
+            usleep(50000);
+            ret = recv( fd, buffer+len, size-len, 0 );
+        }
+#endif
         if( ret<0 ) {
             mp_msg(MSGT_NETWORK,MSGL_ERR,"nop_streaming_read error : %s\n",strerror(errno));
             ret = 0;
