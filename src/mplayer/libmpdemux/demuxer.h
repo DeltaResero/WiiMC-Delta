@@ -416,6 +416,7 @@ int ds_get_packet_pts_endpts(demux_stream_t *ds, unsigned char **start, double *
 int ds_get_packet_sub(demux_stream_t *ds,unsigned char **start,
                       double *pts, double *endpts);
 double ds_get_next_pts(demux_stream_t *ds);
+double ds_peek_next_pts(demux_stream_t *ds, int max_packs, int max_bytes);
 int ds_parse(demux_stream_t *sh, uint8_t **buffer, int *len, double pts, off_t pos);
 void ds_clear_parser(demux_stream_t *sh);
 

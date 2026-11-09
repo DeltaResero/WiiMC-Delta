@@ -959,24 +959,28 @@ int ds_get_packet_sub(demux_stream_t *ds, unsigned char **start,
     return len;
 }
 
-double ds_get_next_pts(demux_stream_t *ds)
+static double next_pts_within(demux_stream_t *ds, int max_packs, int max_bytes, int warn)
 {
     demuxer_t *demux = ds->demuxer;
     // if we have not read from the "current" packet, consider it
     // as the next, otherwise we never get the pts for the first packet.
     while (!ds->first && (!ds->current || ds->buffer_pos)) {
-        if (!force_ni && (demux->audio->packs >= MAX_PACKS
-            || demux->audio->bytes >= MAX_PACK_BYTES)) {
-            mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
-                   demux->audio->packs, demux->audio->bytes);
-            mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
+        if (!force_ni && (demux->audio->packs >= max_packs
+            || demux->audio->bytes >= max_bytes)) {
+            if (warn) {
+                mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
+                       demux->audio->packs, demux->audio->bytes);
+                mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
+            }
             return MP_NOPTS_VALUE;
         }
-        if (!force_ni && (demux->video->packs >= MAX_PACKS
-            || demux->video->bytes >= MAX_PACK_BYTES)) {
-            mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
-                   demux->video->packs, demux->video->bytes);
-            mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
+        if (!force_ni && (demux->video->packs >= max_packs
+            || demux->video->bytes >= max_bytes)) {
+            if (warn) {
+                mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
+                       demux->video->packs, demux->video->bytes);
+                mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
+            }
             return MP_NOPTS_VALUE;
         }
         if (!demux_fill_buffer(demux, ds))
@@ -986,6 +990,22 @@ double ds_get_next_pts(demux_stream_t *ds)
     if (ds->current && !ds->buffer_pos)
         return ds->current->pts;
     return ds->first->pts;
+}
+
+double ds_get_next_pts(demux_stream_t *ds)
+{
+    return next_pts_within(ds, MAX_PACKS, MAX_PACK_BYTES, 1);
+}
+
+/**
+ * \brief Like ds_get_next_pts(), but gives up quietly, with MP_NOPTS_VALUE,
+ *        once the other streams hold max_packs packets or max_bytes bytes.
+ *        Reading ahead to the next video packet keeps all the audio in
+ *        between in memory.
+ */
+double ds_peek_next_pts(demux_stream_t *ds, int max_packs, int max_bytes)
+{
+    return next_pts_within(ds, max_packs, max_bytes, 0);
 }
 
 // ====================================================================
