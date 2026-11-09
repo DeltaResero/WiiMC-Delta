@@ -32,6 +32,9 @@ void ChangeTheme();
 bool VideoVolumeLevelBarVisible();
 void ShowVideoVolumeLevelBar();
 void HideVideoVolumeLevelBar();
+bool VideoSettingsVisible();
+bool VideoSettingsHit(int x, int y);
+void HideVideoSettings();
 void UndoChangeMenu();
 void UpdateBrowser();
 

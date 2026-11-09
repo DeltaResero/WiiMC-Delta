@@ -73,6 +73,8 @@
     separation between stream an demuxer and thus is not
     actually a stream cache can not be used */
 #define STREAM_NON_CACHEABLE 8
+/// The stream is a live broadcast, such as internet radio
+#define MP_STREAM_LIVE 16
 
 //////////// Open return code
 #define STREAM_REDIRECTED -2

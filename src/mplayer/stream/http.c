@@ -916,6 +916,8 @@ static int fixup_open(stream_t *stream,int seekable) {
     int is_ultravox = av_strcasecmp(stream->streaming_ctrl->url->protocol, "unsv") == 0;
 
     stream->type = STREAMTYPE_STREAM;
+    if(is_icy || is_ultravox || (http_hdr && !av_strcasecmp(http_hdr->protocol, "ICY")))
+        stream->flags |= MP_STREAM_LIVE;
     if(!is_icy && !is_ultravox && seekable)
     {
         stream->flags |= MP_STREAM_SEEK;
