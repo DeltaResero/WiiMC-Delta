@@ -198,6 +198,7 @@ int wii_error = 0;
 char wii_error_text[160]; // why the file can't play, when wii_error is 2
 extern char lavc_missing_video_feature[128];
 static double wiiTimeFromStart(double t);
+static double wiiPlayTime(void);
 static int pause_low_cache=0;
 static bool thp_vid = false;
 unsigned timerFadeBlack = 0; // not an actual fade.
@@ -5270,7 +5271,7 @@ static void save_restore_point(char *_filename, char *_partitionlabel)
                 strncmp(_filename,"mms:",4) == 0)
                 return;
 
-        int position = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        int position = wiiTimeFromStart(wiiPlayTime());
 
         if(position <= 8 || !( mpctx->demuxer->seekable))
         {
@@ -5859,6 +5860,32 @@ static double wiiTimeFromStart(double t)
         return t > start ? t - start : 0;
 }
 
+// Where playback is. The newest decoded frame is one ahead of the picture,
+// and in a still held for seconds, or after the picture of a song with one
+// picture ends, far ahead or behind. So with sound, follow the sound being
+// played, as VLC and mpv do. Without it, take the decoded frame's time less
+// the wait until it shows. A DVD has its own clock.
+static double wiiPlayTime(void)
+{
+        sh_video_t *sh_video = mpctx->sh_video;
+        int video_done = !sh_video || (mpctx->d_video->eof && !mpctx->num_buffered_frames);
+
+        if (mpctx->demuxer->stream_pts != MP_NOPTS_VALUE)
+                return mpctx->demuxer->stream_pts;
+
+        // the sound, unless it ended while the picture goes on
+        if (mpctx->sh_audio && mpctx->audio_out &&
+            (!mpctx->d_audio->eof || video_done) &&
+            calc_a_pts(mpctx->sh_audio, mpctx->d_audio) != MP_NOPTS_VALUE)
+                return playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out) - audio_delay;
+
+        if (sh_video && sh_video->pts != MP_NOPTS_VALUE) {
+                double wait = mpctx->num_buffered_frames ? time_to_next_frame() : 0;
+                return wait > 0 ? sh_video->pts - wait : sh_video->pts;
+        }
+        return demuxer_get_current_time(mpctx->demuxer);
+}
+
 double wiiGetTimePos()
 {
         if(!playing_file || controlledbygui == 2)
@@ -5870,10 +5897,7 @@ double wiiGetTimePos()
         //if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return 0;
 
-        if (!mpctx->sh_video && mpctx->sh_audio && mpctx->audio_out)
-                return wiiTimeFromStart(playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out));
-
-        return wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        return wiiTimeFromStart(wiiPlayTime());
 }
 
 void wiiGetTimeDisplay(char * buf)
@@ -5885,7 +5909,7 @@ void wiiGetTimeDisplay(char * buf)
                 //return;
 
         int len = demuxer_get_time_length(mpctx->demuxer);
-        int pts = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        int pts = wiiTimeFromStart(wiiPlayTime());
 
         sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
                 pts/3600,(pts/60)%60,pts%60,
