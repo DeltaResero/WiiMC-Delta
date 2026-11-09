@@ -8362,6 +8362,65 @@ void SetBufferingStatus(int s)
 /****************************************************************************
  * MPlayer Menu
  ***************************************************************************/
+/****************************************************************************
+ * PausedVideoDim
+ *
+ * Dims the screen once a video has sat paused, with nothing on the first
+ * controller pressed or moved, for the screensaver delay, when Burn-in
+ * Reduction is on. The menus' screensaver doesn't run over a video. The
+ * player calls this each time it draws.
+ ***************************************************************************/
+static bool pausedDimmed = false;
+
+static void PausedVideoUndim()
+{
+    if(pausedDimmed)
+        *HW_VIDIM &= ~1 << 7; // clears the dimming bits, as the menus do
+    pausedDimmed = false;
+}
+
+void PausedVideoDim()
+{
+    static u64 still = 0; // when the controller last moved
+    static u32 btns, pbtns, cbtns;
+    static int irx, iry, ax, ay, az, sx, sy;
+
+    // anything pressed, the pointer moved, the remote picked up, or a stick pushed
+    WPADData *w = userInput[0].wpad;
+    bool moved = false;
+    if(w)
+    {
+        int x = w->ir.valid ? (int)w->ir.x : -100, y = w->ir.valid ? (int)w->ir.y : -100;
+        moved = w->btns_h != btns || abs(x - irx) > 4 || abs(y - iry) > 4 ||
+            abs(w->accel.x - ax) > 20 || abs(w->accel.y - ay) > 20 || abs(w->accel.z - az) > 20;
+        btns = w->btns_h;
+        irx = x;
+        iry = y;
+        ax = w->accel.x;
+        ay = w->accel.y;
+        az = w->accel.z;
+    }
+    moved = moved || userInput[0].pad.btns_h != pbtns || userInput[0].cpad.data.held != cbtns ||
+        abs(userInput[0].pad.stickX - sx) > 36 || abs(userInput[0].pad.stickY - sy) > 36;
+    pbtns = userInput[0].pad.btns_h;
+    cbtns = userInput[0].cpad.data.held;
+    sx = userInput[0].pad.stickX;
+    sy = userInput[0].pad.stickY;
+
+    if(!wiiIsPaused() || WiiSettings.screenDim != 1 || moved || still == 0)
+    {
+        still = gettime();
+        PausedVideoUndim();
+    }
+    else if(!pausedDimmed && diff_sec(still, gettime()) >= (u32)WiiSettings.screensaverDelay)
+    {
+        *HW_VIDIM |= 1 << 7; // dim, as the menus' screensaver does
+        *HW_VIDIM |= 1 << 4;
+        *HW_VIDIM |= 1 << 1;
+        pausedDimmed = true;
+    }
+}
+
 void MPlayerMenu()
 {
     guiShutdown = false;
@@ -8403,6 +8462,7 @@ void MPlayerMenu()
         }
     }
 
+    PausedVideoUndim(); // the player stopped drawing while the screen was dim
     DisableRumble();
     mainWindow = NULL;
 }

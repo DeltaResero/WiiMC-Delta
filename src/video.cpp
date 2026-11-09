@@ -351,6 +351,7 @@ extern bool point_on;
 int DrawMPlayerGui()
 {
     UpdatePads();
+    PausedVideoDim();
     if(safe_gc) { // GC controller reads 1 input as 2 inputs when using tiled rendering
         MPlayerInput();
         return 0;
