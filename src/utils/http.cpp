@@ -174,7 +174,12 @@ static s32 tcp_connect(char *host, const u16 port)
     {
         hp = net_gethostbyname (host);
         if (!hp || !(hp->h_addrtype == PF_INET))
-            return errno;
+        {
+            // errno can be zero or positive here, which the caller would
+            // take for a socket and then close someone else's
+            net_close(s);
+            return -1;
+        }
 
         memcpy((char *) &sa.sin_addr, hp->h_addr_list[0], hp->h_length);
     }
