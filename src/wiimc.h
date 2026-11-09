@@ -61,6 +61,7 @@ void wiiPause();
 bool wiiIsPaused();
 bool wiiCanSeek();
 float wiiGetSpeed();
+void wiiSetStartPos(double sec);
 int wiiAudioTracks(int *aid, char (*name)[48], int max);
 int wiiAudioTrack();
 void wiiSetAudioTrack(int aid);

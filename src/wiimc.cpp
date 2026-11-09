@@ -50,6 +50,7 @@ u8 iosVal = 58;
 extern "C" {
 extern void __exception_setreload(int t);
 extern char *network_useragent;
+extern char *audio_stream; // MPlayer's -audiofile
 }
 
 bool ExitRequested = false;
@@ -777,7 +778,7 @@ void LoadMPlayerFile()
     char ytid[32];
     char *ytlink = NULL;
 
-    YouTubeClearCaptions(); // only a YouTube video has any
+    YouTubeForget(); // what the last YouTube video had
 
     if(YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
     {
@@ -788,6 +789,11 @@ void LoadMPlayerFile()
             ytlink = NULL;
         }
     }
+
+    // YouTube's sound comes as a stream of its own above 360p, or in another
+    // language; any other file has its sound in it
+    free(audio_stream);
+    audio_stream = ytlink && YouTubeAudioUrl() ? strdup(YouTubeAudioUrl()) : NULL;
 
     // set new file to load
     wiiLoadFile(ytlink ? ytlink : loadedFile, partitionlabel);

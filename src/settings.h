@@ -176,6 +176,7 @@ struct SWiiSettings {
     int     yggdrasilQuality;
     int     anisonfmQuality;
     int     onlineBanners;
+    int     youtubeQuality; // tallest YouTube video to ask for: 360 or 480
     // Network
     SMBSettings smbConf[MAX_SHARES];
     FTPSettings ftpConf[MAX_SHARES];

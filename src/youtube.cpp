@@ -15,6 +15,7 @@
 #include <gccore.h>
 
 #include "youtube.h"
+#include "settings.h"
 #include "utils/http.h"
 
 #define REPLY_SIZE (1024*1024) // enough for a page of results, unpacked
@@ -24,6 +25,10 @@
 #define ANDROID_CLIENT "{\"clientName\":\"ANDROID\",\"clientVersion\":\"21.26.364\",\"androidSdkVersion\":30," \
     "\"userAgent\":\"com.google.android.youtube/21.26.364 (Linux; U; Android 11) gzip\"," \
     "\"osName\":\"Android\",\"osVersion\":\"11\",\"hl\":\"en\",\"gl\":\"US\""
+#define VISIONOS_CLIENT "{\"clientName\":\"VISIONOS\",\"clientVersion\":\"1.02\",\"deviceMake\":\"Apple\"," \
+    "\"deviceModel\":\"RealityDevice17,1\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) " \
+    "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15\"," \
+    "\"osName\":\"visionOS\",\"osVersion\":\"26.5.23O471\",\"hl\":\"en\",\"gl\":\"US\""
 #define BROWSER_HEADERS "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
     "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n"
 
@@ -35,6 +40,15 @@ static char visitor[1024]; // about 450 characters in November 2026
 static YtCaption *captions = NULL;
 static int captionCount = 0;
 static int captionSerial = 0;
+
+// the video's streams: the one found, and the sound
+static int height = 0;
+static YtAudioTrack *audioTracks = NULL;
+static int audioCount = 0;
+static int audioPlaying = 0;        // which of audioTracks plays
+static char *audioUrl = NULL;       // its link when it's a stream of its own
+static char audioWanted[64] = "";   // the track picked for audioFor; "" = original
+static char audioFor[32] = "";
 
 // a reply from YouTube in a new buffer, which the caller frees; NULL on failure
 static char *Fetch(const char *url, const char *body, const char *headers, u32 *len)
@@ -160,43 +174,159 @@ int YouTubeSuggest(const char *text, char (*out)[96], int max)
     return count;
 }
 
+// the player reply for a video as a client sees it; NULL on failure
+static char *Player(const char *videoId, const char *client, u32 *len)
+{
+    char id[32], vis[1024], body[2560];
+
+    YtJsonEscape(videoId, id, sizeof(id));
+    YtJsonEscape(Visitor(), vis, sizeof(vis));
+    snprintf(body, sizeof(body), "{\"videoId\":\"%s\",\"context\":{\"client\":%s%s%s%s}},"
+        "\"contentCheckOk\":true,\"racyCheckOk\":true}", id, client,
+        vis[0] ? ",\"visitorData\":\"" : "", vis, vis[0] ? "\"" : "");
+    return Fetch(YT_API "player?prettyPrint=false", body, BROWSER_HEADERS, len);
+}
+
+static bool Playable(const char *reply)
+{
+    return strstr(reply, "\"playabilityStatus\":{\"status\":\"OK\"") != NULL;
+}
+
+// which of the tracks to play: the one picked for this video, else the original
+static int AudioPick()
+{
+    for (int i = 0; audioWanted[0] && i < audioCount; i++)
+        if (strcmp(audioTracks[i].name, audioWanted) == 0)
+            return i;
+    return 0;
+}
+
 bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason, size_t reasonsize)
 {
-    char id[32], vis[1024], body[2048];
+    u32 len;
 
     url[0] = 0;
     if (reason && reasonsize)
         reason[0] = 0;
 
-    YtJsonEscape(videoId, id, sizeof(id));
-    YtJsonEscape(Visitor(), vis, sizeof(vis));
-    snprintf(body, sizeof(body), "{\"videoId\":\"%s\",\"context\":{\"client\":" ANDROID_CLIENT "%s%s%s}},"
-        "\"contentCheckOk\":true,\"racyCheckOk\":true}", id,
-        vis[0] ? ",\"visitorData\":\"" : "", vis, vis[0] ? "\"" : "");
+    YouTubeForget();
 
-    u32 len;
-    char *reply = Fetch(YT_API "player?prettyPrint=false", body, BROWSER_HEADERS, &len);
+    if (strcmp(audioFor, videoId) != 0)
+    {
+        // a new video: its original sound, until something else is picked
+        snprintf(audioFor, sizeof(audioFor), "%s", videoId);
+        audioWanted[0] = 0;
+    }
+
+    if (!captions)
+        captions = (YtCaption *)malloc(YT_CAPTIONS_MAX * sizeof(YtCaption));
+    if (!audioTracks)
+        audioTracks = (YtAudioTrack *)malloc(YT_AUDIO_MAX * sizeof(YtAudioTrack));
+    if (!captions || !audioTracks)
+        return false;
+
+    // Taller than 360p, or another language, comes as separate video and
+    // audio streams, which the VISIONOS client gives plain links to. At 360p
+    // with the original sound, itag 18 has both in one file: better.
+    int quality = WiiSettings.youtubeQuality;
+    if (quality > 360 || audioWanted[0])
+    {
+        char *reply = Player(videoId, VISIONOS_CLIENT, &len);
+        if (reply && Playable(reply))
+        {
+            int h = 0;
+            audioCount = YtParseAdaptive(reply, len, quality, url, urlsize, &h, audioTracks, YT_AUDIO_MAX);
+            int pick = AudioPick();
+
+            if (url[0] && audioCount > 0 && audioTracks[pick].url[0] && (h > 360 || pick > 0))
+            {
+                audioUrl = strdup(audioTracks[pick].url);
+                if (audioUrl)
+                {
+                    audioPlaying = pick;
+                    height = h;
+                    captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
+                    free(reply);
+                    return true;
+                }
+            }
+        }
+        free(reply);
+        url[0] = 0;
+        audioCount = 0;
+    }
+
+    char *reply = Player(videoId, ANDROID_CLIENT, &len);
     if (!reply)
         return false;
 
     bool ok = YtParsePlayer(reply, len, url, urlsize, reason, reasonsize);
-
-    YouTubeClearCaptions();
     if (ok)
     {
-        if (!captions)
-            captions = (YtCaption *)malloc(YT_CAPTIONS_MAX * sizeof(YtCaption));
-        if (captions)
-            captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
+        // the languages there are, for the player settings; their links come
+        // with the VISIONOS reply when one is picked
+        char none[8];
+        int h;
+        audioCount = YtParseAdaptive(reply, len, 0, none, sizeof(none), &h, audioTracks, YT_AUDIO_MAX);
+        height = 360;
+        captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
     }
     free(reply);
     return ok;
 }
 
-void YouTubeClearCaptions()
+void YouTubeSetQuality(int h)
+{
+    WiiSettings.youtubeQuality = h; // kept in settings.xml
+}
+
+int YouTubeQuality()
+{
+    return WiiSettings.youtubeQuality;
+}
+
+int YouTubeHeight()
+{
+    return height;
+}
+
+const char *YouTubeAudioUrl()
+{
+    return audioUrl;
+}
+
+int YouTubeAudioCount()
+{
+    return audioCount;
+}
+
+const char *YouTubeAudioName(int i)
+{
+    return i >= 0 && i < audioCount ? audioTracks[i].name : "";
+}
+
+int YouTubeAudioPlaying()
+{
+    return audioPlaying;
+}
+
+void YouTubeSetAudio(int i)
+{
+    if (i <= 0 || i >= audioCount)
+        audioWanted[0] = 0;
+    else
+        snprintf(audioWanted, sizeof(audioWanted), "%s", audioTracks[i].name);
+}
+
+void YouTubeForget()
 {
     captionCount = 0;
     captionSerial++;
+    audioCount = 0;
+    audioPlaying = 0;
+    free(audioUrl);
+    audioUrl = NULL;
+    height = 0;
 }
 
 int YouTubeCaptionCount()

@@ -29,16 +29,36 @@ int YouTubeSuggest(const char *text, char (*out)[96], int max);
 // works from the address that asked for it)
 bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason, size_t reasonsize);
 
-// The captions of the video YouTubeResolve last found, until
-// YouTubeClearCaptions. The serial number changes whenever the list does.
+// What YouTubeResolve found for the last video (its captions, audio tracks,
+// and height) lasts until YouTubeForget, which any other file calls. The
+// serial number changes whenever the captions do.
 #define YT_CAPTIONS_MAX 30
-void YouTubeClearCaptions();
+void YouTubeForget();
 int YouTubeCaptionCount();
 int YouTubeCaptionSerial();
 const char *YouTubeCaptionName(int i);
 
 // Downloads caption track i and saves it to file as SubRip
 bool YouTubeCaptionSave(int i, const char *file);
+
+// The tallest video to ask for, kept in the settings: 360 plays itag 18,
+// which has the sound in it; 480 plays separate video and audio streams,
+// when the video has them.
+void YouTubeSetQuality(int height);
+int YouTubeQuality();
+
+// The height of the video YouTubeResolve last found, and the link to its
+// sound when that's a stream of its own (NULL when the video has it)
+int YouTubeHeight();
+const char *YouTubeAudioUrl();
+
+// The video's audio tracks (one per language when it's dubbed), the one
+// playing, and the one to play next time it's resolved (0 = the original)
+#define YT_AUDIO_MAX 24
+int YouTubeAudioCount();
+const char *YouTubeAudioName(int i);
+int YouTubeAudioPlaying();
+void YouTubeSetAudio(int i);
 
 // The video ID from a RiiTube video link, or false when it isn't one
 bool YouTubeRiiTubeId(const char *url, char *id, size_t size);

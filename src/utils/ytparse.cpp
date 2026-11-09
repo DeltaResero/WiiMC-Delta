@@ -604,6 +604,74 @@ int YtParseCaptions(const char *json, size_t len, YtCaption *out, int max)
     return n;
 }
 
+int YtParseAdaptive(const char *json, size_t len, int maxHeight, char *vurl, size_t vsize, int *height,
+    YtAudioTrack *audio, int maxAudio)
+{
+    const char *e = json + len;
+    const char *formats = path(json, e, "streamingData.adaptiveFormats");
+    const char *bestv = NULL;
+    int bh = 0, bb = 0, n = 0;
+    char mime[64];
+
+    vurl[0] = 0;
+    *height = 0;
+
+    for (int i = 0; ; i++)
+    {
+        const char *f = element(formats, e, i);
+        if (!f)
+            break;
+
+        getstr(member(f, e, "mimeType"), e, mime, sizeof(mime));
+        const char *it = member(f, e, "itag");
+        const char *h = member(f, e, "height");
+        const char *b = member(f, e, "bitrate");
+        int itag = it ? atoi(it) : 0, hh = h ? atoi(h) : 0, bt = b ? atoi(b) : 0;
+
+        if (strstr(mime, "avc1") && hh > 0 && hh <= maxHeight && (hh > bh || (hh == bh && bt > bb)))
+        {
+            bestv = f;
+            bh = hh;
+            bb = bt;
+        }
+        else if (itag == 140 && n < maxAudio)
+        {
+            // a copy with its loudness evened out, which comes beside the original
+            const char *drc = member(f, e, "isDrc");
+            if (drc && strncmp(drc, "true", 4) == 0)
+                continue;
+
+            YtAudioTrack *t = &audio[n];
+            const char *at = member(f, e, "audioTrack");
+            char isdef[8] = "";
+            getstr(member(at, e, "displayName"), e, t->name, sizeof(t->name));
+            getstr(member(f, e, "url"), e, t->url, sizeof(t->url));
+            const char *d = member(at, e, "audioIsDefault");
+            if (d)
+                snprintf(isdef, sizeof(isdef), "%.4s", d);
+            t->original = !at || strncmp(isdef, "true", 4) == 0 || strstr(t->name, "original");
+            n++;
+        }
+    }
+
+    // the original first, the others in the reply's order
+    for (int i = 1; i < n; i++)
+    {
+        if (!audio[i].original || audio[0].original)
+            continue;
+        YtAudioTrack t = audio[i];
+        memmove(&audio[1], &audio[0], i * sizeof(YtAudioTrack));
+        audio[0] = t;
+        break;
+    }
+
+    if (bestv && getstr(member(bestv, e, "url"), e, vurl, vsize) && vurl[0])
+        *height = bh;
+    else
+        vurl[0] = 0;
+    return n;
+}
+
 // an attribute's number in a tag that runs from p to e, or -1 when it's
 // missing or too big to be a time in milliseconds
 static long xml_num(const char *p, const char *e, const char *name)

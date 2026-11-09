@@ -7229,8 +7229,9 @@ class SettingsPanel : public GuiWindow
 
 static SettingsPanel *settingsPanel = NULL;
 
-enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO };
-enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6 };
+enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO, PAGE_QUALITY };
+enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6,
+    ACT_QUALITY = -7 };
 
 static int setPage = PAGE_MAIN;
 static int setFirst = 0;            // first choice on screen when a list is longer
@@ -7241,6 +7242,17 @@ static int setChoices = 0;
 static int setCurrent = -1;         // the choice in use
 
 static const float speeds[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
+static const int qualities[] = { 360, 480 };
+#define QUALITIES (int)(sizeof(qualities) / sizeof(qualities[0]))
+
+// a YouTube video to start again where it was, in another quality or
+// language, by the GUI thread in MPlayerMenu; -1 when there's none
+static volatile double videoRestartAt = -1;
+
+static bool PlayingYouTube()
+{
+    return YouTubeHeight() > 0;
+}
 #define SPEEDS (int)(sizeof(speeds) / sizeof(speeds[0]))
 
 // YouTube captions: which one is shown (-1 = none), which subtitle file each
@@ -7331,6 +7343,27 @@ static void SettingsList(int page)
             }
         }
     }
+    else if(page == PAGE_QUALITY)
+    {
+        for(int i = 0; i < QUALITIES; i++)
+        {
+            snprintf(setChoice[i], 64, "%dp", qualities[i]);
+            setValue[i] = qualities[i];
+            if(qualities[i] == YouTubeQuality())
+                setCurrent = i;
+        }
+        setChoices = QUALITIES;
+    }
+    else if(page == PAGE_AUDIO && PlayingYouTube())
+    {
+        for(int i = 0; i < YouTubeAudioCount() && i < SET_LIST; i++)
+        {
+            snprintf(setChoice[i], 64, "%s", YouTubeAudioName(i)[0] ? YouTubeAudioName(i) : gettext("Original"));
+            setValue[i] = i;
+        }
+        setChoices = YouTubeAudioCount() < SET_LIST ? YouTubeAudioCount() : SET_LIST;
+        setCurrent = YouTubeAudioPlaying();
+    }
     else if(page == PAGE_AUDIO)
     {
         static char names[SET_LIST][48];
@@ -7358,6 +7391,8 @@ static bool AudioTracksExist()
 {
     static char names[2][48];
     int aid[2];
+    if(PlayingYouTube())
+        return YouTubeAudioCount() > 1;
     return wiiAudioTracks(aid, names, 2) > 1;
 }
 
@@ -7394,6 +7429,12 @@ static void ShowSettingsPage(int page)
         SpeedName(SpeedIndex(), buf, sizeof(buf));
         SettingsRow(r++, "Playback speed", buf, ACT_SPEED, false);
 
+        if(PlayingYouTube())
+        {
+            snprintf(buf, sizeof(buf), "%dp", YouTubeHeight()); // what plays, not what was asked for
+            SettingsRow(r++, "Quality", buf, ACT_QUALITY, false);
+        }
+
         if(SubtitlesExist())
         {
             SettingsList(PAGE_SUBS);
@@ -7409,7 +7450,7 @@ static void ShowSettingsPage(int page)
     }
     else
     {
-        static const char *titles[] = { "", "Playback speed", NULL, "Audio track" };
+        static const char *titles[] = { "", "Playback speed", NULL, "Audio track", "Quality" };
         const char *title = titles[page];
         if(page == PAGE_SUBS)
             title = YouTubeCaptionCount() > 0 ? "Captions" : "Subtitles";
@@ -7471,6 +7512,22 @@ static void SettingsPick(int c)
     {
         wiiSetProperty(MP_CMD_SPEED_SET, speeds[setValue[c]]);
     }
+    else if(setPage == PAGE_QUALITY)
+    {
+        if(setValue[c] != YouTubeQuality())
+        {
+            YouTubeSetQuality(setValue[c]);
+            videoRestartAt = wiiGetTimePos();
+        }
+    }
+    else if(setPage == PAGE_AUDIO && PlayingYouTube())
+    {
+        if(setValue[c] != YouTubeAudioPlaying())
+        {
+            YouTubeSetAudio(setValue[c]);
+            videoRestartAt = wiiGetTimePos();
+        }
+    }
     else if(setPage == PAGE_AUDIO)
     {
         wiiSetAudioTrack(setValue[c]);
@@ -7521,6 +7578,8 @@ static void VideoSettingsUpdate()
             ShowSettingsPage(PAGE_SUBS);
         else if(a == ACT_AUDIO)
             ShowSettingsPage(PAGE_AUDIO);
+        else if(a == ACT_QUALITY)
+            ShowSettingsPage(PAGE_QUALITY);
         else if(a == ACT_BACK)
             ShowSettingsPage(PAGE_MAIN);
         else if(a == ACT_MORE)
@@ -8992,14 +9051,9 @@ void PausedVideoDim()
     }
 }
 
-void MPlayerMenu()
+// the video bar as a file starts
+static void VideoBarForFile()
 {
-    guiShutdown = false;
-    mainWindow = mplayerWindow;
-
-    mainWindow->SetVisible(false);
-    mainWindow->SetState(STATE_DISABLED);
-
     HideVideoVolumeLevelBar();
     HideVideoSettings();
 
@@ -9016,15 +9070,47 @@ void MPlayerMenu()
         videoSkips = true;
     }
 
+    videobarPauseImg->SetImage(actionbarPause);
+    videobarPauseTip->SetText("Pause");
+}
+
+// a YouTube video in another quality or language, from where it was
+static void VideoRestart()
+{
+    double pos = videoRestartAt;
+    videoRestartAt = -1;
+    if(pos < 0)
+        return;
+
+    float speed = wiiGetSpeed(); // a new file starts at normal speed
+
+    wiiSetStartPos(pos);
+    LoadMPlayerFile();
+    VideoBarForFile();
+
+    if(speed != 1.0f)
+        wiiSetProperty(MP_CMD_SPEED_SET, speed);
+}
+
+void MPlayerMenu()
+{
+    guiShutdown = false;
+    mainWindow = mplayerWindow;
+
+    mainWindow->SetVisible(false);
+    mainWindow->SetState(STATE_DISABLED);
+
+    VideoBarForFile();
+
     menuMode = 1; // switch to MPlayer GUI mode
     EnableRumble();
 
-    videobarPauseImg->SetImage(actionbarPause);
-    videobarPauseTip->SetText("Pause");
+    videoRestartAt = -1;
 
     for(int tick = 0; controlledbygui == 0; tick++)
     {
         VideoSettingsFetch();
+        VideoRestart();
         usleep(100000);
         if(tick % 5)
             continue;

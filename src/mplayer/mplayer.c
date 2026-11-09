@@ -296,6 +296,9 @@ static char *term_osd_esc = "\x1b[A\r\x1b[K";
 static char *playing_msg;
 // seek:
 static double seek_to_sec = MP_NOPTS_VALUE;
+#ifdef GEKKO
+static double wii_start_pos = 0; // wiiSetStartPos
+#endif
 static off_t seek_to_byte;
 static off_t step_sec;
 static int loop_seek;
@@ -4527,6 +4530,10 @@ if (mpctx->sh_video)
         {
                 stream_cache_min_percent=online_stream_cache_min_percent;
                 stream_cache_seek_min_percent=5;
+                // a video started again in another quality picks up where it was
+                if(wii_start_pos > 0 && wii_start_pos + 5 < demuxer_get_time_length(mpctx->demuxer))
+                        seek_to_sec = wii_start_pos;
+                wii_start_pos = 0;
         }
         else if(strncmp(fileplaying,"dvd:",4) != 0 && strncmp(fileplaying,"dvdnav:",7) != 0)
         {
@@ -5847,6 +5854,12 @@ bool wiiCanSeek()
  * subtitles. They run in MPlayer's own thread, from the bar's update, so
  * they may read mpctx; changes go through the command queue.
  ***************************************************************************/
+
+// where the next network video starts, in seconds
+void wiiSetStartPos(double sec)
+{
+        wii_start_pos = sec;
+}
 
 float wiiGetSpeed()
 {

@@ -53,6 +53,21 @@ int YtParseCaptions(const char *json, size_t len, YtCaption *out, int max);
 // no text (out is always terminated).
 size_t YtCaptionsToSrt(const char *xml, size_t len, char *out, size_t size);
 
+typedef struct
+{
+    char name[64];      // "English (US) original"; "" when the video has one track
+    char url[2048];     // about 1.2 KB; "" in a reply without plain links
+    bool original;
+} YtAudioTrack;
+
+// From a player reply's adaptiveFormats: the H.264 video stream that's
+// tallest within maxHeight (its height in *height), and the AAC audio
+// streams (itag 140), one per language, the original first. vurl and the
+// links stay empty when the reply has none (the ANDROID client's), but the
+// track names are still there. Returns how many audio tracks were stored.
+int YtParseAdaptive(const char *json, size_t len, int maxHeight, char *vurl, size_t vsize, int *height,
+    YtAudioTrack *audio, int maxAudio);
+
 // Writes s into out as a JSON string's contents, escaped
 void YtJsonEscape(const char *s, char *out, size_t size);
 
