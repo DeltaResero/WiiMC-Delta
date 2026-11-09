@@ -2581,6 +2581,34 @@ static void handle_udp_master(double time)
 }
 #endif
 
+#ifdef GEKKO
+extern void wiiUploadFrame(void);
+extern int wiiRedrawShownFrame(void);
+
+// The time until the decoded frame is due, worked out as sleep_until_update
+// does.
+static float time_to_next_frame(void)
+{
+    if (mpctx->sh_audio && !mpctx->d_audio->eof)
+        return mpctx->audio_out->get_delay() - mpctx->delay / playback_speed;
+    return mpctx->time_frame;
+}
+
+// Spends about wait seconds drawing the shown frame, and the controls over
+// it, again and again. Returns 0 at once, drawing nothing, when the texture
+// holds a frame that isn't due yet.
+static int redraw_while_waiting(float wait)
+{
+    u64 start = GetTimer();
+
+    if (!wiiRedrawShownFrame())
+        return 0;
+    while ((GetTimer() - start) * 0.000001F < wait && wiiRedrawShownFrame())
+        usec_sleep(1000);
+    return 1;
+}
+#endif
+
 static int sleep_until_update(float *time_frame, float *aq_sleep_time)
 {
     int frame_time_remaining = 0;
@@ -2647,6 +2675,16 @@ static int sleep_until_update(float *time_frame, float *aq_sleep_time)
 
     // flag 256 means: libvo driver does its timing (dvb card)
     if (!(vo_flags & 256)) {
+#ifdef GEKKO
+        // A long wait, as for a still in a variable frame rate video, or
+        // a picture that ended before the sound: keep the shown frame and
+        // the controls over it drawn, so the controls still work.
+        if ((frame_time_remaining || *time_frame > 0.3) && *time_frame > 0.04 &&
+            redraw_while_waiting((*time_frame > 0.2 ? 0.2F : *time_frame) - 0.02F)) {
+            *time_frame -= GetRelativeTime() * 0.000001F;
+            frame_time_remaining = 1;
+        } else
+#endif
         if (*time_frame > 0.3) {
             // Avoid sleeping too long without reacting to user input
             usec_sleep(200000);
@@ -4643,6 +4681,11 @@ total_time_usage_start=GetTimer();
                         mpctx->sh_video->endpts = MP_NOPTS_VALUE;
                     }
                     if (frame_time < 0) {
+#ifdef GEKKO
+                        // the picture ended before the sound: keep the last
+                        // frame and the controls over it drawn
+                        wiiRedrawShownFrame();
+#endif
                         // if we have no more video, sleep some arbitrary time
                         frame_time = 1.0 / 20.0;
                         // Ensure vo_pts is updated so that ao_pcm will not hang.
@@ -4654,6 +4697,12 @@ total_time_usage_start=GetTimer();
                         // might return with !eof && !blit_frame if !correct_pts
                         mpctx->num_buffered_frames += blit_frame;
                         mpctx->time_frame += frame_time / playback_speed; // for nosound
+#ifdef GEKKO
+                        // keep the frame out of the texture only while it's
+                        // long until it shows
+                        if (time_to_next_frame() < 0.5)
+                            wiiUploadFrame();
+#endif
                     }
                 }
 
