@@ -91,6 +91,49 @@ static int devsleep;
 static bool MountPartitions(int device, int silent);
 static void UnmountPartitions(int device);
 
+/****************************************************************************
+ * usbwakecallback
+ *
+ * The Homebrew Channel reloads IOS before it starts an app, which resets the
+ * USB bus, and some drives then take seconds to answer their first command.
+ * This thread sends that command as soon as WiiMC starts, so the wait overlaps
+ * startup and stays out of the device thread, which file loads wait for.
+ ***************************************************************************/
+#define USBWAKESTACK (16*1024)
+static u8 usbwakestack[USBWAKESTACK] ATTRIBUTE_ALIGN (32);
+static lwp_t usbwakethread = LWP_THREAD_NULL;
+static volatile bool usbWaking = false;
+
+static void * usbwakecallback (void *arg)
+{
+    u64 start = gettime();
+
+    // the drive can take a moment to show up again after the reset
+    while(diff_sec(start, gettime()) < 5)
+    {
+        if(usb->startup() && usb->isInserted())
+            break;
+        usleep(250000); // 1/4 sec
+    }
+    usbWaking = false;
+    devsleep = 0; // let the device thread mount it now
+    return NULL;
+}
+
+static void StartUSBWake()
+{
+    usbWaking = true;
+
+    if(LWP_CreateThread(&usbwakethread, usbwakecallback, NULL, usbwakestack, USBWAKESTACK, 40) < 0)
+        usbWaking = false;
+}
+
+static void WaitUSBWake()
+{
+    while(usbWaking)
+        usleep(10000);
+}
+
 static void * devicecallback (void *arg)
 {
     devsleep = 200*1000;
@@ -150,7 +193,7 @@ static void * devicecallback (void *arg)
                 devicesChanged = true;
             }
         }
-        else if(usb->startup() && usb->isInserted()) // device was inserted
+        else if(!usbWaking && usb->startup() && usb->isInserted()) // device was inserted
         {
             MountPartitions(DEVICE_USB, SILENT);
             isInserted[DEVICE_USB] = true;
@@ -905,6 +948,7 @@ static void UnmountPartitions(int device)
 
 void UnmountAllDevices()
 {
+    WaitUSBWake();
     UnmountPartitions(DEVICE_SD);
     UnmountPartitions(DEVICE_USB);
 }
@@ -951,6 +995,9 @@ static bool Remount(int device, int silent)
 
     SuspendDeviceThread();
 
+    if(device == DEVICE_USB)
+        WaitUSBWake();
+
     // unmount
     if(isInserted[device])
     {
@@ -993,6 +1040,8 @@ void FindAppPath()
     char filepath[MAXPATHLEN];
     DIR *dir;
 
+    StartUSBWake();
+
     if(sd->startup() && sd->isInserted())
     {
         isInserted[DEVICE_SD] = true;
@@ -1010,18 +1059,10 @@ void FindAppPath()
         }
     }
 
-    u64 start = gettime();
-    usleep(20000);
+    WaitUSBWake();
 
-    while(diff_sec(start, gettime()) < 5) // 5 sec
-    {
-        if(usb->startup() && usb->isInserted())
-        {
-            isInserted[DEVICE_USB] = true;
-            break;
-        }
-        usleep(250000); // 1/4 sec
-    }
+    if(usb->startup() && usb->isInserted())
+        isInserted[DEVICE_USB] = true;
 
     if(isInserted[DEVICE_USB])
     {
