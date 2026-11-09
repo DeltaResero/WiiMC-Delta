@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <file app="WiiMC" version="3.0.0">
-<folder name="YouTube">
+<link name="YouTube" type="youtube" addr="youtube:" />
+<folder name="YouTube (RiiTube)">
     <link name="YouTube - Search" type="search" addr="http://riitube.rc24.xyz/wiimc/?q=" />
     <link name="YouTube - Most Popular" addr="http://riitube.rc24.xyz/wiimc/" />
     <link name="YouTube - Trending" addr="http://riitube.rc24.xyz/wiimc/?trending=1" />

@@ -16,9 +16,10 @@
 // previous page. Returns the number of items, 0 on failure.
 int YouTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize);
 
-// The videos on a page such as a topic channel or "FEhype_leaderboard", or in
-// a playlist (pass the playlist's ID; "VL" is added).
-int YouTubeBrowse(const char *browseId, YtItem *items, int max);
+// The videos on a page such as a topic channel or "FEpodcasts_destination"
+// (with its params, else NULL), or in a playlist (pass the playlist's ID;
+// "VL" is added).
+int YouTubeBrowse(const char *browseId, const char *params, YtItem *items, int max);
 int YouTubePlaylist(const char *playlistId, YtItem *items, int max);
 
 // Search suggestions for what has been typed so far

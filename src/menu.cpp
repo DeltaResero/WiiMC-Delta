@@ -32,6 +32,7 @@
 #include "networkop.h"
 #include "musicplaylist.h"
 #include "filebrowser.h"
+#include "youtube_menu.h"
 #include "theme.h"
 #include "utils/gettext.h"
 #include "utils/http.h"
@@ -129,7 +130,7 @@ static GuiImage *settingsBtnImg = NULL;
 static GuiImage *settingsBtnOnImg = NULL;
 
 static GuiButton *logoBtn = NULL;
-static GuiWindow *mainWindow = NULL;
+GuiWindow *mainWindow = NULL; // the YouTube screen draws on it too
 static GuiWindow *menuWindow = NULL;
 static GuiWindow *mplayerWindow = NULL;
 static GuiText *settingText = NULL;
@@ -441,7 +442,7 @@ static void ChangeMenuSettings(void *ptr) { ChangeMenu(ptr, MENU_SETTINGS); }
  * after finishing the removal/insertion of new elements, and after initial
  * GUI setup.
  ***************************************************************************/
-static void ResumeGui()
+void ResumeGui()
 {
     if(guithread == LWP_THREAD_NULL || guiShutdown)
         return;
@@ -458,7 +459,7 @@ static void ResumeGui()
  * This eliminates the possibility that the GUI is in the middle of accessing
  * an element that is being changed.
  ***************************************************************************/
-static void SuspendGui()
+void SuspendGui()
 {
     if(guithread == LWP_THREAD_NULL)
         return;
@@ -3511,6 +3512,55 @@ void UpdateBrowser()
     fileBrowser->TriggerUpdate();
 }
 
+/****************************************************************************
+ * BrowseYouTube
+ *
+ * Runs the YouTube screen over the browser, and plays what was picked.
+ * Returns LoadNewFile's result, or 0 when nothing was picked.
+ ***************************************************************************/
+static int BrowseYouTube(GuiButton *backBtn)
+{
+    char url[128], title[256];
+    bool backVisible = backBtn->IsVisible();
+
+    SuspendGui();
+    fileBrowser->SetVisible(false);
+    backBtn->SetVisible(false);
+    ResumeGui();
+
+    bool picked = YouTubeScreen(url, sizeof(url), title, sizeof(title));
+
+    SuspendGui();
+    fileBrowser->SetVisible(true);
+    backBtn->SetVisible(backVisible);
+    fileBrowser->ResetState();
+    mainWindow->ChangeFocus(fileBrowser);
+    ResumeGui();
+
+    if(!picked)
+        return 0;
+
+    strcpy(loadedFile, url);
+    snprintf(loadedFileDisplay, 128, "%s", title);
+    browserMusic.selIndex = MusicPlaylistFindIndex(loadedFile);
+
+    if(!mainWindow->Find(disabled))
+        mainWindow->Append(disabled);
+    mainWindow->SetState(STATE_DISABLED);
+
+    ShowAction("Loading...");
+    int res = LoadNewFile();
+    CancelAction();
+
+    if(res != 1)
+    {
+        YouTubeScreenReopen(); // nothing is playing to come back from
+        mainWindow->Remove(disabled);
+        mainWindow->SetState(STATE_DEFAULT);
+    }
+    return res;
+}
+
 static void MenuBrowse(int menu)
 {
     ShutoffRumble();
@@ -3795,9 +3845,20 @@ static void MenuBrowse(int menu)
         ResumeGui();
     }
 
+    // back from a video picked on the YouTube screen: show the screen again
+    bool reopenYouTube = menu == MENU_BROWSE_ONLINEMEDIA && YouTubeScreenReopen();
+
     while(menuCurrent == menu && !guiShutdown)
     {
         usleep(THREAD_SLEEP);
+
+        if(reopenYouTube)
+        {
+            reopenYouTube = false;
+            if(BrowseYouTube(&backBtn) == 1)
+                goto done;
+            continue;
+        }
 
         if(findLoadedFile == 2)
         {
@@ -3836,7 +3897,8 @@ static void MenuBrowse(int menu)
         {
             upOneLevelBtn.ResetState();
 
-            if(browser.selIndex && browser.selIndex->file && IsHttpUrl(browser.selIndex->file))
+            // at the top there's no folder to load, so no wait to show
+            if(browser.dir[0] != 0 && browser.selIndex && browser.selIndex->file && IsHttpUrl(browser.selIndex->file))
             {
                 mainWindow->Append(disabled);
                 mainWindow->SetState(STATE_DISABLED);
@@ -3877,6 +3939,13 @@ static void MenuBrowse(int menu)
                         goto done;
 
                     fileBrowser->ResetState();
+                    continue;
+                }
+
+                if(browser.selIndex->type == TYPE_YOUTUBE)
+                {
+                    if(BrowseYouTube(&backBtn) == 1)
+                        goto done;
                     continue;
                 }
 

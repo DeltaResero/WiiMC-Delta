@@ -111,12 +111,14 @@ int YouTubeSearch(const char *query, const char *page, YtItem *items, int max, c
     return count;
 }
 
-int YouTubeBrowse(const char *browseId, YtItem *items, int max)
+int YouTubeBrowse(const char *browseId, const char *params, YtItem *items, int max)
 {
     char esc[160], body[512];
 
     YtJsonEscape(browseId, esc, sizeof(esc));
-    snprintf(body, sizeof(body), "{\"context\":{\"client\":" WEB_CLIENT "}},\"browseId\":\"%s\"}", esc);
+    // params are base64, which needs no escaping
+    snprintf(body, sizeof(body), "{\"context\":{\"client\":" WEB_CLIENT "}},\"browseId\":\"%s\"%s%s%s}", esc,
+        params ? ",\"params\":\"" : "", params ? params : "", params ? "\"" : "");
     return Items("browse", body, items, max, NULL, 0);
 }
 
@@ -124,7 +126,7 @@ int YouTubePlaylist(const char *playlistId, YtItem *items, int max)
 {
     char id[80];
     snprintf(id, sizeof(id), "VL%s", playlistId);
-    return YouTubeBrowse(id, items, max);
+    return YouTubeBrowse(id, NULL, items, max);
 }
 
 int YouTubeSuggest(const char *text, char (*out)[96], int max)

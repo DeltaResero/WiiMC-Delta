@@ -12,6 +12,8 @@
 #include <ogcsys.h>
 
 void WiiMenu();
+void SuspendGui();
+void ResumeGui();
 void MPlayerMenu();
 void PausedVideoDim();
 void DisableMainWindow();

@@ -572,6 +572,8 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
             {
                 if(strncmp(type, "search", 6) == 0)
                     o_entry->type = TYPE_SEARCH;
+                else if(strncmp(type, "youtube", 7) == 0)
+                    o_entry->type = TYPE_YOUTUBE;
                 else if(strncmp(type, "playlist", 8) == 0)
                     o_entry->type = TYPE_PLAYLIST;
                 else
