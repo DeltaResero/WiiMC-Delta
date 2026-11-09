@@ -31,6 +31,66 @@ extern bool want3DS;
 // net_init_async(), and no libogc header declares it
 extern "C" int socInit(void);
 
+/****************************************************************************
+ * Host name lookups
+ *
+ * libogc's net_gethostbyname() fills one static buffer and then turns the
+ * addresses IOS wrote there into pointers, in place. Two lookups at once (a
+ * thumbnail and a video stream, say) leave each other's pointers half
+ * converted, and reading them faults. The DOL is linked with
+ * --wrap=net_gethostbyname, so every lookup comes here: WiiMC's, MPlayer's,
+ * and FFmpeg's through libogc's gethostbyname(). They run one at a time, and
+ * each answer is copied to a slot of its own, which its caller has read long
+ * before the lookups come round to that slot again.
+ ***************************************************************************/
+
+#define HOST_SLOTS 8
+
+typedef struct
+{
+    struct hostent h;
+    char name[256];
+    char *aliases[1];
+    char *addrs[2];
+    struct in_addr addr;
+} HostSlot;
+
+static HostSlot hostSlots[HOST_SLOTS];
+static u32 hostNext = 0;
+static mutex_t hostLock = LWP_MUTEX_NULL; // made before the network starts
+
+extern "C" struct hostent *__real_net_gethostbyname(const char *name);
+extern "C" struct hostent *__wrap_net_gethostbyname(const char *name);
+
+struct hostent *__wrap_net_gethostbyname(const char *name)
+{
+    if(hostLock == LWP_MUTEX_NULL)
+        return __real_net_gethostbyname(name);
+
+    struct hostent *found = NULL;
+
+    LWP_MutexLock(hostLock);
+    struct hostent *h = __real_net_gethostbyname(name);
+
+    if(h && h->h_addrtype == AF_INET && h->h_length == sizeof(struct in_addr) &&
+        h->h_addr_list && h->h_addr_list[0])
+    {
+        HostSlot *slot = &hostSlots[hostNext++ % HOST_SLOTS];
+        memset(slot, 0, sizeof(HostSlot));
+        snprintf(slot->name, sizeof(slot->name), "%s", name);
+        memcpy(&slot->addr, h->h_addr_list[0], sizeof(struct in_addr));
+        slot->addrs[0] = (char *)&slot->addr;
+        slot->h.h_name = slot->name;
+        slot->h.h_aliases = slot->aliases;
+        slot->h.h_addrtype = AF_INET;
+        slot->h.h_length = sizeof(struct in_addr);
+        slot->h.h_addr_list = slot->addrs;
+        found = &slot->h;
+    }
+    LWP_MutexUnlock(hostLock);
+    return found;
+}
+
 void ShowAction (const char *msg, UpdateCallback c);
 
 static int netHalt = 0;
@@ -129,6 +189,9 @@ static void * netcb (void *arg)
 void StartNetworkThread()
 {
     netHalt = 0;
+
+    if(hostLock == LWP_MUTEX_NULL)
+        LWP_MutexInit(&hostLock, false);
 
     if(networkthread == LWP_THREAD_NULL)
         LWP_CreateThread(&networkthread, netcb, NULL, netstack, 32768, 40);
