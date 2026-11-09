@@ -795,6 +795,9 @@ void LoadMPlayerFile()
     free(audio_stream);
     audio_stream = ytlink && YouTubeAudioUrl() ? strdup(YouTubeAudioUrl()) : NULL;
 
+    // its captions can be picked while it plays
+    wiiExpectSubtitles(ytlink && YouTubeCaptionCount() > 0);
+
     // set new file to load
     wiiLoadFile(ytlink ? ytlink : loadedFile, partitionlabel);
     free(ytlink);

@@ -2722,12 +2722,14 @@ extern char *BrowserGetSub(char *filename);
  * everything that can still supply them: the demuxer's subtitle streams,
  * DVD subtitles, -sub files and the subtitle files the browser found
  * next to the video. */
+static int wii_subs_expected = 0; // wiiExpectSubtitles
+
 static int subtitles_expected(void)
 {
     char name[1024];
     int i;
 
-    if (mpctx->global_sub_size > 0 || (sub_name && sub_name[0]))
+    if (wii_subs_expected || mpctx->global_sub_size > 0 || (sub_name && sub_name[0]))
         return 1;
     for (i = 0; i < SUB_SOURCES; i++)
         if (mpctx->sub_counts[i])
@@ -5854,6 +5856,14 @@ bool wiiCanSeek()
  * subtitles. They run in MPlayer's own thread, from the bar's update, so
  * they may read mpctx; changes go through the command queue.
  ***************************************************************************/
+
+// Subtitles that may be loaded once the next file plays (a YouTube video's
+// captions) need the libass filter, which goes in only as a file starts.
+// It passes frames straight on while no subtitle shows.
+void wiiExpectSubtitles(int expect)
+{
+        wii_subs_expected = expect;
+}
 
 // where the next network video starts, in seconds
 void wiiSetStartPos(double sec)
