@@ -655,7 +655,7 @@ static void *ScreensaverThread(void *arg)
             }
         }
 
-        if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
+        if(thumbImg && menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
             // Prevent file thumbs from appearing in the ss
             thumbImg->SetVisible(false);
 
@@ -673,7 +673,7 @@ static void *ScreensaverThread(void *arg)
                 audiobarNowPlayingBtn->SetVisible(false);
         }
 
-        if((menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit == 0 && !thumbImg->IsVisible() && !audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt < ART_FULL)
+        if((menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit == 0 && (!thumbImg || !thumbImg->IsVisible()) && !audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt < ART_FULL)
              || !WiiSettings.screensaverArt) {
             w.Remove(thumbImg);
             w.Append(&logoLargeImg);
@@ -838,6 +838,7 @@ static void *ScreensaverThread(void *arg)
             //  lessPos = 160;
 
                 //if(lessPos > 2)
+                if(thumbImg)
                     thumbImg->SetVisible(true);
                 w.SetPosition(x-lessPos, y);
             } else
@@ -861,9 +862,11 @@ done:
         // To fix cover art appearing in the credits screen, exit immediately.
         if(creditsThreadHalt == 0)
             creditsThreadHalt = 1;
-        oldWindow->Append(thumbImg);
-        thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-        thumbImg->SetPosition(-33, 91);
+        if(thumbImg) {
+            oldWindow->Append(thumbImg);
+            thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
+            thumbImg->SetPosition(-33, 91);
+        }
         dontdim = false;
         foundArt = false; // doing this in the loop doesn't work right.
 
@@ -873,16 +876,16 @@ done:
         lessPos = 0;
         bannerSSactive = false;
         ssIsActive = false;
-        if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
+        if(thumbImg && menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
             thumbImg->SetVisible(false);
         }
         if(!audiobarNowPlayingBtn->IsVisible())
             audiobarNowPlayingBtn->SetVisible(true);
 
         if(WiiSettings.screensaverArt >= ART_FULL) {
-            if (thumbImg->GetWidth() == 256)
+            if (thumbImg && thumbImg->GetWidth() == 256)
                 thumbImg->SetScale(256, screenheight-100);
-            else
+            else if (thumbImg)
                 thumbImg->SetScale(188, screenheight-100);
 
             if(!audiobarNowPlayingBtn->IsVisible() && wiiAudioOnly())
@@ -1291,7 +1294,8 @@ static void *GuiThread (void *arg)
                 lessPos = 0;
             changeDirection ^= 1;
 
-            thumbImg->SetVisible(false);
+            if(thumbImg)
+                thumbImg->SetVisible(false);
             ssTimer_2 = 0;
         }
 
@@ -4350,6 +4354,7 @@ done:
         thumbthread = LWP_THREAD_NULL;
         mainWindow->Remove(thumbImg);
         delete thumbImg;
+        thumbImg = NULL;
         // Prevent year/desc to remain stuck in some cases
         mainWindow->Remove(fileYear);
         mainWindow->Remove(fileInfo);
