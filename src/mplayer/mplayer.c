@@ -6051,6 +6051,20 @@ void wiiSetCacheFill(int fill)
                 stream_cache_min_percent = fill;
 }
 
+// MPlayer's thread can take a queued command at once, so the command must be
+// complete before it's queued: af_switch with no filter string crashes
+static void wiiSwitchAudioFilters(const char *filters)
+{
+        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+        cmd->id=MP_CMD_AF_SWITCH;
+        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
+        cmd->nargs = 1;
+        cmd->args[0].type = MP_CMD_ARG_STRING;
+        cmd->args[0].v.s = strdup(filters);
+        cmd->args[1].type = -1;
+        mp_input_queue_cmd(cmd);
+}
+
 void wiiSetVolNorm0()
 {
         //static const char nul_byte[1] = { 0x00 };
@@ -6066,22 +6080,14 @@ void wiiSetVolNorm1()
 {
         //m_config_set_option(mconfig,"af","volnorm=1:2.25");
 
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
-        cmd->args[0].v.s = strdup("volnorm=1:0.25");
+        wiiSwitchAudioFilters("volnorm=1:0.25");
 }
 
 void wiiSetVolNorm2()
 {
         //m_config_set_option(mconfig,"af","volnorm=2:0.25");
 
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
-        cmd->args[0].v.s = strdup("volnorm=2:0.25");
+        wiiSwitchAudioFilters("volnorm=2:0.25");
 }
 
 void wiiSetLoopOn()
@@ -6125,10 +6131,6 @@ void wiiSetVolume(int vol)
         static vu16* const _vWii = (vu16*)0xCD8005A0;
         if (*_vWii == 0xCAFE) {
         //if (*_vWii != 0xCAFE) { //for dolphin testing
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
         char wiiu[16];
         //sprintf(wiiu, "volume=%d", vol<1?-99:vol/5); //control is very off
         int volAF = 0;
@@ -6154,7 +6156,7 @@ void wiiSetVolume(int vol)
                 volAF = 16;
 
         sprintf(wiiu, "volume=%d", volAF); //control is not as accurate but works well
-        cmd->args[0].v.s = strdup(wiiu);
+        wiiSwitchAudioFilters(wiiu);
         }
 #endif
 }
