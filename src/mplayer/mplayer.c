@@ -3977,7 +3977,8 @@ audio_delay=0;
     initialized_flags |= INITIALIZED_STREAM;
 
 #ifdef GEKKO
-  strcpy(fileplaying, filename);
+  // a YouTube link runs past MAXPATHLEN; only its start is ever looked at
+  snprintf(fileplaying, sizeof(fileplaying), "%s", filename);
   strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying));
   partitionlabelplaying[sizeof(partitionlabelplaying)-1] = '\0';
 #endif
