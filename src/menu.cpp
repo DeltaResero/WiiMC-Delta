@@ -6895,7 +6895,7 @@ static void VideoProgressCallback(void *ptr)
 
     if(b->GetState() == STATE_CLICKED)
     {
-        if(b->GetStateChan() >= 0)
+        if(b->GetStateChan() >= 0 && total > 0)
         {
             guiDelay = 4;
             percent_2 = (userInput[b->GetStateChan()].wpad->ir.x - b->GetLeft())/560.0;
