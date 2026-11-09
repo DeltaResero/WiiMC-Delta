@@ -70,7 +70,7 @@ unsigned char *global_buffer=NULL;
 
 // MPlayer threads
 #define MPLAYER_STACKSIZE (512*1024)
-#define CACHE_STACKSIZE (16*1024)
+#define CACHE_STACKSIZE (64*1024) // a TLS reconnect takes about 45 KB
 static lwp_t mthread = LWP_THREAD_NULL;
 static lwp_t cthread = LWP_THREAD_NULL;
 static u8 cachestack[CACHE_STACKSIZE] ATTRIBUTE_ALIGN (32);
