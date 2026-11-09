@@ -198,6 +198,7 @@ int wii_error = 0;
 char wii_error_text[160]; // why the file can't play, when wii_error is 2
 extern char lavc_missing_video_feature[128];
 static double wiiTimeFromStart(double t);
+static double wiiPlayTime(void);
 static int pause_low_cache=0;
 static bool thp_vid = false;
 unsigned timerFadeBlack = 0; // not an actual fade.
@@ -2581,6 +2582,34 @@ static void handle_udp_master(double time)
 }
 #endif
 
+#ifdef GEKKO
+extern void wiiUploadFrame(void);
+extern int wiiRedrawShownFrame(void);
+
+// The time until the decoded frame is due, worked out as sleep_until_update
+// does.
+static float time_to_next_frame(void)
+{
+    if (mpctx->sh_audio && !mpctx->d_audio->eof)
+        return mpctx->audio_out->get_delay() - mpctx->delay / playback_speed;
+    return mpctx->time_frame;
+}
+
+// Spends about wait seconds drawing the shown frame, and the controls over
+// it, again and again. Returns 0 at once, drawing nothing, when the texture
+// holds a frame that isn't due yet.
+static int redraw_while_waiting(float wait)
+{
+    u64 start = GetTimer();
+
+    if (!wiiRedrawShownFrame())
+        return 0;
+    while ((GetTimer() - start) * 0.000001F < wait && wiiRedrawShownFrame())
+        usec_sleep(1000);
+    return 1;
+}
+#endif
+
 static int sleep_until_update(float *time_frame, float *aq_sleep_time)
 {
     int frame_time_remaining = 0;
@@ -2647,6 +2676,16 @@ static int sleep_until_update(float *time_frame, float *aq_sleep_time)
 
     // flag 256 means: libvo driver does its timing (dvb card)
     if (!(vo_flags & 256)) {
+#ifdef GEKKO
+        // A long wait, as for a still in a variable frame rate video, or
+        // a picture that ended before the sound: keep the shown frame and
+        // the controls over it drawn, so the controls still work.
+        if ((frame_time_remaining || *time_frame > 0.3) && *time_frame > 0.04 &&
+            redraw_while_waiting((*time_frame > 0.2 ? 0.2F : *time_frame) - 0.02F)) {
+            *time_frame -= GetRelativeTime() * 0.000001F;
+            frame_time_remaining = 1;
+        } else
+#endif
         if (*time_frame > 0.3) {
             // Avoid sleeping too long without reacting to user input
             usec_sleep(200000);
@@ -3000,6 +3039,12 @@ static double update_video(int *blit_frame)
             mp_msg(MSGT_CPLAYER, MSGL_V, "pts value < previous\n");
         }
         frame_time = sh_video->pts - sh_video->last_pts;
+        // A broken timestamp, or a break in the stream: show the frame
+        // after the usual time, not after the jump.
+        if (!demuxer_frame_end_is_real(mpctx->demuxer, sh_video->last_pts, sh_video->pts)) {
+            mp_msg(MSGT_CPLAYER, MSGL_V, "pts jumped %.1f s ahead\n", frame_time);
+            frame_time = sh_video->frametime > 0 && sh_video->frametime < 1 ? sh_video->frametime : 0;
+        }
         // The first frame should be displayed directly,
         // all others should get a default frame_time
         if (!frame_time && mpctx->startup_decode_retry == 0)
@@ -3010,6 +3055,15 @@ static double update_video(int *blit_frame)
     }
     return frame_time;
 }
+
+#ifdef GEKKO
+// a DVD in the drive; an ISO or a VIDEO_TS folder sets dvd_device to its path
+static int playing_disc(void)
+{
+  return (strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) &&
+         (!dvd_device || strcmp(dvd_device, "/dev/di") == 0);
+}
+#endif
 
 static void pause_loop(void)
 {
@@ -3064,7 +3118,7 @@ static void pause_loop(void)
 
   if(controlledbygui != 2 && cmd && cmd->id != MP_CMD_QUIT)
   {
-          if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
+          if(playing_disc())
             StartDVDMotor();
           else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
@@ -4616,7 +4670,9 @@ total_time_usage_start=GetTimer();
                         // try to figure out duration of last frame
                         if (correct_pts && mpctx->sh_video->endpts != MP_NOPTS_VALUE &&
                             mpctx->sh_video->pts != MP_NOPTS_VALUE &&
-                            mpctx->sh_video->endpts > mpctx->sh_video->pts) {
+                            mpctx->sh_video->endpts > mpctx->sh_video->pts &&
+                            demuxer_frame_end_is_real(mpctx->demuxer, mpctx->sh_video->pts,
+                                                      mpctx->sh_video->endpts)) {
                             frame_time = mpctx->sh_video->endpts - mpctx->sh_video->pts;
                         } else {
                             frame_time = mpctx->sh_video->frametime;
@@ -4626,6 +4682,11 @@ total_time_usage_start=GetTimer();
                         mpctx->sh_video->endpts = MP_NOPTS_VALUE;
                     }
                     if (frame_time < 0) {
+#ifdef GEKKO
+                        // the picture ended before the sound: keep the last
+                        // frame and the controls over it drawn
+                        wiiRedrawShownFrame();
+#endif
                         // if we have no more video, sleep some arbitrary time
                         frame_time = 1.0 / 20.0;
                         // Ensure vo_pts is updated so that ao_pcm will not hang.
@@ -4637,6 +4698,12 @@ total_time_usage_start=GetTimer();
                         // might return with !eof && !blit_frame if !correct_pts
                         mpctx->num_buffered_frames += blit_frame;
                         mpctx->time_frame += frame_time / playback_speed; // for nosound
+#ifdef GEKKO
+                        // keep the frame out of the texture only while it's
+                        // long until it shows
+                        if (time_to_next_frame() < 0.5)
+                            wiiUploadFrame();
+#endif
                     }
                 }
 
@@ -5205,7 +5272,7 @@ static void save_restore_point(char *_filename, char *_partitionlabel)
                 strncmp(_filename,"mms:",4) == 0)
                 return;
 
-        int position = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        int position = wiiTimeFromStart(wiiPlayTime());
 
         if(position <= 8 || !( mpctx->demuxer->seekable))
         {
@@ -5482,7 +5549,7 @@ void PauseAndGotoGUI()
 
         mpctx->osd_function = OSD_PLAY;
 
-        if ((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0)/* && !dvd_device*/)
+        if (playing_disc())
                 StartDVDMotor();
         else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
@@ -5586,7 +5653,7 @@ static void low_cache_loop(void)
         }
 
         mpctx->osd_function=OSD_PLAY;
-        if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
+        if(playing_disc())
                 StartDVDMotor();
         else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
                 WakeupUSB();
@@ -5830,6 +5897,32 @@ static double wiiTimeFromStart(double t)
         return t > start ? t - start : 0;
 }
 
+// Where playback is. The newest decoded frame is one ahead of the picture,
+// and in a still held for seconds, or after the picture of a song with one
+// picture ends, far ahead or behind. So with sound, follow the sound being
+// played, as VLC and mpv do. Without it, take the decoded frame's time less
+// the wait until it shows. A DVD has its own clock.
+static double wiiPlayTime(void)
+{
+        sh_video_t *sh_video = mpctx->sh_video;
+        int video_done = !sh_video || (mpctx->d_video->eof && !mpctx->num_buffered_frames);
+
+        if (mpctx->demuxer->stream_pts != MP_NOPTS_VALUE)
+                return mpctx->demuxer->stream_pts;
+
+        // the sound, unless it ended while the picture goes on
+        if (mpctx->sh_audio && mpctx->audio_out &&
+            (!mpctx->d_audio->eof || video_done) &&
+            calc_a_pts(mpctx->sh_audio, mpctx->d_audio) != MP_NOPTS_VALUE)
+                return playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out) - audio_delay;
+
+        if (sh_video && sh_video->pts != MP_NOPTS_VALUE) {
+                double wait = mpctx->num_buffered_frames ? time_to_next_frame() : 0;
+                return wait > 0 ? sh_video->pts - wait : sh_video->pts;
+        }
+        return demuxer_get_current_time(mpctx->demuxer);
+}
+
 double wiiGetTimePos()
 {
         if(!playing_file || controlledbygui == 2)
@@ -5841,10 +5934,7 @@ double wiiGetTimePos()
         //if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return 0;
 
-        if (!mpctx->sh_video && mpctx->sh_audio && mpctx->audio_out)
-                return wiiTimeFromStart(playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out));
-
-        return wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        return wiiTimeFromStart(wiiPlayTime());
 }
 
 void wiiGetTimeDisplay(char * buf)
@@ -5856,7 +5946,7 @@ void wiiGetTimeDisplay(char * buf)
                 //return;
 
         int len = demuxer_get_time_length(mpctx->demuxer);
-        int pts = wiiTimeFromStart(demuxer_get_current_time(mpctx->demuxer));
+        int pts = wiiTimeFromStart(wiiPlayTime());
 
         sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
                 pts/3600,(pts/60)%60,pts%60,
@@ -6071,6 +6161,20 @@ void wiiSetCacheFill(int fill)
                 stream_cache_min_percent = fill;
 }
 
+// MPlayer's thread can take a queued command at once, so the command must be
+// complete before it's queued: af_switch with no filter string crashes
+static void wiiSwitchAudioFilters(const char *filters)
+{
+        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+        cmd->id=MP_CMD_AF_SWITCH;
+        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
+        cmd->nargs = 1;
+        cmd->args[0].type = MP_CMD_ARG_STRING;
+        cmd->args[0].v.s = strdup(filters);
+        cmd->args[1].type = -1;
+        mp_input_queue_cmd(cmd);
+}
+
 void wiiSetVolNorm0()
 {
         //static const char nul_byte[1] = { 0x00 };
@@ -6086,22 +6190,14 @@ void wiiSetVolNorm1()
 {
         //m_config_set_option(mconfig,"af","volnorm=1:2.25");
 
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
-        cmd->args[0].v.s = strdup("volnorm=1:0.25");
+        wiiSwitchAudioFilters("volnorm=1:0.25");
 }
 
 void wiiSetVolNorm2()
 {
         //m_config_set_option(mconfig,"af","volnorm=2:0.25");
 
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
-        cmd->args[0].v.s = strdup("volnorm=2:0.25");
+        wiiSwitchAudioFilters("volnorm=2:0.25");
 }
 
 void wiiSetLoopOn()
@@ -6145,10 +6241,6 @@ void wiiSetVolume(int vol)
         static vu16* const _vWii = (vu16*)0xCD8005A0;
         if (*_vWii == 0xCAFE) {
         //if (*_vWii != 0xCAFE) { //for dolphin testing
-        mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-        cmd->id=MP_CMD_AF_SWITCH;
-        av_strlcpy(cmd->name, "af_switch", sizeof(cmd->name));
-        mp_input_queue_cmd(cmd);
         char wiiu[16];
         //sprintf(wiiu, "volume=%d", vol<1?-99:vol/5); //control is very off
         int volAF = 0;
@@ -6174,7 +6266,7 @@ void wiiSetVolume(int vol)
                 volAF = 16;
 
         sprintf(wiiu, "volume=%d", volAF); //control is not as accurate but works well
-        cmd->args[0].v.s = strdup(wiiu);
+        wiiSwitchAudioFilters(wiiu);
         }
 #endif
 }

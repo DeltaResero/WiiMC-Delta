@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <ogcsys.h>
 #include <ogc/machine/processor.h>
+#include <ogc/lwp_watchdog.h>
 
 #include "config.h"
 #include "libaf/af.h"
@@ -158,12 +159,24 @@ static int init(int rate, int channels, int format, int flags)
     return CONTROL_TRUE;
 }
 
+// Lets the block the DMA is playing finish. A stopped DMA keeps the count
+// of what it had left, which then never reaches zero: closing the output
+// stops it anywhere in a block, and a seek straight after a track switch
+// resets the new output before anything plays. So wait only while it runs,
+// and for no more than a few blocks.
+static void finish_dma_block(void)
+{
+    u64 start = gettime();
+
+    while(AUDIO_GetDMAEnableFlag() && AUDIO_GetDMABytesLeft() > 0 &&
+        ticks_to_millisecs(diff_ticks(start, gettime())) < 100)
+        usleep(100);
+}
+
 static void reset(void)
 {
     AUDIO_RegisterDMACallback(NULL);
-
-    while(AUDIO_GetDMABytesLeft() > 0)
-        usleep(100);
+    finish_dma_block();
 
     playing = false;
 
@@ -182,8 +195,7 @@ static void uninit(int immed)
 {
     reset();
     AUDIO_RegisterDMACallback(NULL);
-    while(AUDIO_GetDMABytesLeft() > 0)
-        usleep(100);
+    finish_dma_block();
     AUDIO_StopDMA();
 }
 

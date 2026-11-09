@@ -64,28 +64,81 @@ static u16 chroma_width, chroma_height;
 
 u32 gx_width, gx_height;
 
+// A decoded frame waits here, out of the texture, until the player knows
+// how long until it shows. If that's long, as for a still in a variable
+// frame rate video, the texture keeps the frame on screen, so the player
+// can redraw it, and the controls drawn over it, while it waits. The
+// decoder keeps the frame's planes until it decodes the next one, which
+// comes only after this one shows.
+static uint8_t *held_planes[3];
+static int held_stride[3];
+static int frame_held;   // a decoded frame not yet in the texture
+static int osd_held;     // its OSD and subtitles, still to draw
+static int frame_unshown; // the texture holds a frame not yet shown
+
+static void upload_held_frame(void)
+{
+    if (!frame_held)
+        return;
+    GX_FillTextureYUV(held_planes, held_stride);
+    frame_held = 0;
+    frame_unshown = 1;
+    if (osd_held) {
+        vo_draw_text(image_width, image_height, vo_draw_alpha_gekko);
+        osd_held = 0;
+    }
+}
+
+// The frame will show soon: put it in the texture now, as before.
+void wiiUploadFrame(void)
+{
+    upload_held_frame();
+}
+
+// Draws the frame on screen again, with the controls over it. Returns 0,
+// drawing nothing, when the texture holds a frame that isn't due yet.
+int wiiRedrawShownFrame(void)
+{
+    if (frame_unshown || !image_width)
+        return 0;
+    DrawMPlayer();
+    return 1;
+}
+
 static int draw_slice(uint8_t *image[], int stride[], int w, int h, int x, int y)
 {
     GX_FillTextureYUV(image, stride);
+    frame_unshown = 1;
     return 0;
 }
 
 static void draw_osd(void)
 {
-    vo_draw_text(image_width, image_height, vo_draw_alpha_gekko);
+    if (frame_held)
+        osd_held = 1;
+    else
+        vo_draw_text(image_width, image_height, vo_draw_alpha_gekko);
 }
 
 static uint32_t draw_image(mp_image_t *mpi)
 {
-    if (mpi->flags & MP_IMGFLAG_PLANAR)
-        GX_FillTextureYUV(mpi->planes, mpi->stride);
+    if (mpi->flags & MP_IMGFLAG_PLANAR) {
+        for (int i = 0; i < 3; i++) {
+            held_planes[i] = mpi->planes[i];
+            held_stride[i] = mpi->stride[i];
+        }
+        frame_held = 1;
+        osd_held = 0;
+    }
 
     return VO_TRUE;
 }
 
 static void flip_page(void)
 {
+    upload_held_frame();
     GX_RenderTexture();
+    frame_unshown = 0;
 }
 
 static int draw_frame(uint8_t *src[])
@@ -131,6 +184,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 {
     image_width = width;
     image_height = height;
+    frame_held = osd_held = frame_unshown = 0;
 
     float screen_aspect = (float)mplayerwidth / (float)mplayerheight;
     float image_aspect = (float)d_width / (float)d_height;
@@ -161,6 +215,7 @@ static void uninit(void)
 {
     image_width = 0;
     image_height = 0;
+    frame_held = osd_held = frame_unshown = 0;
 }
 
 static void check_events(void)
@@ -214,6 +269,10 @@ static int control(uint32_t request, void *data)
 
         case VOCTRL_DRAW_IMAGE:
             return draw_image(data);
+        case VOCTRL_RESET:
+            // a seek: the decoder lets go of a held frame's planes
+            frame_held = osd_held = 0;
+            return VO_TRUE;
         default:
             return VO_NOTIMPL;
     }

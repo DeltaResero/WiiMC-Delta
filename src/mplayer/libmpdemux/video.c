@@ -649,18 +649,32 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
         // Newer FFmpeg takes r_frame_rate from the codec, which can
         // disagree with the container (H.264 declaring 23.976 fps in a
         // 29.97 fps Matroska file), so prefer the packet's own duration.
+        // Not a broken one, though, or the player waits that long for the
+        // next frame.
         if(d_video->current && d_video->current->pts != MP_NOPTS_VALUE &&
            d_video->current->endpts != MP_NOPTS_VALUE &&
-           d_video->current->endpts > d_video->current->pts){
+           d_video->current->endpts > d_video->current->pts &&
+           demuxer_frame_end_is_real(d_video->demuxer, d_video->current->pts,
+                                     d_video->current->endpts)){
           frame_time = d_video->current->endpts - d_video->current->pts;
-          break;
-        }
-        if((int)sh_video->fps==1000 || (int)sh_video->fps<=1){
+        } else if((int)sh_video->fps==1000 || (int)sh_video->fps<=1){
           double next_pts = ds_get_next_pts(d_video);
           double d= (next_pts != MP_NOPTS_VALUE) ? next_pts - d_video->pts : d_video->pts-pts1;
           if(d>=0){
             frame_time = d;
           }
+        }
+        // A variable frame rate Matroska file can give every packet the
+        // usual frame duration, even a still held for seconds, so look at
+        // when the next frame starts. Only a gap far longer than any frame
+        // reordering counts, and no more than 2048 audio packets, 40 s or
+        // more, are read ahead to find it.
+        if(d_video->current && d_video->current->pts != MP_NOPTS_VALUE){
+          double next_pts = ds_peek_next_pts(d_video, 2048, 4 * 1024 * 1024);
+          double gap = next_pts - d_video->current->pts;
+          if(next_pts != MP_NOPTS_VALUE && gap > 1.0 && gap > 20 * frame_time &&
+             demuxer_frame_end_is_real(d_video->demuxer, d_video->current->pts, next_pts))
+            frame_time = gap;
         }
       break;
       case DEMUXER_TYPE_REAL:

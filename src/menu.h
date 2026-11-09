@@ -13,6 +13,7 @@
 
 void WiiMenu();
 void MPlayerMenu();
+void PausedVideoDim();
 void DisableMainWindow();
 void ErrorPrompt(const char * msg);
 int ErrorPromptRetry(const char * msg);
