@@ -62,6 +62,7 @@
 #    include "../../utils/mem2_manager.h"
 #    include <ogc/lwp_watchdog.h>
 extern bool StartDVDMotor();
+extern void SetLastDVDMotorTime();
 #endif
 
 #ifdef DARWIN_DVD_IOCTL
@@ -1208,8 +1209,10 @@ static int di_read_blocks(dvdcss_t dvdcss, void *bfr, int blocks) {
         int ret = DI_ReadDVD(bfr, blocks, dvdcss->i_pos);
         uint32_t error;
 
-        if (ret == 0)
+        if (ret == 0) {
+            SetLastDVDMotorTime(); /* in use: don't let it spin down */
             return 0;
+        }
 
         error = ret > 0 ? di_request_error() : 0;
         print_debug(dvdcss, "DI: reading %d blocks at %d failed with %d, drive error 0x%08x",
