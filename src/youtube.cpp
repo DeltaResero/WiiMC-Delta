@@ -29,7 +29,7 @@
 
 #define RIITUBE_VIDEO "http://riitube.rc24.xyz/video/wii/?q="
 
-static char visitor[256];
+static char visitor[1024]; // about 450 characters in November 2026
 
 // a reply from YouTube in a new buffer, which the caller frees; NULL on failure
 static char *Fetch(const char *url, const char *body, const char *headers, u32 *len)
@@ -157,7 +157,7 @@ int YouTubeSuggest(const char *text, char (*out)[96], int max)
 
 bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason, size_t reasonsize)
 {
-    char id[32], vis[300], body[1024];
+    char id[32], vis[1024], body[2048];
 
     url[0] = 0;
     if (reason && reasonsize)
