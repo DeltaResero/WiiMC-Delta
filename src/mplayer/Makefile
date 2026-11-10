@@ -63,6 +63,7 @@ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                    \
                                         libmpcodecs/vf_screenshot.c     \
                                         libmpdemux/demux_lavf.c         \
                                         stream/stream_ffmpeg.c          \
+                                        stream/stream_hls.c             \
                                         sub/av_sub.c                    \
 
 SRCS_COMMON-$(CONFIG_VF_LAVFI)      +=  libmpcodecs/vf_lavfi.c
