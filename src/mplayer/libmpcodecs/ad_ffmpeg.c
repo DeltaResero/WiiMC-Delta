@@ -348,11 +348,15 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
         av_init_packet(&pkt);
         pkt.data = start;
         pkt.size = x;
+        // demux_lavf appends a packet's side data to it, as vd_ffmpeg.c
+        // knows; without this the decoder takes it for the next frame
+        mp_packet_split_side_data(&pkt);
         if (pts != MP_NOPTS_VALUE) {
             sh_audio->pts = pts;
             sh_audio->pts_bytes = 0;
         }
         y=avcodec_send_packet(sh_audio->context, &pkt);
+        av_packet_free_side_data(&pkt);
         if(y<0){ mp_msg(MSGT_DECAUDIO,MSGL_V,"lavc_audio: error\n");break; }
         continue;
         }
