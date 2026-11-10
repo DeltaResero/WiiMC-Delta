@@ -32,6 +32,9 @@ int hls_is_playlist(const char *url, const char *mime);
  * opened with opts. NULL if the playlist can't be played. */
 hls_t *hls_open(const char *url, AVIOContext *pb, AVDictionary *opts);
 
+/* Whether the stream is live: its playlist is still growing. */
+int hls_is_live(hls_t *h);
+
 /* Up to size bytes of the stream; -1 at its end or on failure. */
 int hls_read(hls_t *h, unsigned char *buf, int size);
 

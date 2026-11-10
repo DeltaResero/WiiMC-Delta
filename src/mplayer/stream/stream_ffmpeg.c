@@ -268,6 +268,8 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
         stream->end_pos = 0;
         stream->type = STREAMTYPE_STREAM;
         stream->seek = NULL;
+        if (hls_is_live(hls))
+            stream->flags |= MP_STREAM_LIVE;
         stream->fill_buffer = hls_fill_buffer;
         stream->close = hls_close_f;
         res = STREAM_OK;

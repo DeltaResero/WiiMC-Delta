@@ -351,6 +351,11 @@ hls_t *hls_open(const char *url, AVIOContext *pb, AVDictionary *opts)
     return h;
 }
 
+int hls_is_live(hls_t *h)
+{
+    return !h->ended;
+}
+
 int hls_read(hls_t *h, unsigned char *buf, int size)
 {
     while (h->failures < HLS_MAX_FAILURES) {
