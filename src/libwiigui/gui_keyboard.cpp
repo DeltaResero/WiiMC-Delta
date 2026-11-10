@@ -9,7 +9,7 @@
  ***************************************************************************/
 
 #include "gui.h"
-#include <wiikeyboard/keyboard.h>
+#include "../input.h"
 
 // how wide the text in the box can be
 #define TEXT_WIDTH 360
@@ -81,14 +81,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     alignmentHor = ALIGN_CENTRE;
     alignmentVert = ALIGN_MIDDLE;
 
-    // a USB keyboard types too. libogc's thread for it wakes 100 times a
-    // second, so it starts the first time the keyboard opens, not at boot.
-    static bool usbKeyboard = false;
-
-    if(!usbKeyboard)
-        usbKeyboard = (KEYBOARD_Init(NULL) == 0);
-    else
-        KEYBOARD_FlushEvents(); // keys pressed while the keyboard was closed
+    KeyboardTyping(true); // a USB keyboard types here while this is open
 
     strncpy(kbtextstr, t, max);
     kbtextstr[max] = 0;
@@ -204,6 +197,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
  */
 GuiKeyboard::~GuiKeyboard()
 {
+    KeyboardTyping(false);
     delete kbText;
     delete measureText;
     delete keyTextbox;
@@ -394,9 +388,9 @@ void GuiKeyboard::ReadUsbKeyboard()
 {
     keyboard_event ev;
 
-    while(KEYBOARD_GetEvent(&ev) > 0)
+    while(KeyboardGetKey(&ev))
     {
-        if(ev.type != KEYBOARD_PRESSED || MOD_ONESET(ev.modifiers, MOD_ANYCONTROL | MOD_ANYMETA))
+        if(MOD_ONESET(ev.modifiers, MOD_ANYCONTROL | MOD_ANYMETA))
             continue;
 
         switch(ev.symbol)
