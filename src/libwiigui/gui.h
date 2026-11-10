@@ -968,6 +968,7 @@ class GuiKeyboard : public GuiWindow
         void Type(char c);
         void Backspace();
         void Delete();
+        void PlaceCursor(int x);
         int TextWidth(u32 from, u32 to);
         GuiButton * NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k);
         const char * placeholder;
@@ -976,6 +977,8 @@ class GuiKeyboard : public GuiWindow
         int caps;
         u32 cursor; //!< where typing goes, as a byte in kbtextstr
         u32 shown; //!< the first byte of kbtextstr in the box
+        u32 shownEnd; //!< the byte after the last one in the box
+        int shownLeft; //!< where the box's text starts, from the keyboard's centre
         u64 cursorMoved; //!< when the cursor last moved, to blink it from then
         bool textChanged; //!< the box needs ShowText, which measures text on the GUI thread
         GuiText * kbText;

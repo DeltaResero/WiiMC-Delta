@@ -83,6 +83,8 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     kbtextmaxlen = max;
     cursor = strlen(kbtextstr);
     shown = 0;
+    shownEnd = 0;
+    shownLeft = 0;
     cursorMoved = gettime();
     textChanged = true;
 
@@ -283,7 +285,8 @@ void GuiKeyboard::ShowText()
         kbText->SetColor((GXColor){150, 150, 155, 0xff});
         kbText->SetText(placeholder);
         shown = 0;
-        x = -kbText->GetTextWidth()/2;
+        shownEnd = 0;
+        shownLeft = x = -kbText->GetTextWidth()/2;
     }
     else
     {
@@ -307,7 +310,9 @@ void GuiKeyboard::ShowText()
         kbText->SetColor((GXColor){255, 255, 255, 0xff});
         kbText->SetText(&kbtextstr[shown]);
         kbtextstr[end] = c;
-        x = -kbText->GetTextWidth()/2 + TextWidth(shown, cursor);
+        shownEnd = end;
+        shownLeft = -kbText->GetTextWidth()/2;
+        x = shownLeft + TextWidth(shown, cursor);
     }
     cursorImg->SetPosition(x - 1, 8);
 }
@@ -315,6 +320,27 @@ void GuiKeyboard::ShowText()
 void GuiKeyboard::SetPlaceholder(const char * p)
 {
     placeholder = p;
+    textChanged = true;
+}
+
+// Moves the cursor to the gap between characters nearest x, which is measured
+// from the keyboard's centre
+void GuiKeyboard::PlaceCursor(int x)
+{
+    int best = -1;
+
+    for(u32 i = shown; ; i = NextChar(kbtextstr, i))
+    {
+        int d = abs(shownLeft + TextWidth(shown, i) - x);
+
+        if(best < 0 || d < best)
+        {
+            best = d;
+            cursor = i;
+        }
+        if(i >= shownEnd)
+            break;
+    }
     textChanged = true;
 }
 
@@ -434,6 +460,15 @@ void GuiKeyboard::Update(GuiTrigger * t)
             int selected = this->GetSelected();
             _elements.at(selected)->SetState(STATE_SELECTED);
         }
+    }
+
+    // pointing at the text and pressing A puts the cursor there
+    if((t->wpad->btns_d & WPAD_BUTTON_A) && t->wpad->ir.valid &&
+        keyTextboxImg->IsInside(t->wpad->ir.x, t->wpad->ir.y))
+    {
+        if(textChanged)
+            ShowText();
+        PlaceCursor(t->wpad->ir.x - (this->GetLeft() + this->GetWidth()/2));
     }
 
     if(textChanged)
