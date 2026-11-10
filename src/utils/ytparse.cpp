@@ -929,6 +929,7 @@ int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *n
     char name[256] = "";
     bool nextPage = false;
     int count = 0;
+    YtItem *last = NULL; // the video the next thumb= line belongs to
 
     if (next && nextsize)
         next[0] = 0;
@@ -963,11 +964,19 @@ int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *n
                 {
                     snprintf(it->title, sizeof(it->title), "%s", name);
                     tidy(it->title);
+                    last = it;
                     count++;
                 }
             }
             name[0] = 0;
             nextPage = false;
+        }
+        else if (starts(p, le, "thumb="))
+        {
+            // the picture RiiTube names for the video before
+            if (last && (starts(p + 6, le, "http://") || starts(p + 6, le, "https://")))
+                copy_line(p + 6, le, last->image, sizeof(last->image));
+            last = NULL;
         }
         p = after;
     }
