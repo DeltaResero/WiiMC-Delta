@@ -188,6 +188,23 @@ static void put_utf8(char *out, size_t *n, unsigned cp)
     }
 }
 
+// a JSON number at p, read no further than e; 0 when there's none
+static long num(const char *p, const char *e)
+{
+    long v = 0;
+    if (!p)
+        return 0;
+    while (p < e && (*p == ' ' || *p == '"'))
+        p++;
+    for (; p < e && *p >= '0' && *p <= '9'; p++)
+    {
+        if (v > 99999999)
+            break;
+        v = v * 10 + (*p - '0');
+    }
+    return v;
+}
+
 static unsigned hex4(const char *p, const char *e)
 {
     if (e - p < 4)
@@ -592,7 +609,7 @@ bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char
             break;
 
         const char *itag = member(f, e, "itag");
-        if (itag && atoi(itag) == 18)
+        if (num(itag, e) == 18)
             return getstr(member(f, e, "url"), e, url, urlsize) && url[0];
     }
     return false;
@@ -650,7 +667,7 @@ int YtParseAdaptive(const char *json, size_t len, int maxHeight, char *vurl, siz
         const char *it = member(f, e, "itag");
         const char *h = member(f, e, "height");
         const char *b = member(f, e, "bitrate");
-        int itag = it ? atoi(it) : 0, hh = h ? atoi(h) : 0, bt = b ? atoi(b) : 0;
+        int itag = num(it, e), hh = num(h, e), bt = num(b, e);
 
         if (strstr(mime, "avc1") && hh > 0 && hh <= maxHeight && (hh > bh || (hh == bh && bt > bb)))
         {
