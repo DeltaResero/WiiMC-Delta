@@ -963,17 +963,26 @@ class GuiKeyboard : public GuiWindow
         bool backPressed; //!< B was pressed with no text left to delete
     protected:
         //!The keys that don't type a character
-        enum { KB_BACKSPACE, KB_CAPS, KB_SHIFT, KB_CLEAR, KB_SPACE, KB_SPECIALS };
+        enum { KB_BACKSPACE, KB_DELETE, KB_CAPS, KB_SHIFT, KB_CLEAR, KB_SPACE, KB_LEFT, KB_RIGHT, KB_SPECIALS };
         void ShowText();
         void Type(char c);
         void Backspace();
+        void Delete();
+        int TextWidth(u32 from, u32 to);
         GuiButton * NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k);
         const char * placeholder;
         u32 kbtextmaxlen;
         int shift;
         int caps;
+        u32 cursor; //!< where typing goes, as a byte in kbtextstr
+        u32 shown; //!< the first byte of kbtextstr in the box
+        u64 cursorMoved; //!< when the cursor last moved, to blink it from then
+        bool textChanged; //!< the box needs ShowText, which measures text on the GUI thread
         GuiText * kbText;
+        GuiText * measureText;
         GuiImage * keyTextboxImg;
+        GuiImage * cursorImg;
+        GuiImage * arrowImg[2];
         GuiButton * keyBtn[KB_KEYS + KB_SPECIALS];
         GuiImage * keyImg[KB_KEYS + KB_SPECIALS];
         GuiImage * keyImgOver[KB_KEYS + KB_SPECIALS];
@@ -989,6 +998,7 @@ class GuiKeyboard : public GuiWindow
         GuiImageData * keyBackspaceOver;
         GuiImageData * keyLarge;
         GuiImageData * keyLargeOver;
+        GuiImageData * keyArrow;
         GuiTrigger * trigA;
         Key keys[KB_KEYS]; // two chars = less space than one pointer
 };

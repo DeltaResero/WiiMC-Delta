@@ -10,21 +10,22 @@
 
 #include "gui.h"
 
-static char tmptxt[MAX_KEYBOARD_DISPLAY+1];
+// how wide the text in the box can be
+#define TEXT_WIDTH 360
 
-static char * GetDisplayText(char * t)
+// the start of the UTF-8 character after or before byte i of s
+static u32 NextChar(const char * s, u32 i)
 {
-    if(!t)
-        return NULL;
+    if(s[i])
+        for(i++; (s[i] & 0xC0) == 0x80; i++);
+    return i;
+}
 
-    int len = strlen(t);
-
-    if(len < MAX_KEYBOARD_DISPLAY)
-        return t;
-
-    strncpy(tmptxt, &t[len-MAX_KEYBOARD_DISPLAY], MAX_KEYBOARD_DISPLAY);
-    tmptxt[MAX_KEYBOARD_DISPLAY] = 0;
-    return &tmptxt[0];
+static u32 PrevChar(const char * s, u32 i)
+{
+    if(i > 0)
+        for(i--; i > 0 && (s[i] & 0xC0) == 0x80; i--);
+    return i;
 }
 
 // The keys that type a character, row by row: each row's keys start at x and
@@ -80,6 +81,10 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     strncpy(kbtextstr, t, max);
     kbtextstr[max] = 0;
     kbtextmaxlen = max;
+    cursor = strlen(kbtextstr);
+    shown = 0;
+    cursorMoved = gettime();
+    textChanged = true;
 
     keyTextbox = new GuiImageData(keyboard_textbox_png);
     keyTextboxImg = new GuiImage(keyTextbox);
@@ -87,13 +92,20 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     keyTextboxImg->SetPosition(0, 0);
     this->Append(keyTextboxImg);
 
-    kbText = new GuiText(GetDisplayText(kbtextstr), 20, (GXColor){255, 255, 255, 0xff});
+    kbText = new GuiText(NULL, 20, (GXColor){255, 255, 255, 0xff});
     kbText->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
     // centre the font's ascent and descent on the box, not hang the text from
     // its top: Noto Sans has a tall ascent, which pushed g and j out the bottom
     kbText->SetStyle(FTGX_JUSTIFY_CENTER | FTGX_ALIGN_MIDDLE);
     kbText->SetPosition(0, 17);
     this->Append(kbText);
+    measureText = new GuiText(NULL, 20, (GXColor){255, 255, 255, 0xff});
+
+    // a 2 pixel line, from a 4 pixel wide image (textures come in 4s)
+    cursorImg = new GuiImage(4, 24, (GXColor){110, 180, 255, 0xff});
+    cursorImg->SetScaleX(0.5);
+    cursorImg->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+    this->Append(cursorImg);
 
     key = new GuiImageData(keyboard_key_png);
     keyOver = new GuiImageData(keyboard_key_over_png);
@@ -105,6 +117,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     keyBackspaceOver = new GuiImageData(keyboard_backspacekey_over_png);
     keyLarge = new GuiImageData(keyboard_largekey_png);
     keyLargeOver = new GuiImageData(keyboard_largekey_over_png);
+    keyArrow = new GuiImageData(keyboard_arrow_png);
 
     trigA = new GuiTrigger;
     trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
@@ -122,10 +135,22 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     };
 
     add(keyBackspace, keyBackspaceOver, "Backspace", 462, 0, KB_KEYS + KB_BACKSPACE);
+    add(keyWide, keyWideOver, "Delete", 482, 1, KB_KEYS + KB_DELETE);
     add(keyMedium, keyMediumOver, "Caps", 0, 2, KB_KEYS + KB_CAPS);
     add(keyWide, keyWideOver, "Shift", 0, 3, KB_KEYS + KB_SHIFT);
     add(keyMedium, keyMediumOver, "Clear", 0, 4, KB_KEYS + KB_CLEAR);
     add(keyLarge, keyLargeOver, NULL, 209, 4, KB_KEYS + KB_SPACE);
+    add(key, keyOver, NULL, 500, 4, KB_KEYS + KB_LEFT);
+    add(key, keyOver, NULL, 542, 4, KB_KEYS + KB_RIGHT);
+
+    // the arrow keys show the one arrow image, the left one turned around
+    for(int i=0; i < 2; i++)
+    {
+        arrowImg[i] = new GuiImage(keyArrow);
+        arrowImg[i]->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
+        arrowImg[i]->SetAngle(i == 0 ? 180 : 0);
+        keyBtn[KB_KEYS + KB_LEFT + i]->SetIcon(arrowImg[i]);
+    }
 
     for(u32 r=0; r < sizeof(keyRows)/sizeof(keyRows[0]); r++)
     {
@@ -166,8 +191,12 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
 GuiKeyboard::~GuiKeyboard()
 {
     delete kbText;
+    delete measureText;
     delete keyTextbox;
     delete keyTextboxImg;
+    delete cursorImg;
+    delete arrowImg[0];
+    delete arrowImg[1];
 
     for(int k=0; k < KB_KEYS + KB_SPECIALS; k++)
     {
@@ -187,6 +216,7 @@ GuiKeyboard::~GuiKeyboard()
     delete keyBackspaceOver;
     delete keyLarge;
     delete keyLargeOver;
+    delete keyArrow;
     delete trigA;
 }
 
@@ -228,48 +258,96 @@ void GuiKeyboard::operator delete[](void *p)
     gui_free(p);
 }
 
-// Shows the typed text, or the grey placeholder while there is none
+// How wide bytes from to to of the text are on screen
+int GuiKeyboard::TextWidth(u32 from, u32 to)
+{
+    char c = kbtextstr[to];
+
+    kbtextstr[to] = 0;
+    measureText->SetText(&kbtextstr[from]);
+    kbtextstr[to] = c;
+    return measureText->GetTextWidth();
+}
+
+// Shows the typed text with the cursor in it, or the grey placeholder while
+// there is none. Text too long for the box scrolls to keep the cursor in it.
 void GuiKeyboard::ShowText()
 {
-    if(kbtextstr[0] == 0 && placeholder)
+    u32 len = strlen(kbtextstr);
+    int x;
+
+    cursorMoved = gettime();
+
+    if(len == 0 && placeholder)
     {
         kbText->SetColor((GXColor){150, 150, 155, 0xff});
         kbText->SetText(placeholder);
+        shown = 0;
+        x = -kbText->GetTextWidth()/2;
     }
     else
     {
+        // keep the box where it was while the cursor is in it, else start
+        // it as far back from the cursor as fits. Then back it up while the
+        // rest of the text fits, and show as much after the cursor as fits.
+        if(cursor < shown)
+            shown = cursor;
+        else if(TextWidth(shown, cursor) > TEXT_WIDTH)
+            for(shown = cursor; shown > 0 && TextWidth(PrevChar(kbtextstr, shown), cursor) <= TEXT_WIDTH; )
+                shown = PrevChar(kbtextstr, shown);
+        while(shown > 0 && TextWidth(PrevChar(kbtextstr, shown), len) <= TEXT_WIDTH)
+            shown = PrevChar(kbtextstr, shown);
+
+        u32 end = cursor;
+        while(end < len && TextWidth(shown, NextChar(kbtextstr, end)) <= TEXT_WIDTH)
+            end = NextChar(kbtextstr, end);
+
+        char c = kbtextstr[end];
+        kbtextstr[end] = 0;
         kbText->SetColor((GXColor){255, 255, 255, 0xff});
-        kbText->SetText(GetDisplayText(kbtextstr));
+        kbText->SetText(&kbtextstr[shown]);
+        kbtextstr[end] = c;
+        x = -kbText->GetTextWidth()/2 + TextWidth(shown, cursor);
     }
+    cursorImg->SetPosition(x - 1, 8);
 }
 
 void GuiKeyboard::SetPlaceholder(const char * p)
 {
     placeholder = p;
-    ShowText();
+    textChanged = true;
 }
 
-// Adds c to the end of the text, while there's room
+// Adds c at the cursor, while there's room
 void GuiKeyboard::Type(char c)
 {
     u32 len = strlen(kbtextstr);
 
     if(len < kbtextmaxlen)
     {
-        kbtextstr[len] = c;
-        kbtextstr[len+1] = 0;
+        memmove(&kbtextstr[cursor+1], &kbtextstr[cursor], len - cursor + 1);
+        kbtextstr[cursor++] = c;
     }
-    ShowText();
+    textChanged = true;
 }
 
-// Takes the last character off the text
+// Takes away the character before the cursor
 void GuiKeyboard::Backspace()
 {
-    u32 len = strlen(kbtextstr);
+    u32 prev = PrevChar(kbtextstr, cursor);
 
-    if(len > 0)
-        kbtextstr[len-1] = 0;
-    ShowText();
+    memmove(&kbtextstr[prev], &kbtextstr[cursor], strlen(&kbtextstr[cursor]) + 1);
+    cursor = prev;
+    textChanged = true;
+}
+
+// Takes away the character after the cursor
+void GuiKeyboard::Delete()
+{
+    u32 next = NextChar(kbtextstr, cursor);
+
+    memmove(&kbtextstr[cursor], &kbtextstr[next], strlen(&kbtextstr[next]) + 1);
+    textChanged = true;
 }
 
 void GuiKeyboard::Update(GuiTrigger * t)
@@ -317,10 +395,25 @@ void GuiKeyboard::Update(GuiTrigger * t)
         {
             Backspace();
         }
+        else if(k == KB_KEYS + KB_DELETE)
+        {
+            Delete();
+        }
+        else if(k == KB_KEYS + KB_LEFT)
+        {
+            cursor = PrevChar(kbtextstr, cursor);
+            textChanged = true;
+        }
+        else if(k == KB_KEYS + KB_RIGHT)
+        {
+            cursor = NextChar(kbtextstr, cursor);
+            textChanged = true;
+        }
         else if(k == KB_KEYS + KB_CLEAR)
         {
             kbtextstr[0] = 0;
-            ShowText();
+            cursor = 0;
+            textChanged = true;
         }
         else if(k == KB_KEYS + KB_SHIFT)
         {
@@ -342,6 +435,15 @@ void GuiKeyboard::Update(GuiTrigger * t)
             _elements.at(selected)->SetState(STATE_SELECTED);
         }
     }
+
+    if(textChanged)
+    {
+        textChanged = false;
+        ShowText();
+    }
+
+    // the cursor blinks, but stays on for a moment after each change
+    cursorImg->SetVisible(diff_usec(cursorMoved, gettime()) / 530000 % 2 == 0);
 
     if(update)
     {

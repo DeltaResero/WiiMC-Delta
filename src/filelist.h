@@ -108,6 +108,7 @@
 #include "keyboard_backspacekey_over_png.h"
 #include "keyboard_largekey_png.h"
 #include "keyboard_largekey_over_png.h"
+#include "keyboard_arrow_png.h"
 #include "progressbar_empty_png.h"
 #include "progressbar_short_empty_png.h"
 #include "progressbar_long_empty_png.h"
