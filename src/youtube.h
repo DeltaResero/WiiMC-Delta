@@ -13,8 +13,10 @@
 #include "utils/ytparse.h"
 
 // Search results; page is "" for the first page, or the next token from the
-// previous page. Returns the number of items, 0 on failure.
-int YouTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize);
+// previous page, and params the filters from YtSearchParams ("" for none; a
+// later page keeps the first's). Returns the number of items, 0 on failure.
+int YouTubeSearch(const char *query, const char *page, const char *params, YtItem *items, int max,
+    char *next, size_t nextsize);
 
 // The videos on a page such as a topic channel or "FEpodcasts_destination"
 // (with its params, else NULL), or in a playlist (pass the playlist's ID;

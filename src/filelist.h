@@ -136,6 +136,8 @@
 #include "yt_card_over_png.h"
 #include "yt_chip_png.h"
 #include "yt_chip_over_png.h"
+#include "yt_filter_png.h"
+#include "yt_filter_over_png.h"
 #include "yt_source_png.h"
 #include "yt_source_over_png.h"
 #include "yt_button_png.h"

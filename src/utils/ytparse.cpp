@@ -944,6 +944,40 @@ int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *n
     return count;
 }
 
+void YtSearchParams(int sort, int date, int type, int duration, char *out, size_t size)
+{
+    static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    unsigned char msg[16], filter[8];
+    int n = 0, f = 0;
+
+    // field 2: the filters, each a one-byte varint
+    if (date > 0 && date < 128) { filter[f++] = 0x08; filter[f++] = date; }
+    if (type > 0 && type < 128) { filter[f++] = 0x10; filter[f++] = type; }
+    if (duration > 0 && duration < 128) { filter[f++] = 0x18; filter[f++] = duration; }
+
+    // field 1: the order
+    if (sort > 0 && sort < 128) { msg[n++] = 0x08; msg[n++] = sort; }
+    if (f)
+    {
+        msg[n++] = 0x12;
+        msg[n++] = f;
+        memcpy(msg + n, filter, f);
+        n += f;
+    }
+
+    size_t o = 0;
+    for (int i = 0; i < n && o + 4 < size; i += 3)
+    {
+        unsigned v = msg[i] << 16 | (i + 1 < n ? msg[i + 1] << 8 : 0) | (i + 2 < n ? msg[i + 2] : 0);
+        out[o++] = b64[v >> 18 & 63];
+        out[o++] = b64[v >> 12 & 63];
+        out[o++] = i + 1 < n ? b64[v >> 6 & 63] : '=';
+        out[o++] = i + 2 < n ? b64[v & 63] : '=';
+    }
+    if (size)
+        out[o < size ? o : size - 1] = 0;
+}
+
 void YtJsonEscape(const char *s, char *out, size_t size)
 {
     size_t n = 0;

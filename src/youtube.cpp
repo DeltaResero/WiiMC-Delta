@@ -102,9 +102,10 @@ static int Items(const char *endpoint, const char *body, YtItem *items, int max,
     return count;
 }
 
-int YouTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize)
+int YouTubeSearch(const char *query, const char *page, const char *params, YtItem *items, int max,
+    char *next, size_t nextsize)
 {
-    size_t size = 2 * (strlen(query) + strlen(page)) + 256;
+    size_t size = 2 * (strlen(query) + strlen(page) + strlen(params)) + 256;
     char *body = (char *)malloc(size);
     char *esc = (char *)malloc(size);
     if (!body || !esc)
@@ -122,7 +123,9 @@ int YouTubeSearch(const char *query, const char *page, YtItem *items, int max, c
     else
     {
         YtJsonEscape(query, esc, size);
-        snprintf(body, size, "{\"context\":{\"client\":" WEB_CLIENT "}},\"query\":\"%s\"}", esc);
+        int n = snprintf(body, size, "{\"context\":{\"client\":" WEB_CLIENT "}},\"query\":\"%s\"", esc);
+        // base64 needs no escaping
+        snprintf(body + n, size - n, params[0] ? ",\"params\":\"%s\"}" : "}", params);
     }
 
     int count = Items("search", body, items, max, next, nextsize);

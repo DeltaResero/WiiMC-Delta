@@ -70,6 +70,30 @@ static const struct
     { "Live", NULL, NULL, NULL, yt_icon_live_png },
 };
 
+// a search's filters, as YouTube's site has them; each button steps through
+// its choices, the first being the default: videos only, else no filter.
+// Kept between visits.
+#define FILTERS 4
+static const struct
+{
+    const char *name;
+    int code; // for YtSearchParams
+} filterOpts[FILTERS][5] = {
+    { { "Videos", 1 }, { "Playlists", 3 }, { "All types", 0 } },
+    { { "Any length", 0 }, { "Under 3 min", 1 }, { "3-20 min", 3 }, { "Over 20 min", 2 } },
+    { { "Any time", 0 }, { "Today", 2 }, { "This week", 3 }, { "This month", 4 }, { "This year", 5 } },
+    { { "Relevance", 0 }, { "Popularity", 3 } },
+};
+static int filterPick[FILTERS];
+
+static int FilterChoices(int f)
+{
+    int n = 0;
+    while (n < 5 && filterOpts[f][n].name)
+        n++;
+    return n;
+}
+
 // kept between visits, so the screen comes back as it was after a video
 static YtList *lists[LEVELS];
 static int depth = 0; // lists open; 0 is the home page
@@ -427,6 +451,8 @@ typedef struct
     GuiImageData *tileIcon[TILES];
     GuiButton *source;
     GuiText *sourceTxt;
+    GuiButton *filter[FILTERS];
+    GuiText *filterTxt[FILTERS];
     // results
     GuiText *header;
     GuiButton *card[PAGE];
@@ -484,6 +510,14 @@ static void Show(Screen *sc)
     for (int i = 0; i < TILES; i++)
         Enable(sc->tile[i], !l);
     Enable(sc->source, !l);
+
+    // RiiTube's search can't be filtered
+    for (int f = 0; f < FILTERS; f++)
+    {
+        Enable(sc->filter[f], !l && !rii);
+        sc->filterTxt[f]->SetText(filterOpts[f][filterPick[f]].name);
+        sc->filterTxt[f]->SetColor(filterPick[f] ? (GXColor){110, 180, 255, 255} : (GXColor){200, 200, 205, 255});
+    }
     sc->sourceTxt->SetText(rii ? "Source: RiiTube" : "Source: YouTube");
 
     sc->header->SetVisible(l != NULL);
@@ -590,7 +624,12 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
     if (query && l->riitube)
         l->count = RiiTubeSearch(query, "", l->items, LIST_MAX, l->next, sizeof(l->next));
     else if (query)
-        l->count = YouTubeSearch(query, "", l->items, LIST_MAX, l->next, sizeof(l->next));
+    {
+        char params[32];
+        YtSearchParams(filterOpts[3][filterPick[3]].code, filterOpts[2][filterPick[2]].code,
+            filterOpts[0][filterPick[0]].code, filterOpts[1][filterPick[1]].code, params, sizeof(params));
+        l->count = YouTubeSearch(query, "", params, l->items, LIST_MAX, l->next, sizeof(l->next));
+    }
     else if (playlist)
         l->count = YouTubePlaylist(browseId, l->items, LIST_MAX);
     else
@@ -643,7 +682,7 @@ static void More(YtList *l)
     ShowAction("Loading...");
     YtItem *more = (YtItem *)malloc(sizeof(YtItem) * (LIST_MAX - l->count));
     int n = !more ? 0 : l->riitube ? RiiTubeSearch(l->query, next, more, LIST_MAX - l->count, next, sizeof(next)) :
-        YouTubeSearch(l->query, next, more, LIST_MAX - l->count, next, sizeof(next));
+        YouTubeSearch(l->query, next, "", more, LIST_MAX - l->count, next, sizeof(next));
     CancelAction();
 
     LWP_MutexLock(lock);
@@ -754,7 +793,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         w.Append(sc.tile[i]);
     }
 
-    // where lists and videos come from, in the row under the tiles
+    // where lists and videos come from, first in the row under the tiles
     int rowY = 162 + 3 * (tile.GetHeight() + 12);
     GuiImageData *sourceData = new GuiImageData(yt_source_png);
     GuiImageData *sourceDataOver = new GuiImageData(yt_source_over_png);
@@ -769,6 +808,26 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     sc.source->SetLabel(sc.sourceTxt);
     sc.source->SetTrigger(&trigA);
     w.Append(sc.source);
+
+    // the search's filters, after it
+    GuiImageData *filterData = new GuiImageData(yt_filter_png);
+    GuiImageData *filterDataOver = new GuiImageData(yt_filter_over_png);
+    GuiImage *filterImg[FILTERS], *filterImgOver[FILTERS];
+    for (int f = 0; f < FILTERS; f++)
+    {
+        filterImg[f] = new GuiImage(filterData);
+        filterImgOver[f] = new GuiImage(filterDataOver);
+        sc.filterTxt[f] = new GuiText(NULL, 15, (GXColor){200, 200, 205, 255});
+        sc.filterTxt[f]->SetMaxWidth(filterData->GetWidth() - 8);
+        sc.filter[f] = new GuiButton(filterData->GetWidth(), filterData->GetHeight());
+        sc.filter[f]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+        sc.filter[f]->SetPosition(x0 + sourceData->GetWidth() + 5 + f * (filterData->GetWidth() + 5), rowY);
+        sc.filter[f]->SetImage(filterImg[f]);
+        sc.filter[f]->SetImageOver(filterImgOver[f]);
+        sc.filter[f]->SetLabel(sc.filterTxt[f]);
+        sc.filter[f]->SetTrigger(&trigA);
+        w.Append(sc.filter[f]);
+    }
 
     // results: a header, the cards, and the pages
     sc.header = new GuiText(NULL, 18, (GXColor){255, 255, 255, 255});
@@ -921,7 +980,14 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             {
                 snprintf(lastQuery, sizeof(lastQuery), "%s", query);
                 char head[160];
-                snprintf(head, sizeof(head), "Results for \"%s\"", query);
+                int n = snprintf(head, sizeof(head), "Results for \"%s\"", query);
+                // and the filters used, in brackets
+                int k = 0;
+                for (int f = 0; f < FILTERS && !YouTubeUseRiiTube() && n < (int)sizeof(head); f++)
+                    if (filterPick[f])
+                        n += snprintf(head + n, sizeof(head) - n, "%s%s", k++ ? ", " : " (", filterOpts[f][filterPick[f]].name);
+                if (k && n < (int)sizeof(head) - 1)
+                    snprintf(head + n, sizeof(head) - n, ")");
                 Open(&sc, query, NULL, false, head);
             }
             mainWindow->ChangeFocus(&w);
@@ -948,6 +1014,16 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 }
                 else
                     Open(&sc, NULL, tiles[i].browseId, false, tiles[i].name, tiles[i].params, tiles[i].topic);
+            }
+        }
+
+        for (int f = 0; f < FILTERS; f++)
+        {
+            if (sc.filter[f]->GetState() == STATE_CLICKED)
+            {
+                sc.filter[f]->ResetState();
+                filterPick[f] = (filterPick[f] + 1) % FilterChoices(f);
+                Show(&sc);
             }
         }
 
@@ -1027,6 +1103,15 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         delete tileTxt[i];
         delete tileIcon[i];
     }
+    for (int f = 0; f < FILTERS; f++)
+    {
+        delete sc.filter[f];
+        delete sc.filterTxt[f];
+        delete filterImg[f];
+        delete filterImgOver[f];
+    }
+    delete filterData;
+    delete filterDataOver;
     delete sc.source;
     delete sourceImg;
     delete sourceImgOver;

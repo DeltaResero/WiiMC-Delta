@@ -75,6 +75,12 @@ int YtParseAdaptive(const char *json, size_t len, int maxHeight, char *vurl, siz
 // number of items stored.
 int YtParseRiiTube(const char *text, size_t len, YtItem *items, int max, char *next, size_t nextsize);
 
+// A search's filters as YouTube's "params": a protobuf message, base64. Each
+// is 0 for none: sort 3 = by views; date 2 today, 3 this week, 4 this month,
+// 5 this year; type 1 videos, 3 playlists; duration 1 under 3 minutes,
+// 3 from 3 to 20, 2 over 20. out is "" when nothing is filtered.
+void YtSearchParams(int sort, int date, int type, int duration, char *out, size_t size);
+
 // Writes s into out as a JSON string's contents, escaped
 void YtJsonEscape(const char *s, char *out, size_t size);
 
