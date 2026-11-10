@@ -422,6 +422,11 @@ typedef struct
     GuiButton *search;
     GuiText *searchTxt;
     GuiButton *tile[TILES];
+    GuiText *tileTxt[TILES];
+    GuiImage *tileIconImg[TILES];
+    GuiImageData *tileIcon[TILES];
+    GuiButton *source;
+    GuiText *sourceTxt;
     // results
     GuiText *header;
     GuiButton *card[PAGE];
@@ -475,8 +480,11 @@ static void Show(Screen *sc)
     Enable(sc->search, !l);
     sc->searchTxt->SetText(lastQuery[0] ? lastQuery : "Search YouTube...");
     sc->searchTxt->SetColor(lastQuery[0] ? (GXColor){255, 255, 255, 255} : (GXColor){150, 150, 155, 255});
+    bool rii = YouTubeUseRiiTube();
     for (int i = 0; i < TILES; i++)
         Enable(sc->tile[i], !l);
+    Enable(sc->source, !l);
+    sc->sourceTxt->SetText(rii ? "Source: RiiTube" : "Source: YouTube");
 
     sc->header->SetVisible(l != NULL);
     if (l)
@@ -575,8 +583,13 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
     snprintf(l->title, sizeof(l->title), "%s", title);
     snprintf(l->query, sizeof(l->query), "%s", query ? query : "");
 
-    ShowAction(query ? "Searching YouTube..." : "Loading...");
-    if (query)
+    // the screen set to RiiTube
+    l->riitube = YouTubeUseRiiTube();
+
+    ShowAction(!query ? "Loading..." : l->riitube ? "Searching RiiTube..." : "Searching YouTube...");
+    if (query && l->riitube)
+        l->count = RiiTubeSearch(query, "", l->items, LIST_MAX, l->next, sizeof(l->next));
+    else if (query)
         l->count = YouTubeSearch(query, "", l->items, LIST_MAX, l->next, sizeof(l->next));
     else if (playlist)
         l->count = YouTubePlaylist(browseId, l->items, LIST_MAX);
@@ -586,7 +599,7 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
 
     // YouTube's list couldn't be had: RiiTube's search, for the query or
     // for the page's topic
-    if (l->count == 0 && (query || topic))
+    if (l->count == 0 && !l->riitube && (query || topic))
     {
         ShowAction("Trying RiiTube...");
         if (!query)
@@ -602,8 +615,11 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
     if (l->count == 0)
     {
         free(l);
-        ErrorPrompt(query ? "No results, or YouTube and RiiTube couldn't be reached." :
-            "YouTube and RiiTube couldn't be reached.");
+        if (YouTubeUseRiiTube())
+            ErrorPrompt(query ? "No results, or RiiTube couldn't be reached." : "RiiTube couldn't be reached.");
+        else
+            ErrorPrompt(query ? "No results, or YouTube and RiiTube couldn't be reached." :
+                "YouTube and RiiTube couldn't be reached.");
         Show(sc);
         return;
     }
@@ -684,7 +700,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     GuiImageData card(yt_card_png), cardOver(yt_card_over_png);
     GuiImageData button(yt_button_png), buttonOver(yt_button_over_png);
     GuiImageData searchIcon(yt_icon_search_png);
-    GuiImageData *tileIcon[TILES];
+    GuiImageData **tileIcon = sc.tileIcon;
 
     GuiWindow w(screenwidth, screenheight);
     sc.w = &w;
@@ -713,8 +729,8 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     sc.search->SetTrigger(&trigA);
     w.Append(sc.search);
 
-    GuiImage *tileImg[TILES], *tileImgOver[TILES], *tileIconImg[TILES];
-    GuiText *tileTxt[TILES];
+    GuiImage *tileImg[TILES], *tileImgOver[TILES], **tileIconImg = sc.tileIconImg;
+    GuiText **tileTxt = sc.tileTxt;
     for (int i = 0; i < TILES; i++)
     {
         tileIcon[i] = new GuiImageData(tiles[i].icon);
@@ -737,6 +753,22 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         sc.tile[i]->SetTrigger(&trigA);
         w.Append(sc.tile[i]);
     }
+
+    // where lists and videos come from, in the row under the tiles
+    int rowY = 162 + 3 * (tile.GetHeight() + 12);
+    GuiImageData *sourceData = new GuiImageData(yt_source_png);
+    GuiImageData *sourceDataOver = new GuiImageData(yt_source_over_png);
+    sc.sourceTxt = new GuiText(NULL, 15, (GXColor){200, 200, 205, 255});
+    sc.sourceTxt->SetMaxWidth(sourceData->GetWidth() - 8);
+    sc.source = new GuiButton(sourceData->GetWidth(), sourceData->GetHeight());
+    sc.source->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+    sc.source->SetPosition(x0, rowY);
+    GuiImage *sourceImg = new GuiImage(sourceData), *sourceImgOver = new GuiImage(sourceDataOver);
+    sc.source->SetImage(sourceImg);
+    sc.source->SetImageOver(sourceImgOver);
+    sc.source->SetLabel(sc.sourceTxt);
+    sc.source->SetTrigger(&trigA);
+    w.Append(sc.source);
 
     // results: a header, the cards, and the pages
     sc.header = new GuiText(NULL, 18, (GXColor){255, 255, 255, 255});
@@ -908,9 +940,22 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                     mainWindow->ChangeFocus(&w);
                     Show(&sc);
                 }
+                else if (YouTubeUseRiiTube())
+                {
+                    char title[64];
+                    RiiTubeTitle(title, sizeof(title), tiles[i].name);
+                    Open(&sc, tiles[i].topic, NULL, false, title);
+                }
                 else
                     Open(&sc, NULL, tiles[i].browseId, false, tiles[i].name, tiles[i].params, tiles[i].topic);
             }
+        }
+
+        if (sc.source->GetState() == STATE_CLICKED)
+        {
+            sc.source->ResetState();
+            YouTubeSetRiiTube(!YouTubeUseRiiTube());
+            Show(&sc);
         }
 
         if (l && sc.prev->GetState() == STATE_CLICKED)
@@ -982,6 +1027,10 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         delete tileTxt[i];
         delete tileIcon[i];
     }
+    delete sc.source;
+    delete sourceImg;
+    delete sourceImgOver;
+    delete sc.sourceTxt;
     delete sc.search;
     delete sc.searchTxt;
     delete sc.header;

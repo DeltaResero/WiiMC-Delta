@@ -195,6 +195,16 @@ int RiiTubeSearch(const char *query, const char *page, YtItem *items, int max, c
     return count;
 }
 
+bool YouTubeUseRiiTube()
+{
+    return WiiSettings.youtubeSource == 1;
+}
+
+void YouTubeSetRiiTube(bool on)
+{
+    WiiSettings.youtubeSource = on ? 1 : 0; // kept in settings.xml
+}
+
 int YouTubeSuggest(const char *text, char (*out)[96], int max)
 {
     char url[512];

@@ -70,4 +70,9 @@ void YouTubeRiiTubeUrl(const char *videoId, char *url, size_t size);
 // the first, or the next link from the page before)
 int RiiTubeSearch(const char *query, const char *page, YtItem *items, int max, char *next, size_t nextsize);
 
+// Whether the YouTube screen and its videos use RiiTube alone, kept in the
+// settings. RiiTube's streams can't seek.
+bool YouTubeUseRiiTube();
+void YouTubeSetRiiTube(bool on);
+
 #endif

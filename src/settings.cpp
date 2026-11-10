@@ -393,6 +393,7 @@ prepareSettingsData ()
     createXMLSetting("anisonfmQuality", "ANISON.FM artstyle", toStr(WiiSettings.anisonfmQuality));
     createXMLSetting("onlineBanners", "Online Screensaver", toStr(WiiSettings.onlineBanners));
     createXMLSetting("youtubeQuality", "YouTube quality", toStr(WiiSettings.youtubeQuality));
+    createXMLSetting("youtubeSource", "YouTube source", toStr(WiiSettings.youtubeSource));
     // Network
     createXMLSection("Network", "Network Settings");
     for(int i=0; i<MAX_SHARES; i++)
@@ -818,6 +819,7 @@ void DefaultSettings ()
     WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
     WiiSettings.onlineBanners = 1;
     WiiSettings.youtubeQuality = 360;
+    WiiSettings.youtubeSource = 0;
     // Network
     for(int i=0; i<MAX_SHARES; i++)
     {
@@ -977,6 +979,8 @@ static void FixInvalidSettings()
         WiiSettings.onlineCacheFill = 20;
     if(WiiSettings.youtubeQuality != 360 && WiiSettings.youtubeQuality != 480)
         WiiSettings.youtubeQuality = 360;
+    if(WiiSettings.youtubeSource != 0 && WiiSettings.youtubeSource != 1)
+        WiiSettings.youtubeSource = 0;
 
     if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
         CleanupPath(WiiSettings.onlinemediaFolder);
@@ -1327,6 +1331,7 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.anisonfmQuality, "anisonfmQuality");
                 loadXMLSetting(&WiiSettings.onlineBanners, "onlineBanners");
                 loadXMLSetting(&WiiSettings.youtubeQuality, "youtubeQuality");
+                loadXMLSetting(&WiiSettings.youtubeSource, "youtubeSource");
                 // Network
 
                 for(int i=0; i<MAX_SHARES; i++)

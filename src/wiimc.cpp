@@ -780,7 +780,8 @@ void LoadMPlayerFile()
 
     YouTubeForget(); // what the last YouTube video had
 
-    if(YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
+    // unless the YouTube screen is set to use RiiTube alone
+    if(!YouTubeUseRiiTube() && YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
     {
         ytlink = (char *)malloc(4096);
         if(ytlink && !YouTubeResolve(ytid, ytlink, 4096, NULL, 0))
