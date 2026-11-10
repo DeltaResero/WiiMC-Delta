@@ -568,7 +568,11 @@ void MPlayerInput()
         else if(wd & WPAD_BUTTON_DOWN || down & PAD_BUTTON_DOWN ||
             userInput[0].cpad.data.down & CTR_BUTTON_DOWN)
         {
-            if(!wiiIsPaused()) {
+            // with one audio track there's nothing to switch to, and the
+            // seek below would only jump the video back
+            static char names[2][48];
+            int aid[2];
+            if(!wiiIsPaused() && wiiAudioTracks(aid, names, 2) > 1) {
                 wiiSetProperty(MP_CMD_SWITCH_AUDIO, 0);
                 /* When changing audio tracks there is a small de-sync */
                 /* So we seek to re-sync */
