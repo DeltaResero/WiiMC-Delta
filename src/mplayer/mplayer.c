@@ -6646,23 +6646,6 @@ void wiiSetSubtitleSize(float size)
         vo_osd_changed(OSDTYPE_SUBTITLE);
 }
 
-bool wiiFindRestorePoint(char *filename, char *partitionlabel)
-{
-        int i;
-        char *aux_partitionlabel;
-        static char szEmptyStr[] = "";
-
-        if(!filename)
-                return false;
-
-        aux_partitionlabel = (partitionlabel) ? partitionlabel : szEmptyStr;
-
-        for(i=0; i<MAX_RESTORE_POINTS; i++)
-            if (match_restore_point(i, filename, aux_partitionlabel))
-                        return true;
-        return false;
-}
-
 void wiiLoadRestorePoints(char *buffer, int size)
 {
         int n, c, i = 0, lineptr = 0, fields;
