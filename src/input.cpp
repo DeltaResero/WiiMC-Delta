@@ -321,11 +321,11 @@ void MPlayerInput()
     if(cur_chan == 0 && userInput[1].pad.btns_d == PAD_BUTTON_A) {
         cur_chan = 1;
         down = PAD_ButtonsDown(cur_chan);
-        held = PAD_ButtonsDown(cur_chan);
+        held = PAD_ButtonsHeld(cur_chan);
     } else if(cur_chan == 1 && userInput[0].pad.btns_d == PAD_BUTTON_A) {
         cur_chan = 0;
         down = PAD_ButtonsDown(cur_chan);
-        held = PAD_ButtonsDown(cur_chan);
+        held = PAD_ButtonsHeld(cur_chan);
     }
 
     if(cur_chan == 0)
@@ -376,7 +376,7 @@ void MPlayerInput()
             }
         }
         else if(userInput[0].wpad->btns_h & WPAD_BUTTON_PLUS || held & PAD_BUTTON_Y ||
-            userInput[0].cpad.data.down & CTR_BUTTON_Y)
+            userInput[0].cpad.data.held & CTR_BUTTON_Y)
         {
             volnow = gettime();
 
@@ -391,7 +391,7 @@ void MPlayerInput()
             }
         }
         else if(userInput[0].wpad->btns_h & WPAD_BUTTON_MINUS || held & PAD_BUTTON_X ||
-            userInput[0].cpad.data.down & CTR_BUTTON_X)
+            userInput[0].cpad.data.held & CTR_BUTTON_X)
         {
             volnow = gettime();
 
