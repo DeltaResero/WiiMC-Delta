@@ -52,12 +52,12 @@ typedef struct
 } YtList;
 
 // YouTube's own pages, as its Explore menu lists them, less the paid ones
-// and the games; Live waits until live streams can play. RiiTube has no
-// such pages, so it's searched for the topic instead.
+// and the games. RiiTube has no such pages, so it's searched for the topic
+// instead.
 static const struct
 {
     const char *name;
-    const char *browseId;   // NULL: not yet
+    const char *browseId;
     const char *params;
     const char *topic;      // what to search RiiTube for
     const u8 *icon;
@@ -67,7 +67,7 @@ static const struct
     { "Podcasts", "FEpodcasts_destination", "qgcCCAE=", "podcast", yt_icon_podcasts_png },
     { "News", "UCYfdidRxbB8Qhf0Nx7ioOYw", NULL, "news", yt_icon_news_png },
     { "Sports", "UCEgdi0XIXXZ-qJOFPf4JSKw", NULL, "sports", yt_icon_sports_png },
-    { "Live", NULL, NULL, NULL, yt_icon_live_png },
+    { "Live", "UC4R8DWoMoI7CAwX8_LjQHig", NULL, "live", yt_icon_live_png },
 };
 
 // a search's filters, as YouTube's site has them; each button steps through
@@ -1013,13 +1013,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             if (sc.tile[i]->GetState() == STATE_CLICKED)
             {
                 sc.tile[i]->ResetState();
-                if (!tiles[i].browseId)
-                {
-                    WindowPrompt(tiles[i].name, "Live isn't LIVE yet!", "OK", NULL);
-                    mainWindow->ChangeFocus(&w);
-                    Show(&sc);
-                }
-                else if (YouTubeUseRiiTube())
+                if (YouTubeUseRiiTube())
                 {
                     char title[64];
                     RiiTubeTitle(title, sizeof(title), tiles[i].name);
