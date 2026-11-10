@@ -124,6 +124,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     add(keyBackspace, keyBackspaceOver, "Backspace", 462, 0, KB_KEYS + KB_BACKSPACE);
     add(keyMedium, keyMediumOver, "Caps", 0, 2, KB_KEYS + KB_CAPS);
     add(keyWide, keyWideOver, "Shift", 0, 3, KB_KEYS + KB_SHIFT);
+    add(keyMedium, keyMediumOver, "Clear", 0, 4, KB_KEYS + KB_CLEAR);
     add(keyLarge, keyLargeOver, NULL, 209, 4, KB_KEYS + KB_SPACE);
 
     for(u32 r=0; r < sizeof(keyRows)/sizeof(keyRows[0]); r++)
@@ -315,6 +316,11 @@ void GuiKeyboard::Update(GuiTrigger * t)
         else if(k == KB_KEYS + KB_BACKSPACE)
         {
             Backspace();
+        }
+        else if(k == KB_KEYS + KB_CLEAR)
+        {
+            kbtextstr[0] = 0;
+            ShowText();
         }
         else if(k == KB_KEYS + KB_SHIFT)
         {

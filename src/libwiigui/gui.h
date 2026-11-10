@@ -963,7 +963,7 @@ class GuiKeyboard : public GuiWindow
         bool backPressed; //!< B was pressed with no text left to delete
     protected:
         //!The keys that don't type a character
-        enum { KB_BACKSPACE, KB_CAPS, KB_SHIFT, KB_SPACE, KB_SPECIALS };
+        enum { KB_BACKSPACE, KB_CAPS, KB_SHIFT, KB_CLEAR, KB_SPACE, KB_SPECIALS };
         void ShowText();
         void Type(char c);
         void Backspace();
