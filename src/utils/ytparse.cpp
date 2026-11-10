@@ -367,6 +367,10 @@ static bool video_item(const char *vr, const char *e, YtItem *it)
     if (!getstr(member(vr, e, "videoId"), e, it->id, sizeof(it->id)) || !it->id[0])
         return false;
 
+    // a live stream that hasn't started has nothing to play yet
+    if (member(vr, e, "upcomingEventData"))
+        return false;
+
     text(member(vr, e, "title"), e, it->title, sizeof(it->title));
 
     static const char *const channel[] = { "ownerText", "longBylineText", "shortBylineText", "bylineText", NULL };
