@@ -89,6 +89,7 @@ void wiiGetFPS(char *buf);
 void wiiSetDVDDevice(char *dev);
 bool wiiAudioOnly();
 bool wiiAudioFileLoaded();
+void wiiWantPicture(bool wanted);
 char * wiiGetMetaTitle();
 char * wiiGetMetaArtist();
 char * wiiGetMetaAlbum();

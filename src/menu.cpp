@@ -3601,6 +3601,7 @@ static int LoadNewFile()
 
     ResetVideos();
     DisableVideoImg();
+    wiiWantPicture(menuCurrent == MENU_BROWSE_VIDEOS);
     LoadMPlayerFile();
     artFirst = true; // For radio stream
 

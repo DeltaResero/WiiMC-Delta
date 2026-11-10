@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -216,6 +217,7 @@ static float orig_stream_cache_min_percent=-1;
 static float orig_stream_cache_seek_min_percent=-1;
 static int orig_stream_cache_size=-1;
 static bool playing_file=false;
+static bool picture_wanted=false; // a file whose picture can't be shown is refused
 static bool audio_file_loaded=false; // MPlayer gave the GUI control back to play audio
 static int force_frame_dropping=-1;
 #endif
@@ -4292,12 +4294,36 @@ stream_cache_min_percent=0.2;
     mpctx->sh_audio = mpctx->d_audio->sh;
     mpctx->sh_video = mpctx->d_video->sh;
 
+#ifdef GEKKO
+    unsigned int picture_format = mpctx->sh_video ? mpctx->sh_video->format : 0;
+#endif
+
     if (mpctx->sh_video) {
         current_module = "video_read_properties";
         reinit_video_chain();
     }
 
 #ifdef GEKKO
+    // The file has a picture that no decoder here can show. Say so rather
+    // than play the sound alone, where the caller asked for the picture.
+    if (picture_wanted && picture_format && !mpctx->sh_video && !wii_error) {
+        char name[8];
+        int i;
+        for (i = 0; i < 4; i++) {
+            name[i] = toupper((picture_format >> (8 * i)) & 0xff);
+            if (!isalnum((unsigned char)name[i]))
+                break;
+        }
+        name[i] = 0;
+        if (!strcmp(name, "AV01"))
+            strcpy(name, "AV1");
+        snprintf(wii_error_text, sizeof(wii_error_text),
+                 i == 4 ? "%s video unsupported" : "Video format unsupported%s",
+                 i == 4 ? name : "");
+        wii_error = 2;
+        goto goto_next_file;
+    }
+
     // WiiMC's FFmpeg leaves out some bit depths to save space (see
     // FF_VP9_8_10BIT_ONLY and FF_HEVC_8_10BIT_ONLY). The probe already tried
     // the video, so stop here rather than play the sound without a picture.
@@ -6190,6 +6216,12 @@ void wiiSetDVDDevice(char * dev)
                 return;
 
         dvd_device = strdup(dev);
+}
+
+// whether the next files must show their picture to be played at all
+void wiiWantPicture(bool wanted)
+{
+        picture_wanted = wanted;
 }
 
 // true once MPlayer has handed control back to the GUI to play an audio-only
