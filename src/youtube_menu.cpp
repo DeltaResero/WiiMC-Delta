@@ -321,7 +321,7 @@ static bool SearchKeyboard(char *query)
         chipTxt[i]->SetMaxWidth(chip.GetWidth() - 14);
         chipBtn[i] = new GuiButton(chip.GetWidth(), chip.GetHeight());
         chipBtn[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-        chipBtn[i]->SetPosition(i * (chip.GetWidth() + 3), 45);
+        chipBtn[i]->SetPosition((keyboard.GetWidth() - SUGGESTIONS * (chip.GetWidth() + 3) + 3) / 2 + i * (chip.GetWidth() + 3), 45);
         chipBtn[i]->SetImage(chipImg[i]);
         chipBtn[i]->SetImageOver(chipImgOver[i]);
         chipBtn[i]->SetLabel(chipTxt[i]);
@@ -357,7 +357,7 @@ static bool SearchKeyboard(char *query)
 
         if (ExitRequested)
             result = 0;
-        else if (okBtn.GetState() == STATE_CLICKED)
+        else if (okBtn.GetState() == STATE_CLICKED || keyboard.enterPressed)
             result = 1;
         else if (cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed)
             result = 0;
@@ -478,6 +478,19 @@ static void Enable(GuiButton *b, bool on)
     }
     else
         b->SetState(STATE_DISABLED);
+}
+
+// after a page turn the d-pad's highlight stays on the button pressed, or
+// moves to the other one when it has gone grey on the first or last page
+static void KeepPageHighlight(GuiButton *b, GuiButton *other)
+{
+    if (userInput[0].wpad->ir.valid)
+        return; // the pointer has the highlight
+
+    if (b->GetState() != STATE_DISABLED)
+        b->SetState(STATE_SELECTED);
+    else if (other->GetState() != STATE_DISABLED)
+        other->SetState(STATE_SELECTED);
 }
 
 static int Pages(YtList *l)
@@ -1039,6 +1052,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             sc.prev->ResetState();
             l->first = l->first >= PAGE ? l->first - PAGE : 0;
             Show(&sc);
+            KeepPageHighlight(sc.prev, sc.next);
         }
 
         if (l && sc.next->GetState() == STATE_CLICKED)
@@ -1049,6 +1063,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             if (l->first + PAGE < l->count)
                 l->first += PAGE;
             Show(&sc);
+            KeepPageHighlight(sc.next, sc.prev);
         }
 
         for (int s = 0; l && s < PAGE; s++)

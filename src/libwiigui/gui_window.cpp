@@ -368,7 +368,10 @@ void GuiWindow::MoveSelectionHor(int dir)
         this->SelectOnly(found);
 }
 
-void GuiWindow::MoveSelectionVert(int dir)
+bool guiUpMoved = false;
+bool guiUpAtTop = false;
+
+bool GuiWindow::MoveSelectionVert(int dir)
 {
     int found = -1;
     u16 left = 0;
@@ -407,12 +410,9 @@ void GuiWindow::MoveSelectionVert(int dir)
         catch (const std::exception& e) { }
     }
     if(found >= 0)
-        goto matchfound;
-
-    // match found
-    matchfound:
-    if(found >= 0)
         this->SelectOnly(found);
+
+    return found >= 0;
 }
 
 void GuiWindow::ResetText()
@@ -451,7 +451,12 @@ void GuiWindow::Update(GuiTrigger * t)
         else if(t->Down())
             this->MoveSelectionVert(1);
         else if(t->Up())
-            this->MoveSelectionVert(-1);
+        {
+            if(this->MoveSelectionVert(-1))
+                guiUpMoved = true;
+            else
+                guiUpAtTop = true;
+        }
     }
 
     if(updateCB)

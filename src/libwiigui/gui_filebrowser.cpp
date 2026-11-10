@@ -441,12 +441,16 @@ void GuiFileBrowser::Update(GuiTrigger * t)
             // move list up by 1
             --browser.pageIndex;
             listChanged = true;
+            guiUpMoved = true;
         }
         else if(selectedItem > 0)
         {
             fileList[selectedItem]->ResetState();
             fileList[--selectedItem]->SetState(STATE_SELECTED, -1);
+            guiUpMoved = true;
         }
+        else
+            guiUpAtTop = true;
     }
 
     if(listChanged)

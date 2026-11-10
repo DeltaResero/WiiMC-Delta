@@ -76,6 +76,11 @@ extern FreeTypeGX *fontSystemBold[];
 #define MAX_MENUITEMS           11
 #define MAX_KEYBOARD_DISPLAY    32
 
+// Up was pressed this frame: whether a list or window moved its highlight, and
+// whether one was already at its top. Up at the top of a screen reaches the tab bar.
+extern bool guiUpMoved;
+extern bool guiUpAtTop;
+
 typedef void (*UpdateCallback)(void * e);
 
 enum
@@ -566,7 +571,7 @@ class GuiWindow : public GuiElement
         void MoveSelectionHor(int d);
         //!Moves the selected element to the element above or below
         //!\param d Direction to move (-1 = up, 1 = down)
-        void MoveSelectionVert(int d);
+        bool MoveSelectionVert(int d);
         //!Selects one element and clears every other selection, so a pointer
         //!highlight can't be left behind when the D-pad moves on
         //!\param n Index of the element to select
@@ -941,6 +946,8 @@ typedef struct _keytype {
     char ch, chShift;
 } Key;
 
+#define KB_KEYS 47 //!< keys that type a character, space aside
+
 //!On-screen keyboard
 class GuiKeyboard : public GuiWindow
 {
@@ -958,43 +965,52 @@ class GuiKeyboard : public GuiWindow
         //!Shows p in grey while nothing is typed; p must outlive the keyboard
         void SetPlaceholder(const char * p);
         char kbtextstr[256];
-        bool backPressed; //!< B was pressed with no text left to delete
+        bool backPressed; //!< B was pressed with no text left to delete, or Esc
+        bool enterPressed; //!< Enter was pressed on a USB keyboard
     protected:
+        //!The keys that don't type a character
+        enum { KB_BACKSPACE, KB_DELETE, KB_CAPS, KB_SHIFT, KB_CLEAR, KB_SPACE, KB_LEFT, KB_RIGHT, KB_SPECIALS };
         void ShowText();
+        void Type(char c);
+        void Backspace();
+        void Delete();
+        void PlaceCursor(int x);
+        void ReadUsbKeyboard();
+        int TextWidth(u32 from, u32 to);
+        GuiButton * NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k);
         const char * placeholder;
         u32 kbtextmaxlen;
         int shift;
         int caps;
+        u32 cursor; //!< where typing goes, as a byte in kbtextstr
+        u32 shown; //!< the first byte of kbtextstr in the box
+        u32 shownEnd; //!< the byte after the last one in the box
+        int shownLeft; //!< where the box's text starts, from the keyboard's centre
+        u64 cursorMoved; //!< when the cursor last moved, to blink it from then
+        bool textChanged; //!< the box needs ShowText, which measures text on the GUI thread
         GuiText * kbText;
+        GuiText * measureText;
         GuiImage * keyTextboxImg;
-        GuiText * keyCapsText;
-        GuiImage * keyCapsImg;
-        GuiImage * keyCapsOverImg;
-        GuiButton * keyCaps;
-        GuiText * keyShiftText;
-        GuiImage * keyShiftImg;
-        GuiImage * keyShiftOverImg;
-        GuiButton * keyShift;
-        GuiText * keyBackText;
-        GuiImage * keyBackImg;
-        GuiImage * keyBackOverImg;
-        GuiButton * keyBack;
-        GuiImage * keySpaceImg;
-        GuiImage * keySpaceOverImg;
-        GuiButton * keySpace;
-        GuiButton * keyBtn[4][11];
-        GuiImage * keyImg[4][11];
-        GuiImage * keyImgOver[4][11];
-        GuiText * keyTxt[4][11];
+        GuiImage * cursorImg;
+        GuiImage * arrowImg[2];
+        GuiButton * keyBtn[KB_KEYS + KB_SPECIALS];
+        GuiImage * keyImg[KB_KEYS + KB_SPECIALS];
+        GuiImage * keyImgOver[KB_KEYS + KB_SPECIALS];
+        GuiText * keyTxt[KB_KEYS + KB_SPECIALS];
         GuiImageData * keyTextbox;
         GuiImageData * key;
         GuiImageData * keyOver;
         GuiImageData * keyMedium;
         GuiImageData * keyMediumOver;
+        GuiImageData * keyWide;
+        GuiImageData * keyWideOver;
+        GuiImageData * keyBackspace;
+        GuiImageData * keyBackspaceOver;
         GuiImageData * keyLarge;
         GuiImageData * keyLargeOver;
+        GuiImageData * keyArrow;
         GuiTrigger * trigA;
-        Key keys[4][11]; // two chars = less space than one pointer
+        Key keys[KB_KEYS]; // two chars = less space than one pointer
 };
 
 //!On-screen keypad

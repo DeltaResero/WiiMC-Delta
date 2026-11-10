@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
+#include <wiikeyboard/keyboard.h>
 
 #include "wiimc.h"
 #include "menu.h"
@@ -47,14 +48,128 @@ extern bool want3DS;
 GuiTrigger userInput[4];
 
 /****************************************************************************
+ * USB keyboard
+ *
+ * Outside a text box the keyboard acts as GameCube controller 1: the arrows
+ * are the d-pad, Enter and Space are A, Esc and Backspace are B, Tab is R
+ * (Shift+Tab is L), and + and - are Y and X. While a video plays, Esc and
+ * Backspace leave it like Start and Tab shows its info like B.
+ ***************************************************************************/
+
+static bool kbdTyping = false;
+static keyboard_event kbdQueue[32];
+static int kbdHead = 0, kbdTail = 0;
+static u16 kbdHeldGui[256], kbdHeldPlay[256]; // by keycode, as pressed
+static u16 kbdDownGui = 0, kbdDownPlay = 0;
+static u16 kbdPadDown = 0, kbdPadHeld = 0;
+
+static void KeyboardButtons(const keyboard_event &ev, u16 &gui, u16 &play)
+{
+    bool shift = MOD_ONESET(ev.modifiers, MOD_SHIFT_L | MOD_SHIFT_R);
+    gui = play = 0;
+
+    switch(ev.symbol)
+    {
+        case KS_Up: case KS_KP_Up:          gui = play = PAD_BUTTON_UP; break;
+        case KS_Down: case KS_KP_Down:      gui = play = PAD_BUTTON_DOWN; break;
+        case KS_Left: case KS_KP_Left:      gui = play = PAD_BUTTON_LEFT; break;
+        case KS_Right: case KS_KP_Right:    gui = play = PAD_BUTTON_RIGHT; break;
+        case KS_Return: case KS_KP_Enter:
+        case KS_space:                      gui = play = PAD_BUTTON_A; break;
+        case KS_Escape: case KS_BackSpace:  gui = PAD_BUTTON_B; play = PAD_BUTTON_START; break;
+        case KS_Tab:                        gui = shift ? PAD_TRIGGER_L : PAD_TRIGGER_R; play = PAD_BUTTON_B; break;
+        case KS_plus: case KS_equal:
+        case KS_KP_Add:                     gui = play = PAD_BUTTON_Y; break;
+        case KS_minus: case KS_KP_Subtract: gui = play = PAD_BUTTON_X; break;
+    }
+}
+
+static void ReadKeyboard()
+{
+    keyboard_event ev;
+
+    kbdDownGui = kbdDownPlay = 0;
+
+    while(KEYBOARD_GetEvent(&ev) > 0)
+    {
+        if(ev.type == KEYBOARD_DISCONNECTED)
+        {
+            memset(kbdHeldGui, 0, sizeof(kbdHeldGui));
+            memset(kbdHeldPlay, 0, sizeof(kbdHeldPlay));
+            continue;
+        }
+
+        if(ev.type == KEYBOARD_RELEASED)
+        {
+            // by keycode: Shift can change the symbol before the key comes up
+            kbdHeldGui[ev.keycode] = kbdHeldPlay[ev.keycode] = 0;
+            continue;
+        }
+
+        if(ev.type != KEYBOARD_PRESSED)
+            continue;
+
+        if(kbdTyping)
+        {
+            if(((kbdTail + 1) & 31) != kbdHead)
+            {
+                kbdQueue[kbdTail] = ev;
+                kbdTail = (kbdTail + 1) & 31;
+            }
+            continue;
+        }
+
+        if(MOD_ONESET(ev.modifiers, MOD_ANYCONTROL | MOD_ANYMETA))
+            continue;
+
+        u16 gui, play;
+        KeyboardButtons(ev, gui, play);
+        kbdHeldGui[ev.keycode] = gui;
+        kbdHeldPlay[ev.keycode] = play;
+        kbdDownGui |= gui;
+        kbdDownPlay |= play;
+    }
+}
+
+static u16 KeyboardHeld(const u16 *held)
+{
+    u16 b = 0;
+
+    for(int i = 0; i < 256; i++)
+        b |= held[i];
+
+    return b;
+}
+
+// a text box takes the keys while it's open
+void KeyboardTyping(bool on)
+{
+    kbdTyping = on;
+    kbdHead = kbdTail = 0;
+    memset(kbdHeldGui, 0, sizeof(kbdHeldGui));
+    memset(kbdHeldPlay, 0, sizeof(kbdHeldPlay));
+}
+
+bool KeyboardGetKey(keyboard_event *ev)
+{
+    if(kbdHead == kbdTail)
+        return false;
+
+    *ev = kbdQueue[kbdHead];
+    kbdHead = (kbdHead + 1) & 31;
+    return true;
+}
+
+/****************************************************************************
  * UpdatePads
  *
  * Scans wpad
  ***************************************************************************/
-void UpdatePads()
+void UpdatePads(bool playing)
 {
     WPAD_ReadPending(0, NULL); // only wiimote 1
     PAD_ScanPads();
+    ReadKeyboard();
 
     for(int i=3; i >= 0; i--)
     {
@@ -70,6 +185,11 @@ void UpdatePads()
     userInput[0].cpad.data.held = ctr.data.held;
     userInput[0].cpad.data.stick.x = ctr.data.stick.x;
     userInput[0].cpad.data.stick.y = ctr.data.stick.y;
+
+    kbdPadDown = playing ? kbdDownPlay : kbdDownGui;
+    kbdPadHeld = KeyboardHeld(playing ? kbdHeldPlay : kbdHeldGui);
+    userInput[0].pad.btns_d |= kbdPadDown;
+    userInput[0].pad.btns_h |= kbdPadHeld;
 }
 
 /****************************************************************************
@@ -80,6 +200,7 @@ void UpdatePads()
 void SetupPads()
 {
     PAD_Init();
+    KEYBOARD_Init(NULL); // its thread costs about 0.02% of the CPU with no keyboard in
 
     WPAD_SetIdleTimeout(60);
 
@@ -205,6 +326,12 @@ void MPlayerInput()
         cur_chan = 0;
         down = PAD_ButtonsDown(cur_chan);
         held = PAD_ButtonsDown(cur_chan);
+    }
+
+    if(cur_chan == 0)
+    {
+        down |= kbdPadDown;
+        held |= kbdPadHeld;
     }
 
     if(userInput[0].wpad->btns_d & WPAD_BUTTON_1 || down & PAD_BUTTON_B || userInput[0].cpad.data.down & CTR_BUTTON_B) {
