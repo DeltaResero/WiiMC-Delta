@@ -97,8 +97,15 @@ static int FilterChoices(int f)
 // kept between visits, so the screen comes back as it was after a video
 static YtList *lists[LEVELS];
 static int depth = 0; // lists open; 0 is the home page
+// The button that opens a list, to highlight again on the way back: a tile's
+// number, OPENER_CARD and up for a card, or the search button. Numbers, as
+// the buttons are made again each time the screen comes back from a video.
+enum { OPENER_SEARCH = -1, OPENER_CARD = 100 };
+static int opener = OPENER_SEARCH;  // the one being pressed
+static int openedBy[LEVELS];
 static char lastQuery[QUERY_MAX + 1];
 static bool reopen = false;
+static int playedCard = -1; // the card whose video is playing, to highlight on the way back
 
 /****************************************************************************
  * Worker thread: search suggestions, then thumbnails for the cards on screen
@@ -678,6 +685,7 @@ static void Open(Screen *sc, const char *query, const char *browseId, bool playl
 
     LWP_MutexLock(lock);
     thumbList = NULL;
+    openedBy[depth] = opener;
     lists[depth++] = l;
     LWP_MutexUnlock(lock);
     Show(sc);
@@ -927,6 +935,12 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     ResumeGui();
     Show(&sc);
 
+    // back from a video: on its card again, for the d-pad
+    if (playedCard >= 0 && depth > 0 && !userInput[0].wpad->ir.valid && sc.card[playedCard]->IsVisible() &&
+        sc.card[playedCard]->GetState() != STATE_DISABLED)
+        sc.card[playedCard]->SetState(STATE_SELECTED);
+    playedCard = -1;
+
     bool done = false;
     int tabClicks = MenuTabClicks();
 
@@ -977,8 +991,13 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 done = true;
             else
             {
+                // back on the button that led here, for the d-pad
+                int by = openedBy[depth - 1];
                 Close();
                 Show(&sc);
+                GuiButton *from = by == OPENER_SEARCH ? sc.search : by >= OPENER_CARD ? sc.card[by - OPENER_CARD] : sc.tile[by];
+                if (!userInput[0].wpad->ir.valid && from->IsVisible() && from->GetState() != STATE_DISABLED)
+                    from->SetState(STATE_SELECTED);
             }
             continue;
         }
@@ -1001,6 +1020,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                         n += snprintf(head + n, sizeof(head) - n, "%s%s", k++ ? ", " : " (", filterOpts[f][filterPick[f]].name);
                 if (k && n < (int)sizeof(head) - 1)
                     snprintf(head + n, sizeof(head) - n, ")");
+                opener = OPENER_SEARCH;
                 Open(&sc, query, NULL, false, head);
             }
             mainWindow->ChangeFocus(&w);
@@ -1013,6 +1033,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             if (sc.tile[i]->GetState() == STATE_CLICKED)
             {
                 sc.tile[i]->ResetState();
+                opener = i;
                 if (YouTubeUseRiiTube())
                 {
                     char title[64];
@@ -1069,12 +1090,14 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             YtItem *it = &l->items[l->first + s];
             if (it->playlist)
             {
+                opener = OPENER_CARD + s;
                 Open(&sc, NULL, it->id, true, it->title);
                 break;
             }
 
             YouTubeRiiTubeUrl(it->id, url, urlsize);
             snprintf(title, titlesize, "%s", it->title);
+            playedCard = s;
             picked = true;
             done = true;
             break;
