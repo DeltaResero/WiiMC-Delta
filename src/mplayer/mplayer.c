@@ -296,6 +296,9 @@ static char *term_osd_esc = "\x1b[A\r\x1b[K";
 static char *playing_msg;
 // seek:
 static double seek_to_sec = MP_NOPTS_VALUE;
+#ifdef GEKKO
+static double wii_start_pos = 0; // wiiSetStartPos
+#endif
 static off_t seek_to_byte;
 static off_t step_sec;
 static int loop_seek;
@@ -2719,12 +2722,14 @@ extern char *BrowserGetSub(char *filename);
  * everything that can still supply them: the demuxer's subtitle streams,
  * DVD subtitles, -sub files and the subtitle files the browser found
  * next to the video. */
+static int wii_subs_expected = 0; // wiiExpectSubtitles
+
 static int subtitles_expected(void)
 {
     char name[1024];
     int i;
 
-    if (mpctx->global_sub_size > 0 || (sub_name && sub_name[0]))
+    if (wii_subs_expected || mpctx->global_sub_size > 0 || (sub_name && sub_name[0]))
         return 1;
     for (i = 0; i < SUB_SOURCES; i++)
         if (mpctx->sub_counts[i])
@@ -4527,6 +4532,10 @@ if (mpctx->sh_video)
         {
                 stream_cache_min_percent=online_stream_cache_min_percent;
                 stream_cache_seek_min_percent=5;
+                // a video started again in another quality picks up where it was
+                if(wii_start_pos > 0 && wii_start_pos + 5 < demuxer_get_time_length(mpctx->demuxer))
+                        seek_to_sec = wii_start_pos;
+                wii_start_pos = 0;
         }
         else if(strncmp(fileplaying,"dvd:",4) != 0 && strncmp(fileplaying,"dvdnav:",7) != 0)
         {
@@ -5848,6 +5857,20 @@ bool wiiCanSeek()
  * they may read mpctx; changes go through the command queue.
  ***************************************************************************/
 
+// Subtitles that may be loaded once the next file plays (a YouTube video's
+// captions) need the libass filter, which goes in only as a file starts.
+// It passes frames straight on while no subtitle shows.
+void wiiExpectSubtitles(int expect)
+{
+        wii_subs_expected = expect;
+}
+
+// where the next network video starts, in seconds
+void wiiSetStartPos(double sec)
+{
+        wii_start_pos = sec;
+}
+
 float wiiGetSpeed()
 {
         return playback_speed;
@@ -5930,6 +5953,30 @@ int wiiSubtitleTrack()
         return mpctx->global_sub_pos;
 }
 
+void wiiShowSubtitleFile(int n)
+{
+        wiiQueueInt(MP_CMD_SUB_VISIBILITY, "sub_visibility", 1);
+        wiiQueueInt(MP_CMD_SUB_FILE, "sub_file", n);
+}
+
+// Loads a subtitle file and shows it. Returns its place among the loaded
+// files, which wiiShowSubtitleFile takes to show it again later.
+int wiiLoadSubtitleFile(const char *file)
+{
+        int n = mpctx->set_of_sub_size;
+        mp_cmd_t *cmd = calloc(1, sizeof(*cmd));
+
+        cmd->id = MP_CMD_SUB_LOAD;
+        av_strlcpy(cmd->name, "sub_load", sizeof(cmd->name));
+        cmd->nargs = 1;
+        cmd->args[0].type = MP_CMD_ARG_STRING;
+        cmd->args[0].v.s = strdup(file);
+        cmd->args[1].type = -1;
+        mp_input_queue_cmd(cmd);
+        wiiShowSubtitleFile(n);
+        return n;
+}
+
 void wiiMute()
 {
         mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
@@ -5980,6 +6027,16 @@ bool wiiIsLive()
         return (mpctx->stream->flags & MP_STREAM_LIVE) != 0;
 }
 
+int YouTubeKnownLength(void); // youtube.cpp
+
+// The length the file gives, or for a RiiTube video, which gives none, the
+// length YouTube has for it
+static double wiiLength(void)
+{
+        double len = demuxer_get_time_length(mpctx->demuxer);
+        return len > 0 ? len : YouTubeKnownLength();
+}
+
 double wiiGetTimeLength()
 {
         if(!playing_file || controlledbygui == 2)
@@ -5991,7 +6048,7 @@ double wiiGetTimeLength()
         //if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return 0;
 
-        return demuxer_get_time_length(mpctx->demuxer);
+        return wiiLength();
 }
 
 // Timestamps in some files, MPEG-TS recordings above all, start far from zero.
@@ -6053,7 +6110,7 @@ void wiiGetTimeDisplay(char * buf)
         //if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return;
 
-        int len = demuxer_get_time_length(mpctx->demuxer);
+        int len = wiiLength();
         int pts = wiiTimeFromStart(wiiPlayTime());
 
         if(wiiIsLive())

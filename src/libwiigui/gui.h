@@ -955,9 +955,13 @@ class GuiKeyboard : public GuiWindow
         void operator delete[](void *p);
 
         void Update(GuiTrigger * t);
+        //!Shows p in grey while nothing is typed; p must outlive the keyboard
+        void SetPlaceholder(const char * p);
         char kbtextstr[256];
         bool backPressed; //!< B was pressed with no text left to delete
     protected:
+        void ShowText();
+        const char * placeholder;
         u32 kbtextmaxlen;
         int shift;
         int caps;

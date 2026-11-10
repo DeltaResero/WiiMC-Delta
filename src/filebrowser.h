@@ -21,13 +21,14 @@ enum
     TYPE_FILE,
     TYPE_FOLDER,
     TYPE_PLAYLIST,
-    TYPE_SEARCH
+    TYPE_SEARCH,
+    TYPE_YOUTUBE // opens the YouTube screen
 };
 
 typedef struct _bentry
 {
     u64 length; // file length
-    int type; // TYPE_FILE, TYPE_FOLDER, TYPE_PLAYLIST, TYPE_SEARCH
+    int type; // TYPE_FILE, TYPE_FOLDER, TYPE_PLAYLIST, TYPE_SEARCH, TYPE_YOUTUBE
     char *file; // full filename
     char *url; // address
     char *display; // name for browser display

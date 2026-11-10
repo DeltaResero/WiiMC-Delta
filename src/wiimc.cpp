@@ -33,6 +33,7 @@
 #include "musicplaylist.h"
 #include "wiimc.h"
 #include "settings.h"
+#include "youtube.h"
 
 char MPLAYER_DATADIR[512];
 char MPLAYER_CONFDIR[512];
@@ -49,6 +50,7 @@ u8 iosVal = 58;
 extern "C" {
 extern void __exception_setreload(int t);
 extern char *network_useragent;
+extern char *audio_stream; // MPlayer's -audiofile
 }
 
 bool ExitRequested = false;
@@ -770,8 +772,42 @@ void LoadMPlayerFile()
     while(WiiSettings.subtitleVisibility && !ParseDone())
         usleep(100);
 
+    // A video from RiiTube's YouTube lists: ask YouTube for its link here,
+    // which starts at once, and keep RiiTube's link if YouTube refuses.
+    // The link only works from this Wii and is too long for loadedFile.
+    char ytid[32];
+    char *ytlink = NULL;
+
+    YouTubeForget(); // what the last YouTube video had
+
+    // unless the YouTube screen is set to use RiiTube alone; then only the
+    // video's length comes from YouTube, while it plays
+    if(YouTubeRiiTubeId(loadedFile, ytid, sizeof(ytid)))
+    {
+        if(YouTubeUseRiiTube())
+            YouTubeLengthFor(ytid);
+        else
+        {
+            ytlink = (char *)malloc(4096);
+            if(ytlink && !YouTubeResolve(ytid, ytlink, 4096, NULL, 0))
+            {
+                free(ytlink);
+                ytlink = NULL;
+            }
+        }
+    }
+
+    // YouTube's sound comes as a stream of its own above 360p, or in another
+    // language; any other file has its sound in it
+    free(audio_stream);
+    audio_stream = ytlink && YouTubeAudioUrl() ? strdup(YouTubeAudioUrl()) : NULL;
+
+    // its captions can be picked while it plays
+    wiiExpectSubtitles(ytlink && YouTubeCaptionCount() > 0);
+
     // set new file to load
-    wiiLoadFile(loadedFile, partitionlabel);
+    wiiLoadFile(ytlink ? ytlink : loadedFile, partitionlabel);
+    free(ytlink);
 
     while(controlledbygui != 0)
         usleep(100);

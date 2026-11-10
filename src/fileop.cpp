@@ -1513,9 +1513,12 @@ static int FileSortCallback(const void *f1, const void *f2)
         if(strcmp(((BROWSERENTRY *)f2)->file, "..") == 0) { return 1; }
     }
 
-    // If one is a file and one is a directory the directory is first.
-    if(((BROWSERENTRY *)f1)->type == TYPE_FOLDER && !(((BROWSERENTRY *)f2)->type == TYPE_FOLDER)) return -1;
-    if(!(((BROWSERENTRY *)f1)->type == TYPE_FOLDER) && ((BROWSERENTRY *)f2)->type == TYPE_FOLDER) return 1;
+    // If one is a file and one is a directory the directory is first. The
+    // YouTube screen counts as a directory.
+    bool d1 = ((BROWSERENTRY *)f1)->type == TYPE_FOLDER || ((BROWSERENTRY *)f1)->type == TYPE_YOUTUBE;
+    bool d2 = ((BROWSERENTRY *)f2)->type == TYPE_FOLDER || ((BROWSERENTRY *)f2)->type == TYPE_YOUTUBE;
+    if(d1 && !d2) return -1;
+    if(!d1 && d2) return 1;
 
     return strcasecmp(((BROWSERENTRY *)f1)->file, ((BROWSERENTRY *)f2)->file);
 }
@@ -2745,7 +2748,8 @@ int ParseOnlineMedia()
             }
             f_entry->length = 0;
             f_entry->type = om_entry->type;
-            f_entry->icon = ICON_NONE;
+            // the YouTube screen opens like a folder, so it looks like one
+            f_entry->icon = om_entry->type == TYPE_YOUTUBE ? ICON_FOLDER : ICON_NONE;
         }
         else if(filepathLen > dirLen &&
             strncmp(browser.dir, om_entry->file, dirLen) == 0)

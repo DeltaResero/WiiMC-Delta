@@ -392,6 +392,8 @@ prepareSettingsData ()
     createXMLSetting("yggdrasilQuality", "Yggdrasil Radio artsyle", toStr(WiiSettings.yggdrasilQuality));
     createXMLSetting("anisonfmQuality", "ANISON.FM artstyle", toStr(WiiSettings.anisonfmQuality));
     createXMLSetting("onlineBanners", "Online Screensaver", toStr(WiiSettings.onlineBanners));
+    createXMLSetting("youtubeQuality", "YouTube quality", toStr(WiiSettings.youtubeQuality));
+    createXMLSetting("youtubeSource", "YouTube source", toStr(WiiSettings.youtubeSource));
     // Network
     createXMLSection("Network", "Network Settings");
     for(int i=0; i<MAX_SHARES; i++)
@@ -572,6 +574,8 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
             {
                 if(strncmp(type, "search", 6) == 0)
                     o_entry->type = TYPE_SEARCH;
+                else if(strncmp(type, "youtube", 7) == 0)
+                    o_entry->type = TYPE_YOUTUBE;
                 else if(strncmp(type, "playlist", 8) == 0)
                     o_entry->type = TYPE_PLAYLIST;
                 else
@@ -814,6 +818,8 @@ void DefaultSettings ()
     WiiSettings.yggdrasilQuality = YGG_TUNEIN;
     WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
     WiiSettings.onlineBanners = 1;
+    WiiSettings.youtubeQuality = 360;
+    WiiSettings.youtubeSource = 0;
     // Network
     for(int i=0; i<MAX_SHARES; i++)
     {
@@ -971,6 +977,10 @@ static void FixInvalidSettings()
     // Online Media
     if(WiiSettings.onlineCacheFill < 5 || WiiSettings.onlineCacheFill > 100)
         WiiSettings.onlineCacheFill = 20;
+    if(WiiSettings.youtubeQuality != 360 && WiiSettings.youtubeQuality != 480)
+        WiiSettings.youtubeQuality = 360;
+    if(WiiSettings.youtubeSource != 0 && WiiSettings.youtubeSource != 1)
+        WiiSettings.youtubeSource = 0;
 
     if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
         CleanupPath(WiiSettings.onlinemediaFolder);
@@ -1320,6 +1330,8 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.yggdrasilQuality, "yggdrasilQuality");
                 loadXMLSetting(&WiiSettings.anisonfmQuality, "anisonfmQuality");
                 loadXMLSetting(&WiiSettings.onlineBanners, "onlineBanners");
+                loadXMLSetting(&WiiSettings.youtubeQuality, "youtubeQuality");
+                loadXMLSetting(&WiiSettings.youtubeSource, "youtubeSource");
                 // Network
 
                 for(int i=0; i<MAX_SHARES; i++)

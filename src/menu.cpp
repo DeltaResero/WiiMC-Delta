@@ -32,6 +32,8 @@
 #include "networkop.h"
 #include "musicplaylist.h"
 #include "filebrowser.h"
+#include "youtube_menu.h"
+#include "youtube.h"
 #include "theme.h"
 #include "utils/gettext.h"
 #include "utils/http.h"
@@ -129,7 +131,7 @@ static GuiImage *settingsBtnImg = NULL;
 static GuiImage *settingsBtnOnImg = NULL;
 
 static GuiButton *logoBtn = NULL;
-static GuiWindow *mainWindow = NULL;
+GuiWindow *mainWindow = NULL; // the YouTube screen draws on it too
 static GuiWindow *menuWindow = NULL;
 static GuiWindow *mplayerWindow = NULL;
 static GuiText *settingText = NULL;
@@ -418,14 +420,29 @@ void UndoChangeMenu()
     menuPrevious = menuUndo;
 }
 
+static int menuTabClicks = 0;
+
 static void ChangeMenu(void *ptr, int menu)
 {
     GuiButton *b = (GuiButton *)ptr;
     if(b->GetState() == STATE_CLICKED)
     {
+        menuTabClicks++;
         ChangeMenu(menu);
         b->ResetState();
     }
+}
+
+// the tabs at the top: Videos, Music, DVD, Online Media, and Settings
+bool IsMenuTab(GuiElement *e)
+{
+    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn);
+}
+
+// how many times a tab was clicked, the current menu's own included
+int MenuTabClicks()
+{
+    return menuTabClicks;
 }
 
 static void ChangeMenuVideos(void *ptr) { ChangeMenu(ptr, MENU_BROWSE_VIDEOS); }
@@ -441,7 +458,7 @@ static void ChangeMenuSettings(void *ptr) { ChangeMenu(ptr, MENU_SETTINGS); }
  * after finishing the removal/insertion of new elements, and after initial
  * GUI setup.
  ***************************************************************************/
-static void ResumeGui()
+void ResumeGui()
 {
     if(guithread == LWP_THREAD_NULL || guiShutdown)
         return;
@@ -458,7 +475,7 @@ static void ResumeGui()
  * This eliminates the possibility that the GUI is in the middle of accessing
  * an element that is being changed.
  ***************************************************************************/
-static void SuspendGui()
+void SuspendGui()
 {
     if(guithread == LWP_THREAD_NULL)
         return;
@@ -3511,6 +3528,55 @@ void UpdateBrowser()
     fileBrowser->TriggerUpdate();
 }
 
+/****************************************************************************
+ * BrowseYouTube
+ *
+ * Runs the YouTube screen over the browser, and plays what was picked.
+ * Returns LoadNewFile's result, or 0 when nothing was picked.
+ ***************************************************************************/
+static int BrowseYouTube(GuiButton *backBtn)
+{
+    char url[128], title[256];
+    bool backVisible = backBtn->IsVisible();
+
+    SuspendGui();
+    fileBrowser->SetVisible(false);
+    backBtn->SetVisible(false);
+    ResumeGui();
+
+    bool picked = YouTubeScreen(url, sizeof(url), title, sizeof(title));
+
+    SuspendGui();
+    fileBrowser->SetVisible(true);
+    backBtn->SetVisible(backVisible);
+    fileBrowser->ResetState();
+    mainWindow->ChangeFocus(fileBrowser);
+    ResumeGui();
+
+    if(!picked)
+        return 0;
+
+    strcpy(loadedFile, url);
+    snprintf(loadedFileDisplay, 128, "%s", title);
+    browserMusic.selIndex = MusicPlaylistFindIndex(loadedFile);
+
+    if(!mainWindow->Find(disabled))
+        mainWindow->Append(disabled);
+    mainWindow->SetState(STATE_DISABLED);
+
+    ShowAction("Loading...");
+    int res = LoadNewFile();
+    CancelAction();
+
+    if(res != 1)
+    {
+        YouTubeScreenReopen(); // nothing is playing to come back from
+        mainWindow->Remove(disabled);
+        mainWindow->SetState(STATE_DEFAULT);
+    }
+    return res;
+}
+
 static void MenuBrowse(int menu)
 {
     ShutoffRumble();
@@ -3795,9 +3861,20 @@ static void MenuBrowse(int menu)
         ResumeGui();
     }
 
+    // back from a video picked on the YouTube screen: show the screen again
+    bool reopenYouTube = menu == MENU_BROWSE_ONLINEMEDIA && YouTubeScreenReopen();
+
     while(menuCurrent == menu && !guiShutdown)
     {
         usleep(THREAD_SLEEP);
+
+        if(reopenYouTube)
+        {
+            reopenYouTube = false;
+            if(BrowseYouTube(&backBtn) == 1)
+                goto done;
+            continue;
+        }
 
         if(findLoadedFile == 2)
         {
@@ -3836,7 +3913,8 @@ static void MenuBrowse(int menu)
         {
             upOneLevelBtn.ResetState();
 
-            if(browser.selIndex && browser.selIndex->file && IsHttpUrl(browser.selIndex->file))
+            // at the top there's no folder to load, so no wait to show
+            if(browser.dir[0] != 0 && browser.selIndex && browser.selIndex->file && IsHttpUrl(browser.selIndex->file))
             {
                 mainWindow->Append(disabled);
                 mainWindow->SetState(STATE_DISABLED);
@@ -3877,6 +3955,13 @@ static void MenuBrowse(int menu)
                         goto done;
 
                     fileBrowser->ResetState();
+                    continue;
+                }
+
+                if(browser.selIndex->type == TYPE_YOUTUBE)
+                {
+                    if(BrowseYouTube(&backBtn) == 1)
+                        goto done;
                     continue;
                 }
 
@@ -7125,9 +7210,10 @@ static void VideoPauseCallback(void *ptr)
 // does what the Home button does: leaves the video for the menu
 /****************************************************************************
  * Player settings: the gear on the video bar opens a list above it with the
- * playback speed, the subtitles, and the audio track when there's more
- * than one. Like the rest of the bar it's updated and drawn by MPlayer's
- * thread.
+ * playback speed, the subtitles (a YouTube video's captions), and the audio
+ * track when there's more than one. Like the rest of the bar it's updated
+ * and drawn by MPlayer's thread; YouTube captions are fetched by the GUI
+ * thread in MPlayerMenu.
  ***************************************************************************/
 
 #define SET_ROWS 9      // rows on screen, the back row included
@@ -7158,8 +7244,9 @@ class SettingsPanel : public GuiWindow
 
 static SettingsPanel *settingsPanel = NULL;
 
-enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO };
-enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6 };
+enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO, PAGE_QUALITY };
+enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6,
+    ACT_QUALITY = -7 };
 
 static int setPage = PAGE_MAIN;
 static int setFirst = 0;            // first choice on screen when a list is longer
@@ -7170,7 +7257,36 @@ static int setChoices = 0;
 static int setCurrent = -1;         // the choice in use
 
 static const float speeds[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
+static const int qualities[] = { 360, 480 };
+#define QUALITIES (int)(sizeof(qualities) / sizeof(qualities[0]))
+
+// a YouTube video to start again where it was, in another quality or
+// language, by the GUI thread in MPlayerMenu; -1 when there's none
+static volatile double videoRestartAt = -1;
+
+static bool PlayingYouTube()
+{
+    return YouTubeHeight() > 0;
+}
 #define SPEEDS (int)(sizeof(speeds) / sizeof(speeds[0]))
+
+// YouTube captions: which one is shown (-1 = none), which subtitle file each
+// became once fetched (-1 = not yet), and the one the GUI thread should fetch
+static int ytCaptionShown = -1;
+static int ytCaptionFile[YT_CAPTIONS_MAX];
+static int ytCaptionSerial = -1;
+static volatile int ytCaptionWanted = -1;
+
+static void CaptionsCheck()
+{
+    if(ytCaptionSerial == YouTubeCaptionSerial())
+        return;
+    ytCaptionSerial = YouTubeCaptionSerial();
+    ytCaptionShown = -1;
+    ytCaptionWanted = -1;
+    for(int i = 0; i < YT_CAPTIONS_MAX; i++)
+        ytCaptionFile[i] = -1;
+}
 
 static int SpeedIndex()
 {
@@ -7213,20 +7329,55 @@ static void SettingsList(int page)
         setChoices = 1;
         setCurrent = 0;
 
-        static char names[SET_LIST - 1][48];
-        int n = wiiSubtitles(names, SET_LIST - 1);
-        int pos = wiiSubtitleTrack();
-        for(int i = 0; i < n; i++)
+        if(YouTubeCaptionCount() > 0)
         {
-            if(names[i][0])
-                snprintf(setChoice[setChoices], 64, "%.48s", names[i]);
-            else
-                snprintf(setChoice[setChoices], 64, "%s %d", gettext("Track"), i + 1);
-            setValue[setChoices] = i;
-            if(i == pos)
-                setCurrent = setChoices;
-            setChoices++;
+            for(int i = 0; i < YouTubeCaptionCount() && setChoices < SET_LIST; i++)
+            {
+                snprintf(setChoice[setChoices], 64, "%s", YouTubeCaptionName(i));
+                setValue[setChoices] = i;
+                if(i == ytCaptionShown)
+                    setCurrent = setChoices;
+                setChoices++;
+            }
         }
+        else
+        {
+            static char names[SET_LIST - 1][48];
+            int n = wiiSubtitles(names, SET_LIST - 1);
+            int pos = wiiSubtitleTrack();
+            for(int i = 0; i < n; i++)
+            {
+                if(names[i][0])
+                    snprintf(setChoice[setChoices], 64, "%.48s", names[i]);
+                else
+                    snprintf(setChoice[setChoices], 64, "%s %d", gettext("Track"), i + 1);
+                setValue[setChoices] = i;
+                if(i == pos)
+                    setCurrent = setChoices;
+                setChoices++;
+            }
+        }
+    }
+    else if(page == PAGE_QUALITY)
+    {
+        for(int i = 0; i < QUALITIES; i++)
+        {
+            snprintf(setChoice[i], 64, "%dp", qualities[i]);
+            setValue[i] = qualities[i];
+            if(qualities[i] == YouTubeQuality())
+                setCurrent = i;
+        }
+        setChoices = QUALITIES;
+    }
+    else if(page == PAGE_AUDIO && PlayingYouTube())
+    {
+        for(int i = 0; i < YouTubeAudioCount() && i < SET_LIST; i++)
+        {
+            snprintf(setChoice[i], 64, "%s", YouTubeAudioName(i)[0] ? YouTubeAudioName(i) : gettext("Original"));
+            setValue[i] = i;
+        }
+        setChoices = YouTubeAudioCount() < SET_LIST ? YouTubeAudioCount() : SET_LIST;
+        setCurrent = YouTubeAudioPlaying();
     }
     else if(page == PAGE_AUDIO)
     {
@@ -7248,13 +7399,15 @@ static void SettingsList(int page)
 static bool SubtitlesExist()
 {
     static char names[1][48];
-    return wiiSubtitles(names, 1) > 0;
+    return YouTubeCaptionCount() > 0 || wiiSubtitles(names, 1) > 0;
 }
 
 static bool AudioTracksExist()
 {
     static char names[2][48];
     int aid[2];
+    if(PlayingYouTube())
+        return YouTubeAudioCount() > 1;
     return wiiAudioTracks(aid, names, 2) > 1;
 }
 
@@ -7275,6 +7428,8 @@ static void ShowSettingsPage(int page)
     int r = 0;
     char buf[64];
 
+    CaptionsCheck();
+
     // showing a window shows and enables all it holds, so first the panel,
     // then each row as this page needs it
     settingsPanel->SetVisible(true);
@@ -7289,10 +7444,17 @@ static void ShowSettingsPage(int page)
         SpeedName(SpeedIndex(), buf, sizeof(buf));
         SettingsRow(r++, "Playback speed", buf, ACT_SPEED, false);
 
+        if(PlayingYouTube())
+        {
+            snprintf(buf, sizeof(buf), "%dp", YouTubeHeight()); // what plays, not what was asked for
+            SettingsRow(r++, "Quality", buf, ACT_QUALITY, false);
+        }
+
         if(SubtitlesExist())
         {
             SettingsList(PAGE_SUBS);
-            SettingsRow(r++, "Subtitles", setChoice[setCurrent >= 0 ? setCurrent : 0], ACT_SUBS, false);
+            SettingsRow(r++, YouTubeCaptionCount() > 0 ? "Captions" : "Subtitles",
+                setChoice[setCurrent >= 0 ? setCurrent : 0], ACT_SUBS, false);
         }
         if(AudioTracksExist())
         {
@@ -7303,8 +7465,10 @@ static void ShowSettingsPage(int page)
     }
     else
     {
-        static const char *titles[] = { "", "Playback speed", "Subtitles", "Audio track" };
+        static const char *titles[] = { "", "Playback speed", NULL, "Audio track", "Quality" };
         const char *title = titles[page];
+        if(page == PAGE_SUBS)
+            title = YouTubeCaptionCount() > 0 ? "Captions" : "Subtitles";
 
         snprintf(buf, sizeof(buf), "< %s", gettext(title));
         SettingsRow(r++, buf, NULL, ACT_BACK, false);
@@ -7363,10 +7527,45 @@ static void SettingsPick(int c)
     {
         wiiSetProperty(MP_CMD_SPEED_SET, speeds[setValue[c]]);
     }
+    else if(setPage == PAGE_QUALITY)
+    {
+        if(setValue[c] != YouTubeQuality())
+        {
+            YouTubeSetQuality(setValue[c]);
+            videoRestartAt = wiiGetTimePos();
+        }
+    }
+    else if(setPage == PAGE_AUDIO && PlayingYouTube())
+    {
+        if(setValue[c] != YouTubeAudioPlaying())
+        {
+            YouTubeSetAudio(setValue[c]);
+            videoRestartAt = wiiGetTimePos();
+        }
+    }
     else if(setPage == PAGE_AUDIO)
     {
         wiiSetAudioTrack(setValue[c]);
         wiiSync(); // as the D-pad's audio switch does: a seek puts it back in step
+    }
+    else if(setPage == PAGE_SUBS && YouTubeCaptionCount() > 0)
+    {
+        int i = setValue[c];
+        if(i < 0)
+        {
+            wiiSetSubtitleTrack(-1);
+            ytCaptionShown = -1;
+        }
+        else if(ytCaptionFile[i] >= 0)
+        {
+            wiiShowSubtitleFile(ytCaptionFile[i]);
+            ytCaptionShown = i;
+        }
+        else
+        {
+            ytCaptionShown = i;
+            ytCaptionWanted = i; // MPlayerMenu fetches it
+        }
     }
     else if(setPage == PAGE_SUBS)
     {
@@ -7394,6 +7593,8 @@ static void VideoSettingsUpdate()
             ShowSettingsPage(PAGE_SUBS);
         else if(a == ACT_AUDIO)
             ShowSettingsPage(PAGE_AUDIO);
+        else if(a == ACT_QUALITY)
+            ShowSettingsPage(PAGE_QUALITY);
         else if(a == ACT_BACK)
             ShowSettingsPage(PAGE_MAIN);
         else if(a == ACT_MORE)
@@ -7405,6 +7606,26 @@ static void VideoSettingsUpdate()
             SettingsPick(a);
         break;
     }
+}
+
+// the GUI thread's part: fetch the YouTube captions asked for, and show them
+static void VideoSettingsFetch()
+{
+    int i = ytCaptionWanted;
+    if(i < 0)
+        return;
+    ytCaptionWanted = -1;
+
+    char file[MAXPATHLEN];
+    snprintf(file, sizeof(file), "%s/captions.utf8", appPath); // ".utf8": MPlayer skips the codepage
+
+    if(!YouTubeCaptionSave(i, file))
+    {
+        if(ytCaptionShown == i)
+            ytCaptionShown = -1;
+        return;
+    }
+    ytCaptionFile[i] = wiiLoadSubtitleFile(file);
 }
 
 static void VideoSettingsCallback(void *ptr)
@@ -8845,14 +9066,9 @@ void PausedVideoDim()
     }
 }
 
-void MPlayerMenu()
+// the video bar as a file starts
+static void VideoBarForFile()
 {
-    guiShutdown = false;
-    mainWindow = mplayerWindow;
-
-    mainWindow->SetVisible(false);
-    mainWindow->SetState(STATE_DISABLED);
-
     HideVideoVolumeLevelBar();
     HideVideoSettings();
 
@@ -8869,16 +9085,51 @@ void MPlayerMenu()
         videoSkips = true;
     }
 
+    videobarPauseImg->SetImage(actionbarPause);
+    videobarPauseTip->SetText("Pause");
+}
+
+// a YouTube video in another quality or language, from where it was
+static void VideoRestart()
+{
+    double pos = videoRestartAt;
+    videoRestartAt = -1;
+    if(pos < 0)
+        return;
+
+    float speed = wiiGetSpeed(); // a new file starts at normal speed
+
+    wiiSetStartPos(pos);
+    LoadMPlayerFile();
+    VideoBarForFile();
+
+    if(speed != 1.0f)
+        wiiSetProperty(MP_CMD_SPEED_SET, speed);
+}
+
+void MPlayerMenu()
+{
+    guiShutdown = false;
+    mainWindow = mplayerWindow;
+
+    mainWindow->SetVisible(false);
+    mainWindow->SetState(STATE_DISABLED);
+
+    VideoBarForFile();
+
     menuMode = 1; // switch to MPlayer GUI mode
     EnableRumble();
 
-    videobarPauseImg->SetImage(actionbarPause);
-    videobarPauseTip->SetText("Pause");
+    videoRestartAt = -1;
 
-    while(controlledbygui == 0)
+    for(int tick = 0; controlledbygui == 0; tick++)
     {
+        VideoSettingsFetch();
+        VideoRestart();
+        usleep(100000);
+        if(tick % 5)
+            continue;
         CheckSleepTimer();
-        usleep(500000);
 
         if(isInserted[DEVICE_DVD] && dvdLastUsed && wiiIsPaused() &&
             diff_sec(dvdLastUsed, gettime()) > 60)

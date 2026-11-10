@@ -96,6 +96,21 @@ static void close_f(stream_t *stream)
 
 static const char prefix[] = "ffmpeg://";
 
+#ifdef GEKKO
+const char *YouTubeStreamAgent(void); /* youtube.cpp */
+
+static int googlevideo_itag18(const char *url)
+{
+    const char *p = url;
+    while ((p = strstr(p, "itag=")) != NULL) {
+        if (p > url && (p[-1] == '?' || p[-1] == '&') && p[5] == '1' && p[6] == '8' && (p[7] == '&' || p[7] == 0))
+            return 1;
+        p += 5;
+    }
+    return 0;
+}
+#endif
+
 static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
 {
     int flags = 0;
@@ -159,6 +174,20 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
             mp_msg(MSGT_OPEN, MSGL_ERR, "[ffmpeg] https needs a CA bundle at %s to verify servers\n", ca_file);
         av_dict_set(&avopts, "tls_verify", "1", 0);
         av_dict_set(&avopts, "ca_file", ca_file, 0);
+
+        /* YouTube slows a separate video or audio stream that's read in one
+         * open-ended request to below its bitrate after the first 256 KB,
+         * but not one read in pieces: ask for 1 MB at a time, on one kept
+         * connection. itag 18, with sound and picture in one file, isn't
+         * slowed. */
+        if (strstr(filename, ".googlevideo.com/") && !googlevideo_itag18(filename)) {
+            av_dict_set(&avopts, "request_size", "1048576", 0);
+            av_dict_set(&avopts, "multiple_requests", "1", 0);
+        }
+
+        /* fetch a YouTube video as the client that was given its links */
+        if (strstr(filename, ".googlevideo.com/") && YouTubeStreamAgent())
+            av_dict_set(&avopts, "user_agent", YouTubeStreamAgent(), 0);
     }
 #endif
 
