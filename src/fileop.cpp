@@ -1798,7 +1798,8 @@ void FindFile()
     // move to this file
     if(indexFound > 0)
     {
-        entry->icon = ICON_PLAY;
+        if(wiiIsPlaying())
+            entry->icon = ICON_PLAY;
         foundArt = true;
 
         if(!selectLoadedFile) // only move to the file when first returning from the video

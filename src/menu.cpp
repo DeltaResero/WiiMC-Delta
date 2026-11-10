@@ -1105,10 +1105,12 @@ static int CurrentTab()
 /****************************************************************************
  * StopLoadedFile
  *
- * Ends the song that is playing or the video that is waiting to be resumed.
- * Each tab keeps its own player, so this runs when another tab opens.
+ * Ends the song that is playing or the video that was stopped. Each tab
+ * keeps its own player, so this runs when another tab opens. It also runs
+ * when a video is stopped, where keepPlace leaves the file's name for the
+ * list to put the highlight back on it.
  ***************************************************************************/
-static void StopLoadedFile()
+static void StopLoadedFile(bool keepPlace = false)
 {
     if(!wiiIsPlaying())
         return;
@@ -1117,8 +1119,16 @@ static void StopLoadedFile()
     while(controlledbygui == 2) // wait for the file to end
         usleep(THREAD_SLEEP);
 
-    loadedFile[0] = 0;
-    loadedFileDisplay[0] = 0;
+    if(!keepPlace)
+    {
+        loadedFile[0] = 0;
+        loadedFileDisplay[0] = 0;
+    }
+
+    for(BROWSERENTRY *i = browser.first; keepPlace && i; i = i->next)
+        if(i->icon == ICON_PLAY)
+            i->icon = ICON_NONE;
+
     DisableVideoImg();
     nowPlaying->SetVisible(false);
 
@@ -4282,7 +4292,7 @@ static void MenuBrowse(int menu)
                     {
                         char aux[1024];
                         GetFullPath(browser.selIndex, aux);
-                        if(strcmp(loadedFile, aux) == 0)
+                        if(wiiIsPlaying() && strcmp(loadedFile, aux) == 0)
                         {
                             ResumeMPlayerFile();
                             // wait until MPlayer is ready to take control (or return control)
@@ -9104,6 +9114,10 @@ void WiiMenu()
     mainWindow->SetState(STATE_DEFAULT);
 
     selectLoadedFile = videoImg->IsVisible();
+
+    // A stopped video is not kept loaded, as the menus need its memory.
+    if(!wiiAudioOnly())
+        StopLoadedFile(true);
 
     StartGuiThreads();
     EnableRumble();
