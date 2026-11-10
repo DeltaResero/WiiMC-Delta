@@ -1154,8 +1154,8 @@ static void TabBarInput()
     // One move for each press, worked out here from the buttons held, and
     // more only after Left or Right has been held a while, as a remote does
     int held = 0;
-    if(PadHeld(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_R, CTR_BUTTON_R)) held |= TAB_NEXT;
-    if(PadHeld(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_L, CTR_BUTTON_L)) held |= TAB_PREV;
+    if(PadHeld(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_R, CTR_BUTTON_R)) held |= TAB_NEXT;
+    if(PadHeld(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_L, CTR_BUTTON_L)) held |= TAB_PREV;
     if(PadHeld(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT)) held |= TAB_RIGHT;
     if(PadHeld(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT)) held |= TAB_LEFT;
     if(PadHeld(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A)) held |= TAB_A;
