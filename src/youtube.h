@@ -36,6 +36,10 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
 // serial number changes whenever the captions do.
 #define YT_CAPTIONS_MAX 30
 void YouTubeForget();
+
+// A RiiTube video's length, which RiiTube doesn't send: name the video as it
+// starts, and a thread of its own asks YouTube for it
+void YouTubeLengthFor(const char *videoId);
 int YouTubeCaptionCount();
 int YouTubeCaptionSerial();
 const char *YouTubeCaptionName(int i);

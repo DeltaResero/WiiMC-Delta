@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <gccore.h>
 
 #include "youtube.h"
@@ -67,6 +68,13 @@ static char *audioUrl = NULL;       // its link when it's a stream of its own
 static char audioWanted[64] = "";   // the track picked for audioFor; "" = original
 static char audioFor[32] = "";
 static const char *streamAgent = NULL;  // the user agent of the client that gave the links
+// the video's length in seconds as YouTube gives it; 0 = not known. For a
+// RiiTube video a thread of its own asks YouTube, so nothing waits on it.
+static int knownLength = 0;
+static int lengthSerial = 0;           // the video a fetched length is for
+static char lengthWant[32] = "";       // the video to fetch it for; "" = none
+static mutex_t lengthLock = LWP_MUTEX_NULL;
+static lwp_t lengthThread = LWP_THREAD_NULL;
 
 // a reply from YouTube in a new buffer, which the caller frees; NULL on failure
 static char *Fetch(const char *url, const char *body, const char *headers, u32 *len)
@@ -309,6 +317,8 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
     if (quality > 360 || audioWanted[0])
     {
         char *reply = Player(videoId, VISIONOS_CLIENT, VISIONOS_HEADERS, &len);
+        if (reply && !knownLength)
+            knownLength = YtParseLength(reply, len);
         if (reply && Playable(reply))
         {
             int h = 0;
@@ -337,6 +347,8 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
     char *reply = Player(videoId, ANDROID_CLIENT, ANDROID_HEADERS, &len);
     if (!reply)
         return false;
+    if (!knownLength)
+        knownLength = YtParseLength(reply, len);
 
     bool ok = YtParsePlayer(reply, len, url, urlsize, reason, reasonsize);
     if (ok)
@@ -407,6 +419,62 @@ void YouTubeForget()
     audioUrl = NULL;
     height = 0;
     streamAgent = NULL;
+
+    // a length still being fetched is for the video before
+    if (lengthLock != LWP_MUTEX_NULL)
+        LWP_MutexLock(lengthLock);
+    lengthSerial++;
+    lengthWant[0] = 0;
+    knownLength = 0;
+    if (lengthLock != LWP_MUTEX_NULL)
+        LWP_MutexUnlock(lengthLock);
+}
+
+static void *LengthThread(void *)
+{
+    while (1)
+    {
+        char id[32];
+        LWP_MutexLock(lengthLock);
+        int serial = lengthSerial;
+        snprintf(id, sizeof(id), "%s", lengthWant);
+        lengthWant[0] = 0;
+        LWP_MutexUnlock(lengthLock);
+
+        if (id[0])
+        {
+            u32 len;
+            char *reply = Player(id, ANDROID_CLIENT, ANDROID_HEADERS, &len);
+            int length = reply ? YtParseLength(reply, len) : 0;
+            free(reply);
+
+            LWP_MutexLock(lengthLock);
+            if (serial == lengthSerial)
+                knownLength = length;
+            LWP_MutexUnlock(lengthLock);
+        }
+        usleep(100000);
+    }
+    return NULL;
+}
+
+void YouTubeLengthFor(const char *videoId)
+{
+    if (lengthLock == LWP_MUTEX_NULL)
+        LWP_MutexInit(&lengthLock, false);
+    // https needs room on the stack, as the cache thread's does
+    if (lengthThread == LWP_THREAD_NULL)
+        LWP_CreateThread(&lengthThread, LengthThread, NULL, NULL, 64*1024, 50);
+
+    LWP_MutexLock(lengthLock);
+    snprintf(lengthWant, sizeof(lengthWant), "%s", videoId);
+    LWP_MutexUnlock(lengthLock);
+}
+
+// RiiTube sends no length, so the player asks here when its stream has none
+extern "C" int YouTubeKnownLength(void)
+{
+    return knownLength;
 }
 
 // The user agent to fetch the video last resolved with, as the client that

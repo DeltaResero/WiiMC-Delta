@@ -39,6 +39,10 @@ bool YtParseVisitor(const char *reply, size_t len, char *out, size_t size);
 // reply. On failure, reason gets YouTube's reason, when it gives one.
 bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char *reason, size_t reasonsize);
 
+// A player reply's length of the video in seconds, which it gives even for
+// one it won't play; 0 when it's missing or the video is live
+int YtParseLength(const char *json, size_t len);
+
 typedef struct
 {
     char name[64];      // "English", "English (auto-generated)"

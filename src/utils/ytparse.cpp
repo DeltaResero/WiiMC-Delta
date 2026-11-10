@@ -583,6 +583,19 @@ bool YtParseVisitor(const char *reply, size_t len, char *out, size_t size)
     return p && getstr(path(p + 1, e, "0.2.0.0.13"), e, out, size) && out[0];
 }
 
+int YtParseLength(const char *json, size_t len)
+{
+    const char *e = json + len;
+    const char *details = member(json, e, "videoDetails");
+    const char *live = member(details, e, "isLive");
+
+    if (live)
+        live = ws(live, e);
+    if (live && live + 4 <= e && memcmp(live, "true", 4) == 0)
+        return 0;
+    return (int)num(member(details, e, "lengthSeconds"), e);
+}
+
 bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char *reason, size_t reasonsize)
 {
     const char *e = json + len;

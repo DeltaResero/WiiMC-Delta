@@ -6027,6 +6027,16 @@ bool wiiIsLive()
         return (mpctx->stream->flags & MP_STREAM_LIVE) != 0;
 }
 
+int YouTubeKnownLength(void); // youtube.cpp
+
+// The length the file gives, or for a RiiTube video, which gives none, the
+// length YouTube has for it
+static double wiiLength(void)
+{
+        double len = demuxer_get_time_length(mpctx->demuxer);
+        return len > 0 ? len : YouTubeKnownLength();
+}
+
 double wiiGetTimeLength()
 {
         if(!playing_file || controlledbygui == 2)
@@ -6038,7 +6048,7 @@ double wiiGetTimeLength()
         //if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return 0;
 
-        return demuxer_get_time_length(mpctx->demuxer);
+        return wiiLength();
 }
 
 // Timestamps in some files, MPEG-TS recordings above all, start far from zero.
@@ -6100,7 +6110,7 @@ void wiiGetTimeDisplay(char * buf)
         //if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
                 //return;
 
-        int len = demuxer_get_time_length(mpctx->demuxer);
+        int len = wiiLength();
         int pts = wiiTimeFromStart(wiiPlayTime());
 
         if(wiiIsLive())
