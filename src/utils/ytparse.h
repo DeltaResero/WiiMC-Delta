@@ -43,6 +43,14 @@ bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char
 // one it won't play; 0 when it's missing or the video is live
 int YtParseLength(const char *json, size_t len);
 
+// The link to a live stream's HLS playlist from a player reply. That
+// playlist lists one more playlist for each picture size.
+bool YtParseHlsManifest(const char *json, size_t len, char *url, size_t urlsize);
+
+// From such a playlist of playlists, the link to the tallest H.264 picture
+// no taller than maxHeight, else to the shortest; height gets its height
+bool YtParseHlsVariant(const char *text, size_t len, int maxHeight, char *url, size_t urlsize, int *height);
+
 typedef struct
 {
     char name[64];      // "English", "English (auto-generated)"

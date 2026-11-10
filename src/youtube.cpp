@@ -277,6 +277,13 @@ static bool Playable(const char *reply)
     return strstr(reply, "\"playabilityStatus\":{\"status\":\"OK\"") != NULL;
 }
 
+// A live stream's links are to pieces that come and go, not to files: its
+// playlist is the way in
+static bool LiveLink(const char *url)
+{
+    return strstr(url, "source=yt_live_broadcast") != NULL;
+}
+
 // which of the tracks to play: the one picked for this video, else the original
 static int AudioPick()
 {
@@ -284,6 +291,26 @@ static int AudioPick()
         if (strcmp(audioTracks[i].name, audioWanted) == 0)
             return i;
     return 0;
+}
+
+// A live stream's playlist of playlists, swapped in url for the one with the
+// tallest picture the quality setting allows
+static bool LiveResolve(char *url, size_t urlsize)
+{
+    u32 len;
+    int h;
+    char *list = Fetch(url, NULL, ANDROID_HEADERS, &len);
+    bool ok = list && YtParseHlsVariant(list, len, WiiSettings.youtubeQuality, url, urlsize, &h);
+
+    free(list);
+    if (!ok)
+    {
+        url[0] = 0;
+        return false;
+    }
+    height = h;
+    streamAgent = ANDROID_UA;
+    return true;
 }
 
 bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason, size_t reasonsize)
@@ -325,6 +352,8 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
             audioCount = YtParseAdaptive(reply, len, quality, url, urlsize, &h, audioTracks, YT_AUDIO_MAX);
             int pick = AudioPick();
 
+            if (LiveLink(url))
+                url[0] = 0;
             if (url[0] && audioCount > 0 && audioTracks[pick].url[0] && (h > 360 || pick > 0))
             {
                 audioUrl = strdup(audioTracks[pick].url);
@@ -351,6 +380,12 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
         knownLength = YtParseLength(reply, len);
 
     bool ok = YtParsePlayer(reply, len, url, urlsize, reason, reasonsize);
+    if (!ok && YtParseHlsManifest(reply, len, url, urlsize))
+    {
+        // live: no files, only HLS
+        free(reply);
+        return LiveResolve(url, urlsize);
+    }
     if (ok)
     {
         // the languages there are, for the player settings; their links come

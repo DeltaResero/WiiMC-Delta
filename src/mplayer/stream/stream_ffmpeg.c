@@ -31,6 +31,7 @@
 #include "m_struct.h"
 #include "av_helpers.h"
 #include "libmpdemux/demuxer.h"
+#include "stream_hls.h"
 #ifdef CONFIG_NETWORKING
 #include "network.h"
 #endif
@@ -41,6 +42,16 @@ static int fill_buffer(stream_t *s, char *buffer, int max_len)
 {
     int r = avio_read(s->priv, buffer, max_len);
     return (r <= 0) ? -1 : r;
+}
+
+static int hls_fill_buffer(stream_t *s, char *buffer, int max_len)
+{
+    return hls_read(s->priv, (unsigned char *)buffer, max_len);
+}
+
+static void hls_close_f(stream_t *s)
+{
+    hls_close(s->priv);
 }
 
 static int write_buffer(stream_t *s, char *buffer, int len)
@@ -120,6 +131,8 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
     int res = STREAM_ERROR;
     int64_t size;
     int dummy;
+    AVDictionary *hlsopts = NULL;
+    int is_hls = 0;
 
     init_avformat();
     avformat_network_init();
@@ -179,17 +192,31 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
          * open-ended request to below its bitrate after the first 256 KB,
          * but not one read in pieces: ask for 1 MB at a time, on one kept
          * connection. itag 18, with sound and picture in one file, isn't
-         * slowed. */
-        if (strstr(filename, ".googlevideo.com/") && !googlevideo_itag18(filename)) {
+         * slowed, and a live stream's playlists aren't files. */
+        if (strstr(filename, ".googlevideo.com/") && !googlevideo_itag18(filename) &&
+            !strstr(filename, "/api/manifest/")) {
             av_dict_set(&avopts, "request_size", "1048576", 0);
             av_dict_set(&avopts, "multiple_requests", "1", 0);
         }
+
+        /* YouTube cuts off a stream that's read slowly, as a separate audio
+         * stream is: it has no cache, so it's read as it plays. Pick it up
+         * again where it stopped instead of ending the sound. */
+        if (strstr(filename, ".googlevideo.com/"))
+            av_dict_set(&avopts, "reconnect", "1", 0);
 
         /* fetch a YouTube video as the client that was given its links */
         if (strstr(filename, ".googlevideo.com/") && YouTubeStreamAgent())
             av_dict_set(&avopts, "user_agent", YouTubeStreamAgent(), 0);
     }
 #endif
+
+    /* an HLS stream's pieces are opened as its playlist is */
+    av_dict_copy(&hlsopts, avopts, 0);
+
+    /* a playlist with hours of pieces is megabytes long, but packs small */
+    if (!strncmp(filename, "http", 4) && hls_is_playlist(filename, NULL))
+        av_dict_set(&avopts, "headers", "Accept-Encoding: gzip\r\n", 0);
 
     if (!dummy && avio_open2(&ctx, filename, flags, NULL, &avopts) < 0)
         goto out;
@@ -225,6 +252,7 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
             if (semi)
                 *semi = '\0';
             mp_msg(MSGT_OPEN, MSGL_V, "[ffmpeg] Content-Type: %s\n", (char *)mime);
+            is_hls = hls_is_playlist(filename, (char *)mime);
             for (i = 0; mime_type_table[i].mime_type; i++)
                 if (!av_strcasecmp((char *)mime, mime_type_table[i].mime_type)) {
                     *file_format = mime_type_table[i].demuxer_type;
@@ -232,6 +260,26 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
                 }
         }
         av_free(mime);
+        is_hls = is_hls || hls_is_playlist(filename, NULL);
+    }
+
+    /* An HLS playlist plays as the MPEG-TS pieces it lists, one after
+     * another, through MPlayer's cache, which fetches them ahead. */
+    if (is_hls) {
+        hls_t *hls = hls_open(filename, ctx, hlsopts);
+        avio_closep(&ctx);
+        stream->priv = hls;
+        if (!hls)
+            goto out;
+        stream->end_pos = 0;
+        stream->type = STREAMTYPE_STREAM;
+        stream->seek = NULL;
+        if (hls_is_live(hls))
+            stream->flags |= MP_STREAM_LIVE;
+        stream->fill_buffer = hls_fill_buffer;
+        stream->close = hls_close_f;
+        res = STREAM_OK;
+        goto out;
     }
 #endif
     if (dummy) {
@@ -245,6 +293,7 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
     res = STREAM_OK;
 
 out:
+    av_dict_free(&hlsopts);
     return res;
 }
 

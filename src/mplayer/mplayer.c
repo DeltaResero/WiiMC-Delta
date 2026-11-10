@@ -4847,8 +4847,11 @@ total_time_usage_start=GetTimer();
 
 #ifdef GEKKO
         //low cache, unless the stream was given up: then its reads come
-        //back empty and playback ends
-        if (mpctx->osd_function != OSD_PAUSE && stream_cache_size > 0.0 && stream_cache_min_percent> 1.0 && cache_fill_level<6.0 && cache_fill_level>=0.0 && !getMESS)
+        //back empty and playback ends. A live video stream comes no faster
+        //than it plays, so waiting for the cache to fill again took as long
+        //as playing that much: 20 s, for a quiet webcam. It plays as it comes.
+        if (mpctx->osd_function != OSD_PAUSE && stream_cache_size > 0.0 && stream_cache_min_percent> 1.0 && cache_fill_level<6.0 && cache_fill_level>=0.0 && !getMESS &&
+            !(mpctx->sh_video && (mpctx->stream->flags & MP_STREAM_LIVE)))
         {
                 pause_low_cache=1;
                 mpctx->osd_function = OSD_PAUSE;
