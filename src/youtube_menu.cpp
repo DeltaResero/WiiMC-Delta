@@ -30,7 +30,7 @@ extern GuiWindow *mainWindow;
 #define LIST_MAX      60        // items kept per list
 #define PAGE          3         // cards per page
 #define LEVELS        3         // lists open at once, such as results and a playlist from them
-#define THUMB_MAX     (48*1024) // a 320x180 thumbnail is about 12 KB
+#define THUMB_MAX     (96*1024) // a 320x180 thumbnail is about 12 KB; a playlist's art can be a 55 KB PNG
 #define SUGGESTIONS   3
 #define QUERY_MAX     100
 #define TILES         6
@@ -115,7 +115,8 @@ static bool ThumbWork(int *item)
     for (int s = 0; s < PAGE; s++)
     {
         int i = thumbFirst + s;
-        if (i >= l->count || l->items[i].playlist)
+        // a playlist shows a picture when it has one
+        if (i >= l->count || (l->items[i].playlist && !l->items[i].thumb[0] && !l->items[i].image[0]))
             continue;
 
         if (!l->thumb[i])
@@ -148,7 +149,7 @@ static void *WorkerThread(void *arg)
 {
     while (!workerHalt)
     {
-        char text[QUERY_MAX + 1];
+        char text[QUERY_MAX + 1], url[256];
         int item = -1;
         YtList *l;
 
@@ -159,7 +160,13 @@ static void *WorkerThread(void *arg)
         bool fetch = !suggest && ThumbWork(&item);
         l = thumbList;
         if (fetch)
-            snprintf(text, sizeof(text), "%s", l->items[item].id);
+        {
+            YtItem *it = &l->items[item];
+            if (it->image[0])
+                snprintf(url, sizeof(url), "%s", it->image);
+            else
+                snprintf(url, sizeof(url), "http://i.ytimg.com/vi/%s/mqdefault.jpg", it->thumb[0] ? it->thumb : it->id);
+        }
         LWP_MutexUnlock(lock);
 
         if (suggest)
@@ -178,8 +185,6 @@ static void *WorkerThread(void *arg)
 
         if (fetch)
         {
-            char url[192];
-            snprintf(url, sizeof(url), "http://i.ytimg.com/vi/%s/mqdefault.jpg", text);
             u8 *jpg = (u8 *)malloc(THUMB_MAX);
             int n = jpg ? http_fetch(url, NULL, NULL, (char *)jpg, THUMB_MAX) : 0;
 
@@ -839,10 +844,14 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             GuiImageData *d = thumbReady[s];
             thumbReady[s] = NULL;
             SuspendGui();
+            // fitted into 160x90 and centred there: a podcast's art is square
+            float scale = 160.0f / d->GetWidth();
+            if (d->GetHeight() * scale > 90.0f)
+                scale = 90.0f / d->GetHeight();
             sc.thumb[s]->SetImage(d);
-            sc.thumb[s]->SetScaleX(160.0f / d->GetWidth());
-            sc.thumb[s]->SetScaleY(90.0f / d->GetHeight());
-            sc.thumb[s]->SetPosition(x0 + 10, 120 + s * (CARD_H + 4) + 3);
+            sc.thumb[s]->SetScale(scale);
+            sc.thumb[s]->SetPosition(x0 + 10 + (int)(160 - d->GetWidth() * scale) / 2,
+                120 + s * (CARD_H + 4) + 3 + (int)(90 - d->GetHeight() * scale) / 2);
             sc.thumb[s]->SetVisible(true);
             ResumeGui();
             delete sc.shown[s];

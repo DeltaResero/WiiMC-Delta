@@ -404,6 +404,30 @@ static bool lockup_item(const char *lvm, const char *e, YtItem *it)
     if (!tvm)
         tvm = path(image, e, "collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel");
 
+    // a playlist's picture is one of its videos': .../vi/VIDEOID/hq720.jpg,
+    // or its own square art, as podcasts and YouTube Music's playlists have
+    // (i.ytimg.com, i9.ytimg.com and the like)
+    char url[256];
+    if (it->playlist && getstr(path(tvm, e, "image.sources.0.url"), e, url, sizeof(url)))
+    {
+        const char *v = strstr(url, "/vi/");
+        const char *host = url + 8; // after "https://"
+        size_t hn = strcspn(host, "/");
+        if (!v && strncmp(url, "https://i", 9) == 0 && hn > 10 &&
+            strncmp(host + hn - 10, ".ytimg.com", 10) == 0)
+            snprintf(it->image, sizeof(it->image), "%s", url);
+        if (v)
+        {
+            v += 4;
+            size_t n = strcspn(v, "/?");
+            if (n > 0 && n < sizeof(it->thumb))
+            {
+                memcpy(it->thumb, v, n);
+                it->thumb[n] = 0;
+            }
+        }
+    }
+
     for (int i = 0; tvm && !it->length[0]; i++)
     {
         const char *ov = element(member(tvm, e, "overlays"), e, i);

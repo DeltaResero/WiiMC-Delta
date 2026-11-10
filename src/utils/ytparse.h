@@ -19,6 +19,8 @@ typedef struct
     char length[24];    // "22:53", "LIVE", or a playlist's "24 videos"
     char views[48];
     char age[48];       // "16 years ago"
+    char thumb[16];     // the video whose thumbnail a playlist shows; "" for a video
+    char image[256];    // a playlist's own picture when it has no video's, as podcasts do
     bool playlist;
 } YtItem;
 
