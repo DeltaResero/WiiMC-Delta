@@ -27,13 +27,47 @@ static char * GetDisplayText(char * t)
     return &tmptxt[0];
 }
 
+// The keys that type a character, row by row: each row's keys start at x and
+// sit 42 pixels apart. The bottom row has two groups, either side of space.
+static const struct
+{
+    const char *ch, *chShift;
+    int row, x;
+} keyRows[] = {
+    { "`1234567890", "~!@#$%^&*()", 0, 0 },
+    { "qwertyuiop", "QWERTYUIOP", 1, 61 },
+    { "asdfghjkl;'", "ASDFGHJKL:\"", 2, 82 },
+    { "zxcvbnm,./", "ZXCVBNM<>?", 3, 103 },
+    { "[]\\", "{}|", 4, 82 },
+    { "-=", "_+", 4, 416 }
+};
+
+/**
+ * Makes key k at x on the given row, out of img and over, with label on it.
+ */
+GuiButton * GuiKeyboard::NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k)
+{
+    keyImg[k] = new GuiImage(img);
+    keyImgOver[k] = new GuiImage(over);
+    keyTxt[k] = label ? new GuiText(label, 20, (GXColor){255, 255, 255, 0xff}) : NULL;
+    keyBtn[k] = new GuiButton(img->GetWidth(), img->GetHeight());
+    keyBtn[k]->SetImage(keyImg[k]);
+    keyBtn[k]->SetImageOver(keyImgOver[k]);
+    if(label)
+        keyBtn[k]->SetLabel(keyTxt[k]);
+    keyBtn[k]->SetTrigger(trigA);
+    keyBtn[k]->SetPosition(x, row*42+80);
+    keyBtn[k]->SetEffectGrow();
+    return keyBtn[k];
+}
+
 /**
  * Constructor for the GuiKeyboard class.
  */
 
 GuiKeyboard::GuiKeyboard(char * t, u32 max)
 {
-    width = 540;
+    width = 582;
     height = 400;
     shift = 0;
     caps = 0;
@@ -46,63 +80,6 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     strncpy(kbtextstr, t, max);
     kbtextstr[max] = 0;
     kbtextmaxlen = max;
-
-    Key thekeys[4][11] = {
-    {
-        {'1','!'},
-        {'2','@'},
-        {'3','#'},
-        {'4','$'},
-        {'5','%'},
-        {'6','^'},
-        {'7','&'},
-        {'8','*'},
-        {'9','('},
-        {'0',')'},
-        {'\0','\0'}
-    },
-    {
-        {'q','Q'},
-        {'w','W'},
-        {'e','E'},
-        {'r','R'},
-        {'t','T'},
-        {'y','Y'},
-        {'u','U'},
-        {'i','I'},
-        {'o','O'},
-        {'p','P'},
-        {'-','_'}
-    },
-    {
-        {'a','A'},
-        {'s','S'},
-        {'d','D'},
-        {'f','F'},
-        {'g','G'},
-        {'h','H'},
-        {'j','J'},
-        {'k','K'},
-        {'l','L'},
-        {';',':'},
-        {'\'','"'}
-    },
-
-    {
-        {'z','Z'},
-        {'x','X'},
-        {'c','C'},
-        {'v','V'},
-        {'b','B'},
-        {'n','N'},
-        {'m','M'},
-        {',','<'},
-        {'.','>'},
-        {'/','?'},
-        {'\0','\0'}
-    }
-    };
-    memcpy(keys, thekeys, sizeof(thekeys));
 
     keyTextbox = new GuiImageData(keyboard_textbox_png);
     keyTextboxImg = new GuiImage(keyTextbox);
@@ -122,94 +99,62 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     keyOver = new GuiImageData(keyboard_key_over_png);
     keyMedium = new GuiImageData(keyboard_mediumkey_png);
     keyMediumOver = new GuiImageData(keyboard_mediumkey_over_png);
+    keyWide = new GuiImageData(keyboard_widekey_png);
+    keyWideOver = new GuiImageData(keyboard_widekey_over_png);
+    keyBackspace = new GuiImageData(keyboard_backspacekey_png);
+    keyBackspaceOver = new GuiImageData(keyboard_backspacekey_over_png);
     keyLarge = new GuiImageData(keyboard_largekey_png);
     keyLargeOver = new GuiImageData(keyboard_largekey_over_png);
 
-    //keySoundOver = new GuiSound(button_over_pcm, button_over_pcm_size, SOUND_PCM);
-    //keySoundClick = new GuiSound(button_click_pcm, button_click_pcm_size, SOUND_PCM);
     trigA = new GuiTrigger;
     trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 
-    keyBackImg = new GuiImage(keyMedium);
-    keyBackOverImg = new GuiImage(keyMediumOver);
-    keyBackText = new GuiText("Back", 20, (GXColor){255, 255, 255, 0xff});
-    keyBack = new GuiButton(keyMedium->GetWidth(), keyMedium->GetHeight());
-    keyBack->SetImage(keyBackImg);
-    keyBack->SetImageOver(keyBackOverImg);
-    keyBack->SetLabel(keyBackText);
-    //keyBack->SetSoundOver(keySoundOver);
-    //keyBack->SetSoundClick(keySoundClick);
-    keyBack->SetTrigger(trigA);
-    keyBack->SetPosition(10*42+40, 0*42+80);
-    keyBack->SetEffectGrow();
-    this->Append(keyBack);
-
-    keyCapsImg = new GuiImage(keyMedium);
-    keyCapsOverImg = new GuiImage(keyMediumOver);
-    keyCapsText = new GuiText("Caps", 20, (GXColor){255, 255, 255, 0xff});
-    keyCaps = new GuiButton(keyMedium->GetWidth(), keyMedium->GetHeight());
-    keyCaps->SetImage(keyCapsImg);
-    keyCaps->SetImageOver(keyCapsOverImg);
-    keyCaps->SetLabel(keyCapsText);
-    //keyCaps->SetSoundOver(keySoundOver);
-    //keyCaps->SetSoundClick(keySoundClick);
-    keyCaps->SetTrigger(trigA);
-    keyCaps->SetPosition(0, 2*42+80);
-    keyCaps->SetEffectGrow();
-    this->Append(keyCaps);
-
-    keyShiftImg = new GuiImage(keyMedium);
-    keyShiftOverImg = new GuiImage(keyMediumOver);
-    keyShiftText = new GuiText("Shift", 20, (GXColor){255, 255, 255, 0xff});
-    keyShift = new GuiButton(keyMedium->GetWidth(), keyMedium->GetHeight());
-    keyShift->SetImage(keyShiftImg);
-    keyShift->SetImageOver(keyShiftOverImg);
-    keyShift->SetLabel(keyShiftText);
-    //keyShift->SetSoundOver(keySoundOver);
-    //keyShift->SetSoundClick(keySoundClick);
-    keyShift->SetTrigger(trigA);
-    keyShift->SetPosition(21, 3*42+80);
-    keyShift->SetEffectGrow();
-    this->Append(keyShift);
-
-    keySpaceImg = new GuiImage(keyLarge);
-    keySpaceOverImg = new GuiImage(keyLargeOver);
-    keySpace = new GuiButton(keyLarge->GetWidth(), keyLarge->GetHeight());
-    keySpace->SetImage(keySpaceImg);
-    keySpace->SetImageOver(keySpaceOverImg);
-    //keySpace->SetSoundOver(keySoundOver);
-    //keySpace->SetSoundClick(keySoundClick);
-    keySpace->SetTrigger(trigA);
-    keySpace->SetPosition(0, 4*42+80);
-    keySpace->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
-    keySpace->SetEffectGrow();
-    this->Append(keySpace);
-
+    GuiButton *rowKey[5][16];
+    int rowX[5][16];
+    int rowKeys[5] = { 0, 0, 0, 0, 0 };
     char txt[2] = { 0, 0 };
+    int k = 0;
 
-    for(int i=0; i<4; i++)
+    auto add = [&](GuiImageData *img, GuiImageData *over, const char *label, int x, int i, int n)
     {
-        for(int j=0; j<11; j++)
+        rowX[i][rowKeys[i]] = x;
+        rowKey[i][rowKeys[i]++] = NewKey(img, over, label, x, i, n);
+    };
+
+    add(keyBackspace, keyBackspaceOver, "Backspace", 462, 0, KB_KEYS + KB_BACKSPACE);
+    add(keyMedium, keyMediumOver, "Caps", 0, 2, KB_KEYS + KB_CAPS);
+    add(keyWide, keyWideOver, "Shift", 0, 3, KB_KEYS + KB_SHIFT);
+    add(keyLarge, keyLargeOver, NULL, 209, 4, KB_KEYS + KB_SPACE);
+
+    for(u32 r=0; r < sizeof(keyRows)/sizeof(keyRows[0]); r++)
+    {
+        int i = keyRows[r].row;
+
+        for(int j=0; keyRows[r].ch[j]; j++, k++)
         {
-            if(keys[i][j].ch != '\0')
-            {
-                txt[0] = keys[i][j].ch;
-                keyImg[i][j] = new GuiImage(key);
-                keyImgOver[i][j] = new GuiImage(keyOver);
-                keyTxt[i][j] = new GuiText(txt, 20, (GXColor){255, 255, 255, 0xff});
-                keyTxt[i][j]->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
-                keyTxt[i][j]->SetPosition(0, -10);
-                keyBtn[i][j] = new GuiButton(key->GetWidth(), key->GetHeight());
-                keyBtn[i][j]->SetImage(keyImg[i][j]);
-                keyBtn[i][j]->SetImageOver(keyImgOver[i][j]);
-                //keyBtn[i][j]->SetSoundOver(keySoundOver);
-                //keyBtn[i][j]->SetSoundClick(keySoundClick);
-                keyBtn[i][j]->SetTrigger(trigA);
-                keyBtn[i][j]->SetLabel(keyTxt[i][j]);
-                keyBtn[i][j]->SetPosition(j*42+21*i+40, i*42+80);
-                keyBtn[i][j]->SetEffectGrow();
-                this->Append(keyBtn[i][j]);
-            }
+            keys[k].ch = keyRows[r].ch[j];
+            keys[k].chShift = keyRows[r].chShift[j];
+            txt[0] = keys[k].ch;
+            add(key, keyOver, txt, keyRows[r].x + j*42, i, k);
+            keyTxt[k]->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
+            keyTxt[k]->SetPosition(0, -10);
+        }
+    }
+
+    // each row from left to right, so the D-pad starts at the top left
+    for(int i=0; i < 5; i++)
+    {
+        for(int j=0; j < rowKeys[i]; j++)
+        {
+            int first = j;
+
+            for(int m=j+1; m < rowKeys[i]; m++)
+                if(rowX[i][m] < rowX[i][first])
+                    first = m;
+
+            int x = rowX[i][j]; rowX[i][j] = rowX[i][first]; rowX[i][first] = x;
+            GuiButton *b = rowKey[i][j]; rowKey[i][j] = rowKey[i][first]; rowKey[i][first] = b;
+            this->Append(rowKey[i][j]);
         }
     }
 }
@@ -222,44 +167,26 @@ GuiKeyboard::~GuiKeyboard()
     delete kbText;
     delete keyTextbox;
     delete keyTextboxImg;
-    delete keyCapsText;
-    delete keyCapsImg;
-    delete keyCapsOverImg;
-    delete keyCaps;
-    delete keyShiftText;
-    delete keyShiftImg;
-    delete keyShiftOverImg;
-    delete keyShift;
-    delete keyBackText;
-    delete keyBackImg;
-    delete keyBackOverImg;
-    delete keyBack;
-    delete keySpaceImg;
-    delete keySpaceOverImg;
-    delete keySpace;
+
+    for(int k=0; k < KB_KEYS + KB_SPECIALS; k++)
+    {
+        delete keyImg[k];
+        delete keyImgOver[k];
+        delete keyTxt[k];
+        delete keyBtn[k];
+    }
+
     delete key;
     delete keyOver;
     delete keyMedium;
     delete keyMediumOver;
+    delete keyWide;
+    delete keyWideOver;
+    delete keyBackspace;
+    delete keyBackspaceOver;
     delete keyLarge;
     delete keyLargeOver;
-    //delete keySoundOver;
-    //delete keySoundClick;
     delete trigA;
-
-    for(int i=0; i<4; i++)
-    {
-        for(int j=0; j<11; j++)
-        {
-            if(keys[i][j].ch != '\0')
-            {
-                delete keyImg[i][j];
-                delete keyImgOver[i][j];
-                delete keyTxt[i][j];
-                delete keyBtn[i][j];
-            }
-        }
-    }
 }
 
 // overloaded new operator
@@ -321,6 +248,29 @@ void GuiKeyboard::SetPlaceholder(const char * p)
     ShowText();
 }
 
+// Adds c to the end of the text, while there's room
+void GuiKeyboard::Type(char c)
+{
+    u32 len = strlen(kbtextstr);
+
+    if(len < kbtextmaxlen)
+    {
+        kbtextstr[len] = c;
+        kbtextstr[len+1] = 0;
+    }
+    ShowText();
+}
+
+// Takes the last character off the text
+void GuiKeyboard::Backspace()
+{
+    u32 len = strlen(kbtextstr);
+
+    if(len > 0)
+        kbtextstr[len-1] = 0;
+    ShowText();
+}
+
 void GuiKeyboard::Update(GuiTrigger * t)
 {
     if(_elements.size() == 0 || (state == STATE_DISABLED && parentElement))
@@ -338,112 +288,63 @@ void GuiKeyboard::Update(GuiTrigger * t)
         (t->pad.btns_d & PAD_BUTTON_B) || (t->cpad.data.down & CTR_BUTTON_B))
     {
         if(strlen(kbtextstr) > 0)
-        {
-            kbtextstr[strlen(kbtextstr)-1] = 0;
-            ShowText();
-        }
+            Backspace();
         else
-        {
             backPressed = true;
-        }
     }
 
-    if(keySpace->GetState() == STATE_CLICKED)
+    for(int k=0; k < KB_KEYS + KB_SPECIALS; k++)
     {
-        if(strlen(kbtextstr) < kbtextmaxlen)
-        {
-            kbtextstr[strlen(kbtextstr)] = ' ';
-            ShowText();
-        }
-        keySpace->SetState(STATE_SELECTED, t->chan);
+        if(keyBtn[k]->GetState() != STATE_CLICKED)
+            continue;
 
-        //don't reset pos (D-pad only: a pointer press keeps its own selection)
-        if(focus && !t->wpad->ir.valid)
+        if(k < KB_KEYS)
         {
-            int selected = this->GetSelected();
-            _elements.at(selected)->SetState(STATE_SELECTED);
-        }
-    }
-    else if(keyBack->GetState() == STATE_CLICKED)
-    {
-        if(strlen(kbtextstr) > 0)
-        {
-            kbtextstr[strlen(kbtextstr)-1] = 0;
-            ShowText();
-        }
-        keyBack->SetState(STATE_SELECTED, t->chan);
+            Type((shift || caps) ? keys[k].chShift : keys[k].ch);
 
-        //don't reset pos (D-pad only: a pointer press keeps its own selection)
-        if(focus && !t->wpad->ir.valid)
-        {
-            int selected = this->GetSelected();
-            _elements.at(selected)->SetState(STATE_SELECTED);
-        }
-    }
-    else if(keyShift->GetState() == STATE_CLICKED)
-    {
-        shift ^= 1;
-        keyShift->SetState(STATE_SELECTED, t->chan);
-        update = true;
-    }
-    else if(keyCaps->GetState() == STATE_CLICKED)
-    {
-        caps ^= 1;
-        keyCaps->SetState(STATE_SELECTED, t->chan);
-        update = true;
-    }
-
-    char txt[2] = { 0, 0 };
-
-    startloop:
-
-    for(int i=0; i<4; i++)
-    {
-        for(int j=0; j<11; j++)
-        {
-            if(keys[i][j].ch != '\0')
+            if(shift)
             {
-                if(update)
-                {
-                    if(shift || caps)
-                        txt[0] = keys[i][j].chShift;
-                    else
-                        txt[0] = keys[i][j].ch;
-
-                    keyTxt[i][j]->SetText(txt);
-                }
-
-                if(keyBtn[i][j]->GetState() == STATE_CLICKED)
-                {
-                    if(strlen(kbtextstr) < kbtextmaxlen)
-                    {
-                        if(shift || caps)
-                        {
-                            kbtextstr[strlen(kbtextstr)] = keys[i][j].chShift;
-                        }
-                        else
-                        {
-                            kbtextstr[strlen(kbtextstr)] = keys[i][j].ch;
-                        }
-                    }
-                    ShowText();
-                    keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
-
-                    //don't reset pos (D-pad only: a pointer press keeps its own selection)
-                    if(focus && !t->wpad->ir.valid)
-                    {
-                        int selected = this->GetSelected();
-                        _elements.at(selected)->SetState(STATE_SELECTED);
-                    }
-
-                    if(shift)
-                    {
-                        shift ^= 1;
-                        update = true;
-                        goto startloop;
-                    }
-                }
+                shift = 0;
+                update = true;
             }
+        }
+        else if(k == KB_KEYS + KB_SPACE)
+        {
+            Type(' ');
+        }
+        else if(k == KB_KEYS + KB_BACKSPACE)
+        {
+            Backspace();
+        }
+        else if(k == KB_KEYS + KB_SHIFT)
+        {
+            shift ^= 1;
+            update = true;
+        }
+        else if(k == KB_KEYS + KB_CAPS)
+        {
+            caps ^= 1;
+            update = true;
+        }
+
+        keyBtn[k]->SetState(STATE_SELECTED, t->chan);
+
+        //don't reset pos (D-pad only: a pointer press keeps its own selection)
+        if(focus && !t->wpad->ir.valid)
+        {
+            int selected = this->GetSelected();
+            _elements.at(selected)->SetState(STATE_SELECTED);
+        }
+    }
+
+    if(update)
+    {
+        char txt[2] = { 0, 0 };
+
+        for(int k=0; k < KB_KEYS; k++)
+        {
+            txt[0] = (shift || caps) ? keys[k].chShift : keys[k].ch;
+            keyTxt[k]->SetText(txt);
         }
     }
 

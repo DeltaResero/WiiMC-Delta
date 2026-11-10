@@ -321,7 +321,7 @@ static bool SearchKeyboard(char *query)
         chipTxt[i]->SetMaxWidth(chip.GetWidth() - 14);
         chipBtn[i] = new GuiButton(chip.GetWidth(), chip.GetHeight());
         chipBtn[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-        chipBtn[i]->SetPosition(i * (chip.GetWidth() + 3), 45);
+        chipBtn[i]->SetPosition((keyboard.GetWidth() - SUGGESTIONS * (chip.GetWidth() + 3) + 3) / 2 + i * (chip.GetWidth() + 3), 45);
         chipBtn[i]->SetImage(chipImg[i]);
         chipBtn[i]->SetImageOver(chipImgOver[i]);
         chipBtn[i]->SetLabel(chipTxt[i]);

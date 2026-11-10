@@ -941,6 +941,8 @@ typedef struct _keytype {
     char ch, chShift;
 } Key;
 
+#define KB_KEYS 47 //!< keys that type a character, space aside
+
 //!On-screen keyboard
 class GuiKeyboard : public GuiWindow
 {
@@ -960,41 +962,35 @@ class GuiKeyboard : public GuiWindow
         char kbtextstr[256];
         bool backPressed; //!< B was pressed with no text left to delete
     protected:
+        //!The keys that don't type a character
+        enum { KB_BACKSPACE, KB_CAPS, KB_SHIFT, KB_SPACE, KB_SPECIALS };
         void ShowText();
+        void Type(char c);
+        void Backspace();
+        GuiButton * NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k);
         const char * placeholder;
         u32 kbtextmaxlen;
         int shift;
         int caps;
         GuiText * kbText;
         GuiImage * keyTextboxImg;
-        GuiText * keyCapsText;
-        GuiImage * keyCapsImg;
-        GuiImage * keyCapsOverImg;
-        GuiButton * keyCaps;
-        GuiText * keyShiftText;
-        GuiImage * keyShiftImg;
-        GuiImage * keyShiftOverImg;
-        GuiButton * keyShift;
-        GuiText * keyBackText;
-        GuiImage * keyBackImg;
-        GuiImage * keyBackOverImg;
-        GuiButton * keyBack;
-        GuiImage * keySpaceImg;
-        GuiImage * keySpaceOverImg;
-        GuiButton * keySpace;
-        GuiButton * keyBtn[4][11];
-        GuiImage * keyImg[4][11];
-        GuiImage * keyImgOver[4][11];
-        GuiText * keyTxt[4][11];
+        GuiButton * keyBtn[KB_KEYS + KB_SPECIALS];
+        GuiImage * keyImg[KB_KEYS + KB_SPECIALS];
+        GuiImage * keyImgOver[KB_KEYS + KB_SPECIALS];
+        GuiText * keyTxt[KB_KEYS + KB_SPECIALS];
         GuiImageData * keyTextbox;
         GuiImageData * key;
         GuiImageData * keyOver;
         GuiImageData * keyMedium;
         GuiImageData * keyMediumOver;
+        GuiImageData * keyWide;
+        GuiImageData * keyWideOver;
+        GuiImageData * keyBackspace;
+        GuiImageData * keyBackspaceOver;
         GuiImageData * keyLarge;
         GuiImageData * keyLargeOver;
         GuiTrigger * trigA;
-        Key keys[4][11]; // two chars = less space than one pointer
+        Key keys[KB_KEYS]; // two chars = less space than one pointer
 };
 
 //!On-screen keypad
