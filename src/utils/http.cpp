@@ -360,8 +360,10 @@ static u32 read_body(const http_conn *s, bool chunked, u32 content_length, char 
 
     while (tcp_readln(s, line, sizeof(line) - 1) == 0)
     {
+        // as a subtraction: a chunk size near 4 GB wrapped size + len past
+        // the check, and the read ran off the end of dst
         u32 len = _httoi(line);
-        if (len == 0 || size + len > cap)
+        if (len == 0 || len > cap - size)
             break;
 
         u32 got = tcp_read(s, (u8 *)dst + size, len);
