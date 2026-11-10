@@ -199,6 +199,12 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
             av_dict_set(&avopts, "multiple_requests", "1", 0);
         }
 
+        /* YouTube cuts off a stream that's read slowly, as a separate audio
+         * stream is: it has no cache, so it's read as it plays. Pick it up
+         * again where it stopped instead of ending the sound. */
+        if (strstr(filename, ".googlevideo.com/"))
+            av_dict_set(&avopts, "reconnect", "1", 0);
+
         /* fetch a YouTube video as the client that was given its links */
         if (strstr(filename, ".googlevideo.com/") && YouTubeStreamAgent())
             av_dict_set(&avopts, "user_agent", YouTubeStreamAgent(), 0);
