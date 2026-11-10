@@ -1124,11 +1124,54 @@ static bool PadDown(GuiTrigger *t, u32 wii, u16 gc, u32 ctr)
     return t->wpad->btns_d & wii || t->pad.btns_d & gc || t->cpad.data.down & ctr;
 }
 
+// the Wii Remote's record, while the screen is shown a copy with buttons left out
+static WPADData *tabRealWpad = NULL;
+
+static void TabBarShowButtons()
+{
+    if(tabRealWpad)
+        userInput[0].wpad = tabRealWpad;
+    tabRealWpad = NULL;
+}
+
+static bool PadHeld(GuiTrigger *t, u32 wii, u16 gc, u32 ctr)
+{
+    return t->wpad->btns_h & wii || t->pad.btns_h & gc || t->cpad.data.held & ctr;
+}
+
+enum { TAB_NEXT = 1, TAB_PREV = 2, TAB_RIGHT = 4, TAB_LEFT = 8, TAB_A = 16, TAB_B = 32, TAB_DOWN = 64 };
+
 // before the screen sees the buttons: the tab bar takes them while it's highlighted
 static void TabBarInput()
 {
     GuiTrigger *t = &userInput[0];
     static int lastMenu = -1;
+    static int heldBefore = 0;
+    static u64 holdStart = 0, lastStep = 0;
+
+    TabBarShowButtons();
+
+    // One move for each press, worked out here from the buttons held, and
+    // more only after Left or Right has been held a while, as a remote does
+    int held = 0;
+    if(PadHeld(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_R, CTR_BUTTON_R)) held |= TAB_NEXT;
+    if(PadHeld(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_L, CTR_BUTTON_L)) held |= TAB_PREV;
+    if(PadHeld(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT)) held |= TAB_RIGHT;
+    if(PadHeld(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT)) held |= TAB_LEFT;
+    if(PadHeld(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A)) held |= TAB_A;
+    if(PadHeld(t, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B)) held |= TAB_B;
+    if(PadHeld(t, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN, CTR_BUTTON_DOWN)) held |= TAB_DOWN;
+    int down = held & ~heldBefore;
+    int side = held & (TAB_LEFT | TAB_RIGHT);
+    u64 now = gettime();
+    if(!side || side != (heldBefore & (TAB_LEFT | TAB_RIGHT)))
+        holdStart = lastStep = now;
+    else if(diff_usec(holdStart, now) > 700000 && diff_usec(lastStep, now) > 300000)
+    {
+        down |= side;
+        lastStep = now;
+    }
+    heldBefore = held;
 
     guiUpMoved = false;
     guiUpAtTop = false;
@@ -1143,9 +1186,9 @@ static void TabBarInput()
 
     int dir = 0;
 
-    if(PadDown(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_R, CTR_BUTTON_R))
+    if(down & TAB_NEXT)
         dir = 1;
-    else if(PadDown(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_L, CTR_BUTTON_L))
+    else if(down & TAB_PREV)
         dir = -1;
 
     if(dir)
@@ -1157,11 +1200,11 @@ static void TabBarInput()
     if(tabHighlight < 0)
         return;
 
-    if(PadDown(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT))
+    if(down & TAB_RIGHT)
         HighlightTab(NextTab(tabHighlight, 1));
-    else if(PadDown(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT))
+    else if(down & TAB_LEFT)
         HighlightTab(NextTab(tabHighlight, -1));
-    else if(PadDown(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A))
+    else if(down & TAB_A)
     {
         // A with the pointer on a tab is a click on that tab
         if(t->wpad->ir.valid && (videosBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
@@ -1181,8 +1224,7 @@ static void TabBarInput()
         if(menu != CurrentTab() && screensaverThreadHalt != 0)
             ChangeMenu(menu);
     }
-    else if(PadDown(t, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B) ||
-        PadDown(t, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN, CTR_BUTTON_DOWN))
+    else if(down & (TAB_B | TAB_DOWN))
     {
         HighlightTab(-1);
     }
@@ -1197,8 +1239,14 @@ static void TabBarInput()
     u32 ctr = CTR_BUTTON_UP | CTR_BUTTON_DOWN | CTR_BUTTON_LEFT | CTR_BUTTON_RIGHT |
         CTR_BUTTON_A | CTR_BUTTON_B | CTR_STICK_UP | CTR_STICK_DOWN | CTR_STICK_LEFT | CTR_STICK_RIGHT;
 
-    t->wpad->btns_d &= ~wii;
-    t->wpad->btns_h &= ~wii;
+    // The Wii Remote's buttons are libogc's own record, which it tells new
+    // presses from: the screen gets a copy without them instead.
+    static WPADData hidden;
+    hidden = *t->wpad;
+    hidden.btns_d &= ~wii;
+    hidden.btns_h &= ~wii;
+    tabRealWpad = t->wpad;
+    t->wpad = &hidden;
     t->pad.btns_d &= ~gc;
     t->pad.btns_h &= ~gc;
     t->pad.stickX = 0;
@@ -1211,6 +1259,8 @@ static void TabBarInput()
 static void TabBarAfterInput()
 {
     GuiTrigger *t = &userInput[0];
+
+    TabBarShowButtons();
 
     if(mainWindow->GetState() == STATE_DISABLED)
         return;
