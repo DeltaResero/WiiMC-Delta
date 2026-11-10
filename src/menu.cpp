@@ -1124,11 +1124,54 @@ static bool PadDown(GuiTrigger *t, u32 wii, u16 gc, u32 ctr)
     return t->wpad->btns_d & wii || t->pad.btns_d & gc || t->cpad.data.down & ctr;
 }
 
+// the Wii Remote's record, while the screen is shown a copy with buttons left out
+static WPADData *tabRealWpad = NULL;
+
+static void TabBarShowButtons()
+{
+    if(tabRealWpad)
+        userInput[0].wpad = tabRealWpad;
+    tabRealWpad = NULL;
+}
+
+static bool PadHeld(GuiTrigger *t, u32 wii, u16 gc, u32 ctr)
+{
+    return t->wpad->btns_h & wii || t->pad.btns_h & gc || t->cpad.data.held & ctr;
+}
+
+enum { TAB_NEXT = 1, TAB_PREV = 2, TAB_RIGHT = 4, TAB_LEFT = 8, TAB_A = 16, TAB_B = 32, TAB_DOWN = 64 };
+
 // before the screen sees the buttons: the tab bar takes them while it's highlighted
 static void TabBarInput()
 {
     GuiTrigger *t = &userInput[0];
     static int lastMenu = -1;
+    static int heldBefore = 0;
+    static u64 holdStart = 0, lastStep = 0;
+
+    TabBarShowButtons();
+
+    // One move for each press, worked out here from the buttons held, and
+    // more only after Left or Right has been held a while, as a remote does
+    int held = 0;
+    if(PadHeld(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_R, CTR_BUTTON_R)) held |= TAB_NEXT;
+    if(PadHeld(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_L, CTR_BUTTON_L)) held |= TAB_PREV;
+    if(PadHeld(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT)) held |= TAB_RIGHT;
+    if(PadHeld(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT)) held |= TAB_LEFT;
+    if(PadHeld(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A)) held |= TAB_A;
+    if(PadHeld(t, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B)) held |= TAB_B;
+    if(PadHeld(t, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN, CTR_BUTTON_DOWN)) held |= TAB_DOWN;
+    int down = held & ~heldBefore;
+    int side = held & (TAB_LEFT | TAB_RIGHT);
+    u64 now = gettime();
+    if(!side || side != (heldBefore & (TAB_LEFT | TAB_RIGHT)))
+        holdStart = lastStep = now;
+    else if(diff_usec(holdStart, now) > SCROLL_DELAY_INITIAL && diff_usec(lastStep, now) > 300000)
+    {
+        down |= side;
+        lastStep = now;
+    }
+    heldBefore = held;
 
     guiUpMoved = false;
     guiUpAtTop = false;
@@ -1143,9 +1186,9 @@ static void TabBarInput()
 
     int dir = 0;
 
-    if(PadDown(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_R, CTR_BUTTON_R))
+    if(down & TAB_NEXT)
         dir = 1;
-    else if(PadDown(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_L, CTR_BUTTON_L))
+    else if(down & TAB_PREV)
         dir = -1;
 
     if(dir)
@@ -1157,11 +1200,11 @@ static void TabBarInput()
     if(tabHighlight < 0)
         return;
 
-    if(PadDown(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT))
+    if(down & TAB_RIGHT)
         HighlightTab(NextTab(tabHighlight, 1));
-    else if(PadDown(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT))
+    else if(down & TAB_LEFT)
         HighlightTab(NextTab(tabHighlight, -1));
-    else if(PadDown(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A))
+    else if(down & TAB_A)
     {
         // A with the pointer on a tab is a click on that tab
         if(t->wpad->ir.valid && (videosBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
@@ -1181,8 +1224,7 @@ static void TabBarInput()
         if(menu != CurrentTab() && screensaverThreadHalt != 0)
             ChangeMenu(menu);
     }
-    else if(PadDown(t, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B) ||
-        PadDown(t, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN, CTR_BUTTON_DOWN))
+    else if(down & (TAB_B | TAB_DOWN))
     {
         HighlightTab(-1);
     }
@@ -1197,8 +1239,14 @@ static void TabBarInput()
     u32 ctr = CTR_BUTTON_UP | CTR_BUTTON_DOWN | CTR_BUTTON_LEFT | CTR_BUTTON_RIGHT |
         CTR_BUTTON_A | CTR_BUTTON_B | CTR_STICK_UP | CTR_STICK_DOWN | CTR_STICK_LEFT | CTR_STICK_RIGHT;
 
-    t->wpad->btns_d &= ~wii;
-    t->wpad->btns_h &= ~wii;
+    // The Wii Remote's buttons are libogc's own record, which it tells new
+    // presses from: the screen gets a copy without them instead.
+    static WPADData hidden;
+    hidden = *t->wpad;
+    hidden.btns_d &= ~wii;
+    hidden.btns_h &= ~wii;
+    tabRealWpad = t->wpad;
+    t->wpad = &hidden;
     t->pad.btns_d &= ~gc;
     t->pad.btns_h &= ~gc;
     t->pad.stickX = 0;
@@ -1211,6 +1259,8 @@ static void TabBarInput()
 static void TabBarAfterInput()
 {
     GuiTrigger *t = &userInput[0];
+
+    TabBarShowButtons();
 
     if(mainWindow->GetState() == STATE_DISABLED)
         return;
@@ -7343,11 +7393,12 @@ class SettingsPanel : public GuiWindow
             Menu_DrawRectangle(this->GetLeft(), this->GetTop(), this->GetWidth(),
                 this->GetHeight(), (GXColor){ 24, 24, 28, 230 }, 1);
             for(int i = 0; i < SET_ROWS; i++)
-                if(row[i]->IsVisible() && row[i]->GetState() == STATE_SELECTED)
+                if(row[i]->IsVisible() && (row[i]->GetState() == STATE_SELECTED || i == cursor))
                     Menu_DrawRectangle(row[i]->GetLeft(), row[i]->GetTop(), row[i]->GetWidth(),
                         row[i]->GetHeight(), (GXColor){ 255, 255, 255, 40 }, 1);
             GuiWindow::Draw();
         }
+        int cursor; // the row the d-pad is on, -1 when the pointer opened the panel
         GuiButton *row[SET_ROWS];
         GuiText *label[SET_ROWS];
         GuiText *value[SET_ROWS];
@@ -7357,7 +7408,7 @@ static SettingsPanel *settingsPanel = NULL;
 
 enum { PAGE_MAIN, PAGE_SPEED, PAGE_SUBS, PAGE_AUDIO, PAGE_QUALITY };
 enum { ACT_NONE = -1, ACT_SPEED = -2, ACT_SUBS = -3, ACT_AUDIO = -4, ACT_BACK = -5, ACT_MORE = -6,
-    ACT_QUALITY = -7 };
+    ACT_QUALITY = -7, ACT_DISCMENU = -8 };
 
 static int setPage = PAGE_MAIN;
 static int setFirst = 0;            // first choice on screen when a list is longer
@@ -7366,6 +7417,7 @@ static char setChoice[SET_LIST][64];
 static int setValue[SET_LIST];      // a speed's index, a subtitle's place, an audio id
 static int setChoices = 0;
 static int setCurrent = -1;         // the choice in use
+static int setRows = 0;             // rows showing
 
 static const float speeds[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
 static const int qualities[] = { 360, 480 };
@@ -7573,6 +7625,8 @@ static void ShowSettingsPage(int page)
             SettingsRow(r++, "Audio track", setCurrent >= 0 ? setChoice[setCurrent] : "",
                 ACT_AUDIO, false);
         }
+        if(strncmp(loadedFile, "dvdnav://", 9) == 0)
+            SettingsRow(r++, "Disc menu", NULL, ACT_DISCMENU, false);
     }
     else
     {
@@ -7609,6 +7663,10 @@ static void ShowSettingsPage(int page)
     }
 
     settingsPanel->SetSize(SET_W, r * SET_ROW_H + 8);
+
+    setRows = r;
+    if(settingsPanel->cursor >= r)
+        settingsPanel->cursor = r - 1;
 }
 
 bool VideoSettingsVisible()
@@ -7630,6 +7688,7 @@ void HideVideoSettings()
         return;
     settingsPanel->SetVisible(false);
     settingsPanel->SetState(STATE_DISABLED);
+    settingsPanel->cursor = -1;
 }
 
 static void SettingsPick(int c)
@@ -7685,6 +7744,35 @@ static void SettingsPick(int c)
     HideVideoSettings();
 }
 
+// what the row picked does
+static void SettingsAct(int r)
+{
+    int a = setAction[r];
+
+    if(a == ACT_SPEED)
+        ShowSettingsPage(PAGE_SPEED);
+    else if(a == ACT_SUBS)
+        ShowSettingsPage(PAGE_SUBS);
+    else if(a == ACT_AUDIO)
+        ShowSettingsPage(PAGE_AUDIO);
+    else if(a == ACT_QUALITY)
+        ShowSettingsPage(PAGE_QUALITY);
+    else if(a == ACT_BACK)
+        ShowSettingsPage(PAGE_MAIN);
+    else if(a == ACT_MORE)
+    {
+        setFirst += SET_ROWS - 2;
+        ShowSettingsPage(setPage);
+    }
+    else if(a == ACT_DISCMENU)
+    {
+        HideVideoSettings();
+        wiiDVDNav(MP_CMD_DVDNAV_MENU);
+    }
+    else if(a >= 0)
+        SettingsPick(a);
+}
+
 // called after the video bar's update, in MPlayer's thread
 static void VideoSettingsUpdate()
 {
@@ -7697,26 +7785,65 @@ static void VideoSettingsUpdate()
             continue;
         settingsPanel->row[r]->ResetState();
 
-        int a = setAction[r];
-        if(a == ACT_SPEED)
-            ShowSettingsPage(PAGE_SPEED);
-        else if(a == ACT_SUBS)
-            ShowSettingsPage(PAGE_SUBS);
-        else if(a == ACT_AUDIO)
-            ShowSettingsPage(PAGE_AUDIO);
-        else if(a == ACT_QUALITY)
-            ShowSettingsPage(PAGE_QUALITY);
-        else if(a == ACT_BACK)
-            ShowSettingsPage(PAGE_MAIN);
-        else if(a == ACT_MORE)
-        {
-            setFirst += SET_ROWS - 2;
-            ShowSettingsPage(setPage);
-        }
-        else if(a >= 0)
-            SettingsPick(a);
+        SettingsAct(r);
         break;
     }
+}
+
+// The panel by the buttons, for a controller with no pointer. These run
+// in MPlayer's thread, as the panel's update does.
+bool VideoSettingsCursor()
+{
+    return VideoSettingsVisible() && settingsPanel->cursor >= 0;
+}
+
+void ToggleVideoSettings()
+{
+    if(!settingsPanel)
+        return;
+    if(VideoSettingsVisible())
+    {
+        HideVideoSettings();
+        return;
+    }
+    HideVideoVolumeLevelBar();
+    settingsPanel->cursor = 0;
+    ShowSettingsPage(PAGE_MAIN);
+}
+
+void VideoSettingsMove(int dir)
+{
+    if(!VideoSettingsCursor() || setRows < 1)
+        return;
+    settingsPanel->cursor = (settingsPanel->cursor + dir + setRows) % setRows;
+}
+
+void VideoSettingsSelect()
+{
+    if(!VideoSettingsCursor())
+        return;
+
+    int page = setPage;
+    SettingsAct(settingsPanel->cursor);
+
+    // a list opens on its first choice, under the row that leads back
+    if(VideoSettingsVisible() && setPage != page)
+        settingsPanel->cursor = setPage != PAGE_MAIN && setRows > 1 ? 1 : 0;
+}
+
+// one step back: from a list to the first page, and from there shut
+void VideoSettingsBack()
+{
+    if(!VideoSettingsVisible())
+        return;
+    if(setPage == PAGE_MAIN)
+    {
+        HideVideoSettings();
+        return;
+    }
+    if(settingsPanel->cursor >= 0)
+        settingsPanel->cursor = 0;
+    ShowSettingsPage(PAGE_MAIN);
 }
 
 // the GUI thread's part: fetch the YouTube captions asked for, and show them
@@ -8382,6 +8509,7 @@ static void SetupGui()
     settingsPanel = new SettingsPanel;
     settingsPanel->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
     settingsPanel->SetPosition(20, -84); // just above the bar
+    settingsPanel->cursor = -1;
     for(int i = 0; i < SET_ROWS; i++)
     {
         settingsPanel->label[i] = new GuiText(NULL, 18, (GXColor){255, 255, 255, 255});
