@@ -480,6 +480,19 @@ static void Enable(GuiButton *b, bool on)
         b->SetState(STATE_DISABLED);
 }
 
+// after a page turn the d-pad's highlight stays on the button pressed, or
+// moves to the other one when it has gone grey on the first or last page
+static void KeepPageHighlight(GuiButton *b, GuiButton *other)
+{
+    if (userInput[0].wpad->ir.valid)
+        return; // the pointer has the highlight
+
+    if (b->GetState() != STATE_DISABLED)
+        b->SetState(STATE_SELECTED);
+    else if (other->GetState() != STATE_DISABLED)
+        other->SetState(STATE_SELECTED);
+}
+
 static int Pages(YtList *l)
 {
     return (l->count + PAGE - 1) / PAGE + (l->next[0] ? 1 : 0);
@@ -1039,6 +1052,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             sc.prev->ResetState();
             l->first = l->first >= PAGE ? l->first - PAGE : 0;
             Show(&sc);
+            KeepPageHighlight(sc.prev, sc.next);
         }
 
         if (l && sc.next->GetState() == STATE_CLICKED)
@@ -1049,6 +1063,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             if (l->first + PAGE < l->count)
                 l->first += PAGE;
             Show(&sc);
+            KeepPageHighlight(sc.next, sc.prev);
         }
 
         for (int s = 0; l && s < PAGE; s++)
