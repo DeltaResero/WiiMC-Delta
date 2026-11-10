@@ -412,12 +412,18 @@ static void ChangeMenu(int menu)
     UpdateMenuImages(menuPrevious, menuCurrent);
 }
 
+// the tab that owns what is loaded; anything loaded ends when another opens
+static int playbackTab = -1;
+
 void UndoChangeMenu()
 {
     SaveFolder();
     UpdateMenuImages(menuCurrent, menuPrevious);
     menuCurrent = menuPrevious;
     menuPrevious = menuUndo;
+
+    // a tab that sends the user back hands over what it loaded
+    playbackTab = menuCurrent > MENU_SETTINGS ? MENU_SETTINGS : menuCurrent;
 }
 
 static int menuTabClicks = 0;
@@ -1094,6 +1100,30 @@ static GuiButton *TabButton(int menu)
 static int CurrentTab()
 {
     return menuCurrent > MENU_SETTINGS ? MENU_SETTINGS : menuCurrent;
+}
+
+/****************************************************************************
+ * StopLoadedFile
+ *
+ * Ends the song that is playing or the video that is waiting to be resumed.
+ * Each tab keeps its own player, so this runs when another tab opens.
+ ***************************************************************************/
+static void StopLoadedFile()
+{
+    if(!wiiIsPlaying())
+        return;
+
+    StopMPlayerFile();
+    while(controlledbygui == 2) // wait for the file to end
+        usleep(THREAD_SLEEP);
+
+    loadedFile[0] = 0;
+    loadedFileDisplay[0] = 0;
+    DisableVideoImg();
+    nowPlaying->SetVisible(false);
+
+    for(int i = 1; i < 4; i++)
+        audiobarNowPlaying[i]->SetText(NULL);
 }
 
 static int NextTab(int menu, int dir)
@@ -9156,6 +9186,13 @@ void WiiMenu()
 
     while(!guiShutdown)
     {
+        if(CurrentTab() != playbackTab)
+        {
+            if(playbackTab != -1)
+                StopLoadedFile();
+            playbackTab = CurrentTab();
+        }
+
         switch (menuCurrent)
         {
             case MENU_BROWSE_VIDEOS:
