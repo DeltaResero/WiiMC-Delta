@@ -56,14 +56,42 @@ typedef struct
 {
     s32 s;
     wiimc_tls *tls;
+    // read ahead, so a header line costs one read instead of one per byte;
+    // what it holds past the headers is the body's start
+    u8 *ahead;
+    u32 pos, len;
 } http_conn;
 
-static s32 conn_read(const http_conn *c, void *buf, u32 len)
+#define AHEAD_SIZE 2048
+
+static s32 conn_read(http_conn *c, void *buf, u32 len)
 {
+    if (c->pos < c->len)
+    {
+        u32 n = c->len - c->pos < len ? c->len - c->pos : len;
+        memcpy(buf, c->ahead + c->pos, n);
+        c->pos += n;
+        return n;
+    }
     return c->tls ? tls_read(c->tls, buf, len) : net_read(c->s, buf, len);
 }
 
-static s32 conn_write(const http_conn *c, const void *buf, u32 len)
+// one byte, refilling the read-ahead when it's empty; 1, or what the read gave
+static s32 conn_getc(http_conn *c, char *ch)
+{
+    if (c->pos >= c->len)
+    {
+        s32 r = c->tls ? tls_read(c->tls, c->ahead, AHEAD_SIZE) : net_read(c->s, c->ahead, AHEAD_SIZE);
+        if (r <= 0)
+            return r;
+        c->pos = 0;
+        c->len = r;
+    }
+    *ch = c->ahead[c->pos++];
+    return 1;
+}
+
+static s32 conn_write(http_conn *c, const void *buf, u32 len)
 {
     return c->tls ? tls_write(c->tls, buf, len) : net_write(c->s, buf, len);
 }
@@ -73,6 +101,8 @@ static void conn_close(http_conn *c)
     tls_close(c->tls);
     c->tls = NULL;
     net_close(c->s);
+    free(c->ahead);
+    c->ahead = NULL;
 }
 
 static int _httoi(const char *value)
@@ -201,19 +231,17 @@ static s32 tcp_connect(char *host, const u16 port)
     return s;
 }
 
-static int tcp_readln(const http_conn *s, char *buf, const u16 max_length)
+// a line without its CRLF into buf, which holds max_length bytes; a line too
+// long for it keeps its start, and the rest is skipped. 0, or -1 on failure.
+static int tcp_readln(http_conn *s, char *buf, const u16 max_length)
 {
-    s32 res = -1;
-    s32 ret;
     u64 start_time = gettime();
     u16 c = 0;
+    char ch;
 
-    while (c < max_length)
+    while (ticks_to_millisecs(diff_ticks(start_time, gettime())) <= HTTP_TIMEOUT)
     {
-        if (ticks_to_millisecs(diff_ticks(start_time, gettime())) > HTTP_TIMEOUT)
-            break;
-
-        ret = conn_read(s, &buf[c], 1);
+        s32 ret = conn_getc(s, &ch);
 
         if (ret == -EAGAIN)
         {
@@ -224,20 +252,24 @@ static int tcp_readln(const http_conn *s, char *buf, const u16 max_length)
         if (ret <= 0)
             break;
 
-        if (c > 0 && buf[c - 1] == '\r' && buf[c] == '\n')
-        {
-            res = 0;
-            buf[c-1] = 0;
-            break;
-        }
-        c++;
         start_time = gettime();
-        usleep(100);
+
+        if (ch == '\n')
+        {
+            if (c > 0 && buf[c - 1] == '\r')
+                c--;
+            buf[c] = 0;
+            return 0;
+        }
+        if (c < max_length - 1)
+            buf[c++] = ch;
     }
-    return res;
+    if (max_length)
+        buf[c < max_length ? c : max_length - 1] = 0;
+    return -1;
 }
 
-static u32 tcp_read(const http_conn *s, u8 *buffer, const u32 length)
+static u32 tcp_read(http_conn *s, u8 *buffer, const u32 length)
 {
     char *p;
     u32 left, block, received, step=0;
@@ -285,7 +317,7 @@ static u32 tcp_read(const http_conn *s, u8 *buffer, const u32 length)
     return received;
 }
 
-static u32 tcp_write(const http_conn *s, const u8 *buffer, const u32 length)
+static u32 tcp_write(http_conn *s, const u8 *buffer, const u32 length)
 {
     const u8 *p;
     u32 left, block, sent, step=0;
@@ -350,7 +382,7 @@ static const char *header_value(const char *line, const char *name)
 }
 
 // reads a whole body, chunked or not, into dst; stops at cap
-static u32 read_body(const http_conn *s, bool chunked, u32 content_length, char *dst, u32 cap)
+static u32 read_body(http_conn *s, bool chunked, u32 content_length, char *dst, u32 cap)
 {
     if (!chunked)
         return tcp_read(s, (u8 *)dst, content_length < cap ? content_length : cap);
@@ -451,7 +483,11 @@ static u32 http_request(const char *url, FILE *hfile, char *buffer, u32 maxsize,
 
     url_free(tmpurl);
 
-    http_conn conn = { -1, NULL };
+    http_conn conn;
+    conn.s = -1;
+    conn.tls = NULL;
+    conn.ahead = NULL;
+    conn.pos = conn.len = 0;
     http_conn *s = &conn;
 
     conn.s = tcp_connect(http_host, http_port);
@@ -474,6 +510,15 @@ static u32 http_request(const char *url, FILE *hfile, char *buffer, u32 maxsize,
             free(http_host);
             return 0;
         }
+    }
+
+    conn.ahead = (u8 *) malloc(AHEAD_SIZE);
+    if (!conn.ahead)
+    {
+        conn_close(s);
+        free(http_path);
+        free(http_host);
+        return 0;
     }
 
     size_t bodylen = body ? strlen(body) : 0;
