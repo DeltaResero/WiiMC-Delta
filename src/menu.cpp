@@ -6025,6 +6025,7 @@ static void MenuSettingsOnlineMedia()
     else
         sprintf(options.name[i++], nulo);
     sprintf(options.name[i++], "Banner Screensaver");
+    sprintf(options.name[i++], "Correct the Clock Online");
 
     options.length = i;
 
@@ -6136,6 +6137,9 @@ static void MenuSettingsOnlineMedia()
                 if(WiiSettings.onlineBanners > 1)
                     WiiSettings.onlineBanners = 0;
                 break;
+            case 5:
+                WiiSettings.clockOnline ^= 1;
+                break;
         }
 
         if(ret >= 0 || firstRun)
@@ -6173,6 +6177,7 @@ static void MenuSettingsOnlineMedia()
             }
             //sprintf (options.value[3], "%d", WiiSettings.anisonfmQuality);
             sprintf(options.value[4], "%s", WiiSettings.onlineBanners ? "On" : "Off");
+            sprintf(options.value[5], "%s", WiiSettings.clockOnline ? "On" : "Off");
             optionBrowser.TriggerUpdate();
         }
 

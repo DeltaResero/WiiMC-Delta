@@ -18,4 +18,8 @@ u32 http_request (char *url, FILE *hfile, char *buffer, u32 maxsize, bool silent
 // the size stored, or 0 on failure.
 u32 http_fetch (const char *url, const char *body, const char *headers, char *buffer, u32 maxsize);
 
+// The time a plain http server gives in its Date header, in seconds since
+// 1970, from a HEAD request for url. 0 on failure.
+time_t http_server_time(const char *url);
+
 #endif

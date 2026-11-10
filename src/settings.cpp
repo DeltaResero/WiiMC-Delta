@@ -392,6 +392,7 @@ prepareSettingsData ()
     createXMLSetting("yggdrasilQuality", "Yggdrasil Radio artsyle", toStr(WiiSettings.yggdrasilQuality));
     createXMLSetting("anisonfmQuality", "ANISON.FM artstyle", toStr(WiiSettings.anisonfmQuality));
     createXMLSetting("onlineBanners", "Online Screensaver", toStr(WiiSettings.onlineBanners));
+    createXMLSetting("clockOnline", "Correct the clock online", toStr(WiiSettings.clockOnline));
     createXMLSetting("youtubeQuality", "YouTube quality", toStr(WiiSettings.youtubeQuality));
     createXMLSetting("youtubeSource", "YouTube source", toStr(WiiSettings.youtubeSource));
     // Network
@@ -818,6 +819,7 @@ void DefaultSettings ()
     WiiSettings.yggdrasilQuality = YGG_TUNEIN;
     WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
     WiiSettings.onlineBanners = 1;
+    WiiSettings.clockOnline = 1;
     WiiSettings.youtubeQuality = 360;
     WiiSettings.youtubeSource = 0;
     // Network
@@ -993,6 +995,8 @@ static void FixInvalidSettings()
 
     if(WiiSettings.onlineBanners < 0 || WiiSettings.onlineBanners > 1)
         WiiSettings.onlineBanners = 1;
+    if(WiiSettings.clockOnline != 0 && WiiSettings.clockOnline != 1)
+        WiiSettings.clockOnline = 1;
 
     // Network
     for(int i=0; i<MAX_SHARES; i++)
@@ -1330,6 +1334,7 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.yggdrasilQuality, "yggdrasilQuality");
                 loadXMLSetting(&WiiSettings.anisonfmQuality, "anisonfmQuality");
                 loadXMLSetting(&WiiSettings.onlineBanners, "onlineBanners");
+                loadXMLSetting(&WiiSettings.clockOnline, "clockOnline");
                 loadXMLSetting(&WiiSettings.youtubeQuality, "youtubeQuality");
                 loadXMLSetting(&WiiSettings.youtubeSource, "youtubeSource");
                 // Network

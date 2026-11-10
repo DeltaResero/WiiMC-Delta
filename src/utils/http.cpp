@@ -710,6 +710,75 @@ u32 http_request(char *url, FILE *hfile, char *buffer, u32 maxsize, bool silent)
     return http_request(url, hfile, buffer, maxsize, silent, 0, NULL, NULL, false);
 }
 
+// "Tue, 10 Nov 2026 13:05:09 GMT", the form RFC 9110 has servers send, as
+// seconds since 1970; 0 if it isn't one
+static time_t http_date(const char *v)
+{
+    static const char months[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+    char mon[4];
+    int d, y, h, m, sec;
+
+    if (sscanf(v, "%*3s, %d %3s %d %d:%d:%d", &d, mon, &y, &h, &m, &sec) != 6)
+        return 0;
+    const char *at = strstr(months, mon);
+    if (!at || (at - months) % 3 || y < 1970)
+        return 0;
+
+    // days since 1970 from the civil date (Howard Hinnant's days_from_civil)
+    int mo = (at - months) / 3 + 1;
+    y -= mo <= 2;
+    long era = y / 400;
+    long yoe = y - era * 400;
+    long doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    long doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    long days = era * 146097 + doe - 719468;
+    return (time_t)days * 86400 + h * 3600 + m * 60 + sec;
+}
+
+time_t http_server_time(const char *url)
+{
+    URL_t *u = url_new(url);
+    if (!u)
+        return 0;
+    if (!u->hostname || (u->protocol && strcasecmp(u->protocol, "http") != 0))
+    {
+        url_free(u);
+        return 0;
+    }
+
+    char request[1024];
+    snprintf(request, sizeof(request), "HEAD %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: %s/%s\r\n"
+        "Connection: close\r\n\r\n", u->file ? u->file : "/", u->hostname, APPNAME, APPVERSION);
+
+    http_conn conn;
+    conn.s = tcp_connect(u->hostname, u->port ? u->port : 80);
+    conn.tls = NULL;
+    conn.ahead = (u8 *)malloc(AHEAD_SIZE);
+    conn.pos = conn.len = 0;
+    url_free(u);
+
+    if (conn.s < 0 || !conn.ahead)
+    {
+        if (conn.s >= 0)
+            net_close(conn.s);
+        free(conn.ahead);
+        return 0;
+    }
+
+    time_t t = 0;
+    if (tcp_write(&conn, (const u8 *)request, strlen(request)))
+    {
+        char line[256];
+        const char *v;
+
+        for (int i = 0; i < 64 && tcp_readln(&conn, line, sizeof(line) - 1) == 0 && line[0]; i++)
+            if ((v = header_value(line, "Date")))
+                t = http_date(v);
+    }
+    conn_close(&conn);
+    return t;
+}
+
 u32 http_fetch(const char *url, const char *body, const char *headers, char *buffer, u32 maxsize)
 {
     return http_request(url, NULL, buffer, maxsize, true, 0, body, headers, true);

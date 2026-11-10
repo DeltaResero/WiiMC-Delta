@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "networkop.h"
 #include "settings.h"
+#include "utils/clock.h"
 #include "utils/ftp_devoptab.h"
 #include "utils/http.h"
 #include "utils/gettext.h"
@@ -161,6 +162,16 @@ static void * netcb (void *arg)
                 {
                     strcpy(wiiIP, inet_ntoa(hostip));
                     socInit();
+
+                    // once, before anything uses the network, so the first
+                    // https connection already has the right time
+                    static bool clockChecked = false;
+                    if(!clockChecked && WiiSettings.clockOnline)
+                    {
+                        clockChecked = true;
+                        ClockCorrectOnline();
+                    }
+
                     networkInit = true;
                     prevInit = true;
                     break;
