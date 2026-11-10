@@ -1069,6 +1069,166 @@ extern char onlinePLS[];
 //static bool isLoadingFile = false;
 
 /****************************************************************************
+ * Tab bar
+ *
+ * 1, 2, Tab, L, and R move a highlight along the tabs at the top, and so does
+ * the d-pad once Up at the top of a screen reaches them. A opens the
+ * highlighted tab. B, Down, or A on the tab already open goes back into the
+ * screen.
+ ***************************************************************************/
+
+static int tabHighlight = -1; // the menu whose tab is highlighted, or -1
+
+static GuiButton *TabButton(int menu)
+{
+    switch(menu)
+    {
+        case MENU_BROWSE_VIDEOS:        return videosBtn;
+        case MENU_BROWSE_MUSIC:         return musicBtn;
+        case MENU_DVD:                  return dvdBtn;
+        case MENU_BROWSE_ONLINEMEDIA:   return onlineBtn;
+        default:                        return settingsBtn;
+    }
+}
+
+static int CurrentTab()
+{
+    return menuCurrent > MENU_SETTINGS ? MENU_SETTINGS : menuCurrent;
+}
+
+static int NextTab(int menu, int dir)
+{
+    menu += dir;
+    if(menu == MENU_DVD && WiiSettings.dvdDisabled)
+        menu += dir;
+    if(menu > MENU_SETTINGS)
+        menu = MENU_BROWSE_VIDEOS;
+    if(menu < MENU_BROWSE_VIDEOS)
+        menu = MENU_SETTINGS;
+    return menu;
+}
+
+static void HighlightTab(int menu)
+{
+    if(tabHighlight >= 0)
+        TabButton(tabHighlight)->ResetState();
+
+    tabHighlight = menu;
+
+    if(tabHighlight >= 0)
+        TabButton(tabHighlight)->SetState(STATE_SELECTED);
+}
+
+static bool PadDown(GuiTrigger *t, u32 wii, u16 gc, u32 ctr)
+{
+    return t->wpad->btns_d & wii || t->pad.btns_d & gc || t->cpad.data.down & ctr;
+}
+
+// before the screen sees the buttons: the tab bar takes them while it's highlighted
+static void TabBarInput()
+{
+    GuiTrigger *t = &userInput[0];
+    static int lastMenu = -1;
+
+    guiUpMoved = false;
+    guiUpAtTop = false;
+
+    // a tab picked with the pointer, or a menu change from elsewhere
+    if(tabHighlight >= 0 && menuCurrent != lastMenu)
+        HighlightTab(-1);
+    lastMenu = menuCurrent;
+
+    if(mainWindow->GetState() == STATE_DISABLED)
+        return;
+
+    int dir = 0;
+
+    if(PadDown(t, WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X, PAD_TRIGGER_R, CTR_BUTTON_R))
+        dir = 1;
+    else if(PadDown(t, WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y, PAD_TRIGGER_L, CTR_BUTTON_L))
+        dir = -1;
+
+    if(dir)
+    {
+        HighlightTab(NextTab(tabHighlight >= 0 ? tabHighlight : CurrentTab(), dir));
+        return;
+    }
+
+    if(tabHighlight < 0)
+        return;
+
+    if(PadDown(t, WPAD_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_RIGHT, PAD_BUTTON_RIGHT, CTR_BUTTON_RIGHT))
+        HighlightTab(NextTab(tabHighlight, 1));
+    else if(PadDown(t, WPAD_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_LEFT, PAD_BUTTON_LEFT, CTR_BUTTON_LEFT))
+        HighlightTab(NextTab(tabHighlight, -1));
+    else if(PadDown(t, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A))
+    {
+        // A with the pointer on a tab is a click on that tab
+        if(t->wpad->ir.valid && (videosBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
+            musicBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
+            (dvdBtn->IsVisible() && dvdBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)) ||
+            onlineBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
+            settingsBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)))
+        {
+            HighlightTab(-1);
+            return;
+        }
+
+        int menu = tabHighlight;
+        HighlightTab(-1);
+
+        // GC controller can crash if screensaver is active.
+        if(menu != CurrentTab() && screensaverThreadHalt != 0)
+            ChangeMenu(menu);
+    }
+    else if(PadDown(t, WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B, PAD_BUTTON_B, CTR_BUTTON_B) ||
+        PadDown(t, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN, CTR_BUTTON_DOWN))
+    {
+        HighlightTab(-1);
+    }
+
+    // the screen underneath doesn't move or act while the tabs have the highlight
+    u32 wii = WPAD_BUTTON_UP | WPAD_BUTTON_DOWN | WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT |
+        WPAD_BUTTON_A | WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_UP | WPAD_CLASSIC_BUTTON_DOWN |
+        WPAD_CLASSIC_BUTTON_LEFT | WPAD_CLASSIC_BUTTON_RIGHT | WPAD_CLASSIC_BUTTON_A |
+        WPAD_CLASSIC_BUTTON_B;
+    u16 gc = PAD_BUTTON_UP | PAD_BUTTON_DOWN | PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT |
+        PAD_BUTTON_A | PAD_BUTTON_B;
+    u32 ctr = CTR_BUTTON_UP | CTR_BUTTON_DOWN | CTR_BUTTON_LEFT | CTR_BUTTON_RIGHT |
+        CTR_BUTTON_A | CTR_BUTTON_B | CTR_STICK_UP | CTR_STICK_DOWN | CTR_STICK_LEFT | CTR_STICK_RIGHT;
+
+    t->wpad->btns_d &= ~wii;
+    t->wpad->btns_h &= ~wii;
+    t->pad.btns_d &= ~gc;
+    t->pad.btns_h &= ~gc;
+    t->pad.stickX = 0;
+    t->pad.stickY = 0;
+    t->cpad.data.down &= ~ctr;
+    t->cpad.data.held &= ~ctr;
+}
+
+// after the screen has had the buttons: Up at its top reaches the tabs
+static void TabBarAfterInput()
+{
+    GuiTrigger *t = &userInput[0];
+
+    if(mainWindow->GetState() == STATE_DISABLED)
+        return;
+
+    if(tabHighlight >= 0)
+    {
+        // the pointer passing over a tab clears its highlight
+        if(TabButton(tabHighlight)->GetState() == STATE_DEFAULT)
+            TabButton(tabHighlight)->SetState(STATE_SELECTED);
+        return;
+    }
+
+    if(guiUpAtTop && !guiUpMoved && !t->wpad->ir.valid &&
+        PadDown(t, WPAD_BUTTON_UP | WPAD_CLASSIC_BUTTON_UP, PAD_BUTTON_UP, CTR_BUTTON_UP))
+        HighlightTab(CurrentTab());
+}
+
+/****************************************************************************
  * GuiThread
  *
  * Primary GUI thread to allow GUI to respond to state changes, and draws GUI
@@ -1111,6 +1271,7 @@ static void *GuiThread (void *arg)
             SetVIscale();
         }
         UpdatePads();
+        TabBarInput();
         mainWindow->Update(&userInput[3]);
         mainWindow->Update(&userInput[2]);
         mainWindow->Update(&userInput[1]);
@@ -1142,35 +1303,7 @@ static void *GuiThread (void *arg)
             //! render everything
             mainWindow->Draw();
 
-        if(mainWindow->GetState() != STATE_DISABLED)
-        {
-            if(userInput[0].wpad->btns_d & (WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X) ||
-                userInput[0].pad.btns_d & PAD_TRIGGER_R || userInput[0].cpad.data.down & CTR_BUTTON_R)
-            {
-                int newMenu = menuCurrent + 1;
-                if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
-                    newMenu++;
-                if(newMenu > MENU_SETTINGS)
-                    newMenu = MENU_BROWSE_VIDEOS;
-
-                // GC controller can crash if screensaver is active.
-                if(screensaverThreadHalt != 0)
-                    ChangeMenu(newMenu);
-            }
-            else if(userInput[0].wpad->btns_d & (WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y) ||
-                    userInput[0].pad.btns_d & PAD_TRIGGER_L || userInput[0].cpad.data.down & CTR_BUTTON_L)
-            {
-                int newMenu = menuCurrent - 1;
-                if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
-                    newMenu--;
-                if(newMenu < MENU_BROWSE_VIDEOS)
-                    newMenu = MENU_SETTINGS;
-
-                // GC controller can crash if screensaver is active.
-                if(screensaverThreadHalt != 0)
-                    ChangeMenu(newMenu);
-            }
-        }
+        TabBarAfterInput();
 
             u32 xfb_offset = (((vmode->fbWidth * VI_DISPLAY_PIX_SZ) * (vmode->xfbHeight / 2)) * y) + ((half_wh * VI_DISPLAY_PIX_SZ) * x);
             GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
@@ -1211,40 +1344,13 @@ static void *GuiThread (void *arg)
                 96, 96, pointer[0]->GetImage(), userInput[0].wpad->ir.angle, 1, 1, 255, GX_TF_RGBA8);
 
         DoRumble(0);
+        TabBarInput();
         mainWindow->Update(&userInput[3]);
         mainWindow->Update(&userInput[2]);
         mainWindow->Update(&userInput[1]);
         mainWindow->Update(&userInput[0]);
 
-        if(mainWindow->GetState() != STATE_DISABLED)
-        {
-            if(userInput[0].wpad->btns_d & (WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X) ||
-                    userInput[0].pad.btns_d & PAD_TRIGGER_R || userInput[0].cpad.data.down & CTR_BUTTON_R)
-            {
-                int newMenu = menuCurrent + 1;
-                if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
-                    newMenu++;
-                if(newMenu > MENU_SETTINGS)
-                    newMenu = MENU_BROWSE_VIDEOS;
-
-                // GC controller can crash if screensaver is active.
-                if(screensaverThreadHalt != 0)
-                    ChangeMenu(newMenu);
-            }
-            else if(userInput[0].wpad->btns_d & (WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y) ||
-                    userInput[0].pad.btns_d & PAD_TRIGGER_L || userInput[0].cpad.data.down & CTR_BUTTON_L)
-            {
-                int newMenu = menuCurrent - 1;
-                if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
-                    newMenu--;
-                if(newMenu < MENU_BROWSE_VIDEOS)
-                    newMenu = MENU_SETTINGS;
-
-                // GC controller can crash if screensaver is active.
-                if(screensaverThreadHalt != 0)
-                    ChangeMenu(newMenu);
-            }
-        }
+        TabBarAfterInput();
         //! render to screen
         Menu_Render();
     }

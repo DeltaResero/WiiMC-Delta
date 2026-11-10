@@ -76,6 +76,11 @@ extern FreeTypeGX *fontSystemBold[];
 #define MAX_MENUITEMS           11
 #define MAX_KEYBOARD_DISPLAY    32
 
+// Up was pressed this frame: whether a list or window moved its highlight, and
+// whether one was already at its top. Up at the top of a screen reaches the tab bar.
+extern bool guiUpMoved;
+extern bool guiUpAtTop;
+
 typedef void (*UpdateCallback)(void * e);
 
 enum
@@ -566,7 +571,7 @@ class GuiWindow : public GuiElement
         void MoveSelectionHor(int d);
         //!Moves the selected element to the element above or below
         //!\param d Direction to move (-1 = up, 1 = down)
-        void MoveSelectionVert(int d);
+        bool MoveSelectionVert(int d);
         //!Selects one element and clears every other selection, so a pointer
         //!highlight can't be left behind when the D-pad moves on
         //!\param n Index of the element to select

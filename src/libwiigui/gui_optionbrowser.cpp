@@ -439,8 +439,12 @@ void GuiOptionBrowser::Update(GuiTrigger * t)
     {
         prev = this->FindMenuItem(optionIndex[selectedItem], -1);
 
-        if(prev >= 0)
+        if(prev < 0)
+            guiUpAtTop = true;
+        else
         {
+            guiUpMoved = true;
+
             if(selectedItem == 0)
             {
                 // move list up by 1
