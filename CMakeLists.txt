@@ -267,7 +267,7 @@ target_link_libraries(wiimc PRIVATE
   ${MPLAYER}/libmplayerwii.a ${FFMPEG_LIBS}
   mbedtls mbedx509 mbedcrypto
   jpeg di iso9660 ${EXTPREFIX}/lib/libiconv.a png z mxml PkgConfig::FREETYPE
-  fat wiiuse bte ogc tinysmb ${WIIMC_FS_LIBS})
+  fat wiikeyboard wiiuse bte ogc tinysmb ${WIIMC_FS_LIBS})
 add_dependencies(wiimc mplayer ffmpeg iconv)
 
 ogc_create_dol(wiimc)

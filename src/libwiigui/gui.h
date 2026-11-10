@@ -960,7 +960,8 @@ class GuiKeyboard : public GuiWindow
         //!Shows p in grey while nothing is typed; p must outlive the keyboard
         void SetPlaceholder(const char * p);
         char kbtextstr[256];
-        bool backPressed; //!< B was pressed with no text left to delete
+        bool backPressed; //!< B was pressed with no text left to delete, or Esc
+        bool enterPressed; //!< Enter was pressed on a USB keyboard
     protected:
         //!The keys that don't type a character
         enum { KB_BACKSPACE, KB_DELETE, KB_CAPS, KB_SHIFT, KB_CLEAR, KB_SPACE, KB_LEFT, KB_RIGHT, KB_SPECIALS };
@@ -969,6 +970,7 @@ class GuiKeyboard : public GuiWindow
         void Backspace();
         void Delete();
         void PlaceCursor(int x);
+        void ReadUsbKeyboard();
         int TextWidth(u32 from, u32 to);
         GuiButton * NewKey(GuiImageData * img, GuiImageData * over, const char * label, int x, int row, int k);
         const char * placeholder;

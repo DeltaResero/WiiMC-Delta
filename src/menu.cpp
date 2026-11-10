@@ -2263,9 +2263,9 @@ bool OnScreenKeyboard(char *var, u32 maxlen)
     {
         usleep(THREAD_SLEEP);
 
-        if(okBtn.GetState() == STATE_CLICKED)
+        if(okBtn.GetState() == STATE_CLICKED || keyboard.enterPressed)
             save = 1;
-        else if(cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed) // B with no text left
+        else if(cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed) // B with no text left, or Esc
             save = 0;
     }
 

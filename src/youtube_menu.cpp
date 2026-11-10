@@ -357,7 +357,7 @@ static bool SearchKeyboard(char *query)
 
         if (ExitRequested)
             result = 0;
-        else if (okBtn.GetState() == STATE_CLICKED)
+        else if (okBtn.GetState() == STATE_CLICKED || keyboard.enterPressed)
             result = 1;
         else if (cancelBtn.GetState() == STATE_CLICKED || keyboard.backPressed)
             result = 0;

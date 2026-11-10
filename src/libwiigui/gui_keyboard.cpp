@@ -9,6 +9,7 @@
  ***************************************************************************/
 
 #include "gui.h"
+#include <wiikeyboard/keyboard.h>
 
 // how wide the text in the box can be
 #define TEXT_WIDTH 360
@@ -73,11 +74,22 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
     shift = 0;
     caps = 0;
     backPressed = false;
+    enterPressed = false;
     placeholder = NULL;
     selectable = true;
     focus = 1; // allow focus
     alignmentHor = ALIGN_CENTRE;
     alignmentVert = ALIGN_MIDDLE;
+
+    // a USB keyboard types too. libogc's thread for it wakes 100 times a
+    // second, so it starts the first time the keyboard opens, not at boot.
+    static bool usbKeyboard = false;
+
+    if(!usbKeyboard)
+        usbKeyboard = (KEYBOARD_Init(NULL) == 0);
+    else
+        KEYBOARD_FlushEvents(); // keys pressed while the keyboard was closed
+
     strncpy(kbtextstr, t, max);
     kbtextstr[max] = 0;
     kbtextmaxlen = max;
@@ -376,6 +388,61 @@ void GuiKeyboard::Delete()
     textChanged = true;
 }
 
+// Types what's pressed on a USB keyboard. Enter and Esc are for whoever
+// opened the keyboard, to act on like OK and Cancel.
+void GuiKeyboard::ReadUsbKeyboard()
+{
+    keyboard_event ev;
+
+    while(KEYBOARD_GetEvent(&ev) > 0)
+    {
+        if(ev.type != KEYBOARD_PRESSED || MOD_ONESET(ev.modifiers, MOD_ANYCONTROL | MOD_ANYMETA))
+            continue;
+
+        switch(ev.symbol)
+        {
+            case KS_BackSpace:
+                Backspace();
+                break;
+            case KS_Delete:
+            case KS_KP_Delete:
+                Delete();
+                break;
+            case KS_Left:
+            case KS_KP_Left:
+                cursor = PrevChar(kbtextstr, cursor);
+                textChanged = true;
+                break;
+            case KS_Right:
+            case KS_KP_Right:
+                cursor = NextChar(kbtextstr, cursor);
+                textChanged = true;
+                break;
+            case KS_Home:
+            case KS_KP_Home:
+                cursor = 0;
+                textChanged = true;
+                break;
+            case KS_End:
+            case KS_KP_End:
+                cursor = strlen(kbtextstr);
+                textChanged = true;
+                break;
+            case KS_Return:
+            case KS_KP_Enter:
+                enterPressed = true;
+                break;
+            case KS_Escape:
+                backPressed = true;
+                break;
+            default:
+                if(ev.symbol >= 0x20 && ev.symbol < 0x7f)
+                    Type(ev.symbol);
+                break;
+        }
+    }
+}
+
 void GuiKeyboard::Update(GuiTrigger * t)
 {
     if(_elements.size() == 0 || (state == STATE_DISABLED && parentElement))
@@ -388,6 +455,8 @@ void GuiKeyboard::Update(GuiTrigger * t)
     }
 
     bool update = false;
+
+    ReadUsbKeyboard();
 
     if((t->wpad->btns_d & (WPAD_BUTTON_B | WPAD_CLASSIC_BUTTON_B)) ||
         (t->pad.btns_d & PAD_BUTTON_B) || (t->cpad.data.down & CTR_BUTTON_B))
