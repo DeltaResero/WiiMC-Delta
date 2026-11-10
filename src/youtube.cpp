@@ -21,16 +21,32 @@
 #define REPLY_SIZE (1024*1024) // enough for a page of results, unpacked
 
 #define YT_API "https://www.youtube.com/youtubei/v1/"
-#define WEB_CLIENT "{\"clientName\":\"WEB\",\"clientVersion\":\"2.20260925.01.00\",\"hl\":\"en\",\"gl\":\"US\""
-#define ANDROID_CLIENT "{\"clientName\":\"ANDROID\",\"clientVersion\":\"21.26.364\",\"androidSdkVersion\":30," \
-    "\"userAgent\":\"com.google.android.youtube/21.26.364 (Linux; U; Android 11) gzip\"," \
+// Each client YouTube is asked as, and the user agent that client's own
+// requests carry. A request says the same in its body and its headers.
+#define WEB_VERSION "2.20260925.01.00"
+#define WEB_UA "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " \
+    "Chrome/156.0.0.0 Safari/537.36"
+#define ANDROID_VERSION "21.26.364"
+#define ANDROID_UA "com.google.android.youtube/" ANDROID_VERSION " (Linux; U; Android 11) gzip"
+#define VISIONOS_UA "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 " \
+    "(KHTML, like Gecko) Version/26.0 Safari/605.1.15"
+
+#define WEB_CLIENT "{\"clientName\":\"WEB\",\"clientVersion\":\"" WEB_VERSION "\",\"hl\":\"en\",\"gl\":\"US\""
+#define ANDROID_CLIENT "{\"clientName\":\"ANDROID\",\"clientVersion\":\"" ANDROID_VERSION "\"," \
+    "\"androidSdkVersion\":30,\"userAgent\":\"" ANDROID_UA "\"," \
     "\"osName\":\"Android\",\"osVersion\":\"11\",\"hl\":\"en\",\"gl\":\"US\""
 #define VISIONOS_CLIENT "{\"clientName\":\"VISIONOS\",\"clientVersion\":\"1.02\",\"deviceMake\":\"Apple\"," \
-    "\"deviceModel\":\"RealityDevice17,1\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) " \
-    "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15\"," \
+    "\"deviceModel\":\"RealityDevice17,1\",\"userAgent\":\"" VISIONOS_UA "\"," \
     "\"osName\":\"visionOS\",\"osVersion\":\"26.5.23O471\",\"hl\":\"en\",\"gl\":\"US\""
-#define BROWSER_HEADERS "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
-    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n"
+
+// the browser's headers, for pages that aren't the API; then each client's,
+// with the client's number and version where it's known (1 web, 3 Android)
+#define BROWSER_HEADERS "User-Agent: " WEB_UA "\r\n"
+#define WEB_HEADERS "User-Agent: " WEB_UA "\r\nX-YouTube-Client-Name: 1\r\n" \
+    "X-YouTube-Client-Version: " WEB_VERSION "\r\nOrigin: https://www.youtube.com\r\n"
+#define ANDROID_HEADERS "User-Agent: " ANDROID_UA "\r\nX-YouTube-Client-Name: 3\r\n" \
+    "X-YouTube-Client-Version: " ANDROID_VERSION "\r\n"
+#define VISIONOS_HEADERS "User-Agent: " VISIONOS_UA "\r\n"
 
 #define RIITUBE_VIDEO "http://riitube.rc24.xyz/video/wii/?q="
 #define RIITUBE_LIST "http://riitube.rc24.xyz/wiimc/"
@@ -50,6 +66,7 @@ static int audioPlaying = 0;        // which of audioTracks plays
 static char *audioUrl = NULL;       // its link when it's a stream of its own
 static char audioWanted[64] = "";   // the track picked for audioFor; "" = original
 static char audioFor[32] = "";
+static const char *streamAgent = NULL;  // the user agent of the client that gave the links
 
 // a reply from YouTube in a new buffer, which the caller frees; NULL on failure
 static char *Fetch(const char *url, const char *body, const char *headers, u32 *len)
@@ -93,7 +110,7 @@ static int Items(const char *endpoint, const char *body, YtItem *items, int max,
     snprintf(url, sizeof(url), YT_API "%s?prettyPrint=false", endpoint);
 
     u32 len;
-    char *reply = Fetch(url, body, BROWSER_HEADERS, &len);
+    char *reply = Fetch(url, body, WEB_HEADERS, &len);
     if (!reply)
         return 0;
 
@@ -235,7 +252,7 @@ int YouTubeSuggest(const char *text, char (*out)[96], int max)
 }
 
 // the player reply for a video as a client sees it; NULL on failure
-static char *Player(const char *videoId, const char *client, u32 *len)
+static char *Player(const char *videoId, const char *client, const char *headers, u32 *len)
 {
     char id[32], vis[1024], body[2560];
 
@@ -244,7 +261,7 @@ static char *Player(const char *videoId, const char *client, u32 *len)
     snprintf(body, sizeof(body), "{\"videoId\":\"%s\",\"context\":{\"client\":%s%s%s%s}},"
         "\"contentCheckOk\":true,\"racyCheckOk\":true}", id, client,
         vis[0] ? ",\"visitorData\":\"" : "", vis, vis[0] ? "\"" : "");
-    return Fetch(YT_API "player?prettyPrint=false", body, BROWSER_HEADERS, len);
+    return Fetch(YT_API "player?prettyPrint=false", body, headers, len);
 }
 
 static bool Playable(const char *reply)
@@ -291,7 +308,7 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
     int quality = WiiSettings.youtubeQuality;
     if (quality > 360 || audioWanted[0])
     {
-        char *reply = Player(videoId, VISIONOS_CLIENT, &len);
+        char *reply = Player(videoId, VISIONOS_CLIENT, VISIONOS_HEADERS, &len);
         if (reply && Playable(reply))
         {
             int h = 0;
@@ -306,6 +323,7 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
                     audioPlaying = pick;
                     height = h;
                     captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
+                    streamAgent = VISIONOS_UA;
                     free(reply);
                     return true;
                 }
@@ -316,7 +334,7 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
         audioCount = 0;
     }
 
-    char *reply = Player(videoId, ANDROID_CLIENT, &len);
+    char *reply = Player(videoId, ANDROID_CLIENT, ANDROID_HEADERS, &len);
     if (!reply)
         return false;
 
@@ -330,6 +348,7 @@ bool YouTubeResolve(const char *videoId, char *url, size_t urlsize, char *reason
         audioCount = YtParseAdaptive(reply, len, 0, none, sizeof(none), &h, audioTracks, YT_AUDIO_MAX);
         height = 360;
         captionCount = YtParseCaptions(reply, len, captions, YT_CAPTIONS_MAX);
+        streamAgent = ANDROID_UA;
     }
     free(reply);
     return ok;
@@ -387,6 +406,14 @@ void YouTubeForget()
     free(audioUrl);
     audioUrl = NULL;
     height = 0;
+    streamAgent = NULL;
+}
+
+// The user agent to fetch the video last resolved with, as the client that
+// gave its links would; NULL for anything else. FFmpeg's https asks this.
+extern "C" const char *YouTubeStreamAgent(void)
+{
+    return streamAgent;
 }
 
 int YouTubeCaptionCount()
@@ -410,7 +437,9 @@ bool YouTubeCaptionSave(int i, const char *file)
         return false;
 
     u32 len;
-    char *xml = Fetch(captions[i].url, NULL, BROWSER_HEADERS, &len);
+    char headers[256];
+    snprintf(headers, sizeof(headers), "User-Agent: %s\r\n", streamAgent ? streamAgent : WEB_UA);
+    char *xml = Fetch(captions[i].url, NULL, headers, &len);
     if (!xml)
         return false;
 

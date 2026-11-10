@@ -97,6 +97,8 @@ static void close_f(stream_t *stream)
 static const char prefix[] = "ffmpeg://";
 
 #ifdef GEKKO
+const char *YouTubeStreamAgent(void); /* youtube.cpp */
+
 static int googlevideo_itag18(const char *url)
 {
     const char *p = url;
@@ -182,6 +184,10 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
             av_dict_set(&avopts, "request_size", "1048576", 0);
             av_dict_set(&avopts, "multiple_requests", "1", 0);
         }
+
+        /* fetch a YouTube video as the client that was given its links */
+        if (strstr(filename, ".googlevideo.com/") && YouTubeStreamAgent())
+            av_dict_set(&avopts, "user_agent", YouTubeStreamAgent(), 0);
     }
 #endif
 
