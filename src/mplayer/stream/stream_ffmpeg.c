@@ -192,8 +192,9 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
          * open-ended request to below its bitrate after the first 256 KB,
          * but not one read in pieces: ask for 1 MB at a time, on one kept
          * connection. itag 18, with sound and picture in one file, isn't
-         * slowed. */
-        if (strstr(filename, ".googlevideo.com/") && !googlevideo_itag18(filename)) {
+         * slowed, and a live stream's playlists aren't files. */
+        if (strstr(filename, ".googlevideo.com/") && !googlevideo_itag18(filename) &&
+            !strstr(filename, "/api/manifest/")) {
             av_dict_set(&avopts, "request_size", "1048576", 0);
             av_dict_set(&avopts, "multiple_requests", "1", 0);
         }

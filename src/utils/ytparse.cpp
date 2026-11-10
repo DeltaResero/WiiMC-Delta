@@ -628,6 +628,63 @@ bool YtParsePlayer(const char *json, size_t len, char *url, size_t urlsize, char
     return false;
 }
 
+bool YtParseHlsManifest(const char *json, size_t len, char *url, size_t urlsize)
+{
+    const char *e = json + len;
+    char status[32];
+
+    url[0] = 0;
+    getstr(path(json, e, "playabilityStatus.status"), e, status, sizeof(status));
+    return strcmp(status, "OK") == 0 &&
+        getstr(path(json, e, "streamingData.hlsManifestUrl"), e, url, urlsize) &&
+        strncmp(url, "https://", 8) == 0;
+}
+
+bool YtParseHlsVariant(const char *text, size_t len, int maxHeight, char *url, size_t urlsize, int *height)
+{
+    const char *e = text + len;
+    const char *best = NULL;
+    int bh = 0, h = -1; // h: the height of the playlist on the next line, -1 for none
+
+    url[0] = 0;
+    *height = 0;
+
+    // each #EXT-X-STREAM-INF line describes the playlist on the line after it
+    for (const char *p = text; p < e; )
+    {
+        const char *nl = (const char *)memchr(p, '\n', e - p);
+        const char *end = nl ? nl : e;
+        size_t n = end - p;
+
+        if (n && end[-1] == '\r')
+            n--;
+        if (n > 18 && strncmp(p, "#EXT-X-STREAM-INF:", 18) == 0)
+        {
+            const char *r = (const char *)memmem(p, n, "RESOLUTION=", 11);
+            const char *c = (const char *)memmem(p, n, "avc1", 4);
+            const char *x = r ? (const char *)memchr(r, 'x', end - r) : NULL;
+            h = (x && c) ? atoi(x + 1) : -1;
+        }
+        else if (n && p[0] != '#' && h > 0)
+        {
+            bool fits = h <= maxHeight;
+            if (!best || (fits && (h > bh || bh > maxHeight)) || (!fits && bh > maxHeight && h < bh))
+            {
+                best = p;
+                bh = h;
+                if (n >= urlsize)
+                    return false;
+                memcpy(url, p, n);
+                url[n] = 0;
+            }
+            h = -1;
+        }
+        p = nl ? nl + 1 : e;
+    }
+    *height = bh;
+    return best && strncmp(url, "https://", 8) == 0;
+}
+
 int YtParseCaptions(const char *json, size_t len, YtCaption *out, int max)
 {
     const char *e = json + len;
