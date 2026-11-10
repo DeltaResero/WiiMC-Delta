@@ -1166,7 +1166,7 @@ static void TabBarInput()
     u64 now = gettime();
     if(!side || side != (heldBefore & (TAB_LEFT | TAB_RIGHT)))
         holdStart = lastStep = now;
-    else if(diff_usec(holdStart, now) > 700000 && diff_usec(lastStep, now) > 300000)
+    else if(diff_usec(holdStart, now) > SCROLL_DELAY_INITIAL && diff_usec(lastStep, now) > 300000)
     {
         down |= side;
         lastStep = now;

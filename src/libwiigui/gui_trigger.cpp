@@ -225,7 +225,7 @@ bool GuiTrigger::Left()
 
             if(delay[chan] == SCROLL_DELAY_INITIAL)
                 delay[chan] = SCROLL_DELAY_LOOP;
-            else if(delay[chan] > SCROLL_DELAY_DECREASE)
+            else if(delay[chan] > SCROLL_DELAY_FASTEST + SCROLL_DELAY_DECREASE)
                 delay[chan] -= SCROLL_DELAY_DECREASE;
             return true;
         }
@@ -260,7 +260,7 @@ bool GuiTrigger::Right()
 
             if(delay[chan] == SCROLL_DELAY_INITIAL)
                 delay[chan] = SCROLL_DELAY_LOOP;
-            else if(delay[chan] > SCROLL_DELAY_DECREASE)
+            else if(delay[chan] > SCROLL_DELAY_FASTEST + SCROLL_DELAY_DECREASE)
                 delay[chan] -= SCROLL_DELAY_DECREASE;
             return true;
         }
@@ -302,7 +302,7 @@ bool GuiTrigger::Up()
 
             if(delay[chan] == SCROLL_DELAY_INITIAL)
                 delay[chan] = SCROLL_DELAY_LOOP;
-            else if(delay[chan] > SCROLL_DELAY_DECREASE)
+            else if(delay[chan] > SCROLL_DELAY_FASTEST + SCROLL_DELAY_DECREASE)
                 delay[chan] -= SCROLL_DELAY_DECREASE;
             return true;
         }
@@ -344,7 +344,7 @@ bool GuiTrigger::Down()
 
             if(delay[chan] == SCROLL_DELAY_INITIAL)
                 delay[chan] = SCROLL_DELAY_LOOP;
-            else if(delay[chan] > SCROLL_DELAY_DECREASE)
+            else if(delay[chan] > SCROLL_DELAY_FASTEST + SCROLL_DELAY_DECREASE)
                 delay[chan] -= SCROLL_DELAY_DECREASE;
             return true;
         }

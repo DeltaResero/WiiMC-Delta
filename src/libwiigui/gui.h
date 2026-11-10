@@ -67,9 +67,12 @@ using namespace std;
 extern FreeTypeGX *fontSystem[];
 extern FreeTypeGX *fontSystemBold[];
 
-#define SCROLL_DELAY_INITIAL    200000
-#define SCROLL_DELAY_LOOP       30000
-#define SCROLL_DELAY_DECREASE   300
+// The d-pad moves one step for each press. Held, it waits, then steps on
+// faster and faster, as a remote control does. In microseconds.
+#define SCROLL_DELAY_INITIAL    500000  // held this long before it repeats
+#define SCROLL_DELAY_LOOP       160000  // then between steps at first
+#define SCROLL_DELAY_DECREASE   6000    // less after each step
+#define SCROLL_DELAY_FASTEST    40000   // down to this
 #define FILE_PAGESIZE           11
 #define PAGESIZE                11
 #define MAX_OPTIONS             150

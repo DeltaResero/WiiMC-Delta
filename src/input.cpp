@@ -418,7 +418,7 @@ void MPlayerInput()
             step = way != 0;
             holdStart = lastStep = now;
         }
-        else if(way && diff_usec(holdStart, now) > 700000 && diff_usec(lastStep, now) > 250000)
+        else if(way && diff_usec(holdStart, now) > SCROLL_DELAY_INITIAL && diff_usec(lastStep, now) > SCROLL_DELAY_LOOP)
         {
             step = true;
             lastStep = now;
