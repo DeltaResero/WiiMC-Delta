@@ -1079,8 +1079,9 @@ extern char onlinePLS[];
  *
  * 1, 2, Tab, L, and R move a highlight along the tabs at the top, and so does
  * the d-pad once Up at the top of a screen reaches them. A opens the
- * highlighted tab. B, Down, or A on the tab already open goes back into the
- * screen. The logo is the last stop along the row: A on it shows the credits.
+ * highlighted tab, and the highlight stays on it. B, Down, or A on the tab
+ * already open goes back into the screen. The logo is the last stop along the
+ * row: A on it shows the credits.
  ***************************************************************************/
 
 #define TAB_LOGO 1000 // the logo's place in the row, after the last menu
@@ -1227,7 +1228,7 @@ static void TabBarInput()
     guiUpAtTop = false;
 
     // a tab picked with the pointer, or a menu change from elsewhere
-    if(tabHighlight >= 0 && menuCurrent != lastMenu)
+    if(tabHighlight >= 0 && menuCurrent != lastMenu && tabHighlight != CurrentTab())
         HighlightTab(-1);
     lastMenu = menuCurrent;
 
@@ -1267,14 +1268,15 @@ static void TabBarInput()
             return;
         }
 
-        int menu = tabHighlight;
-        HighlightTab(-1);
-
+        // The highlight stays on a tab that A opens, and on the logo. A on
+        // the tab already open goes into its screen.
         // GC controller can crash if screensaver is active.
-        if(menu == TAB_LOGO)
+        if(tabHighlight == TAB_LOGO)
             ResumeCreditsThread();
-        else if(menu != CurrentTab() && screensaverThreadHalt != 0)
-            ChangeMenu(menu);
+        else if(tabHighlight != CurrentTab() && screensaverThreadHalt != 0)
+            ChangeMenu(tabHighlight);
+        else
+            HighlightTab(-1);
     }
     else if(down & (TAB_B | TAB_DOWN))
     {
