@@ -1205,6 +1205,7 @@ static void TabBarInput()
     GuiTrigger *t = &userInput[0];
     static int lastMenu = -1;
     static int heldBefore = 0;
+    static int leaving = 0; // the buttons still held from leaving the tabs
     static u64 holdStart = 0, lastStep = 0;
 
     TabBarShowButtons();
@@ -1230,6 +1231,7 @@ static void TabBarInput()
         lastStep = now;
     }
     heldBefore = held;
+    leaving &= held;
 
     // the credits take the whole screen, and every button with it
     if(mainWindow != menuWindow)
@@ -1271,10 +1273,17 @@ static void TabBarInput()
         return;
     }
 
-    if(tabHighlight < 0)
+    if(tabHighlight < 0 && !leaving)
         return;
 
-    if(down & TAB_RIGHT)
+    bool onTabs = tabHighlight >= 0;
+
+    if(!onTabs)
+    {
+        // The button that left the tabs is still held. The screen would
+        // take it for a held d-pad and move on at once.
+    }
+    else if(down & TAB_RIGHT)
         HighlightTab(NextTab(tabHighlight, 1));
     else if(down & TAB_LEFT)
         HighlightTab(NextTab(tabHighlight, -1));
@@ -1294,6 +1303,9 @@ static void TabBarInput()
     {
         HighlightTab(-1);
     }
+
+    if(onTabs && tabHighlight < 0)
+        leaving = held & (TAB_A | TAB_B | TAB_DOWN);
 
     // the screen underneath doesn't move or act while the tabs have the highlight
     u32 wii = WPAD_BUTTON_UP | WPAD_BUTTON_DOWN | WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT |
