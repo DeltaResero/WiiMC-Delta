@@ -952,6 +952,16 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
 
         YtList *l = depth > 0 ? lists[depth - 1] : NULL;
 
+        // Without the pointer, the d-pad starts on the first thing to press.
+        // A button just pressed says where the highlight goes itself.
+        GuiButton *first = l ? sc.card[0] : sc.search;
+        bool pressed = false;
+        for (u32 i = 0; i < w.GetSize() && !pressed; i++)
+            pressed = w.GetGuiElementAt(i)->GetState() == STATE_CLICKED;
+        if (!pressed && !userInput[0].wpad->ir.valid && w.GetSelected() < 0 && first->IsVisible() &&
+            first->GetState() == STATE_DEFAULT)
+            first->SetState(STATE_SELECTED);
+
         // thumbnails the worker has ready
         LWP_MutexLock(lock);
         for (int s = 0; s < PAGE; s++)
