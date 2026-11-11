@@ -969,7 +969,6 @@ void SetMPlayerSettings()
     GetExt(loadedFile, ext);
 
     wiiSetVidFull();
-    wiiSetAutoResume(WiiSettings.autoResume);
     wiiSetVolume(WiiSettings.volume);
     wiiSetSeekBackward(WiiSettings.skipBackward);
     wiiSetSeekForward(WiiSettings.skipForward);

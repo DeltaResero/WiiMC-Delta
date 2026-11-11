@@ -5535,7 +5535,6 @@ static void MenuSettingsVideos()
     sprintf(options.name[i++], "Cache Fill");
     sprintf(options.name[i++], "Audio Language");
     sprintf(options.name[i++], "Audio Delay");
-    sprintf(options.name[i++], "Auto-Resume");
     sprintf(options.name[i++], "Auto-Play Next Video");
     sprintf(options.name[i++], "Skip Backward");
     sprintf(options.name[i++], "Skip Forward");
@@ -5662,33 +5661,30 @@ static void MenuSettingsVideos()
                 }
                 break;
             case 7:
-                WiiSettings.autoResume ^= 1;
-                break;
-            case 8:
                 //WiiSettings.autoPlayNextVideo ^= 1;
                 WiiSettings.autoPlayNextVideo++;
                 if (WiiSettings.autoPlayNextVideo > AUTOPLAY_CONTINUOUS)
                     WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
                 break;
-            case 9:
+            case 8:
                 bwSkip++;
                 if(bwSkip == skipNum) bwSkip = 0;
                 WiiSettings.skipBackward = skip[bwSkip];
                 break;
-            case 10:
+            case 9:
                 fwSkip++;
                 if(fwSkip == skipNum) fwSkip = 0;
                 WiiSettings.skipForward = skip[fwSkip];
                 break;
-            case 11:
+            case 10:
                 OnScreenKeyboard(WiiSettings.videosFolder, MAXPATHLEN);
                 CleanupPath(WiiSettings.videosFolder);
                 break;
-            case 12:
+            case 11:
                 WiiSettings.videoFull ^= 1;
                 wiiSetVidFull();
                 break;
-            case 13:
+            case 12:
                 WiiSettings.audioNorm += 1;
                 if (WiiSettings.audioNorm > 2)
                     WiiSettings.audioNorm = 0;
@@ -5697,7 +5693,7 @@ static void MenuSettingsVideos()
                 if (WiiSettings.audioNorm == 0)
                     wiiSetVolNorm0();
                 break;
-            case 14:
+            case 13:
                 WiiSettings.videoDf ^= 1;
                 if (WiiSettings.night == 1) { // turn off night filter
                     nofade_cb();
@@ -5711,7 +5707,7 @@ static void MenuSettingsVideos()
                 else
                     SetDfOff();
                 break;
-            case 15:
+            case 14:
                 WiiSettings.viWidth ^= 1;
                 if(WiiSettings.viWidth == 1)
                     SetVIscale();
@@ -5750,30 +5746,29 @@ static void MenuSettingsVideos()
             sprintf (options.value[4], "%d%%", WiiSettings.cacheFill);
             strcpy(options.value[5], languages[GetLangIndex(WiiSettings.audioLanguage)].language);
             sprintf (options.value[6], "%.1f %s", WiiSettings.audioDelay, gettext("sec"));
-            sprintf (options.value[7], "%s", WiiSettings.autoResume ? "On" : "Off");
-            //sprintf (options.value[8], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
+            //sprintf (options.value[7], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
             switch(WiiSettings.autoPlayNextVideo)
             {
                 case AUTOPLAY_OFF:
-                    sprintf (options.value[8], "Off"); break;
+                    sprintf (options.value[7], "Off"); break;
                 case AUTOPLAY_ON:
-                    sprintf (options.value[8], "Through"); break;
+                    sprintf (options.value[7], "Through"); break;
                 case AUTOPLAY_SHUFFLE:
-                    sprintf (options.value[8], "Shuffle"); break;
+                    sprintf (options.value[7], "Shuffle"); break;
                 case AUTOPLAY_LOOP:
-                    sprintf (options.value[8], "Loop"); break;
+                    sprintf (options.value[7], "Loop"); break;
                 case AUTOPLAY_CONTINUOUS:
-                    sprintf (options.value[8], "Continuous"); break;
+                    sprintf (options.value[7], "Continuous"); break;
             }
 
-            sprintf (options.value[9], "%d %s", WiiSettings.skipBackward, gettext("sec"));
-            sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
-            snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
-            sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
-            sprintf (options.value[13], "%d%%", WiiSettings.audioNorm);
-            sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
-            sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
-            //sprintf (options.value[17], "%d", WiiSettings.videoDelay);
+            sprintf (options.value[8], "%d %s", WiiSettings.skipBackward, gettext("sec"));
+            sprintf (options.value[9], "%d %s", WiiSettings.skipForward, gettext("sec"));
+            snprintf(options.value[10], 60, "%s", WiiSettings.videosFolder);
+            sprintf (options.value[11], "%s", WiiSettings.videoFull ? "On" : "Off");
+            sprintf (options.value[12], "%d%%", WiiSettings.audioNorm);
+            sprintf (options.value[13], "%s", WiiSettings.videoDf ? "On" : "Off");
+            sprintf (options.value[14], "%s", WiiSettings.viWidth ? "On" : "Off");
+            //sprintf (options.value[16], "%d", WiiSettings.videoDelay);
 
             optionBrowser.TriggerUpdate();
         }

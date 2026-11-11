@@ -150,7 +150,6 @@ struct SWiiSettings {
     int     cacheFill;
     char    audioLanguage[3];
     float   audioDelay; // in secs
-    int     autoResume;
     int     autoPlayNextVideo;
     int     skipBackward;
     int     skipForward;

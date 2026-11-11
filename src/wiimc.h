@@ -142,7 +142,6 @@ void wiiSetTiledVar();
 void wiiSetTiledAuto();
 void wiiSetTiledOFF();
 void wiiSetOnlineCacheFill(int fill);
-void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);
 void wiiSetProperty(int cmd, float val);
 void wiiSetCodepage(char *cp);
@@ -150,8 +149,6 @@ void wiiSetAudioLanguage(char *lang);
 void wiiSetSubtitleLanguage(char *lang);
 void wiiSetSubtitleColor(char *color);
 void wiiSetSubtitleSize(float size);
-void wiiLoadRestorePoints(char *buffer, int size);
-char * wiiSaveRestorePoints(char *path);
 
 }
 
