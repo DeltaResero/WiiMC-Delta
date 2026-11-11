@@ -2864,6 +2864,10 @@ static void CreditsWindow()
     {
         usleep(THREAD_SLEEP);
 
+        // without the pointer, A is on the only button there is
+        if(!GuiPointerOn(&userInput[0]) && backBtn.GetState() == STATE_DEFAULT)
+            backBtn.SetState(STATE_SELECTED);
+
         if(backBtn.GetState() == STATE_CLICKED)
             break;
     }
