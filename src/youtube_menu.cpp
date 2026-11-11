@@ -487,8 +487,9 @@ static void Enable(GuiButton *b, bool on)
         b->SetState(STATE_DISABLED);
 }
 
-// after a page turn the d-pad's highlight stays on the button pressed, or
-// moves to the other one when it has gone grey on the first or last page
+// After a button redraws the screen the d-pad's highlight stays on it. A
+// page button that has gone grey on the first or last page hands it to the
+// other one.
 static void KeepPageHighlight(GuiButton *b, GuiButton *other)
 {
     if (GuiPointerOn(&userInput[0]))
@@ -1072,6 +1073,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 sc.filter[f]->ResetState();
                 filterPick[f] = (filterPick[f] + 1) % FilterChoices(f);
                 Show(&sc);
+                KeepPageHighlight(sc.filter[f], sc.filter[f]);
             }
         }
 
@@ -1080,6 +1082,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             sc.source->ResetState();
             YouTubeSetRiiTube(!YouTubeUseRiiTube());
             Show(&sc);
+            KeepPageHighlight(sc.source, sc.source);
         }
 
         if (l && sc.prev->GetState() == STATE_CLICKED)
