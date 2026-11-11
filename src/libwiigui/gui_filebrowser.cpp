@@ -33,7 +33,6 @@ GuiFileBrowser::GuiFileBrowser(int w, int s)
     iconFolderChecked = new GuiImageData(icon_folder_checked_png);
     iconFile = new GuiImageData(icon_file_png);
     iconFileChecked = new GuiImageData(icon_file_checked_png);
-    iconCheck = new GuiImageData(icon_check_png);
     iconPlay = new GuiImageData(icon_play_png);
     iconSD = new GuiImageData(icon_sd_png);
     iconUSB = new GuiImageData(icon_usb_png);
@@ -143,7 +142,6 @@ GuiFileBrowser::~GuiFileBrowser()
     delete iconFolderChecked;
     delete iconFile;
     delete iconFileChecked;
-    delete iconCheck;
     delete iconPlay;
     delete iconSD;
     delete iconUSB;
@@ -516,9 +514,6 @@ void GuiFileBrowser::Update(GuiTrigger * t)
                     case ICON_FILE_CHECKED:
                         fileListIcon[i]->SetImage(iconFileChecked);
                         break;
-                    case ICON_CHECK:
-                        fileListIcon[i]->SetImage(iconCheck);
-                        break;
                     case ICON_PLAY:
                         fileListIcon[i]->SetImage(iconPlay);
                         break;
@@ -549,9 +544,22 @@ void GuiFileBrowser::Update(GuiTrigger * t)
             }
         }
 
-        if(i != selectedItem && fileList[i]->GetState() == STATE_SELECTED)
+        // no row is lit while the highlight is elsewhere: on the tabs, or
+        // under a pointer that is off the list
+        static bool offList = false; // the pointer is on the screen, but not on a row
+        if(t->wpad->ir.valid)
+        {
+            offList = true;
+            for(int j = 0; offList && j < size; j++)
+                offList = !fileList[j]->IsInside(t->wpad->ir.x, t->wpad->ir.y);
+        }
+        else if(!GuiPointerOn(t))
+            offList = false;
+        bool hide = offList || guiHideSelection;
+
+        if((hide || i != selectedItem) && fileList[i]->GetState() == STATE_SELECTED)
             fileList[i]->ResetState();
-        else if(i == selectedItem && fileList[i]->GetState() == STATE_DEFAULT)
+        else if(!hide && i == selectedItem && fileList[i]->GetState() == STATE_DEFAULT)
             fileList[selectedItem]->SetState(STATE_SELECTED, -1);
 
         if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))

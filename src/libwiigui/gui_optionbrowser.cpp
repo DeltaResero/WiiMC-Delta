@@ -390,9 +390,22 @@ void GuiOptionBrowser::Update(GuiTrigger * t)
 
     for(int i=0; i<size; i++)
     {
-        if(i != selectedItem && optionBtn[i]->GetState() == STATE_SELECTED)
+        // no row is lit while the highlight is elsewhere: on the tabs, or
+        // under a pointer that is off the list
+        static bool offList = false; // the pointer is on the screen, but not on a row
+        if(t->wpad->ir.valid)
+        {
+            offList = true;
+            for(int j = 0; offList && j < size; j++)
+                offList = !optionBtn[j]->IsInside(t->wpad->ir.x, t->wpad->ir.y);
+        }
+        else if(!GuiPointerOn(t))
+            offList = false;
+        bool hide = offList || guiHideSelection;
+
+        if((hide || i != selectedItem) && optionBtn[i]->GetState() == STATE_SELECTED)
             optionBtn[i]->ResetState();
-        else if(focus && i == selectedItem && optionBtn[i]->GetState() == STATE_DEFAULT)
+        else if(!hide && focus && i == selectedItem && optionBtn[i]->GetState() == STATE_DEFAULT)
             optionBtn[selectedItem]->SetState(STATE_SELECTED, -1);
 
         if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))

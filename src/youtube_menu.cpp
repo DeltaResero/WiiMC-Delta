@@ -487,11 +487,12 @@ static void Enable(GuiButton *b, bool on)
         b->SetState(STATE_DISABLED);
 }
 
-// after a page turn the d-pad's highlight stays on the button pressed, or
-// moves to the other one when it has gone grey on the first or last page
+// After a button redraws the screen the d-pad's highlight stays on it. A
+// page button that has gone grey on the first or last page hands it to the
+// other one.
 static void KeepPageHighlight(GuiButton *b, GuiButton *other)
 {
-    if (userInput[0].wpad->ir.valid)
+    if (GuiPointerOn(&userInput[0]))
         return; // the pointer has the highlight
 
     if (b->GetState() != STATE_DISABLED)
@@ -936,12 +937,13 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     Show(&sc);
 
     // back from a video: on its card again, for the d-pad
-    if (playedCard >= 0 && depth > 0 && !userInput[0].wpad->ir.valid && sc.card[playedCard]->IsVisible() &&
+    if (playedCard >= 0 && depth > 0 && !GuiPointerOn(&userInput[0]) && sc.card[playedCard]->IsVisible() &&
         sc.card[playedCard]->GetState() != STATE_DISABLED)
         sc.card[playedCard]->SetState(STATE_SELECTED);
     playedCard = -1;
 
     bool done = false;
+    bool scrolling[PAGE] = { false };
     int tabClicks = MenuTabClicks();
 
     // a tab at the top leaves the screen: Online Media for its list, any
@@ -951,6 +953,16 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         usleep(THREAD_SLEEP);
 
         YtList *l = depth > 0 ? lists[depth - 1] : NULL;
+
+        // Without the pointer, the d-pad starts on the first thing to press.
+        // A button just pressed says where the highlight goes itself.
+        GuiButton *first = l ? sc.card[0] : sc.search;
+        bool pressed = false;
+        for (u32 i = 0; i < w.GetSize() && !pressed; i++)
+            pressed = w.GetGuiElementAt(i)->GetState() == STATE_CLICKED;
+        if (!pressed && !GuiPointerOn(&userInput[0]) && !TabHighlighted() && w.GetSelected() < 0 &&
+            first->IsVisible() && first->GetState() == STATE_DEFAULT)
+            first->SetState(STATE_SELECTED);
 
         // thumbnails the worker has ready
         LWP_MutexLock(lock);
@@ -980,9 +992,18 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         }
         LWP_MutexUnlock(lock);
 
-        // the selected card's title scrolls when it doesn't fit
+        // The selected card's title scrolls when it doesn't fit. Drawing
+        // stops for the change: a title drawn as it changes crashes.
         for (int s = 0; s < PAGE; s++)
-            sc.title[s]->SetScroll(sc.card[s]->GetState() == STATE_SELECTED ? SCROLL_HORIZONTAL : SCROLL_NONE);
+        {
+            bool scroll = sc.card[s]->GetState() == STATE_SELECTED;
+            if (scroll == scrolling[s])
+                continue;
+            scrolling[s] = scroll;
+            SuspendGui();
+            sc.title[s]->SetScroll(scroll ? SCROLL_HORIZONTAL : SCROLL_NONE);
+            ResumeGui();
+        }
 
         if (backBtn.GetState() == STATE_CLICKED)
         {
@@ -996,7 +1017,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 Close();
                 Show(&sc);
                 GuiButton *from = by == OPENER_SEARCH ? sc.search : by >= OPENER_CARD ? sc.card[by - OPENER_CARD] : sc.tile[by];
-                if (!userInput[0].wpad->ir.valid && from->IsVisible() && from->GetState() != STATE_DISABLED)
+                if (!GuiPointerOn(&userInput[0]) && from->IsVisible() && from->GetState() != STATE_DISABLED)
                     from->SetState(STATE_SELECTED);
             }
             continue;
@@ -1052,6 +1073,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 sc.filter[f]->ResetState();
                 filterPick[f] = (filterPick[f] + 1) % FilterChoices(f);
                 Show(&sc);
+                KeepPageHighlight(sc.filter[f], sc.filter[f]);
             }
         }
 
@@ -1060,6 +1082,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
             sc.source->ResetState();
             YouTubeSetRiiTube(!YouTubeUseRiiTube());
             Show(&sc);
+            KeepPageHighlight(sc.source, sc.source);
         }
 
         if (l && sc.prev->GetState() == STATE_CLICKED)
@@ -1111,7 +1134,8 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     mainWindow->SetState(STATE_DEFAULT);
     ResumeGui();
 
-    reopen = picked;
+    // Settings lies over the screen, which comes back as it was left
+    reopen = picked || menuCurrent >= MENU_SETTINGS;
 
     for (int s = 0; s < PAGE; s++)
     {

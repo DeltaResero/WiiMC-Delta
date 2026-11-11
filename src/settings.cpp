@@ -364,7 +364,6 @@ prepareSettingsData ()
     createXMLSetting("cacheFill", "Cache Fill %", toStr(WiiSettings.cacheFill));
     createXMLSetting("audioLanguage", "Audio language", WiiSettings.audioLanguage);
     createXMLSetting("audioDelay", "Audio delay", FtoStr(WiiSettings.audioDelay));
-    createXMLSetting("autoResume", "Auto-resume", toStr(WiiSettings.autoResume));
     createXMLSetting("autoPlayNextVideo", "Auto-play next video", toStr(WiiSettings.autoPlayNextVideo));
     createXMLSetting("skipBackward", "Skip backward", toStr(WiiSettings.skipBackward));
     createXMLSetting("skipForward", "Skip forward", toStr(WiiSettings.skipForward));
@@ -794,7 +793,6 @@ void DefaultSettings ()
     WiiSettings.cacheFill = 30;
     WiiSettings.audioLanguage[0] = 0;
     WiiSettings.audioDelay = 0;
-    WiiSettings.autoResume = 1;
     WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
     WiiSettings.skipBackward = 10;
     WiiSettings.skipForward = 30;
@@ -951,8 +949,6 @@ static void FixInvalidSettings()
 
     if(WiiSettings.audioDelay < -2 || WiiSettings.audioDelay > 2)
         WiiSettings.audioDelay = 0;
-    if(WiiSettings.autoResume != 1 && WiiSettings.autoResume != 0)
-        WiiSettings.autoResume = 1;
     if(WiiSettings.autoPlayNextVideo < 0 || WiiSettings.autoPlayNextVideo > AUTOPLAY_CONTINUOUS)
         WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
     if(WiiSettings.skipBackward < 5 || WiiSettings.skipBackward > 1200)
@@ -1196,16 +1192,6 @@ SaveSettings (bool silent)
         strcpy(appPath, filepath); // save successful path
         char * end = strrchr(appPath, '/');
         end[0] = 0; // strip filename
-
-        // save restore points
-        sprintf(filepath,"%s/%s",appPath,"restore_points");
-        char * buff = wiiSaveRestorePoints(filepath);
-
-        if(buff)
-        {
-            SaveFile(buff, filepath, strlen(buff), SILENT);
-            mem2_free(buff, MEM2_OTHER);
-        }
         return true;
     }
 
@@ -1309,7 +1295,6 @@ static bool LoadSettingsFile(char * filepath)
                 loadXMLSetting(&WiiSettings.cacheFill, "cacheFill");
                 loadXMLSetting(WiiSettings.audioLanguage, "audioLanguage", sizeof(WiiSettings.audioLanguage));
                 loadXMLSetting(&WiiSettings.audioDelay, "audioDelay");
-                loadXMLSetting(&WiiSettings.autoResume, "autoResume");
                 loadXMLSetting(&WiiSettings.autoPlayNextVideo, "autoPlayNextVideo");
                 loadXMLSetting(&WiiSettings.skipBackward, "skipBackward");
                 loadXMLSetting(&WiiSettings.skipForward, "skipForward");
@@ -1413,17 +1398,6 @@ bool LoadSettings()
 
         if(WiiSettings.debug == 5)
             WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC);
-
-        sprintf(filepath,"%s/restore_points", appPath);
-        char *buffer = (char *)mem2_malloc(50*1024, MEM2_OTHER);
-
-        if(buffer)
-        {
-            int size = LoadFile(buffer, 50*1024, filepath, SILENT);
-            if(size > 0)
-                wiiLoadRestorePoints(buffer, size);
-            mem2_free(buffer, MEM2_OTHER);
-        }
     }
     else
     {

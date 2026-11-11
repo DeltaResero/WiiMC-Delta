@@ -48,7 +48,6 @@ bool isReload = false;
 u8 iosVal = 58;
 
 extern "C" {
-extern void __exception_setreload(int t);
 extern char *network_useragent;
 extern char *audio_stream; // MPlayer's -audiofile
 }
@@ -969,7 +968,6 @@ void SetMPlayerSettings()
     GetExt(loadedFile, ext);
 
     wiiSetVidFull();
-    wiiSetAutoResume(WiiSettings.autoResume);
     wiiSetVolume(WiiSettings.volume);
     wiiSetSeekBackward(WiiSettings.skipBackward);
     wiiSetSeekForward(WiiSettings.skipForward);
@@ -1165,8 +1163,6 @@ int main(int argc, char *argv[])
     __STM_Init();
     SYS_SetPowerCallback(ShutdownCB);
     SYS_SetResetCallback(ResetCB);
-
-    __exception_setreload(8);
 
     // path sent by the plugin's argument
     if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))

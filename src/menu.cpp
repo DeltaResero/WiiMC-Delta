@@ -412,12 +412,18 @@ static void ChangeMenu(int menu)
     UpdateMenuImages(menuPrevious, menuCurrent);
 }
 
+// the tab that owns what is loaded; anything loaded ends when another opens
+static int playbackTab = -1;
+
 void UndoChangeMenu()
 {
     SaveFolder();
     UpdateMenuImages(menuCurrent, menuPrevious);
     menuCurrent = menuPrevious;
     menuPrevious = menuUndo;
+
+    // a tab that sends the user back hands over what it loaded
+    playbackTab = menuCurrent > MENU_SETTINGS ? MENU_SETTINGS : menuCurrent;
 }
 
 static int menuTabClicks = 0;
@@ -433,10 +439,17 @@ static void ChangeMenu(void *ptr, int menu)
     }
 }
 
-// the tabs at the top: Videos, Music, DVD, Online Media, and Settings
+// the row at the top: Videos, Music, DVD, Online Media, Settings, and the logo
 bool IsMenuTab(GuiElement *e)
 {
-    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn);
+    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn ||
+        e == logoBtn);
+}
+
+// whether the d-pad's highlight is on the row at the top
+bool TabHighlighted()
+{
+    return guiHideSelection;
 }
 
 // how many times a tab was clicked, the current menu's own included
@@ -482,9 +495,14 @@ void SuspendGui()
 
     guiHalt = 1;
 
-    // wait for thread to finish
+    // Wait for the thread to finish its frame. Another thread's ResumeGui
+    // can cancel the request meanwhile, so it is made again on every look.
     while(!LWP_ThreadIsSuspended(guithread))
+    {
+        if(guiHalt == 0)
+            guiHalt = 1;
         usleep(THREAD_SLEEP);
+    }
 }
 
 static u64 reloadTimer = 0;
@@ -1073,16 +1091,26 @@ extern char onlinePLS[];
  *
  * 1, 2, Tab, L, and R move a highlight along the tabs at the top, and so does
  * the d-pad once Up at the top of a screen reaches them. A opens the
- * highlighted tab. B, Down, or A on the tab already open goes back into the
- * screen.
+ * highlighted tab, and the highlight stays on it. B, Down, or A on the tab
+ * already open goes back into the screen. The logo is the last stop along the
+ * row: A on it shows the credits.
+ *
+ * Only one thing is highlighted at a time. The screen below shows no
+ * highlight while a tab has it, and the pointer takes it from the tabs
+ * whenever it is on the screen. 1 and 2 then change the tab at once.
  ***************************************************************************/
 
+#define TAB_LOGO 1000 // the logo's place in the row, after the last menu
+
 static int tabHighlight = -1; // the menu whose tab is highlighted, or -1
+
+static void ResumeCreditsThread();
 
 static GuiButton *TabButton(int menu)
 {
     switch(menu)
     {
+        case TAB_LOGO:                  return logoBtn;
         case MENU_BROWSE_VIDEOS:        return videosBtn;
         case MENU_BROWSE_MUSIC:         return musicBtn;
         case MENU_DVD:                  return dvdBtn;
@@ -1096,15 +1124,50 @@ static int CurrentTab()
     return menuCurrent > MENU_SETTINGS ? MENU_SETTINGS : menuCurrent;
 }
 
+/****************************************************************************
+ * StopLoadedFile
+ *
+ * Ends the song that is playing or the video that was stopped. Each tab
+ * keeps its own player, so this runs when another tab opens. It also runs
+ * when a video is stopped, where keepPlace leaves the file's name for the
+ * list to put the highlight back on it.
+ ***************************************************************************/
+static void StopLoadedFile(bool keepPlace = false)
+{
+    if(!wiiIsPlaying())
+        return;
+
+    StopMPlayerFile();
+    while(controlledbygui == 2) // wait for the file to end
+        usleep(THREAD_SLEEP);
+
+    if(!keepPlace)
+    {
+        loadedFile[0] = 0;
+        loadedFileDisplay[0] = 0;
+    }
+
+    for(BROWSERENTRY *i = browser.first; keepPlace && i; i = i->next)
+        if(i->icon == ICON_PLAY)
+            i->icon = ICON_NONE;
+
+    DisableVideoImg();
+    nowPlaying->SetVisible(false);
+
+    for(int i = 1; i < 4; i++)
+        audiobarNowPlaying[i]->SetText(NULL);
+}
+
 static int NextTab(int menu, int dir)
 {
+    if(menu == TAB_LOGO)
+        return dir > 0 ? MENU_BROWSE_VIDEOS : MENU_SETTINGS;
+
     menu += dir;
     if(menu == MENU_DVD && WiiSettings.dvdDisabled)
         menu += dir;
-    if(menu > MENU_SETTINGS)
-        menu = MENU_BROWSE_VIDEOS;
-    if(menu < MENU_BROWSE_VIDEOS)
-        menu = MENU_SETTINGS;
+    if(menu > MENU_SETTINGS || menu < MENU_BROWSE_VIDEOS)
+        menu = TAB_LOGO;
     return menu;
 }
 
@@ -1147,6 +1210,7 @@ static void TabBarInput()
     GuiTrigger *t = &userInput[0];
     static int lastMenu = -1;
     static int heldBefore = 0;
+    static int leaving = 0; // the buttons still held from leaving the tabs
     static u64 holdStart = 0, lastStep = 0;
 
     TabBarShowButtons();
@@ -1172,12 +1236,17 @@ static void TabBarInput()
         lastStep = now;
     }
     heldBefore = held;
+    leaving &= held;
+
+    // the credits take the whole screen, and every button with it
+    if(mainWindow != menuWindow)
+        return;
 
     guiUpMoved = false;
     guiUpAtTop = false;
 
     // a tab picked with the pointer, or a menu change from elsewhere
-    if(tabHighlight >= 0 && menuCurrent != lastMenu)
+    if(tabHighlight >= 0 && menuCurrent != lastMenu && tabHighlight != CurrentTab())
         HighlightTab(-1);
     lastMenu = menuCurrent;
 
@@ -1191,43 +1260,57 @@ static void TabBarInput()
     else if(down & TAB_PREV)
         dir = -1;
 
+    // the pointer owns the highlight while it is on the screen
+    if(GuiPointerOn(t))
+    {
+        HighlightTab(-1);
+        int menu = NextTab(CurrentTab(), dir);
+        if(menu == TAB_LOGO)
+            menu = NextTab(menu, dir);
+        if(dir && screensaverThreadHalt != 0)
+            ChangeMenu(menu);
+        return;
+    }
+
     if(dir)
     {
         HighlightTab(NextTab(tabHighlight >= 0 ? tabHighlight : CurrentTab(), dir));
         return;
     }
 
-    if(tabHighlight < 0)
+    if(tabHighlight < 0 && !leaving)
         return;
 
-    if(down & TAB_RIGHT)
+    bool onTabs = tabHighlight >= 0;
+
+    if(!onTabs)
+    {
+        // The button that left the tabs is still held. The screen would
+        // take it for a held d-pad and move on at once.
+    }
+    else if(down & TAB_RIGHT)
         HighlightTab(NextTab(tabHighlight, 1));
     else if(down & TAB_LEFT)
         HighlightTab(NextTab(tabHighlight, -1));
     else if(down & TAB_A)
     {
-        // A with the pointer on a tab is a click on that tab
-        if(t->wpad->ir.valid && (videosBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            musicBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            (dvdBtn->IsVisible() && dvdBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)) ||
-            onlineBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            settingsBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)))
-        {
-            HighlightTab(-1);
-            return;
-        }
-
-        int menu = tabHighlight;
-        HighlightTab(-1);
-
+        // The highlight stays on a tab that A opens, and on the logo. A on
+        // the tab already open goes into its screen.
         // GC controller can crash if screensaver is active.
-        if(menu != CurrentTab() && screensaverThreadHalt != 0)
-            ChangeMenu(menu);
+        if(tabHighlight == TAB_LOGO)
+            ResumeCreditsThread();
+        else if(tabHighlight != CurrentTab() && screensaverThreadHalt != 0)
+            ChangeMenu(tabHighlight);
+        else
+            HighlightTab(-1);
     }
     else if(down & (TAB_B | TAB_DOWN))
     {
         HighlightTab(-1);
     }
+
+    if(onTabs && tabHighlight < 0)
+        leaving = held & (TAB_A | TAB_B | TAB_DOWN);
 
     // the screen underneath doesn't move or act while the tabs have the highlight
     u32 wii = WPAD_BUTTON_UP | WPAD_BUTTON_DOWN | WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT |
@@ -1262,18 +1345,48 @@ static void TabBarAfterInput()
 
     TabBarShowButtons();
 
+    if(mainWindow != menuWindow)
+    {
+        guiHideSelection = false;
+        return;
+    }
+
+    // The logo has no lit picture of its own, so it grows a little under
+    // the pointer or the d-pad's highlight.
+    static bool pointerOnLogo = false;
+    if(t->wpad->ir.valid)
+        pointerOnLogo = logoBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y);
+    else if(!GuiPointerOn(t))
+        pointerOnLogo = false;
+    logoBtnImg->SetScale(tabHighlight == TAB_LOGO || pointerOnLogo ? 1.12f : 1.0f);
+
+    guiHideSelection = tabHighlight >= 0 && mainWindow->GetState() != STATE_DISABLED;
+
     if(mainWindow->GetState() == STATE_DISABLED)
         return;
 
     if(tabHighlight >= 0)
     {
-        // the pointer passing over a tab clears its highlight
         if(TabButton(tabHighlight)->GetState() == STATE_DEFAULT)
             TabButton(tabHighlight)->SetState(STATE_SELECTED);
+
+        // nothing on the screen below stays highlighted
+        for(u32 i = 0; i < mainWindow->GetSize(); i++)
+        {
+            GuiElement *e = mainWindow->GetGuiElementAt(i);
+            if(IsMenuTab(e))
+                continue;
+            if(e->GetState() == STATE_SELECTED)
+                e->ResetState();
+            GuiWindow *w = dynamic_cast<GuiWindow *>(e);
+            int sel = w ? w->GetSelected() : -1;
+            if(sel >= 0)
+                w->GetGuiElementAt(sel)->ResetState();
+        }
         return;
     }
 
-    if(guiUpAtTop && !guiUpMoved && !t->wpad->ir.valid &&
+    if(guiUpAtTop && !guiUpMoved && !GuiPointerOn(t) &&
         PadDown(t, WPAD_BUTTON_UP | WPAD_CLASSIC_BUTTON_UP, PAD_BUTTON_UP, CTR_BUTTON_UP))
         HighlightTab(CurrentTab());
 }
@@ -1352,8 +1465,6 @@ static void *GuiThread (void *arg)
 
             //! render everything
             mainWindow->Draw();
-
-        TabBarAfterInput();
 
             u32 xfb_offset = (((vmode->fbWidth * VI_DISPLAY_PIX_SZ) * (vmode->xfbHeight / 2)) * y) + ((half_wh * VI_DISPLAY_PIX_SZ) * x);
             GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
@@ -2756,6 +2867,10 @@ static void CreditsWindow()
     {
         usleep(THREAD_SLEEP);
 
+        // without the pointer, A is on the only button there is
+        if(!GuiPointerOn(&userInput[0]) && backBtn.GetState() == STATE_DEFAULT)
+            backBtn.SetState(STATE_SELECTED);
+
         if(backBtn.GetState() == STATE_CLICKED)
             break;
     }
@@ -3571,6 +3686,7 @@ static int LoadNewFile()
 
     ResetVideos();
     DisableVideoImg();
+    wiiWantPicture(menuCurrent == MENU_BROWSE_VIDEOS);
     LoadMPlayerFile();
     artFirst = true; // For radio stream
 
@@ -4251,7 +4367,7 @@ static void MenuBrowse(int menu)
                     {
                         char aux[1024];
                         GetFullPath(browser.selIndex, aux);
-                        if(strcmp(loadedFile, aux) == 0)
+                        if(wiiIsPlaying() && strcmp(loadedFile, aux) == 0)
                         {
                             ResumeMPlayerFile();
                             // wait until MPlayer is ready to take control (or return control)
@@ -4678,7 +4794,66 @@ done:
 
 static void MenuDVD()
 {
+    // A disc that was played is not loaded again when its video stops. The
+    // tab then waits with a Play button, and the other tabs stay in reach.
+    static bool played = false;
+
     ResumeGui();
+
+    if(played)
+    {
+        played = false;
+
+        GuiText playBtnTxt("Play", 18, (GXColor){255, 255, 255, 255});
+        playBtnTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+        playBtnTxt.SetPosition(-6, 10);
+        GuiImage playBtnImg(btnBottom);
+        GuiImage playBtnImgOver(btnBottomOver);
+        if(screenwidth > 640) {
+            playBtnImg.SetScaleX(1.112f);
+            playBtnImgOver.SetScaleX(1.112f);
+        }
+        GuiImage playBtnArrow(arrowRightSmall);
+        playBtnArrow.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+        playBtnArrow.SetPosition(playBtnTxt.GetTextWidth()/2 + 6, 11);
+        GuiButton playBtn(screenwidth, btnBottom->GetHeight());
+        playBtn.SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+        playBtn.SetPosition(0, 0);
+        playBtn.SetLabel(&playBtnTxt);
+        playBtn.SetImage(&playBtnImg);
+        playBtn.SetImageOver(&playBtnImgOver);
+        playBtn.SetIcon(&playBtnArrow);
+        playBtn.SetTrigger(trigA);
+
+        // in a window of its own, so that Up from the button reaches the tabs
+        GuiWindow w(screenwidth, screenheight);
+        w.Append(&playBtn);
+
+        SuspendGui();
+        mainWindow->Append(&w);
+        mainWindow->ChangeFocus(&w);
+        ResumeGui();
+
+        while(menuCurrent == MENU_DVD && !guiShutdown && playBtn.GetState() != STATE_CLICKED)
+        {
+            usleep(THREAD_SLEEP);
+
+            // without the pointer, A is on the only button there is
+            if(!GuiPointerOn(&userInput[0]) && !TabHighlighted() && playBtn.GetState() == STATE_DEFAULT)
+                playBtn.SetState(STATE_SELECTED);
+        }
+
+        bool play = playBtn.GetState() == STATE_CLICKED;
+
+        SuspendGui();
+        mainWindow->Remove(&w);
+
+        if(!play)
+            return;
+
+        ResumeGui();
+    }
+
     int device = -1;
 
     if(USBStorage_IsDVD())
@@ -4701,89 +4876,42 @@ static void MenuDVD()
         return;
     }
 
-    if(!wiiPlayingDVD())
+    if(WiiSettings.dvdMenu == 0)
+        sprintf(loadedFile, "dvdnav://");
+    else
+        sprintf(loadedFile, "dvd://"); // e.g. 2|start-end, not working.
+
+    if (device == DEVICE_DVD)
+        sprintf(loadedDevice, "/dev/di");
+    else
+        sprintf(loadedDevice, "/dev/usb");
+
+    sprintf(loadedFileDisplay, "DVD");
+    mainWindow->SetState(STATE_DISABLED);
+    mainWindow->Append(disabled);
+    ShowAction("Loading...");
+    ResetVideos();
+    DisableVideoImg();
+    LoadMPlayerFile();
+
+    // wait until MPlayer is ready to take or return control
+    while(!guiShutdown && controlledbygui != 1)
+        usleep(THREAD_SLEEP);
+
+    CancelAction();
+    SuspendGui();
+
+    if(!guiShutdown) // load failed
     {
-        if(WiiSettings.dvdMenu == 0)
-            sprintf(loadedFile, "dvdnav://");
-        else
-            sprintf(loadedFile, "dvd://"); // e.g. 2|start-end, not working.
-
-        if (device == DEVICE_DVD)
-            sprintf(loadedDevice, "/dev/di");
-        else
-            sprintf(loadedDevice, "/dev/usb");
-
-        sprintf(loadedFileDisplay, "DVD");
-        mainWindow->SetState(STATE_DISABLED);
-        mainWindow->Append(disabled);
-        ShowAction("Loading...");
-        ResetVideos();
-        DisableVideoImg();
-        LoadMPlayerFile();
-
-        // wait until MPlayer is ready to take or return control
-        while(!guiShutdown && controlledbygui != 1)
-            usleep(THREAD_SLEEP);
-
-        CancelAction();
-        SuspendGui();
-
-        if(!guiShutdown) // load failed
-        {
-            if(menuPrevious == MENU_DVD)
-                menuPrevious = MENU_BROWSE_VIDEOS;
-            UndoChangeMenu(); // go back to last menu
-            mainWindow->Remove(disabled);
-            mainWindow->SetState(STATE_DEFAULT);
-            ErrorPrompt("Unrecognized DVD format!");
-        }
+        if(menuPrevious == MENU_DVD)
+            menuPrevious = MENU_BROWSE_VIDEOS;
+        UndoChangeMenu(); // go back to last menu
+        mainWindow->Remove(disabled);
+        mainWindow->SetState(STATE_DEFAULT);
+        ErrorPrompt("Unrecognized DVD format!");
     }
     else
-    {
-        GuiText backBtnTxt("Resume", 18, (GXColor){255, 255, 255, 255});
-        backBtnTxt.SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-        backBtnTxt.SetPosition(-74, 10);
-        GuiImage backBtnImg(btnBottom);
-        GuiImage backBtnImgOver(btnBottomOver);
-        if(screenwidth > 640) {
-            backBtnImg.SetScaleX(1.112f);
-            backBtnImgOver.SetScaleX(1.112f);
-        }
-        GuiImage backBtnArrow(arrowRightSmall);
-        backBtnArrow.SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-        backBtnArrow.SetPosition(-54, 11);
-        GuiButton backBtn(screenwidth, btnBottom->GetHeight());
-        backBtn.SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
-        backBtn.SetPosition(0, 0);
-        backBtn.SetLabel(&backBtnTxt);
-        backBtn.SetImage(&backBtnImg);
-        backBtn.SetImageOver(&backBtnImgOver);
-        backBtn.SetIcon(&backBtnArrow);
-        backBtn.SetTrigger(trigA);
-
-        SuspendGui();
-        mainWindow->Append(&backBtn);
-        ResumeGui();
-
-        while(menuCurrent == MENU_DVD && !guiShutdown)
-        {
-            if(backBtn.GetState() == STATE_CLICKED)
-            {
-                backBtn.ResetState();
-                ResumeMPlayerFile(); // go back to MPlayer
-
-                // wait until MPlayer is ready to take control (or return control)
-                while(!guiShutdown && controlledbygui != 1)
-                    usleep(THREAD_SLEEP);
-
-                break;
-            }
-            usleep(THREAD_SLEEP);
-        }
-        CancelAction();
-        SuspendGui();
-        mainWindow->Remove(&backBtn);
-    }
+        played = true;
 }
 
 static void MenuSettingsGlobal()
@@ -5494,7 +5622,6 @@ static void MenuSettingsVideos()
     sprintf(options.name[i++], "Cache Fill");
     sprintf(options.name[i++], "Audio Language");
     sprintf(options.name[i++], "Audio Delay");
-    sprintf(options.name[i++], "Auto-Resume");
     sprintf(options.name[i++], "Auto-Play Next Video");
     sprintf(options.name[i++], "Skip Backward");
     sprintf(options.name[i++], "Skip Forward");
@@ -5621,33 +5748,30 @@ static void MenuSettingsVideos()
                 }
                 break;
             case 7:
-                WiiSettings.autoResume ^= 1;
-                break;
-            case 8:
                 //WiiSettings.autoPlayNextVideo ^= 1;
                 WiiSettings.autoPlayNextVideo++;
                 if (WiiSettings.autoPlayNextVideo > AUTOPLAY_CONTINUOUS)
                     WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
                 break;
-            case 9:
+            case 8:
                 bwSkip++;
                 if(bwSkip == skipNum) bwSkip = 0;
                 WiiSettings.skipBackward = skip[bwSkip];
                 break;
-            case 10:
+            case 9:
                 fwSkip++;
                 if(fwSkip == skipNum) fwSkip = 0;
                 WiiSettings.skipForward = skip[fwSkip];
                 break;
-            case 11:
+            case 10:
                 OnScreenKeyboard(WiiSettings.videosFolder, MAXPATHLEN);
                 CleanupPath(WiiSettings.videosFolder);
                 break;
-            case 12:
+            case 11:
                 WiiSettings.videoFull ^= 1;
                 wiiSetVidFull();
                 break;
-            case 13:
+            case 12:
                 WiiSettings.audioNorm += 1;
                 if (WiiSettings.audioNorm > 2)
                     WiiSettings.audioNorm = 0;
@@ -5656,7 +5780,7 @@ static void MenuSettingsVideos()
                 if (WiiSettings.audioNorm == 0)
                     wiiSetVolNorm0();
                 break;
-            case 14:
+            case 13:
                 WiiSettings.videoDf ^= 1;
                 if (WiiSettings.night == 1) { // turn off night filter
                     nofade_cb();
@@ -5670,7 +5794,7 @@ static void MenuSettingsVideos()
                 else
                     SetDfOff();
                 break;
-            case 15:
+            case 14:
                 WiiSettings.viWidth ^= 1;
                 if(WiiSettings.viWidth == 1)
                     SetVIscale();
@@ -5709,30 +5833,29 @@ static void MenuSettingsVideos()
             sprintf (options.value[4], "%d%%", WiiSettings.cacheFill);
             strcpy(options.value[5], languages[GetLangIndex(WiiSettings.audioLanguage)].language);
             sprintf (options.value[6], "%.1f %s", WiiSettings.audioDelay, gettext("sec"));
-            sprintf (options.value[7], "%s", WiiSettings.autoResume ? "On" : "Off");
-            //sprintf (options.value[8], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
+            //sprintf (options.value[7], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
             switch(WiiSettings.autoPlayNextVideo)
             {
                 case AUTOPLAY_OFF:
-                    sprintf (options.value[8], "Off"); break;
+                    sprintf (options.value[7], "Off"); break;
                 case AUTOPLAY_ON:
-                    sprintf (options.value[8], "Through"); break;
+                    sprintf (options.value[7], "Through"); break;
                 case AUTOPLAY_SHUFFLE:
-                    sprintf (options.value[8], "Shuffle"); break;
+                    sprintf (options.value[7], "Shuffle"); break;
                 case AUTOPLAY_LOOP:
-                    sprintf (options.value[8], "Loop"); break;
+                    sprintf (options.value[7], "Loop"); break;
                 case AUTOPLAY_CONTINUOUS:
-                    sprintf (options.value[8], "Continuous"); break;
+                    sprintf (options.value[7], "Continuous"); break;
             }
 
-            sprintf (options.value[9], "%d %s", WiiSettings.skipBackward, gettext("sec"));
-            sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
-            snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
-            sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
-            sprintf (options.value[13], "%d%%", WiiSettings.audioNorm);
-            sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
-            sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
-            //sprintf (options.value[17], "%d", WiiSettings.videoDelay);
+            sprintf (options.value[8], "%d %s", WiiSettings.skipBackward, gettext("sec"));
+            sprintf (options.value[9], "%d %s", WiiSettings.skipForward, gettext("sec"));
+            snprintf(options.value[10], 60, "%s", WiiSettings.videosFolder);
+            sprintf (options.value[11], "%s", WiiSettings.videoFull ? "On" : "Off");
+            sprintf (options.value[12], "%d%%", WiiSettings.audioNorm);
+            sprintf (options.value[13], "%s", WiiSettings.videoDf ? "On" : "Off");
+            sprintf (options.value[14], "%s", WiiSettings.viWidth ? "On" : "Off");
+            //sprintf (options.value[16], "%d", WiiSettings.videoDelay);
 
             optionBrowser.TriggerUpdate();
         }
@@ -9074,6 +9197,10 @@ void WiiMenu()
 
     selectLoadedFile = videoImg->IsVisible();
 
+    // A stopped video is not kept loaded, as the menus need its memory.
+    if(!wiiAudioOnly())
+        StopLoadedFile(true);
+
     StartGuiThreads();
     EnableRumble();
 
@@ -9156,6 +9283,14 @@ void WiiMenu()
 
     while(!guiShutdown)
     {
+        // Settings lies over the tab it was opened from, and ends nothing
+        if(CurrentTab() != MENU_SETTINGS && CurrentTab() != playbackTab)
+        {
+            if(playbackTab != -1)
+                StopLoadedFile();
+            playbackTab = CurrentTab();
+        }
+
         switch (menuCurrent)
         {
             case MENU_BROWSE_VIDEOS:

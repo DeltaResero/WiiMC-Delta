@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -187,9 +188,6 @@ void reinit_audio();
 void load_builtin_codecs();
 static void low_cache_loop(void);
 static float timing_sleep(float time_frame);
-static void delete_restore_point(char *_filename, char *_partitionlabel);
-static void save_restore_point(char *_filename, char *_partitionlabel);
-static int load_restore_point(char *_filename, char *_partitionlabel);
 static void remove_subtitles();
 static void reload_subtitles();
 
@@ -206,9 +204,7 @@ unsigned timerFadeBlack = 0; // not an actual fade.
 
 char fileplaying[MAXPATHLEN];
 static char *partitionlabel=NULL;
-static char partitionlabelplaying[50];
 
-static int enable_restore_points=1;
 static int end_film_error=0;
 
 static float online_stream_cache_min_percent=20;
@@ -216,6 +212,7 @@ static float orig_stream_cache_min_percent=-1;
 static float orig_stream_cache_seek_min_percent=-1;
 static int orig_stream_cache_size=-1;
 static bool playing_file=false;
+static bool picture_wanted=false; // a file whose picture can't be shown is refused
 static bool audio_file_loaded=false; // MPlayer gave the GUI control back to play audio
 static int force_frame_dropping=-1;
 #endif
@@ -3988,8 +3985,6 @@ audio_delay=0;
 #ifdef GEKKO
   // a YouTube link runs past MAXPATHLEN; only its start is ever looked at
   snprintf(fileplaying, sizeof(fileplaying), "%s", filename);
-  strncpy(partitionlabelplaying, partitionlabel, sizeof(partitionlabelplaying));
-  partitionlabelplaying[sizeof(partitionlabelplaying)-1] = '\0';
 #endif
 
 #ifdef CONFIG_GUI
@@ -4292,12 +4287,36 @@ stream_cache_min_percent=0.2;
     mpctx->sh_audio = mpctx->d_audio->sh;
     mpctx->sh_video = mpctx->d_video->sh;
 
+#ifdef GEKKO
+    unsigned int picture_format = mpctx->sh_video ? mpctx->sh_video->format : 0;
+#endif
+
     if (mpctx->sh_video) {
         current_module = "video_read_properties";
         reinit_video_chain();
     }
 
 #ifdef GEKKO
+    // The file has a picture that no decoder here can show. Say so rather
+    // than play the sound alone, where the caller asked for the picture.
+    if (picture_wanted && picture_format && !mpctx->sh_video && !wii_error) {
+        char name[8];
+        int i;
+        for (i = 0; i < 4; i++) {
+            name[i] = toupper((picture_format >> (8 * i)) & 0xff);
+            if (!isalnum((unsigned char)name[i]))
+                break;
+        }
+        name[i] = 0;
+        if (!strcmp(name, "AV01"))
+            strcpy(name, "AV1");
+        snprintf(wii_error_text, sizeof(wii_error_text),
+                 i == 4 ? "%s video unsupported" : "Video format unsupported%s",
+                 i == 4 ? name : "");
+        wii_error = 2;
+        goto goto_next_file;
+    }
+
     // WiiMC's FFmpeg leaves out some bit depths to save space (see
     // FF_VP9_8_10BIT_ONLY and FF_HEVC_8_10BIT_ONLY). The probe already tried
     // the video, so stop here rather than play the sound without a picture.
@@ -4536,12 +4555,6 @@ if (mpctx->sh_video)
                 if(wii_start_pos > 0 && wii_start_pos + 5 < demuxer_get_time_length(mpctx->demuxer))
                         seek_to_sec = wii_start_pos;
                 wii_start_pos = 0;
-        }
-        else if(strncmp(fileplaying,"dvd:",4) != 0 && strncmp(fileplaying,"dvdnav:",7) != 0)
-        {
-                seek_to_sec = load_restore_point(fileplaying, partitionlabelplaying) - 8;
-                if(seek_to_sec < 0 || seek_to_sec+120 > demuxer_get_time_length(mpctx->demuxer))
-                        seek_to_sec = 0;
         }
 
 //OSD is not used
@@ -5121,7 +5134,6 @@ sync_interlace = 0;
 //if (controlledbygui == 0) // If using 576p it causes the TV to display info each time a video has ended.
   //   VIDEO_SetBlack(TRUE);
 DisableVideoImg();
-save_restore_point(fileplaying, partitionlabelplaying);
 end_film_error=stream_error(mpctx->stream);
 printf("mplayer: end film. UNINIT. err: %i\n",stream_error(mpctx->stream));
 
@@ -5228,119 +5240,6 @@ goto play_next_file;
  ***************************************************************************/
 #include <ogc/system.h>
 #include <ogc/lwp_watchdog.h>
-
-#define MAX_RESTORE_POINTS 50
-
-typedef struct st_restore_points restore_points_t;
-struct st_restore_points {
-    char filename[MAXPATHLEN];
-    char partitionlabel[50];
-    bool hasPartitionlabel;
-    int position;
-};
-
-restore_points_t restore_points[MAX_RESTORE_POINTS];
-
-static bool match_restore_point(int i, char *_filename, char *_partitionlabel)
-{
-    if (i >= MAX_RESTORE_POINTS)
-        return false;
-
-    if (strcmp(_filename,restore_points[i].filename)==0 &&
-        (!restore_points[i].hasPartitionlabel || strcmp(_partitionlabel,restore_points[i].partitionlabel)==0) )
-        return true;
-    else
-        return false;
-}
-
-static void delete_restore_point(char *_filename, char *_partitionlabel)
-{
-        int i;
-        if(!enable_restore_points)
-                return;
-
-        for(i=0;i<MAX_RESTORE_POINTS;i++)
-        {
-                if(restore_points[i].filename[0] == '\0')
-                        continue;
-
-                if(match_restore_point(i, _filename, _partitionlabel))
-                {
-                        restore_points[i].position=0;
-                        restore_points[i].filename[0]='\0';
-                        restore_points[i].partitionlabel[0]='\0';
-                        restore_points[i].hasPartitionlabel=false;
-                }
-        }
-}
-
-static void save_restore_point(char *_filename, char *_partitionlabel)
-{
-        int i;
-
-        if(!enable_restore_points || strlen(_filename) == 0)
-                return;
-
-        if(!mpctx->demuxer || !mpctx->sh_video)
-                return;
-
-        if(     strncmp(_filename,"dvd:",4) == 0 ||
-                strncmp(_filename,"dvdnav:",7) == 0 ||
-                strncmp(_filename,"http:",5) == 0 ||
-                strncmp(_filename,"https:",6) == 0 ||
-                strncmp(_filename,"mms:",4) == 0)
-                return;
-
-        int position = wiiTimeFromStart(wiiPlayTime());
-
-        if(position <= 8 || !( mpctx->demuxer->seekable))
-        {
-                delete_restore_point(_filename, _partitionlabel);
-                return;
-        }
-
-        for(i=0;i<MAX_RESTORE_POINTS;i++)
-        {
-                if(restore_points[i].filename[0] == '\0' || match_restore_point(i, _filename, _partitionlabel))
-                {
-                        restore_points[i].position=position;
-                        strcpy(restore_points[i].filename,_filename);
-                        strcpy(restore_points[i].partitionlabel,_partitionlabel);
-                        restore_points[i].hasPartitionlabel=true;
-                        return;
-                }
-        }
-
-        // no space found - make room by deleting oldest
-        for(i=0; i<MAX_RESTORE_POINTS-1; i++)
-        {
-                strcpy(restore_points[i].filename,restore_points[i+1].filename);
-                strcpy(restore_points[i].partitionlabel,restore_points[i+1].partitionlabel);
-                restore_points[i].position=restore_points[i+1].position;
-                restore_points[i].hasPartitionlabel=restore_points[i+1].hasPartitionlabel;
-        }
-        restore_points[i].position=position;
-        strcpy(restore_points[i].filename,_filename);
-        strcpy(restore_points[i].partitionlabel,_partitionlabel);
-        restore_points[i].hasPartitionlabel=true;
-}
-
-static int load_restore_point(char *_filename, char *_partitionlabel)
-{
-        int i;
-        if(!enable_restore_points)
-                return 0;
-
-        for(i=0; i<MAX_RESTORE_POINTS; i++)
-        {
-                if(restore_points[i].filename[0] == '\0')
-                        continue;
-
-                if(match_restore_point(i, _filename, _partitionlabel))
-                        return restore_points[i].position;
-        }
-        return 0;
-}
 
 int mpctx_get_set_of_sub_size()
 {
@@ -5524,9 +5423,6 @@ void PauseAndGotoGUI()
 
         if (mpctx->video_out && mpctx->sh_video && vo_config_count)
                 mpctx->video_out->control(VOCTRL_PAUSE, NULL);
-
-        if(mpctx->sh_video)
-                save_restore_point(fileplaying, partitionlabelplaying);
 
         // The cache thread suspends itself between reads. One stuck waiting
         // on a stream that stopped sending can't, and the menu waited for it
@@ -6192,6 +6088,12 @@ void wiiSetDVDDevice(char * dev)
         dvd_device = strdup(dev);
 }
 
+// whether the next files must show their picture to be played at all
+void wiiWantPicture(bool wanted)
+{
+        picture_wanted = wanted;
+}
+
 // true once MPlayer has handed control back to the GUI to play an audio-only
 // file; unlike wiiAudioOnly(), this stays true after a short file has ended
 bool wiiAudioFileLoaded()
@@ -6301,17 +6203,6 @@ typedef struct {
   unsigned int     state;
 } dvdnav_priv_t;
 
-bool wiiPlayingDVD()
-{
-        if(!playing_file || !mpctx->stream)
-                return false;
-
-        if (mpctx->stream->type == STREAMTYPE_DVD || mpctx->stream->type == STREAMTYPE_DVDNAV)
-                return true;
-
-        return false;
-}
-
 bool wiiInDVDMenu()
 {
         if(!playing_file || controlledbygui != 0)
@@ -6395,11 +6286,6 @@ void wiiSetOnlineCacheFill(int fill)
         // only change fill for online streams
         if(filename && (strncmp(filename,"http:",5) == 0 || strncmp(filename,"https:",6) == 0 || strncmp(filename,"mms:",5) == 0))
                 stream_cache_min_percent = fill;
-}
-
-void wiiSetAutoResume(int enable)
-{
-        enable_restore_points = enable;
 }
 
 void wiiSetVolume(int vol)
@@ -6612,131 +6498,6 @@ void wiiSetSubtitleSize(float size)
         //force_load_font = 1;
 #endif
         vo_osd_changed(OSDTYPE_SUBTITLE);
-}
-
-bool wiiFindRestorePoint(char *filename, char *partitionlabel)
-{
-        int i;
-        char *aux_partitionlabel;
-        static char szEmptyStr[] = "";
-
-        if(!filename)
-                return false;
-
-        aux_partitionlabel = (partitionlabel) ? partitionlabel : szEmptyStr;
-
-        for(i=0; i<MAX_RESTORE_POINTS; i++)
-            if (match_restore_point(i, filename, aux_partitionlabel))
-                        return true;
-        return false;
-}
-
-void wiiLoadRestorePoints(char *buffer, int size)
-{
-        int n, c, i = 0, lineptr = 0, fields;
-        char *line = NULL, *pc;
-
-        for(i=0; i<MAX_RESTORE_POINTS; i++)
-        {
-                restore_points[i].filename[0]='\0';
-                restore_points[i].partitionlabel[0]='\0';
-                restore_points[i].position=0;
-                restore_points[i].hasPartitionlabel=false;
-        }
-
-        i=0;
-
-        while(lineptr < size && i < MAX_RESTORE_POINTS)
-        {
-                // setup next line
-                if(line)
-                {
-                        free(line);
-                        line=NULL;
-                }
-                c = 0;
-                while(lineptr+c <= size)
-                {
-                        if(lineptr+c == size || buffer[lineptr+c] == '\n')
-                        {
-                                if(c == 0)
-                                        break;
-
-                                line = strndup(&buffer[lineptr], c);
-
-                                if(!line)
-                                        break;
-
-                                if(line[c-1] == '\r') line[c-1] = 0;
-                                break;
-                        }
-                        c++;
-                }
-
-                lineptr += c+1;
-
-                if(!line)
-                        continue;
-
-                pc = line;
-                fields = 1;
-                while (*pc) {
-                    if (*pc == '\t') {
-                        fields++;
-                    }
-                    pc++;
-                }
-                if (fields == 2) {
-                    // "old" format: <filename>\t<position>
-                    n = sscanf(line,"%[^\t]\t%i", restore_points[i].filename, &(restore_points[i].position));
-                    if (n!=2)
-                        continue;
-                    restore_points[i].partitionlabel[0] = '\0';
-                    restore_points[i].hasPartitionlabel = false;
-                } else if (fields == 3) {
-                    // "new" format: <filename>\t<position>\t<partitionlabel>
-                        n = sscanf(line,"%[^\t]\t%i%*[\t]%[^\n]", restore_points[i].filename, &(restore_points[i].position), restore_points[i].partitionlabel);
-                if (n!=3) {
-                    // empty patitionlabel
-                        restore_points[i].partitionlabel[0] = '\0';
-                    n = sscanf(line,"%[^\t]\t%i\t", restore_points[i].filename, &(restore_points[i].position));
-                if (n!=2)
-                        continue;
-                }
-                    restore_points[i].hasPartitionlabel = true;
-                } else {
-                    // malformed restore point
-                    continue;
-                }
-                i++;
-        }
-        if(line) free(line);
-}
-
-char * wiiSaveRestorePoints(char * path)
-{
-        int i;
-        char tmppath[MAXPATHLEN+100];
-        char *buff = mem2_malloc(MAX_RESTORE_POINTS*1024 + 1024, MEM2_OTHER);
-
-        if(!buff)
-                return NULL;
-
-        buff[0] = 0;
-
-        for(i=0; i<MAX_RESTORE_POINTS; i++)
-        {
-                if(restore_points[i].filename[0]=='\0')
-                        continue;
-
-        if (restore_points[i].hasPartitionlabel)
-                    sprintf(tmppath,"%s\t%i\t%s\n", restore_points[i].filename, restore_points[i].position, restore_points[i].partitionlabel);
-                else
-                    sprintf(tmppath,"%s\t%i\n", restore_points[i].filename, restore_points[i].position);
-
-                strcat(buff,tmppath);
-        }
-        return buff;
 }
 
 #endif

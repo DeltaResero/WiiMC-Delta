@@ -84,6 +84,15 @@ extern FreeTypeGX *fontSystemBold[];
 extern bool guiUpMoved;
 extern bool guiUpAtTop;
 
+// The highlight is somewhere outside the lists, so they show none of their
+// own. Only one thing on the screen is highlighted at a time.
+extern bool guiHideSelection;
+
+// Whether the pointer is in use. Its signal drops out for a moment now and
+// then, so it still counts until half a second has passed without it.
+class GuiTrigger;
+bool GuiPointerOn(GuiTrigger *t);
+
 typedef void (*UpdateCallback)(void * e);
 
 enum
@@ -1176,7 +1185,6 @@ class GuiFileBrowser : public GuiElement
         GuiImageData * iconFolderChecked;
         GuiImageData * iconFile;
         GuiImageData * iconFileChecked;
-        GuiImageData * iconCheck;
         GuiImageData * iconPlay;
         GuiImageData * iconSD;
         GuiImageData * iconUSB;

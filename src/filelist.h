@@ -121,7 +121,6 @@
 #include "icon_folder_checked_png.h"
 #include "icon_file_png.h"
 #include "icon_file_checked_png.h"
-#include "icon_check_png.h"
 #include "icon_sd_png.h"
 #include "icon_usb_png.h"
 #include "icon_dvd_png.h"

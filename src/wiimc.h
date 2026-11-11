@@ -89,13 +89,13 @@ void wiiGetFPS(char *buf);
 void wiiSetDVDDevice(char *dev);
 bool wiiAudioOnly();
 bool wiiAudioFileLoaded();
+void wiiWantPicture(bool wanted);
 char * wiiGetMetaTitle();
 char * wiiGetMetaArtist();
 char * wiiGetMetaAlbum();
 char * wiiGetMetaYear();
 void wiiDVDNav(int cmd);
 void wiiUpdatePointer(int x, int y);
-bool wiiPlayingDVD();
 bool wiiInDVDMenu();
 void wiiSetCacheFill(int fill);
 void wiiSetVolNorm();
@@ -141,7 +141,6 @@ void wiiSetTiledVar();
 void wiiSetTiledAuto();
 void wiiSetTiledOFF();
 void wiiSetOnlineCacheFill(int fill);
-void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);
 void wiiSetProperty(int cmd, float val);
 void wiiSetCodepage(char *cp);
@@ -149,9 +148,6 @@ void wiiSetAudioLanguage(char *lang);
 void wiiSetSubtitleLanguage(char *lang);
 void wiiSetSubtitleColor(char *color);
 void wiiSetSubtitleSize(float size);
-bool wiiFindRestorePoint(char *filename, char *partitionlabel);
-void wiiLoadRestorePoints(char *buffer, int size);
-char * wiiSaveRestorePoints(char *path);
 
 }
 

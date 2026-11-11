@@ -370,6 +370,19 @@ void GuiWindow::MoveSelectionHor(int dir)
 
 bool guiUpMoved = false;
 bool guiUpAtTop = false;
+bool guiHideSelection = false;
+
+bool GuiPointerOn(GuiTrigger *t)
+{
+    static u64 seen = 0;
+
+    if(t->wpad->ir.valid)
+    {
+        seen = gettime();
+        return true;
+    }
+    return seen && diff_usec(seen, gettime()) < 500000;
+}
 
 bool GuiWindow::MoveSelectionVert(int dir)
 {

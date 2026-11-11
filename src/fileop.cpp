@@ -1798,7 +1798,8 @@ void FindFile()
     // move to this file
     if(indexFound > 0)
     {
-        entry->icon = ICON_PLAY;
+        if(wiiIsPlaying())
+            entry->icon = ICON_PLAY;
         foundArt = true;
 
         if(!selectLoadedFile) // only move to the file when first returning from the video
@@ -1979,15 +1980,7 @@ static bool ParseDirEntries()
 
                 f_entry->icon = ICON_NONE;
 
-                if(menuCurrent == MENU_BROWSE_VIDEOS)
-                {
-                    // check if this file was watched
-                    GetFullPath(f_entry, entry->d_name);
-                    char *partitionlabel = GetPartitionLabel(entry->d_name);
-                    if(wiiFindRestorePoint(entry->d_name, partitionlabel))
-                        f_entry->icon = ICON_CHECK;
-                }
-                else if(menuCurrent == MENU_BROWSE_MUSIC)
+                if(menuCurrent == MENU_BROWSE_MUSIC)
                 {
                     // check if this file is in the playlist
                     if(MusicPlaylistFind(f_entry))
