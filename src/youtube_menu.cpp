@@ -1121,7 +1121,8 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     mainWindow->SetState(STATE_DEFAULT);
     ResumeGui();
 
-    reopen = picked;
+    // Settings lies over the screen, which comes back as it was left
+    reopen = picked || menuCurrent >= MENU_SETTINGS;
 
     for (int s = 0; s < PAGE; s++)
     {
