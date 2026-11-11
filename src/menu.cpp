@@ -1461,8 +1461,6 @@ static void *GuiThread (void *arg)
             //! render everything
             mainWindow->Draw();
 
-        TabBarAfterInput();
-
             u32 xfb_offset = (((vmode->fbWidth * VI_DISPLAY_PIX_SZ) * (vmode->xfbHeight / 2)) * y) + ((half_wh * VI_DISPLAY_PIX_SZ) * x);
             GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
         }
