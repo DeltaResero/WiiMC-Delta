@@ -9196,7 +9196,8 @@ void WiiMenu()
 
     while(!guiShutdown)
     {
-        if(CurrentTab() != playbackTab)
+        // Settings lies over the tab it was opened from, and ends nothing
+        if(CurrentTab() != MENU_SETTINGS && CurrentTab() != playbackTab)
         {
             if(playbackTab != -1)
                 StopLoadedFile();
