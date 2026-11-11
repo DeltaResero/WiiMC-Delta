@@ -4794,7 +4794,66 @@ done:
 
 static void MenuDVD()
 {
+    // A disc that was played is not loaded again when its video stops. The
+    // tab then waits with a Play button, and the other tabs stay in reach.
+    static bool played = false;
+
     ResumeGui();
+
+    if(played)
+    {
+        played = false;
+
+        GuiText playBtnTxt("Play", 18, (GXColor){255, 255, 255, 255});
+        playBtnTxt.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+        playBtnTxt.SetPosition(-6, 10);
+        GuiImage playBtnImg(btnBottom);
+        GuiImage playBtnImgOver(btnBottomOver);
+        if(screenwidth > 640) {
+            playBtnImg.SetScaleX(1.112f);
+            playBtnImgOver.SetScaleX(1.112f);
+        }
+        GuiImage playBtnArrow(arrowRightSmall);
+        playBtnArrow.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
+        playBtnArrow.SetPosition(playBtnTxt.GetTextWidth()/2 + 6, 11);
+        GuiButton playBtn(screenwidth, btnBottom->GetHeight());
+        playBtn.SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+        playBtn.SetPosition(0, 0);
+        playBtn.SetLabel(&playBtnTxt);
+        playBtn.SetImage(&playBtnImg);
+        playBtn.SetImageOver(&playBtnImgOver);
+        playBtn.SetIcon(&playBtnArrow);
+        playBtn.SetTrigger(trigA);
+
+        // in a window of its own, so that Up from the button reaches the tabs
+        GuiWindow w(screenwidth, screenheight);
+        w.Append(&playBtn);
+
+        SuspendGui();
+        mainWindow->Append(&w);
+        mainWindow->ChangeFocus(&w);
+        ResumeGui();
+
+        while(menuCurrent == MENU_DVD && !guiShutdown && playBtn.GetState() != STATE_CLICKED)
+        {
+            usleep(THREAD_SLEEP);
+
+            // without the pointer, A is on the only button there is
+            if(!GuiPointerOn(&userInput[0]) && !TabHighlighted() && playBtn.GetState() == STATE_DEFAULT)
+                playBtn.SetState(STATE_SELECTED);
+        }
+
+        bool play = playBtn.GetState() == STATE_CLICKED;
+
+        SuspendGui();
+        mainWindow->Remove(&w);
+
+        if(!play)
+            return;
+
+        ResumeGui();
+    }
+
     int device = -1;
 
     if(USBStorage_IsDVD())
@@ -4817,89 +4876,42 @@ static void MenuDVD()
         return;
     }
 
-    if(!wiiPlayingDVD())
+    if(WiiSettings.dvdMenu == 0)
+        sprintf(loadedFile, "dvdnav://");
+    else
+        sprintf(loadedFile, "dvd://"); // e.g. 2|start-end, not working.
+
+    if (device == DEVICE_DVD)
+        sprintf(loadedDevice, "/dev/di");
+    else
+        sprintf(loadedDevice, "/dev/usb");
+
+    sprintf(loadedFileDisplay, "DVD");
+    mainWindow->SetState(STATE_DISABLED);
+    mainWindow->Append(disabled);
+    ShowAction("Loading...");
+    ResetVideos();
+    DisableVideoImg();
+    LoadMPlayerFile();
+
+    // wait until MPlayer is ready to take or return control
+    while(!guiShutdown && controlledbygui != 1)
+        usleep(THREAD_SLEEP);
+
+    CancelAction();
+    SuspendGui();
+
+    if(!guiShutdown) // load failed
     {
-        if(WiiSettings.dvdMenu == 0)
-            sprintf(loadedFile, "dvdnav://");
-        else
-            sprintf(loadedFile, "dvd://"); // e.g. 2|start-end, not working.
-
-        if (device == DEVICE_DVD)
-            sprintf(loadedDevice, "/dev/di");
-        else
-            sprintf(loadedDevice, "/dev/usb");
-
-        sprintf(loadedFileDisplay, "DVD");
-        mainWindow->SetState(STATE_DISABLED);
-        mainWindow->Append(disabled);
-        ShowAction("Loading...");
-        ResetVideos();
-        DisableVideoImg();
-        LoadMPlayerFile();
-
-        // wait until MPlayer is ready to take or return control
-        while(!guiShutdown && controlledbygui != 1)
-            usleep(THREAD_SLEEP);
-
-        CancelAction();
-        SuspendGui();
-
-        if(!guiShutdown) // load failed
-        {
-            if(menuPrevious == MENU_DVD)
-                menuPrevious = MENU_BROWSE_VIDEOS;
-            UndoChangeMenu(); // go back to last menu
-            mainWindow->Remove(disabled);
-            mainWindow->SetState(STATE_DEFAULT);
-            ErrorPrompt("Unrecognized DVD format!");
-        }
+        if(menuPrevious == MENU_DVD)
+            menuPrevious = MENU_BROWSE_VIDEOS;
+        UndoChangeMenu(); // go back to last menu
+        mainWindow->Remove(disabled);
+        mainWindow->SetState(STATE_DEFAULT);
+        ErrorPrompt("Unrecognized DVD format!");
     }
     else
-    {
-        GuiText backBtnTxt("Resume", 18, (GXColor){255, 255, 255, 255});
-        backBtnTxt.SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-        backBtnTxt.SetPosition(-74, 10);
-        GuiImage backBtnImg(btnBottom);
-        GuiImage backBtnImgOver(btnBottomOver);
-        if(screenwidth > 640) {
-            backBtnImg.SetScaleX(1.112f);
-            backBtnImgOver.SetScaleX(1.112f);
-        }
-        GuiImage backBtnArrow(arrowRightSmall);
-        backBtnArrow.SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-        backBtnArrow.SetPosition(-54, 11);
-        GuiButton backBtn(screenwidth, btnBottom->GetHeight());
-        backBtn.SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
-        backBtn.SetPosition(0, 0);
-        backBtn.SetLabel(&backBtnTxt);
-        backBtn.SetImage(&backBtnImg);
-        backBtn.SetImageOver(&backBtnImgOver);
-        backBtn.SetIcon(&backBtnArrow);
-        backBtn.SetTrigger(trigA);
-
-        SuspendGui();
-        mainWindow->Append(&backBtn);
-        ResumeGui();
-
-        while(menuCurrent == MENU_DVD && !guiShutdown)
-        {
-            if(backBtn.GetState() == STATE_CLICKED)
-            {
-                backBtn.ResetState();
-                ResumeMPlayerFile(); // go back to MPlayer
-
-                // wait until MPlayer is ready to take control (or return control)
-                while(!guiShutdown && controlledbygui != 1)
-                    usleep(THREAD_SLEEP);
-
-                break;
-            }
-            usleep(THREAD_SLEEP);
-        }
-        CancelAction();
-        SuspendGui();
-        mainWindow->Remove(&backBtn);
-    }
+        played = true;
 }
 
 static void MenuSettingsGlobal()

@@ -6203,17 +6203,6 @@ typedef struct {
   unsigned int     state;
 } dvdnav_priv_t;
 
-bool wiiPlayingDVD()
-{
-        if(!playing_file || !mpctx->stream)
-                return false;
-
-        if (mpctx->stream->type == STREAMTYPE_DVD || mpctx->stream->type == STREAMTYPE_DVDNAV)
-                return true;
-
-        return false;
-}
-
 bool wiiInDVDMenu()
 {
         if(!playing_file || controlledbygui != 0)
