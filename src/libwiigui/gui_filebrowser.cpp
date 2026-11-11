@@ -544,9 +544,22 @@ void GuiFileBrowser::Update(GuiTrigger * t)
             }
         }
 
-        if(i != selectedItem && fileList[i]->GetState() == STATE_SELECTED)
+        // no row is lit while the highlight is elsewhere: on the tabs, or
+        // under a pointer that is off the list
+        static bool offList = false; // the pointer is on the screen, but not on a row
+        if(t->wpad->ir.valid)
+        {
+            offList = true;
+            for(int j = 0; offList && j < size; j++)
+                offList = !fileList[j]->IsInside(t->wpad->ir.x, t->wpad->ir.y);
+        }
+        else if(!GuiPointerOn(t))
+            offList = false;
+        bool hide = offList || guiHideSelection;
+
+        if((hide || i != selectedItem) && fileList[i]->GetState() == STATE_SELECTED)
             fileList[i]->ResetState();
-        else if(i == selectedItem && fileList[i]->GetState() == STATE_DEFAULT)
+        else if(!hide && i == selectedItem && fileList[i]->GetState() == STATE_DEFAULT)
             fileList[selectedItem]->SetState(STATE_SELECTED, -1);
 
         if(!(t->wpad->btns_h & WPAD_BUTTON_DOWN) && !(t->wpad->btns_h & WPAD_BUTTON_UP))

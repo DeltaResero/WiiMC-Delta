@@ -46,6 +46,7 @@ void VideoSettingsSelect();
 void VideoSettingsBack();
 void UndoChangeMenu();
 bool IsMenuTab(GuiElement *e);
+bool TabHighlighted();
 int MenuTabClicks();
 void UpdateBrowser();
 

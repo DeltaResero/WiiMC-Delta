@@ -445,6 +445,12 @@ bool IsMenuTab(GuiElement *e)
     return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn);
 }
 
+// whether the d-pad's highlight is on the row at the top
+bool TabHighlighted()
+{
+    return guiHideSelection;
+}
+
 // how many times a tab was clicked, the current menu's own included
 int MenuTabClicks()
 {
@@ -1082,6 +1088,10 @@ extern char onlinePLS[];
  * highlighted tab, and the highlight stays on it. B, Down, or A on the tab
  * already open goes back into the screen. The logo is the last stop along the
  * row: A on it shows the credits.
+ *
+ * Only one thing is highlighted at a time. The screen below shows no
+ * highlight while a tab has it, and the pointer takes it from the tabs
+ * whenever it is on the screen. 1 and 2 then change the tab at once.
  ***************************************************************************/
 
 #define TAB_LOGO 1000 // the logo's place in the row, after the last menu
@@ -1242,6 +1252,18 @@ static void TabBarInput()
     else if(down & TAB_PREV)
         dir = -1;
 
+    // the pointer owns the highlight while it is on the screen
+    if(GuiPointerOn(t))
+    {
+        HighlightTab(-1);
+        int menu = NextTab(CurrentTab(), dir);
+        if(menu == TAB_LOGO)
+            menu = NextTab(menu, dir);
+        if(dir && screensaverThreadHalt != 0)
+            ChangeMenu(menu);
+        return;
+    }
+
     if(dir)
     {
         HighlightTab(NextTab(tabHighlight >= 0 ? tabHighlight : CurrentTab(), dir));
@@ -1257,17 +1279,6 @@ static void TabBarInput()
         HighlightTab(NextTab(tabHighlight, -1));
     else if(down & TAB_A)
     {
-        // A with the pointer on a tab is a click on that tab
-        if(t->wpad->ir.valid && (videosBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            musicBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            (dvdBtn->IsVisible() && dvdBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)) ||
-            onlineBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y) ||
-            settingsBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y)))
-        {
-            HighlightTab(-1);
-            return;
-        }
-
         // The highlight stays on a tab that A opens, and on the logo. A on
         // the tab already open goes into its screen.
         // GC controller can crash if screensaver is active.
@@ -1317,26 +1328,47 @@ static void TabBarAfterInput()
     TabBarShowButtons();
 
     if(mainWindow != menuWindow)
+    {
+        guiHideSelection = false;
         return;
+    }
 
     // The logo has no lit picture of its own, so it grows a little under
     // the pointer or the d-pad's highlight.
-    bool onLogo = tabHighlight == TAB_LOGO ||
-        (t->wpad->ir.valid && logoBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y));
-    logoBtnImg->SetScale(onLogo ? 1.12f : 1.0f);
+    static bool pointerOnLogo = false;
+    if(t->wpad->ir.valid)
+        pointerOnLogo = logoBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y);
+    else if(!GuiPointerOn(t))
+        pointerOnLogo = false;
+    logoBtnImg->SetScale(tabHighlight == TAB_LOGO || pointerOnLogo ? 1.12f : 1.0f);
+
+    guiHideSelection = tabHighlight >= 0 && mainWindow->GetState() != STATE_DISABLED;
 
     if(mainWindow->GetState() == STATE_DISABLED)
         return;
 
     if(tabHighlight >= 0)
     {
-        // the pointer passing over a tab clears its highlight
         if(TabButton(tabHighlight)->GetState() == STATE_DEFAULT)
             TabButton(tabHighlight)->SetState(STATE_SELECTED);
+
+        // nothing on the screen below stays highlighted
+        for(u32 i = 0; i < mainWindow->GetSize(); i++)
+        {
+            GuiElement *e = mainWindow->GetGuiElementAt(i);
+            if(IsMenuTab(e) || e == logoBtn)
+                continue;
+            if(e->GetState() == STATE_SELECTED)
+                e->ResetState();
+            GuiWindow *w = dynamic_cast<GuiWindow *>(e);
+            int sel = w ? w->GetSelected() : -1;
+            if(sel >= 0)
+                w->GetGuiElementAt(sel)->ResetState();
+        }
         return;
     }
 
-    if(guiUpAtTop && !guiUpMoved && !t->wpad->ir.valid &&
+    if(guiUpAtTop && !guiUpMoved && !GuiPointerOn(t) &&
         PadDown(t, WPAD_BUTTON_UP | WPAD_CLASSIC_BUTTON_UP, PAD_BUTTON_UP, CTR_BUTTON_UP))
         HighlightTab(CurrentTab());
 }

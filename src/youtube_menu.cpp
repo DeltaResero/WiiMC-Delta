@@ -491,7 +491,7 @@ static void Enable(GuiButton *b, bool on)
 // moves to the other one when it has gone grey on the first or last page
 static void KeepPageHighlight(GuiButton *b, GuiButton *other)
 {
-    if (userInput[0].wpad->ir.valid)
+    if (GuiPointerOn(&userInput[0]))
         return; // the pointer has the highlight
 
     if (b->GetState() != STATE_DISABLED)
@@ -936,7 +936,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     Show(&sc);
 
     // back from a video: on its card again, for the d-pad
-    if (playedCard >= 0 && depth > 0 && !userInput[0].wpad->ir.valid && sc.card[playedCard]->IsVisible() &&
+    if (playedCard >= 0 && depth > 0 && !GuiPointerOn(&userInput[0]) && sc.card[playedCard]->IsVisible() &&
         sc.card[playedCard]->GetState() != STATE_DISABLED)
         sc.card[playedCard]->SetState(STATE_SELECTED);
     playedCard = -1;
@@ -958,8 +958,8 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         bool pressed = false;
         for (u32 i = 0; i < w.GetSize() && !pressed; i++)
             pressed = w.GetGuiElementAt(i)->GetState() == STATE_CLICKED;
-        if (!pressed && !userInput[0].wpad->ir.valid && w.GetSelected() < 0 && first->IsVisible() &&
-            first->GetState() == STATE_DEFAULT)
+        if (!pressed && !GuiPointerOn(&userInput[0]) && !TabHighlighted() && w.GetSelected() < 0 &&
+            first->IsVisible() && first->GetState() == STATE_DEFAULT)
             first->SetState(STATE_SELECTED);
 
         // thumbnails the worker has ready
@@ -1006,7 +1006,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
                 Close();
                 Show(&sc);
                 GuiButton *from = by == OPENER_SEARCH ? sc.search : by >= OPENER_CARD ? sc.card[by - OPENER_CARD] : sc.tile[by];
-                if (!userInput[0].wpad->ir.valid && from->IsVisible() && from->GetState() != STATE_DISABLED)
+                if (!GuiPointerOn(&userInput[0]) && from->IsVisible() && from->GetState() != STATE_DISABLED)
                     from->SetState(STATE_SELECTED);
             }
             continue;
