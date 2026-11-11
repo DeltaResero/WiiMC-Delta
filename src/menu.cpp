@@ -1080,15 +1080,20 @@ extern char onlinePLS[];
  * 1, 2, Tab, L, and R move a highlight along the tabs at the top, and so does
  * the d-pad once Up at the top of a screen reaches them. A opens the
  * highlighted tab. B, Down, or A on the tab already open goes back into the
- * screen.
+ * screen. The logo is the last stop along the row: A on it shows the credits.
  ***************************************************************************/
 
+#define TAB_LOGO 1000 // the logo's place in the row, after the last menu
+
 static int tabHighlight = -1; // the menu whose tab is highlighted, or -1
+
+static void ResumeCreditsThread();
 
 static GuiButton *TabButton(int menu)
 {
     switch(menu)
     {
+        case TAB_LOGO:                  return logoBtn;
         case MENU_BROWSE_VIDEOS:        return videosBtn;
         case MENU_BROWSE_MUSIC:         return musicBtn;
         case MENU_DVD:                  return dvdBtn;
@@ -1138,13 +1143,14 @@ static void StopLoadedFile(bool keepPlace = false)
 
 static int NextTab(int menu, int dir)
 {
+    if(menu == TAB_LOGO)
+        return dir > 0 ? MENU_BROWSE_VIDEOS : MENU_SETTINGS;
+
     menu += dir;
     if(menu == MENU_DVD && WiiSettings.dvdDisabled)
         menu += dir;
-    if(menu > MENU_SETTINGS)
-        menu = MENU_BROWSE_VIDEOS;
-    if(menu < MENU_BROWSE_VIDEOS)
-        menu = MENU_SETTINGS;
+    if(menu > MENU_SETTINGS || menu < MENU_BROWSE_VIDEOS)
+        menu = TAB_LOGO;
     return menu;
 }
 
@@ -1213,6 +1219,10 @@ static void TabBarInput()
     }
     heldBefore = held;
 
+    // the credits take the whole screen, and every button with it
+    if(mainWindow != menuWindow)
+        return;
+
     guiUpMoved = false;
     guiUpAtTop = false;
 
@@ -1261,7 +1271,9 @@ static void TabBarInput()
         HighlightTab(-1);
 
         // GC controller can crash if screensaver is active.
-        if(menu != CurrentTab() && screensaverThreadHalt != 0)
+        if(menu == TAB_LOGO)
+            ResumeCreditsThread();
+        else if(menu != CurrentTab() && screensaverThreadHalt != 0)
             ChangeMenu(menu);
     }
     else if(down & (TAB_B | TAB_DOWN))
@@ -1301,6 +1313,15 @@ static void TabBarAfterInput()
     GuiTrigger *t = &userInput[0];
 
     TabBarShowButtons();
+
+    if(mainWindow != menuWindow)
+        return;
+
+    // The logo has no lit picture of its own, so it grows a little under
+    // the pointer or the d-pad's highlight.
+    bool onLogo = tabHighlight == TAB_LOGO ||
+        (t->wpad->ir.valid && logoBtn->IsInside(t->wpad->ir.x, t->wpad->ir.y));
+    logoBtnImg->SetScale(onLogo ? 1.12f : 1.0f);
 
     if(mainWindow->GetState() == STATE_DISABLED)
         return;
