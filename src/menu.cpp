@@ -495,9 +495,14 @@ void SuspendGui()
 
     guiHalt = 1;
 
-    // wait for thread to finish
+    // Wait for the thread to finish its frame. Another thread's ResumeGui
+    // can cancel the request meanwhile, so it is made again on every look.
     while(!LWP_ThreadIsSuspended(guithread))
+    {
+        if(guiHalt == 0)
+            guiHalt = 1;
         usleep(THREAD_SLEEP);
+    }
 }
 
 static u64 reloadTimer = 0;
