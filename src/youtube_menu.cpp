@@ -942,6 +942,7 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
     playedCard = -1;
 
     bool done = false;
+    bool scrolling[PAGE] = { false };
     int tabClicks = MenuTabClicks();
 
     // a tab at the top leaves the screen: Online Media for its list, any
@@ -990,9 +991,18 @@ bool YouTubeScreen(char *url, size_t urlsize, char *title, size_t titlesize)
         }
         LWP_MutexUnlock(lock);
 
-        // the selected card's title scrolls when it doesn't fit
+        // The selected card's title scrolls when it doesn't fit. Drawing
+        // stops for the change: a title drawn as it changes crashes.
         for (int s = 0; s < PAGE; s++)
-            sc.title[s]->SetScroll(sc.card[s]->GetState() == STATE_SELECTED ? SCROLL_HORIZONTAL : SCROLL_NONE);
+        {
+            bool scroll = sc.card[s]->GetState() == STATE_SELECTED;
+            if (scroll == scrolling[s])
+                continue;
+            scrolling[s] = scroll;
+            SuspendGui();
+            sc.title[s]->SetScroll(scroll ? SCROLL_HORIZONTAL : SCROLL_NONE);
+            ResumeGui();
+        }
 
         if (backBtn.GetState() == STATE_CLICKED)
         {
