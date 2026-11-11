@@ -439,10 +439,11 @@ static void ChangeMenu(void *ptr, int menu)
     }
 }
 
-// the tabs at the top: Videos, Music, DVD, Online Media, and Settings
+// the row at the top: Videos, Music, DVD, Online Media, Settings, and the logo
 bool IsMenuTab(GuiElement *e)
 {
-    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn);
+    return e && (e == videosBtn || e == musicBtn || e == dvdBtn || e == onlineBtn || e == settingsBtn ||
+        e == logoBtn);
 }
 
 // whether the d-pad's highlight is on the row at the top
@@ -1356,7 +1357,7 @@ static void TabBarAfterInput()
         for(u32 i = 0; i < mainWindow->GetSize(); i++)
         {
             GuiElement *e = mainWindow->GetGuiElementAt(i);
-            if(IsMenuTab(e) || e == logoBtn)
+            if(IsMenuTab(e))
                 continue;
             if(e->GetState() == STATE_SELECTED)
                 e->ResetState();
